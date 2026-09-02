@@ -1,0 +1,210 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "DirectAssignRuleTarget",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/directAssignmentRules/{ruleId}/targets/{targetId}" : {
+      "get" : {
+        "tags" : [ "DirectAssignRuleTarget" ],
+        "summary" : "Get Direct Assignment Rule Target",
+        "description" : "Retrieves a specific target in a direct assignment rule",
+        "operationId" : "getDARTarget",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "targetId",
+          "description" : "Unique ID of the target",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "ruleId",
+          "description" : "Unique ID of the direct assignment rule",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/targetJson"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.automations.READ", "Desk.settings.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "fieldConditionsArr" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "./Criteria.json#/components/schemas/automationCriteriaResponse"
+        }
+      },
+      "criteriaJson" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "fieldConditions" : {
+            "description" : "Field conditions configured for the target criteria",
+            "$ref" : "#/components/schemas/fieldConditionsArr"
+          },
+          "pattern" : {
+            "description" : "Pattern used to evaluate the field conditions",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "[andor()0-9\\s]*"
+          }
+        },
+        "required" : [ "fieldConditions", "pattern" ]
+      },
+      "targetJson" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "agentId" : {
+            "description" : "Unique ID of the agent assigned in the target",
+            "type" : [ "string", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "targetId" : {
+            "description" : "Unique ID of the target",
+            "type" : [ "string" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "criteria" : {
+            "description" : "Criteria configured for the target",
+            "$ref" : "#/components/schemas/criteriaJson"
+          },
+          "teamId" : {
+            "description" : "Unique ID of the team assigned in the target",
+            "type" : [ "string", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "fromDepartmentId" : {
+            "description" : "Unique ID of the source department of the target. Null when the rule applies to tickets from any department.",
+            "type" : [ "string", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "toDepartmentId" : {
+            "description" : "Unique ID of the target department",
+            "type" : [ "string" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        },
+        "required" : [ "criteria", "fromDepartmentId", "targetId", "toDepartmentId" ]
+      },
+      "targetList" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/targetJson"
+        }
+      }
+    },
+    "responses" : {
+      "targetJson" : {
+        "description" : "targetJson template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "agentId" : {
+                  "description" : "Unique ID of the agent assigned in the target",
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "targetId" : {
+                  "description" : "Unique ID of the target",
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "criteria" : {
+                  "description" : "Criteria configured for the target",
+                  "$ref" : "#/components/schemas/criteriaJson"
+                },
+                "teamId" : {
+                  "description" : "Unique ID of the team assigned in the target",
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "fromDepartmentId" : {
+                  "description" : "Unique ID of the source department of the target",
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "toDepartmentId" : {
+                  "description" : "Unique ID of the target department",
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                }
+              },
+              "required" : [ "criteria", "fromDepartmentId", "targetId", "toDepartmentId" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "targetId" : 4000000009530,
+                  "criteria" : {
+                    "fieldConditions" : [ {
+                      "condition" : "is open",
+                      "fieldName" : "Priority",
+                      "fieldModule" : "tickets",
+                      "value" : [ "Low" ]
+                    } ],
+                    "pattern" : "(1)"
+                  },
+                  "teamId" : 4000000008730,
+                  "fromDepartmentId" : 4000000007745,
+                  "toDepartmentId" : 4000000008900
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "DirectAssignRuleTarget"
+}

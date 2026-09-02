@@ -8,20 +8,23 @@
   "components" : {
     "schemas" : {
       "inputParamPayloadJson" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "picklistValues" : {
-            "type" : [ "null", "array" ],
+            "type" : [ "array", "null" ],
             "items" : {
-              "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0,
-              "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+              "type" : [ "object" ],
+              "additionalProperties" : true
             },
             "uniqueItems" : false
           },
           "apiName" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "i18nLabel" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
@@ -33,20 +36,16 @@
           },
           "origin" : {
             "type" : [ "string", "null" ],
-            "enum" : [ "STATIC", "DYNAMIC" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "STATIC", "DYNAMIC" ]
           },
           "length" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           },
           "type" : {
             "type" : [ "string", "null" ],
-            "enum" : [ "STRING", "NUMBER", "DECIMAL", "PICKLIST", "URL", "MULTIPICKLIST", "ARRAY", "OBJECT", "LOOKUP", "BOOLEAN", "TEXT" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "STRING", "NUMBER", "DECIMAL", "PICKLIST", "URL", "MULTIPICKLIST", "ARRAY", "OBJECT", "LOOKUP", "BOOLEAN", "TEXT" ]
           },
           "isEncrypted" : {
             "type" : [ "boolean", "null" ]
@@ -58,22 +57,18 @@
           },
           "uiType" : {
             "type" : [ "string", "null" ],
-            "enum" : [ "Text", "Number", "Percent", "Decimal", "Currency", "Date", "DateTime", "Email", "Phone", "Picklist", "URL", "Textarea", "Boolean", "Multiselect", "AutoNumber", "LookUp", "Fax", "Formula", "Hidden", "MultiLookup", "PrimaryIdentifier", "Expression", "Collection", "RichPlainText", "FileUpload", "LargeText", "Long", "Watchfields", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "Text", "Number", "Percent", "Decimal", "Currency", "Date", "DateTime", "Email", "Phone", "Picklist", "URL", "Textarea", "Boolean", "Multiselect", "AutoNumber", "LookUp", "Fax", "Formula", "Hidden", "MultiLookup", "PrimaryIdentifier", "Expression", "Collection", "RichPlainText", "FileUpload", "LargeText", "Long", "Watchfields", "null" ]
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "hooks" : {
-            "type" : [ "null", "array" ],
+            "type" : [ "array", "null" ],
             "items" : {
-              "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0,
-              "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+              "type" : [ "object" ],
+              "additionalProperties" : true
             },
             "uniqueItems" : false
           },
@@ -85,21 +80,37 @@
             "type" : [ "boolean", "null" ]
           },
           "order" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
+          },
+          "targetTemplateName" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 200,
+            "description" : "Target Template Name of the param upon which event is triggered"
+          },
+          "version" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "description" : "The version of the parameter. Only needed if the param is dynamic."
           }
         },
         "required" : [ "apiName", "hooks", "id", "isEncrypted", "isMandatory", "length", "name", "order", "origin", "picklistValues", "placeHolderContext", "type", "uiType", "value" ]
       },
       "inputParamPayloadJsonArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./GenericActionMapping.json#/components/schemas/inputParamPayloadJson"
+          "$ref" : "#/components/schemas/inputParamPayloadJson"
         }
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

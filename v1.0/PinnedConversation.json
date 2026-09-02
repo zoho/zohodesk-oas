@@ -11,8 +11,19 @@
         "summary" : "Unpin a ticket's pin",
         "description" : "This API deletes one or more pins from a ticket.",
         "operationId" : "unPinConversations",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/ticketId"
+          "name" : "ticketId",
+          "in" : "path",
+          "description" : "Unique ID of the ticket from which pins must be fetched",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -39,26 +50,49 @@
         "summary" : "Get pins of a ticket",
         "description" : "This API fetches the list of pins of a particular ticket.",
         "operationId" : "getPinnedConversations",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "types",
           "in" : "query",
-          "description" : "The type of pins to fetch as a comma separated list. The allowed values are @comments@ and @threads@",
+          "description" : "Type of pins to fetch. Possible values: comments, threads. Multiple values can be provided by separating them with commas.",
           "required" : false,
-          "style" : "simple",
-          "explode" : true,
+          "style" : "form",
+          "explode" : false,
           "schema" : {
-            "type" : [ "null", "array" ],
-            "description" : "The type of pins to fetch as a comma separated list. The allowed values are @comments@ and @threads@",
+            "type" : [ "array" ],
             "items" : {
-              "type" : [ "string", "null" ],
-              "enum" : [ "comments", "threads" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "type" : [ "string" ],
+              "enum" : [ "comments", "threads" ]
             },
             "uniqueItems" : true
           }
         }, {
-          "$ref" : "#/components/parameters/ticketId"
+          "name" : "include",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "enum" : [ "pinnedBy", "mentions" ]
+            },
+            "maxItems" : 2
+          },
+          "style" : "form",
+          "explode" : false,
+          "description" : "Secondary information to include in the response. Possible values: pinnedBy, mentions"
+        }, {
+          "name" : "ticketId",
+          "in" : "path",
+          "description" : "Unique ID of the ticket from which pins must be fetched",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -80,8 +114,19 @@
         "summary" : "Create a pin on the ticket",
         "description" : "This API creates a new pin on the ticket.",
         "operationId" : "pinConversationOnTicket",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/ticketId"
+          "name" : "ticketId",
+          "in" : "path",
+          "description" : "Unique ID of the ticket from which pins must be fetched",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -106,24 +151,26 @@
   "components" : {
     "schemas" : {
       "long_array" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array" ],
         "items" : {
-          "type" : [ "string", "null", "integer" ],
+          "type" : [ "string", "integer" ],
           "format" : "int64",
           "pattern" : "([0-9]+)"
         }
       },
       "pinAConversationThreadResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "pinnedTime" : {
+            "description" : "Time when the conversation was pinned",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "pinnedById" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the agent who pinned the conversation",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
@@ -131,33 +178,36 @@
             "$ref" : "./Thread.json#/components/schemas/threadKeys"
           },
           "isPublic" : {
+            "description" : "Indicates whether the pin is publicly visible.",
             "type" : [ "boolean", "null" ]
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the pin",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "type" : {
+            "description" : "Type of the pinned entity. Possible values: comments, threads",
             "type" : [ "string", "null" ],
-            "enum" : [ "COMMENTS", "THREADS" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "COMMENTS", "THREADS" ]
           }
         },
         "required" : [ "entityPinned", "id", "isPublic", "pinnedById", "pinnedTime", "type" ]
       },
       "pinAConversationFaceBookThreadResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "pinnedTime" : {
+            "description" : "Time when the conversation was pinned",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "pinnedById" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the agent who pinned the conversation",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
@@ -165,33 +215,36 @@
             "$ref" : "./Thread.json#/components/schemas/facebookThreadKeys"
           },
           "isPublic" : {
+            "description" : "Indicates whether the pin is publicly visible.",
             "type" : [ "boolean", "null" ]
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the pin",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "type" : {
+            "description" : "Type of the pinned entity. Possible values: comments, threads",
             "type" : [ "string", "null" ],
-            "enum" : [ "COMMENTS", "THREADS" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "COMMENTS", "THREADS" ]
           }
         },
         "required" : [ "entityPinned", "id", "isPublic", "pinnedById", "pinnedTime", "type" ]
       },
       "pinAConversationTwitterThreadResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "pinnedTime" : {
+            "description" : "Time when the conversation was pinned",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "pinnedById" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the agent who pinned the conversation",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
@@ -199,33 +252,36 @@
             "$ref" : "./Thread.json#/components/schemas/twitterThreadKeys"
           },
           "isPublic" : {
+            "description" : "Indicates whether the pin is publicly visible.",
             "type" : [ "boolean", "null" ]
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the pin",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "type" : {
+            "description" : "Type of the pinned entity. Possible values: comments, threads",
             "type" : [ "string", "null" ],
-            "enum" : [ "COMMENTS", "THREADS" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "COMMENTS", "THREADS" ]
           }
         },
         "required" : [ "entityPinned", "id", "isPublic", "pinnedById", "pinnedTime", "type" ]
       },
       "pinAConversationForumThreadResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "pinnedTime" : {
+            "description" : "Time when the conversation was pinned",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "pinnedById" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the agent who pinned the conversation",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
@@ -233,33 +289,36 @@
             "$ref" : "./Thread.json#/components/schemas/forumThreadKeys"
           },
           "isPublic" : {
+            "description" : "Indicates whether the pin is publicly visible.",
             "type" : [ "boolean", "null" ]
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the pin",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "type" : {
+            "description" : "Type of the pinned entity. Possible values: comments, threads",
             "type" : [ "string", "null" ],
-            "enum" : [ "COMMENTS", "THREADS" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "COMMENTS", "THREADS" ]
           }
         },
         "required" : [ "entityPinned", "id", "isPublic", "pinnedById", "pinnedTime", "type" ]
       },
       "pinAConversationEmailThreadResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "pinnedTime" : {
+            "description" : "Time when the conversation was pinned",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "pinnedById" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the agent who pinned the conversation",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
@@ -267,33 +326,36 @@
             "$ref" : "./Thread.json#/components/schemas/emailThreadKeys"
           },
           "isPublic" : {
+            "description" : "Indicates whether the pin is publicly visible.",
             "type" : [ "boolean", "null" ]
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the pin",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "type" : {
+            "description" : "Type of the pinned entity. Possible values: comments, threads",
             "type" : [ "string", "null" ],
-            "enum" : [ "COMMENTS", "THREADS" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "COMMENTS", "THREADS" ]
           }
         },
         "required" : [ "entityPinned", "id", "isPublic", "pinnedById", "pinnedTime", "type" ]
       },
       "pinAConversationCommentResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "pinnedTime" : {
+            "description" : "Time when the conversation was pinned",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "pinnedById" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the agent who pinned the conversation",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
@@ -301,38 +363,42 @@
             "$ref" : "./TicketComment.json#/components/schemas/commentResponse"
           },
           "isPublic" : {
+            "description" : "Indicates whether the pin is publicly visible.",
             "type" : [ "boolean", "null" ]
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the pin",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "type" : {
+            "description" : "Type of the pinned entity. Possible values: comments, threads",
             "type" : [ "string", "null" ],
-            "enum" : [ "COMMENTS", "THREADS" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "COMMENTS", "THREADS" ]
           }
         },
         "required" : [ "entityPinned", "id", "isPublic", "pinnedById", "pinnedTime", "type" ]
       },
+      "conversationData" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/pinAConversationThreadResponse"
+        }, {
+          "$ref" : "#/components/schemas/pinAConversationFaceBookThreadResponse"
+        }, {
+          "$ref" : "#/components/schemas/pinAConversationTwitterThreadResponse"
+        }, {
+          "$ref" : "#/components/schemas/pinAConversationForumThreadResponse"
+        }, {
+          "$ref" : "#/components/schemas/pinAConversationEmailThreadResponse"
+        }, {
+          "$ref" : "#/components/schemas/pinAConversationCommentResponse"
+        } ]
+      },
       "data" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "anyOf" : [ {
-            "$ref" : "./PinnedConversation.json#/components/schemas/pinAConversationThreadResponse"
-          }, {
-            "$ref" : "./PinnedConversation.json#/components/schemas/pinAConversationFaceBookThreadResponse"
-          }, {
-            "$ref" : "./PinnedConversation.json#/components/schemas/pinAConversationTwitterThreadResponse"
-          }, {
-            "$ref" : "./PinnedConversation.json#/components/schemas/pinAConversationForumThreadResponse"
-          }, {
-            "$ref" : "./PinnedConversation.json#/components/schemas/pinAConversationEmailThreadResponse"
-          }, {
-            "$ref" : "./PinnedConversation.json#/components/schemas/pinAConversationCommentResponse"
-          } ]
+          "$ref" : "#/components/schemas/conversationData"
         }
       },
       "unPinConversationData" : {
@@ -340,15 +406,18 @@
         "additionalProperties" : false,
         "properties" : {
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the pin",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "success" : {
+            "description" : "Indicates whether the unpin operation was successful",
             "type" : [ "boolean", "null" ]
           },
           "errors" : {
-            "type" : [ "null", "string" ]
+            "description" : "Error details if the unpin operation failed",
+            "type" : [ "string", "null" ]
           }
         },
         "required" : [ "errors", "id", "success" ]
@@ -361,16 +430,18 @@
           "application/json" : {
             "schema" : {
               "anyOf" : [ {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "pinnedTime" : {
+                    "description" : "Time when the conversation was pinned",
                     "type" : [ "string", "null" ],
                     "maxLength" : 100,
                     "minLength" : 0
                   },
                   "pinnedById" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "Unique ID of the agent who pinned the conversation",
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
@@ -378,32 +449,35 @@
                     "$ref" : "./Thread.json#/components/schemas/threadKeys"
                   },
                   "isPublic" : {
+                    "description" : "Indicates whether the pin is publicly visible.",
                     "type" : [ "boolean", "null" ]
                   },
                   "id" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "Unique ID of the pin",
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
                   "type" : {
+                    "description" : "Type of the pinned entity. Possible values: comments, threads",
                     "type" : [ "string", "null" ],
-                    "enum" : [ "COMMENTS", "THREADS" ],
-                    "maxLength" : 100,
-                    "minLength" : 0
+                    "enum" : [ "COMMENTS", "THREADS" ]
                   }
                 },
                 "required" : [ "entityPinned", "id", "isPublic", "pinnedById", "pinnedTime", "type" ]
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "pinnedTime" : {
+                    "description" : "Time when the conversation was pinned",
                     "type" : [ "string", "null" ],
                     "maxLength" : 100,
                     "minLength" : 0
                   },
                   "pinnedById" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "Unique ID of the agent who pinned the conversation",
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
@@ -411,32 +485,35 @@
                     "$ref" : "./Thread.json#/components/schemas/facebookThreadKeys"
                   },
                   "isPublic" : {
+                    "description" : "Indicates whether the pin is publicly visible.",
                     "type" : [ "boolean", "null" ]
                   },
                   "id" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "Unique ID of the pin",
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
                   "type" : {
+                    "description" : "Type of the pinned entity. Possible values: comments, threads",
                     "type" : [ "string", "null" ],
-                    "enum" : [ "COMMENTS", "THREADS" ],
-                    "maxLength" : 100,
-                    "minLength" : 0
+                    "enum" : [ "COMMENTS", "THREADS" ]
                   }
                 },
                 "required" : [ "entityPinned", "id", "isPublic", "pinnedById", "pinnedTime", "type" ]
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "pinnedTime" : {
+                    "description" : "Time when the conversation was pinned",
                     "type" : [ "string", "null" ],
                     "maxLength" : 100,
                     "minLength" : 0
                   },
                   "pinnedById" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "Unique ID of the agent who pinned the conversation",
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
@@ -444,32 +521,35 @@
                     "$ref" : "./Thread.json#/components/schemas/twitterThreadKeys"
                   },
                   "isPublic" : {
+                    "description" : "Indicates whether the pin is publicly visible.",
                     "type" : [ "boolean", "null" ]
                   },
                   "id" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "Unique ID of the pin",
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
                   "type" : {
+                    "description" : "Type of the pinned entity. Possible values: comments, threads",
                     "type" : [ "string", "null" ],
-                    "enum" : [ "COMMENTS", "THREADS" ],
-                    "maxLength" : 100,
-                    "minLength" : 0
+                    "enum" : [ "COMMENTS", "THREADS" ]
                   }
                 },
                 "required" : [ "entityPinned", "id", "isPublic", "pinnedById", "pinnedTime", "type" ]
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "pinnedTime" : {
+                    "description" : "Time when the conversation was pinned",
                     "type" : [ "string", "null" ],
                     "maxLength" : 100,
                     "minLength" : 0
                   },
                   "pinnedById" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "Unique ID of the agent who pinned the conversation",
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
@@ -477,32 +557,35 @@
                     "$ref" : "./Thread.json#/components/schemas/forumThreadKeys"
                   },
                   "isPublic" : {
+                    "description" : "Indicates whether the pin is publicly visible.",
                     "type" : [ "boolean", "null" ]
                   },
                   "id" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "Unique ID of the pin",
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
                   "type" : {
+                    "description" : "Type of the pinned entity. Possible values: comments, threads",
                     "type" : [ "string", "null" ],
-                    "enum" : [ "COMMENTS", "THREADS" ],
-                    "maxLength" : 100,
-                    "minLength" : 0
+                    "enum" : [ "COMMENTS", "THREADS" ]
                   }
                 },
                 "required" : [ "entityPinned", "id", "isPublic", "pinnedById", "pinnedTime", "type" ]
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "pinnedTime" : {
+                    "description" : "Time when the conversation was pinned",
                     "type" : [ "string", "null" ],
                     "maxLength" : 100,
                     "minLength" : 0
                   },
                   "pinnedById" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "Unique ID of the agent who pinned the conversation",
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
@@ -510,32 +593,35 @@
                     "$ref" : "./Thread.json#/components/schemas/emailThreadKeys"
                   },
                   "isPublic" : {
+                    "description" : "Indicates whether the pin is publicly visible.",
                     "type" : [ "boolean", "null" ]
                   },
                   "id" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "Unique ID of the pin",
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
                   "type" : {
+                    "description" : "Type of the pinned entity. Possible values: comments, threads",
                     "type" : [ "string", "null" ],
-                    "enum" : [ "COMMENTS", "THREADS" ],
-                    "maxLength" : 100,
-                    "minLength" : 0
+                    "enum" : [ "COMMENTS", "THREADS" ]
                   }
                 },
                 "required" : [ "entityPinned", "id", "isPublic", "pinnedById", "pinnedTime", "type" ]
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "pinnedTime" : {
+                    "description" : "Time when the conversation was pinned",
                     "type" : [ "string", "null" ],
                     "maxLength" : 100,
                     "minLength" : 0
                   },
                   "pinnedById" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "Unique ID of the agent who pinned the conversation",
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
@@ -543,18 +629,19 @@
                     "$ref" : "./TicketComment.json#/components/schemas/commentResponse"
                   },
                   "isPublic" : {
+                    "description" : "Indicates whether the pin is publicly visible.",
                     "type" : [ "boolean", "null" ]
                   },
                   "id" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "Unique ID of the pin",
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
                   "type" : {
+                    "description" : "Type of the pinned entity. Possible values: comments, threads",
                     "type" : [ "string", "null" ],
-                    "enum" : [ "COMMENTS", "THREADS" ],
-                    "maxLength" : 100,
-                    "minLength" : 0
+                    "enum" : [ "COMMENTS", "THREADS" ]
                   }
                 },
                 "required" : [ "entityPinned", "id", "isPublic", "pinnedById", "pinnedTime", "type" ]
@@ -567,42 +654,42 @@
                   "isPublic" : false,
                   "id" : "1235000000013295",
                   "pinnedBy" : {
-                    "firstName" : "Nirmal",
-                    "lastName" : "Kumar",
-                    "photoURL" : "https://desk.zoho.com/api/v1/agents/1235000000010078/photo?orgId=61815772",
+                    "firstName" : "William",
+                    "lastName" : "Jones",
+                    "photoURL" : "https://desk.example.com/api/v1/agents/1235000000010078/photo?orgId=1234567890",
                     "id" : "1235000000010078",
-                    "email" : "nirmalkumar@zylker.com"
+                    "email" : "william.jones@zylker.com"
                   },
-                  "type" : "comments",
+                  "type" : [ "comments" ],
                   "pinnedEntity" : {
                     "modifiedTime" : "2024-05-06T13:05:50.000Z",
                     "attachments" : [ ],
-                    "encodedContent" : "&lt;div style&#x3d;&quot;font-size&#x3a; 13px&#x3b; font-family&#x3a; Arial, Helvetica, sans-serif&quot;&gt;&lt;div&gt;zsu&#x5b;&#x40;user&#x3a;76260187&#x5d;zsu a comment.&lt;br&gt;&lt;&#x2f;div&gt;&lt;&#x2f;div&gt;",
+                    "encodedContent" : "&lt;div style&#x3d;&quot;font-size&#x3a; 13px&#x3b; font-family&#x3a; Arial, Helvetica, sans-serif&quot;&gt;&lt;div&gt;zsu&#x5b;&#x40;user&#x3a;1000000001&#x5d;zsu a comment.&lt;br&gt;&lt;&#x2f;div&gt;&lt;&#x2f;div&gt;",
                     "commentedTime" : "2024-05-06T13:05:50.000Z",
                     "isPublic" : false,
                     "id" : "1235000000013468",
                     "contentType" : "html",
-                    "content" : "<div style=\"font-size: 13px; font-family: Arial, Helvetica, sans-serif\"><div>zsu[@user:76260187]zsu a comment.<br></div></div>",
+                    "content" : "<div style=\"font-size: 13px; font-family: Arial, Helvetica, sans-serif\"><div>zsu[@user:1234567890]zsu a comment.<br></div></div>",
                     "commenterId" : "1235000000010078",
                     "commenter" : {
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/1235000000010078/photo?orgId=61815772",
-                      "firstName" : "Immanuel",
-                      "lastName" : "T",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/1235000000010078/photo?orgId=1234567890",
+                      "firstName" : "John",
+                      "lastName" : "Doe",
                       "id" : "1235000000010078",
-                      "type" : "AGENT",
-                      "email" : "immanuel.t@zylker.com"
+                      "type" : [ "AGENT" ],
+                      "email" : "john.doe@zylker.com"
                     },
                     "impersonatedUser" : null,
                     "mention" : [ {
-                      "firstName" : "Kamalesh",
-                      "lastName" : "SN",
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/1235000000034048/photo?orgId=61815772",
+                      "firstName" : "Jane",
+                      "lastName" : "Smith",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/1235000000034048/photo?orgId=1234567890",
                       "offSet" : "77",
                       "length" : "22",
                       "id" : "1235000000034048",
-                      "type" : "AGENT",
-                      "email" : "kamalesh.sn@zylker.com",
-                      "zuid" : "76260187"
+                      "type" : [ "AGENT" ],
+                      "email" : "jane.smith@zylker.com",
+                      "zuid" : "1234567890"
                     } ]
                   }
                 }
@@ -617,12 +704,13 @@
           "application/json" : {
             "schema" : {
               "allOf" : [ {
-                "type" : "object",
+                "type" : [ "object" ],
                 "properties" : {
                   "data" : {
-                    "type" : "array",
+                    "description" : "List of pinned conversation entries for the ticket",
+                    "type" : [ "array" ],
                     "items" : {
-                      "type" : "object",
+                      "type" : [ "object" ],
                       "properties" : {
                         "plainText" : {
                           "type" : [ "string", "null" ],
@@ -630,33 +718,39 @@
                           "minLength" : 0
                         },
                         "pinnedBy" : {
-                          "type" : [ "null", "object" ],
+                          "description" : "Details of the agent who pinned the conversation",
+                          "type" : [ "object", "null" ],
                           "additionalProperties" : false,
                           "maxProperties" : 5,
                           "minProperties" : 5,
                           "properties" : {
                             "photoURL" : {
+                              "description" : "URL of the agent's profile photo",
                               "type" : [ "string", "null" ],
                               "maxLength" : 200,
                               "minLength" : 0,
                               "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
                             },
                             "firstName" : {
+                              "description" : "First name of the agent",
                               "type" : [ "string", "null" ],
                               "maxLength" : 50,
                               "minLength" : 0
                             },
                             "lastName" : {
+                              "description" : "Last name of the agent",
                               "type" : [ "string", "null" ],
                               "maxLength" : 50,
                               "minLength" : 0
                             },
                             "id" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "description" : "Unique ID of the agent",
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
                               "pattern" : "([0-9]+)"
                             },
                             "email" : {
+                              "description" : "Email address of the agent",
                               "type" : [ "string", "null" ],
                               "maxLength" : 100,
                               "minLength" : 0,
@@ -666,134 +760,149 @@
                           "required" : [ "email", "firstName", "id", "lastName", "photoURL" ]
                         },
                         "mention" : {
-                          "type" : [ "null", "array" ],
+                          "description" : "List of users mentioned in the pinned entity",
+                          "type" : [ "array", "null" ],
                           "items" : {
                             "oneOf" : [ {
-                              "type" : [ "null", "object" ],
+                              "type" : [ "object", "null" ],
                               "additionalProperties" : false,
                               "maxProperties" : 8,
                               "minProperties" : 8,
                               "properties" : {
                                 "photoURL" : {
+                                  "description" : "URL of the mentioned user's profile photo",
                                   "type" : [ "string", "null" ],
                                   "maxLength" : 200,
                                   "minLength" : 0,
                                   "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
                                 },
                                 "offSet" : {
-                                  "type" : [ "string", "null", "integer" ],
+                                  "description" : "Offset position of the mention in the content",
+                                  "type" : [ "string", "integer", "null" ],
                                   "format" : "int32",
                                   "pattern" : "([0-9]+)"
                                 },
                                 "name" : {
+                                  "description" : "Name of the mentioned user",
                                   "type" : [ "string", "null" ],
                                   "maxLength" : 100,
                                   "minLength" : 0
                                 },
                                 "length" : {
-                                  "type" : [ "string", "null", "integer" ],
+                                  "description" : "Length of the mention text in the content",
+                                  "type" : [ "string", "integer", "null" ],
                                   "format" : "int32",
                                   "pattern" : "([0-9]+)"
                                 },
                                 "id" : {
-                                  "type" : [ "string", "null", "integer" ],
+                                  "description" : "Unique ID of the mentioned user",
+                                  "type" : [ "string", "integer", "null" ],
                                   "format" : "int64",
                                   "pattern" : "([0-9]+)"
                                 },
                                 "type" : {
+                                  "description" : "Type of the mentioned user",
                                   "type" : [ "string", "null" ],
-                                  "enum" : [ "END_USER", "AGENT", "TEAM", "TICKET", "ACTIVITY" ],
-                                  "maxLength" : 100,
-                                  "minLength" : 0
+                                  "enum" : [ "END_USER", "AGENT", "TEAM", "TICKET", "ACTIVITY" ]
                                 },
                                 "email" : {
+                                  "description" : "Email address of the mentioned user",
                                   "type" : [ "string", "null" ],
                                   "maxLength" : 100,
                                   "minLength" : 0,
                                   "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
                                 },
                                 "zuid" : {
-                                  "type" : [ "string", "null", "integer" ],
+                                  "description" : "ZUID of the mentioned user",
+                                  "type" : [ "string", "integer", "null" ],
                                   "format" : "int32",
                                   "pattern" : "([0-9]+)"
                                 }
                               },
                               "required" : [ "email", "id", "length", "name", "offSet", "photoURL", "type", "zuid" ]
                             }, {
-                              "type" : [ "null", "object" ],
+                              "type" : [ "object", "null" ],
                               "additionalProperties" : false,
                               "maxProperties" : 5,
                               "minProperties" : 5,
                               "properties" : {
                                 "offSet" : {
-                                  "type" : [ "string", "null", "integer" ],
+                                  "description" : "Offset position of the mention in the content",
+                                  "type" : [ "string", "integer", "null" ],
                                   "format" : "int32",
                                   "pattern" : "([0-9]+)"
                                 },
                                 "length" : {
-                                  "type" : [ "string", "null", "integer" ],
+                                  "description" : "Length of the mention text in the content",
+                                  "type" : [ "string", "integer", "null" ],
                                   "format" : "int32",
                                   "pattern" : "([0-9]+)"
                                 },
                                 "name" : {
+                                  "description" : "Name of the mentioned user",
                                   "type" : [ "string", "null" ],
                                   "maxLength" : 100,
                                   "minLength" : 0
                                 },
                                 "id" : {
-                                  "type" : [ "string", "null", "integer" ],
+                                  "description" : "Unique ID of the mentioned user",
+                                  "type" : [ "string", "integer", "null" ],
                                   "format" : "int64",
                                   "pattern" : "([0-9]+)"
                                 },
                                 "type" : {
+                                  "description" : "Type of the mentioned user",
                                   "type" : [ "string", "null" ],
-                                  "enum" : [ "END_USER", "AGENT", "TEAM", "TICKET", "ACTIVITY" ],
-                                  "maxLength" : 100,
-                                  "minLength" : 0
+                                  "enum" : [ "END_USER", "AGENT", "TEAM", "TICKET", "ACTIVITY" ]
                                 }
                               },
                               "required" : [ "id", "length", "name", "offSet", "type" ]
                             }, {
-                              "type" : [ "null", "object" ],
+                              "type" : [ "object", "null" ],
                               "additionalProperties" : false,
                               "maxProperties" : 7,
                               "minProperties" : 7,
                               "properties" : {
                                 "offSet" : {
-                                  "type" : [ "string", "null", "integer" ],
+                                  "description" : "Offset position of the mention in the content",
+                                  "type" : [ "string", "integer", "null" ],
                                   "format" : "int32",
                                   "pattern" : "([0-9]+)"
                                 },
                                 "departmentId" : {
-                                  "type" : [ "string", "null", "integer" ],
+                                  "description" : "Unique ID of the department",
+                                  "type" : [ "string", "integer", "null" ],
                                   "format" : "int64",
                                   "pattern" : "([0-9]+)"
                                 },
                                 "entityNumber" : {
-                                  "type" : [ "string", "null", "integer" ],
+                                  "description" : "Entity number of the mentioned item",
+                                  "type" : [ "string", "integer", "null" ],
                                   "format" : "int32",
                                   "pattern" : "([0-9]+)"
                                 },
                                 "length" : {
-                                  "type" : [ "string", "null", "integer" ],
+                                  "description" : "Length of the mention text in the content",
+                                  "type" : [ "string", "integer", "null" ],
                                   "format" : "int32",
                                   "pattern" : "([0-9]+)"
                                 },
                                 "name" : {
+                                  "description" : "Name of the mentioned user",
                                   "type" : [ "string", "null" ],
                                   "maxLength" : 100,
                                   "minLength" : 0
                                 },
                                 "id" : {
-                                  "type" : [ "string", "null", "integer" ],
+                                  "description" : "Unique ID of the mentioned user",
+                                  "type" : [ "string", "integer", "null" ],
                                   "format" : "int64",
                                   "pattern" : "([0-9]+)"
                                 },
                                 "type" : {
+                                  "description" : "Type of the mentioned user",
                                   "type" : [ "string", "null" ],
-                                  "enum" : [ "END_USER", "AGENT", "TEAM", "TICKET", "ACTIVITY" ],
-                                  "maxLength" : 100,
-                                  "minLength" : 0
+                                  "enum" : [ "END_USER", "AGENT", "TEAM", "TICKET", "ACTIVITY" ]
                                 }
                               },
                               "required" : [ "departmentId", "entityNumber", "id", "length", "name", "offSet", "type" ]
@@ -801,16 +910,18 @@
                           },
                           "uniqueItems" : false
                         }
-                      }
+                      },
+                      "additionalProperties" : false
                     }
                   }
-                }
+                },
+                "additionalProperties" : false
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "data" : {
-                    "$ref" : "./PinnedConversation.json#/components/schemas/data"
+                    "$ref" : "#/components/schemas/data"
                   }
                 },
                 "required" : [ "data" ]
@@ -824,42 +935,42 @@
                     "isPublic" : true,
                     "id" : "1235000000013295",
                     "pinnedBy" : {
-                      "firstName" : "Nirmal",
-                      "lastName" : "Kumar",
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/1235000000010078/photo?orgId=61815772",
+                      "firstName" : "William",
+                      "lastName" : "Jones",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/1235000000010078/photo?orgId=1234567890",
                       "id" : "1235000000010078",
-                      "email" : "nirmalkumar@zylker.com"
+                      "email" : "william.jones@zylker.com"
                     },
-                    "type" : "comments",
+                    "type" : [ "comments" ],
                     "pinnedEntity" : {
                       "modifiedTime" : "2024-05-06T13:05:50.000Z",
                       "attachments" : [ ],
-                      "encodedContent" : "&lt;div style&#x3d;&quot;font-size&#x3a; 13px&#x3b; font-family&#x3a; Arial, Helvetica, sans-serif&quot;&gt;&lt;div&gt;zsu&#x5b;&#x40;user&#x3a;76260187&#x5d;zsu a comment.&lt;br&gt;&lt;&#x2f;div&gt;&lt;&#x2f;div&gt;",
+                      "encodedContent" : "&lt;div style&#x3d;&quot;font-size&#x3a; 13px&#x3b; font-family&#x3a; Arial, Helvetica, sans-serif&quot;&gt;&lt;div&gt;zsu&#x5b;&#x40;user&#x3a;1000000001&#x5d;zsu a comment.&lt;br&gt;&lt;&#x2f;div&gt;&lt;&#x2f;div&gt;",
                       "commentedTime" : "2024-05-06T13:05:50.000Z",
                       "isPublic" : false,
                       "id" : "1235000000013468",
                       "contentType" : "html",
-                      "content" : "<div style=\"font-size: 13px; font-family: Arial, Helvetica, sans-serif\"><div>zsu[@user:76260187]zsu a comment.<br></div></div>",
+                      "content" : "<div style=\"font-size: 13px; font-family: Arial, Helvetica, sans-serif\"><div>zsu[@user:1234567890]zsu a comment.<br></div></div>",
                       "commenterId" : "1235000000010078",
                       "commenter" : {
-                        "photoURL" : "https://desk.zoho.com/api/v1/agents/1235000000010078/photo?orgId=61815772",
-                        "firstName" : "Immanuel",
-                        "lastName" : "T",
+                        "photoURL" : "https://desk.example.com/api/v1/agents/1235000000010078/photo?orgId=1234567890",
+                        "firstName" : "John",
+                        "lastName" : "Doe",
                         "id" : "1235000000010078",
-                        "type" : "AGENT",
-                        "email" : "immanuel.t@zylker.com"
+                        "type" : [ "AGENT" ],
+                        "email" : "john.doe@zylker.com"
                       },
                       "impersonatedUser" : null,
                       "mention" : [ {
-                        "firstName" : "Kamalesh",
-                        "lastName" : "SN",
-                        "photoURL" : "https://deskt.zoho.com/api/v1/agents/1235000000034048/photo?orgId=61815772",
+                        "firstName" : "Jane",
+                        "lastName" : "Smith",
+                        "photoURL" : "https://deskt.zoho.com/api/v1/agents/1235000000034048/photo?orgId=1234567890",
                         "offSet" : "77",
                         "length" : "22",
                         "id" : "1235000000034048",
-                        "type" : "AGENT",
-                        "email" : "kamalesh.sn@zylker.com",
-                        "zuid" : "76260187"
+                        "type" : [ "AGENT" ],
+                        "email" : "jane.smith@zylker.com",
+                        "zuid" : "1234567890"
                       } ]
                     }
                   }, {
@@ -867,13 +978,13 @@
                     "isPublic" : true,
                     "id" : "1235000000014147",
                     "pinnedBy" : {
-                      "firstName" : "Nirmal",
-                      "lastName" : "Kumar",
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/1235000000010078/photo?orgId=61815772",
+                      "firstName" : "William",
+                      "lastName" : "Jones",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/1235000000010078/photo?orgId=1234567890",
                       "id" : "1235000000010078",
-                      "email" : "nirmalkumar@zylker.com"
+                      "email" : "william.jones@zylker.com"
                     },
-                    "type" : "threads",
+                    "type" : [ "threads" ],
                     "pinnedEntity" : {
                       "sentiment" : "NEGATIVE",
                       "isDescriptionThread" : false,
@@ -885,7 +996,7 @@
                         "appName" : null,
                         "extId" : null,
                         "permalink" : null,
-                        "type" : "SYSTEM",
+                        "type" : [ "SYSTEM" ],
                         "appPhotoURL" : null
                       },
                       "lastRatingIconURL" : null,
@@ -902,11 +1013,11 @@
                       "scheduleInfo" : null,
                       "author" : {
                         "photoURL" : null,
-                        "firstName" : "Immanuel",
-                        "lastName" : "T",
+                        "firstName" : "John",
+                        "lastName" : "Doe",
                         "id" : "1235000000011288",
-                        "type" : "END_USER",
-                        "email" : "immanuel.t@zylker.com"
+                        "type" : [ "END_USER" ],
+                        "email" : "john.doe@zylker.com"
                       },
                       "isForward" : false,
                       "hasAttach" : true,
@@ -914,7 +1025,7 @@
                       "attachmentCount" : "1",
                       "readReceipts" : null,
                       "to" : "\"zylker support\"<support@zylker.com>",
-                      "fromEmailAddress" : "\"kamelesh sn\"<kamelsh.sn@zylker.com>",
+                      "fromEmailAddress" : "\"Jane Smith\"<jane.smith@zylker.com>",
                       "actions" : [ ],
                       "status" : "SUCCESS"
                     }
@@ -930,32 +1041,33 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "results" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array", "null" ],
                   "items" : {
                     "$ref" : "#/components/schemas/unPinConversationData"
                   }
                 }
               }
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "results" : [ {
+                    "id" : "1235000000013295",
+                    "success" : true,
+                    "errors" : null
+                  }, {
+                    "id" : "1235000000013345",
+                    "success" : false,
+                    "errors" : "Pin not found"
+                  } ]
+                }
+              }
             }
           }
-        }
-      }
-    },
-    "parameters" : {
-      "ticketId" : {
-        "name" : "ticketId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
         }
       }
     },
@@ -965,11 +1077,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "ids" : {
-                  "$ref" : "./PinnedConversation.json#/components/schemas/long_array"
+                  "$ref" : "#/components/schemas/long_array"
                 }
               },
               "required" : [ "ids" ]
@@ -989,22 +1101,23 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "isPublic" : {
-                  "type" : [ "boolean", "null" ]
+                  "description" : "Indicates whether the pin is publicly visible.",
+                  "type" : [ "boolean" ]
                 },
                 "entityId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Unique ID of the pinned entity",
+                  "type" : [ "string", "integer" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "type" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "COMMENTS", "THREADS" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "description" : "Type of the pinned entity. Possible values: comments, threads",
+                  "type" : [ "string" ],
+                  "enum" : [ "COMMENTS", "THREADS" ]
                 }
               },
               "required" : [ "entityId", "type" ]
@@ -1014,7 +1127,7 @@
                 "value" : {
                   "isPublic" : false,
                   "entityId" : "1235000000013468",
-                  "type" : "comments"
+                  "type" : [ "comments" ]
                 }
               }
             }
@@ -1023,6 +1136,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

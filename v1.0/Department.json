@@ -2,17 +2,29 @@
   "openapi" : "3.1.0",
   "info" : {
     "title" : "Department",
-    "version" : "1.0.0"
+    "version" : "1.0.0",
+    "description" : "Departments are the organizational divisions configured in your help desk based on the business function performed by each division, such as marketing, sales, finance, and admin."
   },
   "paths" : {
     "/api/v1/departments/{departmentId}/associateAgents" : {
       "post" : {
         "tags" : [ "Department" ],
-        "summary" : "Associate agents to department",
-        "description" : "This API associates agents to a department.",
+        "summary" : "Associate Agents to Department",
+        "description" : "Associates agents to a department.",
         "operationId" : "associateAgentsToDepartment",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/departmentId"
+          "name" : "departmentId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the department"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -28,7 +40,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE", "Desk.basic.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.basic.UPDATE", "Desk.permissions.UPDATE", "Desk.settings.UPDATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -36,11 +48,22 @@
     "/api/v1/departments/{departmentId}" : {
       "get" : {
         "tags" : [ "Department" ],
-        "summary" : "Get department",
-        "description" : "This API fetches the details of a department from your help desk",
+        "summary" : "Get Department",
+        "description" : "Retrieves the details of a department from the help desk.",
         "operationId" : "getDepartment",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/departmentId"
+          "name" : "departmentId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the department"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -50,17 +73,28 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.basic.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.departments.READ", "Desk.settings.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
       },
       "patch" : {
         "tags" : [ "Department" ],
-        "summary" : "Update department",
-        "description" : "This API updates the details of an existing department.",
+        "summary" : "Update Department",
+        "description" : "Updates the details of an existing department.",
         "operationId" : "updateDepartment",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/departmentId"
+          "name" : "departmentId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the department"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -76,7 +110,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE", "Desk.basic.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.basic.UPDATE", "Desk.departments.UPDATE", "Desk.settings.UPDATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -84,25 +118,33 @@
     "/api/v1/departments/{departmentId}/logo" : {
       "get" : {
         "tags" : [ "Department" ],
-        "summary" : "Get department logo",
-        "description" : "This API fetches the logo set for a department.",
+        "summary" : "Get Department Logo",
+        "description" : "Retrieves the logo set for a department.",
         "operationId" : "getDepartmentLogo",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "fileSize",
           "in" : "query",
-          "description" : "Size of the image file to download. Values allowed are @THUMBNAIL@ (image with reduced dimensions and size) and @ACTUAL@ (image with actual dimensions and size). The default value is @ACTUAL@.",
+          "description" : "Size of the image file to download <p><b>  Possible values:</b> THUMBNAIL, ACTUAL</p>",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Size of the image file to download. Values allowed are @THUMBNAIL@ (image with reduced dimensions and size) and @ACTUAL@ (image with actual dimensions and size). The default value is @ACTUAL@.",
-            "enum" : [ "THUMBNAIL", "ACTUAL" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "type" : [ "string" ],
+            "enum" : [ "ACTUAL", "THUMBNAIL" ]
           }
         }, {
-          "$ref" : "#/components/parameters/departmentId"
+          "name" : "departmentId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the department"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -112,17 +154,28 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.basic.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.departments.READ", "Desk.settings.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
       },
       "post" : {
         "tags" : [ "Department" ],
-        "summary" : "Upload department logo",
-        "description" : "This API updates the logo set for a department.",
+        "summary" : "Update Department Logo",
+        "description" : "Updates the logo set for a department.",
         "operationId" : "updateDepartmentLogo",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/departmentId"
+          "name" : "departmentId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the department"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -130,14 +183,16 @@
           "content" : {
             "multipart/form-data" : {
               "schema" : {
-                "type" : "object",
+                "type" : [ "object" ],
                 "properties" : {
                   "departmentLogo" : {
-                    "type" : "string",
-                    "format" : "binary"
+                    "type" : [ "string" ],
+                    "format" : "binary",
+                    "description" : "Image file of the logo  <p> Note: </p> - Maximum file size allowed is 2 MB   - Maximum number of files allowed is one   - Allowed extensions are jpg, png, gif, and jpeg"
                   }
                 },
-                "required" : [ "departmentLogo" ]
+                "required" : [ "departmentLogo" ],
+                "additionalProperties" : false
               }
             }
           }
@@ -151,17 +206,28 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE", "Desk.basic.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.basic.UPDATE", "Desk.departments.UPDATE", "Desk.settings.UPDATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       },
       "delete" : {
         "tags" : [ "Department" ],
-        "summary" : "Delete department logo",
-        "description" : "This API removes the logo set for a department.",
+        "summary" : "Delete Department Logo",
+        "description" : "Deletes the logo set for a department.",
         "operationId" : "deleteDepartmentLogo",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/departmentId"
+          "name" : "departmentId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the department"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -171,7 +237,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.DELETE", "Desk.basic.DELETE" ]
+          "iam-oauth2-schema" : [ "Desk.basic.UPDATE", "Desk.departments.UPDATE", "Desk.settings.UPDATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -179,11 +245,22 @@
     "/api/v1/departments/{departmentId}/enable" : {
       "post" : {
         "tags" : [ "Department" ],
-        "summary" : "Enable department",
-        "description" : "This API enables a department in your help desk portal.",
+        "summary" : "Enable Department",
+        "description" : "Enables a department in the help desk portal.",
         "operationId" : "enableDepartment",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/departmentId"
+          "name" : "departmentId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the department"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -193,7 +270,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE", "Desk.basic.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.basic.UPDATE", "Desk.departments.UPDATE", "Desk.settings.UPDATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -201,11 +278,21 @@
     "/api/v1/departments/{departmentId}/disable" : {
       "post" : {
         "tags" : [ "Department" ],
-        "summary" : "Disable department",
-        "description" : "This API disables a department in your help desk portal.",
+        "summary" : "Disable Department",
+        "description" : "Disables a department in the help desk portal.",
         "operationId" : "disableDepartment",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/departmentId"
+          "name" : "departmentId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the department"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -221,7 +308,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE", "Desk.basic.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.basic.UPDATE", "Desk.departments.UPDATE", "Desk.settings.UPDATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -229,21 +316,21 @@
     "/api/v1/departmentsByIds" : {
       "get" : {
         "tags" : [ "Department" ],
-        "summary" : "Get department details by department IDs",
-        "description" : "This API fetches the details of the departments whose IDs are passed in the API request.",
+        "summary" : "Get Departments by IDs",
+        "description" : "Retrieves the details of the departments whose IDs are passed in the request.",
         "operationId" : "getDepartmentsByIds",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "departmentIds",
           "in" : "query",
-          "description" : "Comma-separated array of department IDs. Maximum number of IDs allowed is 50.",
+          "description" : "ID(s) of the departments to retrieve  <p><b> Note:</b>  - Multiple IDs can be provided by separating them with commas   - A maximum of 50 IDs is allowed</p>",
           "required" : true,
-          "style" : "simple",
+          "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "null", "array" ],
-            "description" : "Comma-separated array of department IDs. Maximum number of IDs allowed is 50.",
+            "type" : [ "array" ],
             "items" : {
-              "type" : [ "string", "null", "integer" ],
+              "type" : [ "string", "integer" ],
               "format" : "int64",
               "pattern" : "([0-9]+)"
             },
@@ -264,7 +351,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.basic.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.departments.READ", "Desk.settings.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -272,81 +359,114 @@
     "/api/v1/departments/{departmentId}/agents" : {
       "get" : {
         "tags" : [ "Department" ],
-        "summary" : "List agents in department",
-        "description" : "This API lists the agents in a department.",
+        "summary" : "Get Agents in Department",
+        "description" : "Retrieves the agents in a department.",
         "operationId" : "getAgentsInDepartment",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "fieldName",
           "in" : "query",
-          "description" : "Name of the field that must be used for searching and listing agents. Values allowed are: @firstName@, @lastName@, @name@, and @emailId@.",
+          "description" : "Field used to search and list agents  <p><b> Possible values:</b> firstName, lastName, name, emailId</p>",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Name of the field that must be used for searching and listing agents. Values allowed are: @firstName@, @lastName@, @name@, and @emailId@.",
-            "enum" : [ "firstName", "lastName", "emailId", "name" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "type" : [ "string" ],
+            "enum" : [ "firstName", "lastName", "name", "emailId" ]
           }
         }, {
-          "$ref" : "#/components/parameters/searchStr"
+          "name" : "searchStr",
+          "in" : "query",
+          "description" : "Search string used to match the first name, last name, or email ID <p><b>  Note:</b>  - string* searches for values that start with the string   - *string* searches for values that contain the string   - string searches for exact matches   - The string must contain at least one character</p>",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "minLength" : 1,
+            "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+"
+          }
         }, {
           "name" : "isLightAgent",
           "in" : "query",
-          "description" : "Key that denotes if the agents must be light or non light.",
+          "description" : "Indicates whether the returned agents must be light or non-light agents  <p><b> Possible values:</b>  • true = returns light agents   • false = returns non-light agents</p>",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "boolean", "null" ],
-            "description" : "Key that denotes if the agents must be light or non light."
+            "type" : [ "boolean" ]
           }
         }, {
           "name" : "sortOrder",
           "in" : "query",
-          "description" : "To sort the available list of agents in either ascending or descending order. Values allowed are: @asc@ or @desc@",
+          "description" : "Sort order used for the agents list <p><b>  Possible values:</b> asc, desc</p>",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "To sort the available list of agents in either ascending or descending order. Values allowed are: @asc@ or @desc@",
-            "enum" : [ "asc", "desc" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "type" : [ "string" ],
+            "enum" : [ "asc", "desc" ]
           }
         }, {
-          "$ref" : "#/components/parameters/limit"
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of agents to fetch",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 200,
+            "minimum" : 0,
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/from"
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number from which the agents must be listed",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "name" : "isConfirmed",
           "in" : "query",
-          "description" : "Key that denotes if the agents must be confirmed or unconfirmed.",
+          "description" : "Indicates whether the returned agents must be confirmed or unconfirmed  <p><b> Possible values: </b> • true = returns confirmed agents   • false = returns unconfirmed agents</p>",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "boolean", "null" ],
-            "description" : "Key that denotes if the agents must be confirmed or unconfirmed."
+            "type" : [ "boolean" ]
           }
         }, {
           "name" : "status",
           "in" : "query",
-          "description" : "Key that filters agents, based on their activation status: @ACTIVE@ or @DISABLED@",
+          "description" : "Activation status used to filter agents <p><b>  Possible values:</b> ACTIVE, DISABLED</p>",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Key that filters agents, based on their activation status: @ACTIVE@ or @DISABLED@",
-            "enum" : [ "ACTIVE", "DISABLED" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "type" : [ "string" ],
+            "enum" : [ "ACTIVE", "DISABLED" ]
           }
         }, {
-          "$ref" : "#/components/parameters/departmentId"
+          "name" : "departmentId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the department"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -359,7 +479,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.basic.READ" ]
+          "iam-oauth2-schema" : [ "Desk.agents.READ", "Desk.basic.READ", "Desk.settings.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -367,10 +487,21 @@
     "/api/v1/departments/count" : {
       "get" : {
         "tags" : [ "Department" ],
-        "summary" : "Get department count",
-        "description" : "This API returns the number of departments configured in your help desk portal.",
+        "summary" : "Get Department Count",
+        "description" : "Retrieves the number of departments configured in the help desk portal.",
         "operationId" : "getDepartmentsCount",
+        "x-mcp-ready" : true,
         "parameters" : [ {
+          "name" : "isEnabled",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "boolean" ]
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Indicates whether departments must be filtered by enabled status  <p><b> Possible values: </b> • true = counts enabled departments   • false = counts disabled departments</p>"
+        }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
@@ -379,7 +510,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.basic.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.departments.READ", "Desk.settings.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -387,11 +518,21 @@
     "/api/v1/departments/{departmentId}/dissociateAgents" : {
       "post" : {
         "tags" : [ "Department" ],
-        "summary" : "Dissociate agents from department",
-        "description" : "This API dissociates agents from a department.",
+        "summary" : "Dissociate Agents from Department",
+        "description" : "Dissociates agents from a department.",
         "operationId" : "dissociateAgents",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/departmentId"
+          "name" : "departmentId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the department"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -407,7 +548,117 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE", "Desk.basic.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.basic.UPDATE", "Desk.permissions.UPDATE", "Desk.settings.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/departments/{departmentId}/associableAgents" : {
+      "get" : {
+        "tags" : [ "Department" ],
+        "summary" : "Get Associable Agents in Department",
+        "description" : "Retrieves the associable agents in a department, with pagination support.",
+        "operationId" : "getAssociableAgents",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "from",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "minimum" : 0,
+            "default" : 0
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Index number from which the agents must be listed"
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "minimum" : 0,
+            "maximum" : 100
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Number of agents to fetch"
+        }, {
+          "name" : "status",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "ACTIVE", "DISABLED" ]
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Activation status used to filter agents <p><b> Possible values: </b>ACTIVE, DISABLED</p>"
+        }, {
+          "name" : "searchStr",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+",
+            "x-regex-name" : "cleartextampersand"
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Search string used to match the first name, last name, or email ID <p><b>Note:</b> - string* searches for values that start with the string - *string* searches for values that contain the string - string searches for exact matches - The string must contain at least one character</p>"
+        }, {
+          "name" : "fieldName",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "firstName", "lastName", "name", "emailId" ]
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Field used to search and list agents <p><b> Possible values: </b>firstName, lastName, name, emailId</p>"
+        }, {
+          "name" : "sortOrder",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "asc", "desc" ]
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Sort order used for the agents list <p><b> Possible values: </b>asc, desc</p>"
+        }, {
+          "name" : "departmentId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the department"
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/getAssociableAgentsResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.basic.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -415,40 +666,71 @@
     "/api/v1/departments" : {
       "get" : {
         "tags" : [ "Department" ],
-        "summary" : "List departments",
-        "description" : "This API lists a particular number of departments, based on the limit specified.",
+        "summary" : "Get Departments",
+        "description" : "Retrieves departments, with pagination support.",
         "operationId" : "getDepartments",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "chatStatus",
           "in" : "query",
-          "description" : "Key that filters departments based on their chat status. Values allowed are @AVAILABLE@, @DISABLED@, @NOT_CREATED@, and @${UNAVAILABLE}@. @${UNAVAILABLE}@ refers to departments which are not available for chat.",
+          "description" : "Chat status used to filter departments <p><b>Possible values:</b> AVAILABLE, DISABLED, NOT_CREATED, ${UNAVAILABLE}<b></p><p> Note:</b>${UNAVAILABLE} refers to departments that are not available for chat</p>",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Key that filters departments based on their chat status. Values allowed are @AVAILABLE@, @DISABLED@, @NOT_CREATED@, and @${UNAVAILABLE}@. @${UNAVAILABLE}@ refers to departments which are not available for chat.",
+            "type" : [ "string" ],
             "enum" : [ "AVAILABLE", "DISABLED", "NOT_CREATED", "${UNAVAILABLE}" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "pattern" : "AVAILABLE|DISABLED|NOT_CREATED|\\$\\{UNAVAILABLE\\}"
           }
         }, {
-          "$ref" : "#/components/parameters/searchStr"
+          "name" : "searchStr",
+          "in" : "query",
+          "description" : "Search string used to match the first name, last name, or email ID <p><b>  Note:</b>  - string* searches for values that start with the string   - *string* searches for values that contain the string   - string searches for exact matches   - The string must contain at least one character</p>",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "minLength" : 1,
+            "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+"
+          }
         }, {
           "name" : "isEnabled",
           "in" : "query",
-          "description" : "Key that filters departments based on their enabled status",
+          "description" : "Indicates whether departments must be filtered by enabled status <p><b>Possible values:</b>• true = returns enabled departments   • false = returns disabled departments</p>",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "boolean", "null" ],
-            "description" : "Key that filters departments based on their enabled status"
+            "type" : [ "boolean" ]
           }
         }, {
-          "$ref" : "#/components/parameters/limit"
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of agents to fetch",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 200,
+            "minimum" : 0,
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/from"
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number from which the agents must be listed",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -461,15 +743,16 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.basic.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.departments.READ", "Desk.settings.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
       },
       "post" : {
         "tags" : [ "Department" ],
-        "summary" : "Add department",
-        "description" : "This API adds a department to your help desk portal.",
+        "summary" : "Create Department",
+        "description" : "Creates a department in the help desk portal.",
         "operationId" : "addDepartment",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -485,7 +768,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.CREATE", "Desk.basic.CREATE" ]
+          "iam-oauth2-schema" : [ "Desk.basic.CREATE", "Desk.departments.CREATE", "Desk.settings.CREATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -496,6 +779,7 @@
         "summary" : "Check for duplicate departments",
         "description" : "This API checks if multiple departments have the same name.",
         "operationId" : "checkDepartmentNameExist",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "departmentName",
           "in" : "query",
@@ -504,11 +788,9 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Name of the department for which you want to check duplicate entries",
-            "maxLength" : 200,
-            "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "type" : [ "string" ],
+            "maxLength" : 150,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -522,6 +804,51 @@
           }
         },
         "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.departments.READ", "Desk.settings.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/myDepartments" : {
+      "get" : {
+        "tags" : [ "Department" ],
+        "summary" : "Get My Departments",
+        "description" : "Retrieves departments associated with the current user.",
+        "operationId" : "getMyDepartments",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "isEnabled",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "boolean" ]
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Indicates whether departments must be filtered by enabled status <p><b>Possible values:</b>• true = returns enabled departments   • false = returns disabled departments</p>"
+        }, {
+          "name" : "chatStatus",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "pattern" : "AVAILABLE|DISABLED|NOT_CREATED|\\$\\{UNAVAILABLE\\}"
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Chat status used to filter departments <p><b>Possible values:</b> AVAILABLE, DISABLED, NOT_CREATED, ${UNAVAILABLE}<b></p><p> Note:</b>${UNAVAILABLE} refers to departments that are not available for chat</p>"
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/departmentListViewArray"
+          }
+        },
+        "security" : [ {
           "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.basic.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
@@ -531,85 +858,98 @@
   "components" : {
     "schemas" : {
       "agentData" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
           "$ref" : "./Agent.json#/components/schemas/agentIdsResponse"
-        }
+        },
+        "description" : "List of associable agents"
       },
       "commonDepartmentResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "isAssignToTeamEnabled" : {
-            "type" : [ "boolean", "null" ]
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the assign-to-team functionality is enabled   <p><b>Possible values: </b> • true = assign-to-team functionality is enabled   • false = assign-to-team functionality is disabled</p>"
           },
           "chatStatus" : {
             "type" : [ "string", "null" ],
             "enum" : [ "AVAILABLE", "DISABLED", "NOT_CREATED" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "description" : "Chat status of the department <p><b>Possible values:</b> AVAILABLE, DISABLED, NOT_CREATED</p>"
           },
           "hasLogo" : {
-            "type" : [ "boolean", "null" ]
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the department has a logo<p><b>Possible values:</b>• true = department has a logo   • false = department does not have a logo</p>"
           },
           "sanitizedName" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Sanitized Name of the department"
           },
           "isVisibleInCustomerPortal" : {
-            "type" : [ "boolean", "null" ]
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the department is visible in the help center<p><b>Possible values:</b>  • true = department is visible in the help center   • false = department is not visible in the help center</p>"
           },
           "creatorId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the user who created the department"
           },
           "description" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Short description of the department"
           },
           "isDefault" : {
-            "type" : [ "boolean", "null" ]
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the department is the default department in the help desk portal<p><b>Possible values: </b> • true = default department   • false = non-default department<p>"
           },
           "isEnabled" : {
-            "type" : [ "boolean", "null" ]
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the department is enabled <p><b>  Possible values:</b>  • true = department is enabled   • false = department is disabled</p."
           },
           "name" : {
             "type" : [ "string", "null" ],
             "maxLength" : 200,
             "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "Name of the department"
           },
           "createdTime" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+            "description" : "Time at which the department was created"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the department"
           },
           "nameInCustomerPortal" : {
             "type" : [ "string", "null" ],
             "maxLength" : 200,
             "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "Display name of the department in the help center"
           }
         },
         "required" : [ "chatStatus", "createdTime", "creatorId", "description", "hasLogo", "id", "isAssignToTeamEnabled", "isDefault", "isEnabled", "isVisibleInCustomerPortal", "name", "nameInCustomerPortal", "sanitizedName" ]
       },
       "data" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
           "$ref" : "#/components/schemas/commonDepartmentResponse"
-        }
+        },
+        "description" : "List of departments"
       },
       "updateDepartmentJson" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "isAssignToTeamEnabled" : {
@@ -619,15 +959,13 @@
           "nameInCustomerPortal" : {
             "type" : [ "string", "null" ],
             "description" : "Display name of the department in the help center",
-            "maxLength" : 200,
-            "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "maxLength" : 150,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s\\|&]+"
           }
-        },
-        "required" : [ "isAssignToTeamEnabled", "nameInCustomerPortal" ]
+        }
       },
       "departmentObjectWithPrimaryDetails" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "name" : {
@@ -637,7 +975,7 @@
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
@@ -651,13 +989,14 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "count" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
-                  "pattern" : "([0-9]+)"
+                  "pattern" : "([0-9]+)",
+                  "description" : "Number of departments"
                 }
               },
               "required" : [ "count" ]
@@ -681,19 +1020,21 @@
               "allOf" : [ {
                 "$ref" : "#/components/schemas/commonDepartmentResponse"
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "properties" : {
                   "associatedAgentIds" : {
-                    "type" : [ "null", "array" ],
+                    "type" : [ "array", "null" ],
                     "items" : {
-                      "type" : [ "string", "null", "integer" ],
+                      "type" : [ "string", "integer", "null" ],
                       "format" : "int64",
                       "pattern" : "([0-9]+)"
                     },
-                    "uniqueItems" : false
+                    "uniqueItems" : false,
+                    "description" : "ID(s) of the agents associated with the department"
                   }
                 },
-                "required" : [ "associatedAgentIds" ]
+                "required" : [ "associatedAgentIds" ],
+                "additionalProperties" : false
               } ]
             },
             "examples" : {
@@ -723,7 +1064,7 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
@@ -768,12 +1109,63 @@
           }
         }
       },
+      "getAssociableAgentsResponse" : {
+        "description" : "getAssociableAgentsResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "#/components/schemas/agentData"
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "data" : [ {
+                    "firstName" : "",
+                    "lastName" : "case",
+                    "photoURL" : null,
+                    "roleId" : "1892000000056099",
+                    "profileId" : "1892000000056091",
+                    "emailId" : "case@zylker.com",
+                    "id" : "1892000000056007",
+                    "zuid" : "1234567890"
+                  }, {
+                    "firstName" : "",
+                    "lastName" : "jade",
+                    "photoURL" : "https://contacts.example.com/file?t=user&ID=1234567890",
+                    "roleId" : "1892000000056899",
+                    "profileId" : "1892000000056091",
+                    "emailId" : "jade@zylker.com",
+                    "id" : "1892000000042001",
+                    "zuid" : "1234567890"
+                  }, {
+                    "firstName" : "Steve",
+                    "lastName" : "Watson",
+                    "photoURL" : "https://contacts.example.com/file?t=user&ID=1234567890",
+                    "roleId" : "1892000000056004",
+                    "profileId" : "18920000000232043",
+                    "emailId" : "stephen@zylker.com",
+                    "id" : "1892000000888059",
+                    "zuid" : null
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      },
       "checkNameResponse" : {
         "description" : "checkNameResponse template definitions",
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "isDepartmentNameExist" : {
@@ -793,77 +1185,19 @@
         }
       }
     },
-    "parameters" : {
-      "searchStr" : {
-        "name" : "searchStr",
-        "in" : "query",
-        "description" : "String to search for agents by first name, last name, or email ID. The string must contain at least one character. Three search methods are supported: 1) string* - Searches for agents whose first name, last name, or email ID start with the string, 2) *string* - Searches for agents whose first name, last name, or email ID contain the string, 3) string - Searches for agents whose first name, last name, or email ID is an exact match for the string",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null" ],
-          "description" : "String to search for agents by first name, last name, or email ID. The string must contain at least one character. Three search methods are supported: 1) string* - Searches for agents whose first name, last name, or email ID start with the string, 2) *string* - Searches for agents whose first name, last name, or email ID contain the string, 3) string - Searches for agents whose first name, last name, or email ID is an exact match for the string",
-          "maxLength" : 100,
-          "minLength" : 0
-        }
-      },
-      "departmentId" : {
-        "name" : "departmentId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "limit" : {
-        "name" : "limit",
-        "in" : "query",
-        "description" : "Number of agents to fetch; default value is 10 and maximum value is 200",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int32",
-          "description" : "Number of agents to fetch; default value is 10 and maximum value is 200",
-          "maximum" : 200,
-          "minimum" : 0,
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "from" : {
-        "name" : "from",
-        "in" : "query",
-        "description" : "Index number, starting from which the agents must be listed",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int32",
-          "description" : "Index number, starting from which the agents must be listed",
-          "minimum" : 0,
-          "pattern" : "([0-9]+)"
-        }
-      }
-    },
     "requestBodies" : {
       "agentIdsArray" : {
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "agentIds" : {
-                  "type" : [ "null", "array" ],
+                  "description" : "ID(s) of the agents",
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
@@ -886,13 +1220,14 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "agentIds" : {
-                  "type" : [ "null", "array" ],
+                  "description" : "ID(s) of the agents",
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
@@ -915,17 +1250,18 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "agentIds" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
-                  "uniqueItems" : false
+                  "uniqueItems" : false,
+                  "description" : "ID(s) of the agents to associate"
                 }
               },
               "required" : [ "agentIds" ]
@@ -944,21 +1280,21 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "emailNewDepartment" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "agentNewDepartment" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 }
               },
-              "required" : [ "agentNewDepartment" ]
+              "required" : [ ]
             },
             "examples" : {
               "Valid requestBody Definitions" : {
@@ -975,17 +1311,18 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "agentIds" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
-                  "uniqueItems" : false
+                  "uniqueItems" : false,
+                  "description" : "ID(s) of the agents to dissociate"
                 }
               },
               "required" : [ "agentIds" ]
@@ -1004,19 +1341,47 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "isAssignToTeamEnabled" : {
-                  "type" : [ "boolean", "null" ],
-                  "description" : "Key that denotes if the assign to team functionality is enabled or not"
+                  "type" : [ "boolean" ],
+                  "description" : "Indicates whether the assign-to-team functionality is enabled <p><b> Possible values: </b> • true = assign-to-team functionality is enabled   • false = assign-to-team functionality is disabled</b>"
                 },
                 "nameInCustomerPortal" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "description" : "Display name of the department in the help center",
-                  "maxLength" : 200,
-                  "minLength" : 0,
-                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                  "maxLength" : 150,
+                  "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s\\|&]+"
+                },
+                "name" : {
+                  "type" : [ "string" ],
+                  "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s\\|&]+",
+                  "x-regex-name" : "departmentName",
+                  "maxLength" : 150,
+                  "description" : "Name of the department"
+                },
+                "description" : {
+                  "type" : [ "string" ],
+                  "maxLength" : 500,
+                  "description" : "Short description of the department"
+                },
+                "isVisibleInCustomerPortal" : {
+                  "type" : [ "boolean" ],
+                  "description" : "Indicates whether the department is visible in the help center <p><b>  Possible values: </b> • true = department is visible in the help center   • false = department is not visible in the help center</p>"
+                },
+                "associatedAgentIds" : {
+                  "type" : [ "array" ],
+                  "items" : {
+                    "type" : [ "string", "integer" ],
+                    "format" : "int64",
+                    "pattern" : "([0-9]+)",
+                    "maxLength" : 11500
+                  },
+                  "maxLength" : 2500,
+                  "minItems" : 1,
+                  "maxItems" : 100,
+                  "description" : "ID(s) of the agents associated with the department"
                 }
               }
             },
@@ -1039,38 +1404,35 @@
               "allOf" : [ {
                 "$ref" : "#/components/schemas/updateDepartmentJson"
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object" ],
                 "properties" : {
                   "isVisibleInCustomerPortal" : {
-                    "type" : [ "boolean", "null" ],
-                    "description" : "Key that denotes if the department is visible in the help center or not"
+                    "type" : [ "boolean" ],
+                    "description" : "Indicates whether the department is visible in the help center <p><b>Possible values:</b>  • true = department is visible in the help center   • false = department is not visible in the help center</p>"
                   },
                   "name" : {
-                    "type" : [ "string", "null" ],
+                    "type" : [ "string" ],
                     "description" : "Name of the department",
-                    "maxLength" : 200,
-                    "minLength" : 0,
-                    "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                    "maxLength" : 150,
+                    "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s\\|&]+"
                   },
                   "description" : {
-                    "type" : [ "string", "null" ],
-                    "description" : "A short description of the department",
-                    "maxLength" : 100,
-                    "minLength" : 0
+                    "type" : [ "string" ],
+                    "description" : "Short description of the department",
+                    "maxLength" : 500
                   },
                   "associatedAgentIds" : {
-                    "type" : [ "null", "array" ],
+                    "type" : [ "array" ],
                     "items" : {
-                      "type" : [ "string", "null", "integer" ],
+                      "type" : [ "string", "integer" ],
                       "format" : "int64",
                       "pattern" : "([0-9]+)"
                     },
-                    "uniqueItems" : false
+                    "uniqueItems" : false,
+                    "description" : "ID(s) of the agents to associate with the department"
                   }
-                }
-              }, {
-                "type" : "object",
-                "required" : [ "associatedAgentIds", "name" ]
+                },
+                "additionalProperties" : false
               } ]
             },
             "examples" : {
@@ -1090,6 +1452,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

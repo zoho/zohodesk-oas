@@ -8,7 +8,7 @@
   "components" : {
     "schemas" : {
       "attachmentsData" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
           "$ref" : "./FAQ.json#/components/schemas/attachments"
         }
@@ -20,11 +20,12 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./FAQTranslation.json#/components/schemas/attachmentsData"
+                  "description" : "List of associated attachment entries",
+                  "$ref" : "#/components/schemas/attachmentsData"
                 }
               },
               "required" : [ "data" ]
@@ -36,8 +37,8 @@
                     "resourceId" : "1vq0db78bc1203a0645e0a38373b3bddf8d40",
                     "extension" : "txt",
                     "name" : "aadas1_2_3_5_54_.txt",
-                    "viewUrl" : "https://desk.zoho.com/support/DocsDisplay?attachId=e91351dc29e5b7394d93c8deb91b642a0b498ee34174141d&action=view&zgId=17ec4c79299ee107dc91a236738b3d70&entityId=e91351dc29e5b739421838319e770b0a42acf79f93f757e8",
-                    "downloadUrl" : "https://desk.zoho.com/support/DocsDisplay?attachId=e91351dc29e5b7394d93c8deb91b642a0b498ee34174141d&action=download&zgId=17ec4c79299ee107dc91a236738b3d70&entityId=e91351dc29e5b739421838319e770b0a42acf79f93f757e8",
+                    "viewUrl" : "https://desk.example.com/support/DocsDisplay?attachId=e91351dc29e5b7394d93c8deb91b642a0b498ee34174141d&action=view&zgId=1234567890abcdef1234567890abcdef&entityId=e91351dc29e5b739421838319e770b0a42acf79f93f757e8",
+                    "downloadUrl" : "https://desk.example.com/support/DocsDisplay?attachId=e91351dc29e5b7394d93c8deb91b642a0b498ee34174141d&action=download&zgId=1234567890abcdef1234567890abcdef&entityId=e91351dc29e5b739421838319e770b0a42acf79f93f757e8",
                     "createdTime" : 1531262705865,
                     "filesize" : "62"
                   } ]
@@ -53,17 +54,19 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "attachmentIds" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
+                  "description" : "ID(s) of the attachments to remove from the translation",
                   "items" : {
-                    "type" : [ "string", "null" ],
-                    "maxLength" : 100,
+                    "type" : [ "string" ],
+                    "maxLength" : 40,
                     "minLength" : 0,
                     "pattern" : "^([a-zA-Z0-9]{37}|-1)$"
                   },
+                  "max-items" : 10,
                   "uniqueItems" : false
                 }
               },
@@ -83,17 +86,19 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "attachmentIds" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
+                  "description" : "ID(s) of the gallery attachments to associate with the translation",
                   "items" : {
-                    "type" : [ "string", "null" ],
-                    "maxLength" : 100,
+                    "type" : [ "string" ],
+                    "maxLength" : 40,
                     "minLength" : 0,
                     "pattern" : "^([a-zA-Z0-9]{37}|-1)$"
                   },
+                  "max-items" : 10,
                   "uniqueItems" : false
                 }
               },
@@ -111,6 +116,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

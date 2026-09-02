@@ -8,11 +8,32 @@
     "/api/v1/communityUsers/{userId}" : {
       "get" : {
         "tags" : [ "CommunityUser" ],
-        "summary" : "Get community user details",
-        "description" : "This API fetches the details of an user from the community.",
+        "summary" : "Get User",
+        "description" : "Retrieves the details of a community user.",
         "operationId" : "getCommunityUserInfo",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/userId"
+          "name" : "include",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "pattern" : "stats",
+            "maxItems" : 1
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Additional information to include in the response. Possible values: stats."
+        }, {
+          "name" : "userId",
+          "in" : "path",
+          "required" : true,
+          "description" : "Unique ID of the community user to retrieve",
+          "schema" : {
+            "$ref" : "#/components/schemas/userIdSchema"
+          },
+          "style" : "simple",
+          "explode" : false
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -37,11 +58,20 @@
       },
       "patch" : {
         "tags" : [ "CommunityUser" ],
-        "summary" : "Update user status in community",
-        "description" : "This API updates the moderation status of end-users in the user community.",
+        "summary" : "Update User Status",
+        "description" : "Updates the moderation status of an end-user in the community.",
         "operationId" : "updateCommunityUserInfo",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/userId"
+          "name" : "userId",
+          "in" : "path",
+          "required" : true,
+          "description" : "Unique ID of the community user to update",
+          "schema" : {
+            "$ref" : "#/components/schemas/userIdSchema"
+          },
+          "style" : "simple",
+          "explode" : false
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -59,7 +89,7 @@
             "$ref" : "./Common.json#/components/responses/internalErrorResponse"
           },
           "204" : {
-            "$ref" : "./Common.json#/components/responses/emptyResponse"
+            "$ref" : "#/components/responses/emptyResponse"
           },
           "403" : {
             "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
@@ -74,15 +104,45 @@
     "/api/v1/communityUsers/{userId}/followers" : {
       "get" : {
         "tags" : [ "CommunityUser" ],
-        "summary" : "List followers of community user",
-        "description" : "This API lists followers of a user, based on the limit defined.",
+        "summary" : "Get User Followers",
+        "description" : "Retrieves users who follow a community user, with pagination support.",
         "operationId" : "getAllCommunityUserFollowers",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/limit"
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of followers to list",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 50,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)",
+            "default" : 10
+          }
         }, {
-          "$ref" : "#/components/parameters/from"
+          "name" : "from",
+          "in" : "query",
+          "required" : false,
+          "description" : "Index number from which followers must be listed",
+          "schema" : {
+            "$ref" : "#/components/schemas/fromSchema"
+          },
+          "style" : "form",
+          "explode" : true
         }, {
-          "$ref" : "#/components/parameters/userId"
+          "name" : "userId",
+          "in" : "path",
+          "required" : true,
+          "description" : "Unique ID of the community user from which followers must be retrieved",
+          "schema" : {
+            "$ref" : "#/components/schemas/userIdSchema"
+          },
+          "style" : "simple",
+          "explode" : false
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -129,13 +189,30 @@
     "/api/v1/communityModeratedUsers" : {
       "get" : {
         "tags" : [ "CommunityUser" ],
-        "summary" : "List moderated community users",
-        "description" : "This API lists a particular number of moderated end-users, based on the limit defined. ",
+        "summary" : "Get Moderated Users",
+        "description" : "Retrieves end-users who are currently under moderation, with pagination support.",
         "operationId" : "getAllCommunityModeratedUsers",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/limit"
+          "name" : "limit",
+          "in" : "query",
+          "required" : false,
+          "description" : "Number of users to list",
+          "schema" : {
+            "$ref" : "#/components/schemas/limitSchema"
+          },
+          "style" : "form",
+          "explode" : true
         }, {
-          "$ref" : "#/components/parameters/from"
+          "name" : "from",
+          "in" : "query",
+          "required" : false,
+          "description" : "Index number from which users must be listed",
+          "schema" : {
+            "$ref" : "#/components/schemas/fromSchema"
+          },
+          "style" : "form",
+          "explode" : true
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -156,11 +233,20 @@
     "/api/v1/communityUsers/{userId}/follow" : {
       "post" : {
         "tags" : [ "CommunityUser" ],
-        "summary" : "Follow community user",
-        "description" : "This API helps to follow users.",
-        "operationId" : "updateFollowersToCommunityUser",
+        "summary" : "Follow User",
+        "description" : "Subscribes the authenticated user to follow a community user.",
+        "operationId" : "followCommunityUser",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/userId"
+          "name" : "userId",
+          "in" : "path",
+          "required" : true,
+          "description" : "Unique ID of the community user to follow",
+          "schema" : {
+            "$ref" : "#/components/schemas/userIdSchema"
+          },
+          "style" : "simple",
+          "explode" : false
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -169,7 +255,7 @@
             "$ref" : "./Common.json#/components/responses/internalErrorResponse"
           },
           "204" : {
-            "$ref" : "./Common.json#/components/responses/emptyResponse"
+            "$ref" : "#/components/responses/emptyResponse"
           },
           "403" : {
             "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
@@ -184,11 +270,20 @@
     "/api/v1/communityUsers/{userId}/unfollow" : {
       "post" : {
         "tags" : [ "CommunityUser" ],
-        "summary" : "Unfollow community user",
-        "description" : "This API helps to unfollow users.",
-        "operationId" : "updateUnFollowersToCommunityUser",
+        "summary" : "Unfollow User",
+        "description" : "Unsubscribes the authenticated user from following a community user.",
+        "operationId" : "unfollowCommunityUser",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/userId"
+          "name" : "userId",
+          "in" : "path",
+          "required" : true,
+          "description" : "Unique ID of the community user to unfollow",
+          "schema" : {
+            "$ref" : "#/components/schemas/userIdSchema"
+          },
+          "style" : "simple",
+          "explode" : false
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -197,7 +292,7 @@
             "$ref" : "./Common.json#/components/responses/internalErrorResponse"
           },
           "204" : {
-            "$ref" : "./Common.json#/components/responses/emptyResponse"
+            "$ref" : "#/components/responses/emptyResponse"
           },
           "403" : {
             "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
@@ -213,17 +308,18 @@
   "components" : {
     "schemas" : {
       "userDetails" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "photoUrl" : {
             "type" : [ "string", "null" ],
             "maxLength" : 400,
             "minLength" : 0,
-            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+            "description" : "URL of the follower's profile photo"
           },
           "contactId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
@@ -231,12 +327,14 @@
             "type" : [ "string", "null" ],
             "maxLength" : 200,
             "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "Display name of the follower"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the follower"
           },
           "label" : {
             "$ref" : "./Label.json#/components/schemas/labelMetaResponse"
@@ -244,33 +342,35 @@
           "type" : {
             "type" : [ "string", "null" ],
             "enum" : [ "END_USER", "AGENT" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "description" : "Type of user. Possible values: AGENT, END_USER."
           }
         },
-        "required" : [ "contactId", "id", "label", "name", "photoUrl", "type" ]
+        "required" : [ "contactId", "id", "label", "name", "photoUrl", "type" ],
+        "description" : "Agent who moderated the user"
       },
       "userFollowersDetailsData" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./CommunityUser.json#/components/schemas/userDetails"
-        }
+          "$ref" : "#/components/schemas/userDetails"
+        },
+        "description" : "List of users who follow the specified user"
       },
       "moderatedUserDetails" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "moderatedBy" : {
-            "$ref" : "./CommunityUser.json#/components/schemas/userDetails"
+            "$ref" : "#/components/schemas/userDetails"
           },
           "photoUrl" : {
             "type" : [ "string", "null" ],
             "maxLength" : 400,
             "minLength" : 0,
-            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+            "description" : "URL of the moderated user's profile photo"
           },
           "contactId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
@@ -278,52 +378,113 @@
             "type" : [ "string", "null" ],
             "maxLength" : 200,
             "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "Display name of the moderated user"
           },
           "moderatedOn" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+            "description" : "Time at which the user was moderated (ISO 8601 format)"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the moderated user"
           },
           "type" : {
             "type" : [ "string", "null" ],
             "enum" : [ "END_USER", "AGENT" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "description" : "Type of user. Possible values: AGENT, END_USER."
           },
           "status" : {
             "type" : [ "string", "null" ],
             "enum" : [ "ACTIVE", "DISABLED", "DELETED", "ANONYMIZED", "CLOSED_SUPPORT_REP", "LICENSE_DOWNGRADED_SUPPORT_REP" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "description" : "Status of the user. Possible values: ACTIVE, DISABLED."
           }
         },
         "required" : [ "contactId", "id", "moderatedBy", "moderatedOn", "name", "photoUrl", "status", "type" ]
       },
       "moderatedUserDetailsData" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./CommunityUser.json#/components/schemas/moderatedUserDetails"
-        }
+          "$ref" : "#/components/schemas/moderatedUserDetails"
+        },
+        "description" : "List of moderated users"
+      },
+      "community_user_status" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "postCount" : {
+            "type" : [ "string" ],
+            "pattern" : "([0-9]+)",
+            "description" : "Total number of topics posted by the user"
+          },
+          "isFollowing" : {
+            "type" : [ "boolean" ]
+          },
+          "commentsCount" : {
+            "type" : [ "string" ],
+            "pattern" : "([0-9]+)"
+          },
+          "followersCount" : {
+            "type" : [ "string" ],
+            "pattern" : "([0-9]+)",
+            "description" : "Number of users following this user"
+          },
+          "topicTypeWiseCount" : {
+            "type" : [ "object" ],
+            "patternProperties" : {
+              "(DISCUSSION|ANNOUNCEMENT|QUESTION|IDEA|PROBLEM)" : {
+                "type" : [ "string" ],
+                "pattern" : "([0-9]+)"
+              }
+            },
+            "additionalProperties" : false,
+            "description" : "Breakdown of the user's topics by type"
+          }
+        },
+        "required" : [ "postCount", "commentsCount", "followersCount", "isFollowing", "topicTypeWiseCount" ],
+        "description" : "Activity statistics of the user"
+      },
+      "limitSchema" : {
+        "type" : [ "integer" ],
+        "format" : "int32",
+        "maximum" : 50,
+        "minimum" : 1,
+        "pattern" : "([0-9]+)",
+        "default" : 25
+      },
+      "userIdSchema" : {
+        "type" : [ "string", "integer" ],
+        "format" : "int64",
+        "pattern" : "([0-9]+)"
+      },
+      "fromSchema" : {
+        "type" : [ "integer" ],
+        "format" : "int32",
+        "minimum" : 1,
+        "pattern" : "([0-9]+)",
+        "default" : 1
       }
     },
     "responses" : {
+      "emptyResponse" : {
+        "description" : "This API returns a 204 status code with no response body."
+      },
       "listAllCommunityUserFollowers" : {
         "description" : "listAllCommunityUserFollowers template definitions",
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./CommunityUser.json#/components/schemas/userFollowersDetailsData"
+                  "$ref" : "#/components/schemas/userFollowersDetailsData"
                 }
               },
               "required" : [ "data" ]
@@ -332,7 +493,7 @@
               "Valid responses Definitions" : {
                 "value" : {
                   "data" : [ {
-                    "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015971/photo?orgId=123456",
+                    "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015971/photo?orgId=1234567890",
                     "name" : "user 1",
                     "id" : "7000000015971",
                     "label" : {
@@ -343,12 +504,12 @@
                       },
                       "name" : "Admin",
                       "id" : "6000000158001",
-                      "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/6000000158231?orgId=14132"
+                      "logoUrl" : "https://desk.example.com/portal/api/publicImages/6000000158231?orgId=1234567890"
                     },
-                    "type" : "AGENT",
+                    "type" : [ "AGENT" ],
                     "status" : "ACTIVE"
                   }, {
-                    "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015972/photo?orgId=123456",
+                    "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015972/photo?orgId=1234567890",
                     "name" : "user 3",
                     "id" : "7000000015972",
                     "label" : {
@@ -359,9 +520,9 @@
                       },
                       "name" : "Admin",
                       "id" : "6000000158001",
-                      "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/6000000158231?orgId=14132"
+                      "logoUrl" : "https://desk.example.com/portal/api/publicImages/6000000158231?orgId=1234567890"
                     },
-                    "type" : "AGENT",
+                    "type" : [ "AGENT" ],
                     "status" : "DISABLED"
                   } ]
                 }
@@ -375,11 +536,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./CommunityUser.json#/components/schemas/moderatedUserDetailsData"
+                  "$ref" : "#/components/schemas/moderatedUserDetailsData"
                 }
               },
               "required" : [ "data" ]
@@ -389,30 +550,30 @@
                 "value" : {
                   "data" : [ {
                     "moderatedBy" : {
-                      "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015972/photo?orgId=123456",
+                      "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015972/photo?orgId=1234567890",
                       "name" : "user 2",
                       "id" : "7000000015972",
-                      "type" : "AGENT",
+                      "type" : [ "AGENT" ],
                       "status" : "ACTIVE"
                     },
-                    "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015971/photo?orgId=123456",
+                    "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015971/photo?orgId=1234567890",
                     "name" : "user 1",
                     "moderatedOn" : 1539682932716,
                     "id" : "7000000015971",
-                    "type" : "AGENT",
+                    "type" : [ "AGENT" ],
                     "status" : "ACTIVE"
                   }, {
                     "moderatedBy" : {
-                      "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015974/photo?orgId=123456",
+                      "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015974/photo?orgId=1234567890",
                       "name" : "user 4",
                       "id" : "7000000015974",
-                      "type" : "AGENT"
+                      "type" : [ "AGENT" ]
                     },
-                    "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015972/photo?orgId=123456",
+                    "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015972/photo?orgId=1234567890",
                     "name" : "user 3",
                     "moderatedOn" : 1539682932716,
                     "id" : "7000000015972",
-                    "type" : "AGENT"
+                    "type" : [ "AGENT" ]
                   } ]
                 }
               }
@@ -425,28 +586,32 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "photoUrl" : {
                   "type" : [ "string", "null" ],
                   "maxLength" : 400,
                   "minLength" : 0,
-                  "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+                  "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+                  "description" : "URL of the user's profile photo"
                 },
                 "name" : {
                   "type" : [ "string", "null" ],
                   "maxLength" : 200,
                   "minLength" : 0,
-                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+                  "description" : "Display name of the user"
                 },
                 "isModerated" : {
-                  "type" : [ "boolean", "null" ]
+                  "type" : [ "boolean", "null" ],
+                  "description" : "Indicates whether the user is moderated. Possible values: true = User's posts are reviewed before publishing, false = User's posts are published without review."
                 },
                 "id" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
-                  "pattern" : "([0-9]+)"
+                  "pattern" : "([0-9]+)",
+                  "description" : "Unique ID of the community user"
                 },
                 "label" : {
                   "$ref" : "./Label.json#/components/schemas/labelMetaResponse"
@@ -454,8 +619,7 @@
                 "type" : {
                   "type" : [ "string", "null" ],
                   "enum" : [ "END_USER", "AGENT" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "description" : "Type of user. Possible values: AGENT, END_USER."
                 },
                 "email" : {
                   "type" : [ "string", "null" ],
@@ -466,8 +630,10 @@
                 "status" : {
                   "type" : [ "string", "null" ],
                   "enum" : [ "ACTIVE", "DISABLED", "DELETED", "ANONYMIZED", "CLOSED_SUPPORT_REP", "LICENSE_DOWNGRADED_SUPPORT_REP" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "description" : "Status of the user. Possible values: ACTIVE, DISABLED."
+                },
+                "stats" : {
+                  "$ref" : "#/components/schemas/community_user_status"
                 }
               },
               "required" : [ "email", "id", "isModerated", "label", "name", "photoUrl", "status", "type" ]
@@ -475,7 +641,7 @@
             "examples" : {
               "Valid responses Definitions" : {
                 "value" : {
-                  "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015971/photo?orgId=123456",
+                  "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015971/photo?orgId=1234567890",
                   "stats" : {
                     "postCount" : "35",
                     "topicTypeWiseCount" : {
@@ -491,7 +657,7 @@
                   "name" : "user 1",
                   "isModerated" : true,
                   "id" : "7000000015971",
-                  "type" : "AGENT",
+                  "type" : [ "AGENT" ],
                   "status" : "ACTIVE"
                 }
               }
@@ -500,62 +666,17 @@
         }
       }
     },
-    "parameters" : {
-      "limit" : {
-        "name" : "limit",
-        "in" : "query",
-        "description" : "Number of followers to list",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int32",
-          "description" : "Number of followers to list",
-          "maximum" : 100,
-          "minimum" : 1,
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "from" : {
-        "name" : "from",
-        "in" : "query",
-        "description" : "Index number, starting from which the followers must be listed",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int32",
-          "description" : "Index number, starting from which the followers must be listed",
-          "minimum" : 0,
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "userId" : {
-        "name" : "userId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      }
-    },
     "requestBodies" : {
       "updateCommunityUserInfoRequestJSON" : {
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "isModerated" : {
-                  "type" : [ "boolean", "null" ],
-                  "description" : "Key that defines whether the user is moderated or not"
+                  "type" : [ "boolean" ],
+                  "description" : "Indicates whether the user must be moderated. Possible values: true = Enable moderation for the user, false = Disable moderation for the user."
                 }
               },
               "required" : [ "isModerated" ]
@@ -574,13 +695,13 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "userIds" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
@@ -601,6 +722,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

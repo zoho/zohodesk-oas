@@ -8,11 +8,23 @@
     "/api/v1/contacts/{contactId}/removeFollowers" : {
       "post" : {
         "tags" : [ "ContactFollowers" ],
-        "summary" : "Remove contact followers",
-        "description" : "This API removes one or more users from the followers list of a contact.",
+        "summary" : "Remove Contact Followers",
+        "description" : "Removes one or more users from the followers list of a contact. Followers track the tickets raised by the contact and the support provided.",
         "operationId" : "removeContactFollowers",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/contactId"
+          "name" : "contactId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "description" : "Unique ID of the contact",
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "maxLength" : 100,
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -39,11 +51,23 @@
     "/api/v1/contacts/{contactId}/addFollowers" : {
       "post" : {
         "tags" : [ "ContactFollowers" ],
-        "summary" : "Add contact followers",
-        "description" : "This API adds one or more users to the followers list of a contact.",
+        "summary" : "Add Contact Followers",
+        "description" : "Adds one or more users to the followers list of a contact. Followers track the tickets raised by the contact and the support provided.",
         "operationId" : "addContactFollowers",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/contactId"
+          "name" : "contactId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "description" : "Unique ID of the contact",
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "maxLength" : 100,
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -70,11 +94,48 @@
     "/api/v1/contacts/{contactId}/followers" : {
       "get" : {
         "tags" : [ "ContactFollowers" ],
-        "summary" : "Get contact followers",
-        "description" : "This API fetches the list of users following a contact.",
+        "summary" : "Get Contact Followers",
+        "description" : "Retrieves the list of users following a contact, with pagination support. Followers track the tickets raised by the contact and the support provided.",
         "operationId" : "getContactFollowers",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/contactId"
+          "name" : "from",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "default" : 0
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Index number, starting from which the followers must be fetched"
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "minimum" : 1,
+            "maximum" : 100
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Number of followers to list"
+        }, {
+          "name" : "contactId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "description" : "Unique ID of the contact",
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "maxLength" : 100,
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -93,44 +154,49 @@
   "components" : {
     "schemas" : {
       "followerDetails" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "firstName" : {
             "type" : [ "string", "null" ],
             "maxLength" : 200,
             "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "First name of the user"
           },
           "lastName" : {
             "type" : [ "string", "null" ],
             "maxLength" : 200,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Last name of the user"
           },
           "photoURL" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+            "description" : "URL to access the user's photo"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the user"
           },
           "email" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+            "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$",
+            "description" : "Email ID of the user"
           }
         },
         "required" : [ "email", "firstName", "id", "lastName", "photoURL" ]
       },
       "followersDataResponse" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./ContactFollowers.json#/components/schemas/followerDetails"
+          "$ref" : "#/components/schemas/followerDetails"
         }
       }
     },
@@ -141,28 +207,29 @@
           "application/json" : {
             "schema" : {
               "oneOf" : [ {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "data" : {
-                    "$ref" : "./ContactFollowers.json#/components/schemas/followersDataResponse"
+                    "$ref" : "#/components/schemas/followersDataResponse",
+                    "description" : "List of users following the contact"
                   }
                 },
                 "required" : [ "data" ]
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "errorCode" : {
                     "type" : [ "string", "null" ],
                     "enum" : [ "URL_NOT_FOUND", "UNAUTHORIZED", "INVALID_OAUTH", "SCOPE_MISMATCH", "FORBIDDEN", "LICENSE_ACCESS_LIMITED", "METHOD_NOT_ALLOWED", "RESOURCE_SIZE_EXCEEDED", "UNSUPPORTED_MEDIA_TYPE", "INVALID_DATA", "UNPROCESSABLE_ENTITY", "ONLY_LIVECHAT_USER", "INTEGRATION_ADMIN_ERROR", "THRESHOLD_EXCEEDED", "INTERNAL_SERVER_ERROR", "EMPTY_PAYLOAD" ],
-                    "maxLength" : 100,
-                    "minLength" : 0
+                    "description" : "Accepted values: URL_NOT_FOUND, UNAUTHORIZED, INVALID_OAUTH, SCOPE_MISMATCH, FORBIDDEN, LICENSE_ACCESS_LIMITED, METHOD_NOT_ALLOWED, RESOURCE_SIZE_EXCEEDED, UNSUPPORTED_MEDIA_TYPE, INVALID_DATA, UNPROCESSABLE_ENTITY, ONLY_LIVECHAT_USER, INTEGRATION_ADMIN_ERROR, THRESHOLD_EXCEEDED, INTERNAL_SERVER_ERROR, EMPTY_PAYLOAD"
                   },
                   "message" : {
                     "type" : [ "string", "null" ],
                     "maxLength" : 255,
-                    "minLength" : 0
+                    "minLength" : 0,
+                    "description" : "Human-readable error message describing the failure"
                   }
                 },
                 "required" : [ "errorCode", "message" ]
@@ -173,14 +240,14 @@
                 "value" : {
                   "data" : [ {
                     "firstName" : "",
-                    "lastName" : "agent",
-                    "photoURL" : "https://desk.zoho.com/api/v1/agent/5000000012903/photo",
+                    "lastName" : "Adams",
+                    "photoURL" : "https://desk.example.com/api/v1/agent/5000000012903/photo",
                     "id" : "5000000012903",
                     "email" : "agent@zylker.com"
                   }, {
                     "firstName" : "",
-                    "lastName" : "deskagent",
-                    "photoURL" : "https://desk.zoho.com/api/v1/agent/5000000012902/photo",
+                    "lastName" : "Baker",
+                    "photoURL" : "https://desk.example.com/api/v1/agent/5000000012902/photo",
                     "id" : "5000000012902",
                     "email" : "deskagent@zylker.com"
                   } ]
@@ -191,36 +258,23 @@
         }
       }
     },
-    "parameters" : {
-      "contactId" : {
-        "name" : "contactId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      }
-    },
     "requestBodies" : {
       "removeFollowers" : {
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "followerIds" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
-                  "uniqueItems" : true
+                  "uniqueItems" : true,
+                  "description" : "ID(s) of the users to remove from the followers list"
                 }
               },
               "required" : [ "followerIds" ]
@@ -239,17 +293,18 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "followerIds" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
-                  "uniqueItems" : true
+                  "uniqueItems" : true,
+                  "description" : "ID(s) of the users to add as followers"
                 }
               },
               "required" : [ "followerIds" ]
@@ -266,6 +321,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

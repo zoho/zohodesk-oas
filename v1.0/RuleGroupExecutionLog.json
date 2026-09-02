@@ -1,0 +1,372 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "RuleGroup Execution Log APIs",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/rulegroups/executionLogs" : {
+      "get" : {
+        "tags" : [ "RuleGroupExecutionLog" ],
+        "summary" : "Get Execution Logs",
+        "description" : "Retrieves a list of async rule group execution logs, with pagination support.",
+        "operationId" : "getExecLogs",
+        "parameters" : [ {
+          "name" : "engineId",
+          "in" : "query",
+          "description" : "Unique ID of the automation engine to filter execution logs. _Note:_ For identifying the engine, you must provide either engineId or engineSysName.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : ""
+          }
+        }, {
+          "name" : "engineSysName",
+          "in" : "query",
+          "description" : "System name of the automation engine to filter execution logs. _Note:_ For identifying the engine, you must provide either engineId or engineSysName.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "",
+            "maxLength" : 100
+          }
+        }, {
+          "name" : "moduleId",
+          "in" : "query",
+          "description" : "Unique ID of the module to filter execution logs. _Note:_ For identifying the module, you must provide either moduleId or moduleApiName.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : ""
+          }
+        }, {
+          "name" : "moduleApiName",
+          "in" : "query",
+          "description" : "API name of the module to filter execution logs. _Note:_ For identifying the module, you must provide either moduleId or moduleApiName.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "",
+            "maxLength" : 100
+          }
+        }, {
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "Unique ID of the department to filter execution logs",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : ""
+          }
+        }, {
+          "name" : "triggerEvent",
+          "in" : "query",
+          "description" : "System name of the trigger event to filter execution logs. _Note:_ Multiple values can be provided by separating them with commas. A maximum of 50 values is allowed.",
+          "required" : false,
+          "style" : "form",
+          "explode" : false,
+          "schema" : {
+            "type" : "array",
+            "description" : "",
+            "items" : {
+              "type" : "string",
+              "description" : "",
+              "maxLength" : 100
+            },
+            "maxItems" : 50
+          }
+        }, {
+          "name" : "status",
+          "in" : "query",
+          "description" : "Execution status values to filter logs. _Possible values:_ COMPLETED, PARTIALLY_COMPLETED, SCHEDULE_PENDING. _Note:_ Multiple values can be provided by separating them with commas.",
+          "required" : false,
+          "style" : "form",
+          "explode" : false,
+          "schema" : {
+            "type" : "array",
+            "description" : "",
+            "items" : {
+              "type" : "string",
+              "description" : "",
+              "enum" : [ "COMPLETED", "PARTIALLY_COMPLETED", "SCHEDULE_PENDING" ]
+            },
+            "maxItems" : 3
+          }
+        }, {
+          "name" : "ruleGroupId",
+          "in" : "query",
+          "description" : "Unique ID of the rule group to filter execution logs",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : ""
+          }
+        }, {
+          "name" : "recordId",
+          "in" : "query",
+          "description" : "Unique ID of the entity to filter execution logs",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : ""
+          }
+        }, {
+          "name" : "startTime",
+          "in" : "query",
+          "description" : "Start of the time range to filter execution logs, in ISO 8601 UTC format",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "",
+            "maxLength" : 30
+          }
+        }, {
+          "name" : "endTime",
+          "in" : "query",
+          "description" : "End of the time range to filter execution logs, in ISO 8601 UTC format",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "",
+            "maxLength" : 30
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number from which execution logs must be fetched",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : ""
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of execution logs to fetch. The value must be between 1 and 50.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "",
+            "maximum" : 50,
+            "minimum" : 1
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/getExecLogsResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.automations.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/rulegroups/executionLogs/{id}" : {
+      "get" : {
+        "tags" : [ "RuleGroupExecutionLog" ],
+        "summary" : "Get Execution Log",
+        "description" : "Retrieves the details of a specific execution log entry. The response includes execution metadata and a rule group snapshot with per-node execution details.",
+        "operationId" : "getExecLog",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "Unique ID of the execution log entry",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.automations.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "GetExecLogsResponse" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "properties" : {
+          "data" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ExecLog"
+            }
+          }
+        }
+      },
+      "ExecLog" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "properties" : {
+          "executionId" : {
+            "type" : [ "string", "null" ]
+          },
+          "startTime" : {
+            "type" : [ "string", "null" ],
+            "format" : "date-time"
+          },
+          "status" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "enum" : [ "COMPLETED", "PARTIALLY_COMPLETED", "SCHEDULE_PENDING" ]
+            }
+          },
+          "timeTaken" : {
+            "type" : [ "string", "null" ]
+          },
+          "departmentId" : {
+            "type" : [ "string", "null" ]
+          },
+          "module" : {
+            "$ref" : "#/components/schemas/ExecLogModule"
+          },
+          "record" : {
+            "$ref" : "#/components/schemas/ExecLogRecord"
+          },
+          "ruleGroup" : {
+            "$ref" : "#/components/schemas/ExecLogRuleGroup"
+          },
+          "triggerEvent" : {
+            "$ref" : "#/components/schemas/ExecLogTriggerEvent"
+          }
+        }
+      },
+      "ExecLogModule" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "id" : {
+            "type" : [ "string", "null" ]
+          },
+          "apiName" : {
+            "type" : [ "string", "null" ]
+          },
+          "displayLabel" : {
+            "type" : [ "string", "null" ]
+          }
+        }
+      },
+      "ExecLogRecord" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "id" : {
+            "type" : [ "string", "null" ]
+          },
+          "name" : {
+            "type" : [ "string", "null" ]
+          },
+          "webUrl" : {
+            "type" : [ "string", "null" ]
+          }
+        }
+      },
+      "ExecLogRuleGroup" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "id" : {
+            "type" : [ "string", "null" ]
+          },
+          "name" : {
+            "type" : [ "string", "null" ]
+          }
+        }
+      },
+      "ExecLogTriggerEvent" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "sysName" : {
+            "type" : [ "string", "null" ]
+          },
+          "displayLabel" : {
+            "type" : [ "string", "null" ]
+          },
+          "i18nLabel" : {
+            "type" : [ "string", "null" ]
+          }
+        }
+      }
+    },
+    "responses" : {
+      "getExecLogsResponse" : {
+        "description" : "List of execution logs",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/GetExecLogsResponse"
+            },
+            "examples" : {
+              "emptyList" : {
+                "value" : {
+                  "data" : [ ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "RuleGroupExecutionLog"
+}

@@ -1,0 +1,755 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Records",
+    "description" : "Records store the structured data created within custom modules in Zoho Desk. Each record represents a distinct entity within a module. Once a custom module is created, records can be created for that module. For example, within a doctor module, a list of doctors can be created, with each doctor being a distinct record within that module.",
+    "version" : "1.0.0"
+  },
+  "paths" : { },
+  "components" : {
+    "schemas" : {
+      "recordIdsArray" : {
+        "type" : [ "array" ],
+        "minItems" : 1,
+        "maxItems" : 50,
+        "items" : {
+          "type" : [ "string", "integer" ],
+          "format" : "int64",
+          "pattern" : "([0-9]+)"
+        }
+      },
+      "agentData" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "photoURL" : {
+            "type" : [ "string", "null" ],
+            "description" : "URL to the agent's photo",
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+          },
+          "firstName" : {
+            "type" : [ "string", "null" ],
+            "description" : "First name of the agent",
+            "maxLength" : 50,
+            "minLength" : 0
+          },
+          "lastName" : {
+            "type" : [ "string" ],
+            "description" : "Last name of the agent",
+            "maxLength" : 50,
+            "minLength" : 0
+          },
+          "id" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Unique ID of the agent",
+            "pattern" : "([0-9]+)"
+          },
+          "email" : {
+            "type" : [ "string", "null" ],
+            "description" : "Email ID of the agent",
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+          }
+        },
+        "required" : [ "firstName", "id", "lastName", "photoURL", "email" ]
+      },
+      "layoutData" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "id" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "ID of the layout",
+            "pattern" : "([0-9]+)"
+          },
+          "layoutName" : {
+            "type" : [ "string" ],
+            "description" : "Name of the layout",
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          }
+        },
+        "required" : [ "id", "layoutName" ]
+      },
+      "departmentData" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "name" : {
+            "type" : [ "string" ],
+            "description" : "Name of the department",
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "id" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Unique ID of the department",
+            "pattern" : "([0-9]+)"
+          }
+        },
+        "required" : [ "name", "id" ]
+      },
+      "recordOldResponse" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "layout" : {
+            "description" : "Layout of the record",
+            "$ref" : "#/components/schemas/layoutData"
+          },
+          "owner" : {
+            "description" : "Owner of the record",
+            "$ref" : "#/components/schemas/agentData"
+          },
+          "modifiedTime" : {
+            "description" : "Time when the record was last modified",
+            "$ref" : "#/components/schemas/dateTimeField"
+          },
+          "cf" : {
+            "description" : "Custom fields of the record",
+            "$ref" : "#/components/schemas/cfInput"
+          },
+          "createdBy" : {
+            "description" : "User who created the record",
+            "type" : [ "object" ],
+            "$ref" : "#/components/schemas/agentData"
+          },
+          "name" : {
+            "description" : "Primary field of the custom module for the record",
+            "$ref" : "#/components/schemas/nameField"
+          },
+          "createdTime" : {
+            "description" : "Time when the record was created",
+            "$ref" : "#/components/schemas/dateTimeField"
+          },
+          "modifiedBy" : {
+            "description" : "User who last modified the record",
+            "type" : [ "object" ],
+            "$ref" : "#/components/schemas/agentData"
+          },
+          "isPresence" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the record is moved to Recycle Bin. Possible values: true = Record is present, false = Record has been moved to the Recycle Bin"
+          },
+          "id" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Unique ID of the record",
+            "pattern" : "([0-9]+)"
+          },
+          "department" : {
+            "description" : "Department associated with the record",
+            "$ref" : "#/components/schemas/departmentData"
+          },
+          "layoutId" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "ID of the layout associated with the record",
+            "pattern" : "([0-9]+)"
+          }
+        }
+      },
+      "arrayOfRecordOldResponse" : {
+        "type" : [ "null", "array" ],
+        "items" : {
+          "$ref" : "#/components/schemas/recordOldResponse",
+          "required" : [ "id", "layout" ]
+        },
+        "description" : "department is required only for department-specific modules"
+      },
+      "dateTimeField" : {
+        "type" : [ "string" ],
+        "description" : "A timestamp value in ISO 8601 format",
+        "maxLength" : 100,
+        "minLength" : 0,
+        "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+      },
+      "bulkActionResult" : {
+        "type" : [ "null", "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "data" : {
+            "type" : [ "null", "array" ],
+            "description" : "List of per-record operation results, each indicating success or failure with details.",
+            "items" : {
+              "type" : [ "null", "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "success" : {
+                  "type" : [ "boolean", "null" ],
+                  "description" : "Boolean indicating whether the operation on the individual record succeeded"
+                },
+                "id" : {
+                  "type" : [ "string", "null", "integer" ],
+                  "format" : "int64",
+                  "description" : "The ID of the record that was processed",
+                  "pattern" : "([0-9]+)"
+                },
+                "errors" : {
+                  "type" : [ "null", "object" ],
+                  "additionalProperties" : false,
+                  "description" : "Error details for the individual record",
+                  "properties" : {
+                    "errorCode" : {
+                      "type" : [ "string", "null" ],
+                      "description" : "Machine-readable error code string"
+                    },
+                    "httpCode" : {
+                      "type" : [ "string", "null", "integer" ],
+                      "description" : "HTTP status code of the error"
+                    },
+                    "errorMessage" : {
+                      "type" : [ "string", "null" ],
+                      "description" : "Human-readable error description"
+                    }
+                  },
+                  "required" : [ "errorCode", "httpCode" ]
+                }
+              },
+              "required" : [ "errors", "id", "success" ]
+            }
+          }
+        },
+        "required" : [ "data" ]
+      },
+      "layoutInput" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "description" : "Layout to associate with the record",
+        "properties" : {
+          "id" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Unique ID of the layout to associate with the record",
+            "pattern" : "([0-9]+)"
+          }
+        },
+        "required" : [ "id" ]
+      },
+      "ownerInput" : {
+        "type" : [ "null", "object" ],
+        "additionalProperties" : false,
+        "description" : "Owner of the record",
+        "properties" : {
+          "id" : {
+            "type" : [ "string", "null", "integer" ],
+            "format" : "int64",
+            "description" : "Unique ID of the agent to assign as the record owner",
+            "pattern" : "([0-9]+)"
+          }
+        },
+        "required" : [ "id" ]
+      },
+      "departmentInput" : {
+        "type" : [ "null", "object" ],
+        "additionalProperties" : false,
+        "description" : "Department to associate with the record. Note: This parameter is mandatory if the target custom module is a department-specific module",
+        "properties" : {
+          "id" : {
+            "type" : [ "string", "null", "integer" ],
+            "format" : "int64",
+            "description" : "Unique ID of the department to associate with the record",
+            "pattern" : "([0-9]+)"
+          }
+        },
+        "required" : [ "id" ]
+      },
+      "cfInput" : {
+        "type" : [ "null", "object" ],
+        "additionalProperties" : false,
+        "description" : "Custom fields of the record. Each key corresponds to a field API name obtained from the Organization Field API",
+        "patternProperties" : {
+          "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          }
+        }
+      },
+      "nameField" : {
+        "type" : [ "string" ],
+        "description" : "Primary field value of the record in the specified custom module",
+        "maxLength" : 200,
+        "minLength" : 0,
+        "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+      }
+    },
+    "responses" : {
+      "createRecordOldResponse" : {
+        "description" : "createRecordOldResponse template definitions. Note: department is not returned in the response even for department-specific modules.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/recordOldResponse",
+              "required" : [ "createdBy", "createdTime", "id", "isPresence", "layout", "modifiedBy", "modifiedTime", "name", "owner" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "layout" : {
+                    "id" : "1000003000004",
+                    "layoutName" : "Standard - Department1"
+                  },
+                  "owner" : {
+                    "firstName" : "",
+                    "lastName" : "Kyle",
+                    "photoURL" : "https://desk.example.com/api/v1/agents/4000000000329/photo?orgId=1234567890",
+                    "id" : "4000000000329",
+                    "email" : "kyle@zylker.com"
+                  },
+                  "modifiedTime" : "2024-04-22T13:55:53.000Z",
+                  "cf" : {
+                    "cf_doctor_description" : "Doctor 1 description"
+                  },
+                  "createdBy" : {
+                    "firstName" : "",
+                    "lastName" : "Kyle",
+                    "photoURL" : "https://desk.example.com/api/v1/agents/4000000000329/photo?orgId=1234567890",
+                    "id" : "4000000000329",
+                    "email" : "kyle@zylker.com"
+                  },
+                  "name" : "Doctor 1",
+                  "createdTime" : "2024-04-22T13:55:53.000Z",
+                  "modifiedBy" : {
+                    "firstName" : "",
+                    "lastName" : "Kyle",
+                    "photoURL" : "https://desk.example.com/api/v1/agents/4000000000329/photo?orgId=1234567890",
+                    "id" : "4000000000329",
+                    "email" : "kyle@zylker.com"
+                  },
+                  "isPresence" : true,
+                  "id" : "1000003019049",
+                  "department" : {
+                    "name" : "Department1",
+                    "id" : "1000000025632"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "recordOldResponse" : {
+        "description" : "recordOldResponse template definitions. Note: department is required only for department-specific modules.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/recordOldResponse",
+              "required" : [ "createdBy", "createdTime", "id", "isPresence", "layout", "modifiedBy", "modifiedTime", "name", "owner" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "layout" : {
+                    "id" : "1000000318009",
+                    "layoutName" : "Standard"
+                  },
+                  "owner" : {
+                    "firstName" : "Kyle",
+                    "lastName" : "Smith",
+                    "photoURL" : "https://desk.example.com/api/v1/agents/4000000000329/photo?orgId=1234567890",
+                    "id" : "4000000000329",
+                    "email" : "kyle@zylker.com"
+                  },
+                  "modifiedTime" : "2026-03-04T05:54:23.000Z",
+                  "cf" : {
+                    "cf_single_line_1" : "Sample value"
+                  },
+                  "createdBy" : {
+                    "lastName" : "Smith",
+                    "firstName" : "Kyle",
+                    "photoURL" : "https://desk.example.com/api/v1/agents/4000000000329/photo?orgId=1234567890",
+                    "id" : "4000000000329",
+                    "email" : "kyle@zylker.com"
+                  },
+                  "canEdit" : true,
+                  "name" : "Doctor 1",
+                  "createdTime" : "2026-03-04T05:54:23.000Z",
+                  "modifiedBy" : {
+                    "lastName" : "Smith",
+                    "firstName" : "Kyle",
+                    "photoURL" : "https://desk.example.com/api/v1/agents/4000000000329/photo?orgId=1234567890",
+                    "id" : "4000000000329",
+                    "email" : "kyle@zylker.com"
+                  },
+                  "isPresence" : true,
+                  "id" : "1000000330041",
+                  "department" : {
+                    "name" : "Department1",
+                    "id" : "1000000025632"
+                  },
+                  "layoutId" : "1000000318009"
+                }
+              }
+            }
+          }
+        }
+      },
+      "moveToTrashResponse" : {
+        "description" : "moveToTrashResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/bulkActionResult"
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "data" : [ {
+                    "success" : true,
+                    "id" : "1000003019001",
+                    "errors" : null
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "listRecordsOldResponse" : {
+        "description" : "listRecordsOldResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "null", "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "#/components/schemas/arrayOfRecordOldResponse"
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "data" : [ {
+                    "layout" : {
+                      "id" : "1000000732034",
+                      "layoutName" : "Standard - Twilight"
+                    },
+                    "id" : "1000000734184",
+                    "name" : "Doctor 1",
+                    "isPresence" : true,
+                    "canEdit" : true,
+                    "owner" : {
+                      "firstName" : "Kyle",
+                      "lastName" : "Smith",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000000329/photo?orgId=1234567890",
+                      "id" : "4000000000329",
+                      "email" : "kyle@zylker.com"
+                    },
+                    "createdBy" : {
+                      "firstName" : "Kyle",
+                      "lastName" : "Smith",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000000329/photo?orgId=1234567890",
+                      "id" : "4000000000329",
+                      "email" : "kyle@zylker.com"
+                    },
+                    "modifiedBy" : {
+                      "firstName" : "Kyle",
+                      "lastName" : "Smith",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000000329/photo?orgId=1234567890",
+                      "id" : "4000000000329",
+                      "email" : "kyle@zylker.com"
+                    },
+                    "createdTime" : "2024-04-22T10:30:00.000Z",
+                    "modifiedTime" : "2024-04-22T13:55:53.000Z",
+                    "cf" : {
+                      "cf_doctor_description" : "Specialist in internal medicine"
+                    },
+                    "department" : {
+                      "name" : "Department1",
+                      "id" : "1000000025632"
+                    },
+                    "layoutId" : "1000000732034"
+                  }, {
+                    "layout" : {
+                      "id" : "1000000732034",
+                      "layoutName" : "Standard - Twilight"
+                    },
+                    "id" : "1000000734179",
+                    "name" : "Doctor 2",
+                    "isPresence" : true,
+                    "canEdit" : false,
+                    "owner" : {
+                      "firstName" : "Kyle",
+                      "lastName" : "Smith",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000000329/photo?orgId=1234567890",
+                      "id" : "4000000000329",
+                      "email" : "kyle@zylker.com"
+                    },
+                    "createdBy" : {
+                      "firstName" : "Kyle",
+                      "lastName" : "Smith",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000000329/photo?orgId=1234567890",
+                      "id" : "4000000000329",
+                      "email" : "kyle@zylker.com"
+                    },
+                    "modifiedBy" : {
+                      "firstName" : "Kyle",
+                      "lastName" : "Smith",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000000329/photo?orgId=1234567890",
+                      "id" : "4000000000329",
+                      "email" : "kyle@zylker.com"
+                    },
+                    "createdTime" : "2024-04-21T08:00:00.000Z",
+                    "modifiedTime" : "2024-04-21T09:15:00.000Z",
+                    "cf" : {
+                      "cf_doctor_description" : "Specialist in cardiology"
+                    },
+                    "department" : {
+                      "name" : "Department1",
+                      "id" : "1000000025632"
+                    },
+                    "layoutId" : "1000000732034"
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "parameters" : {
+      "moduleApiName" : {
+        "name" : "moduleApiName",
+        "in" : "path",
+        "description" : "API name of the custom module from which the record is to be retrieved. Must be a custom module only. Custom module API names begin with the prefix cm_ (for example, cm_doctors). Note: To retrieve the list of available custom modules and their API names, call the Get Modules API.",
+        "required" : true,
+        "style" : "simple",
+        "explode" : false,
+        "schema" : {
+          "type" : [ "string" ],
+          "maxLength" : 100,
+          "minLength" : 0,
+          "pattern" : "(cm_[a-zA-Z0-9_]+)"
+        }
+      },
+      "recordId" : {
+        "name" : "recordId",
+        "in" : "path",
+        "description" : "ID of the record to retrieve",
+        "required" : true,
+        "style" : "simple",
+        "explode" : false,
+        "schema" : {
+          "type" : [ "string", "integer" ],
+          "format" : "int64",
+          "pattern" : "([0-9]+)"
+        }
+      }
+    },
+    "requestBodies" : {
+      "createRecordPayload" : {
+        "description" : "Request body for creating a record. If moduleApiName refers to a department-specific module, the department field is required. If it refers to an org-specific module, department is not applicable and should be omitted.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "name" : {
+                  "$ref" : "#/components/schemas/nameField"
+                },
+                "layout" : {
+                  "$ref" : "#/components/schemas/layoutInput"
+                },
+                "owner" : {
+                  "$ref" : "#/components/schemas/ownerInput"
+                },
+                "cf" : {
+                  "$ref" : "#/components/schemas/cfInput"
+                },
+                "department" : {
+                  "$ref" : "#/components/schemas/departmentInput"
+                }
+              },
+              "required" : [ "name" ]
+            },
+            "examples" : {
+              "Department-specific module" : {
+                "summary" : "Create record in a department-specific module (department is mandatory)",
+                "value" : {
+                  "name" : "Doctor 1",
+                  "layout" : {
+                    "id" : "1000003000004"
+                  },
+                  "owner" : {
+                    "id" : "1000000000375"
+                  },
+                  "cf" : {
+                    "cf_doctor_description" : "Doctor 1 description"
+                  },
+                  "department" : {
+                    "id" : "1000000025632"
+                  }
+                }
+              },
+              "Org-specific module" : {
+                "summary" : "Create record in an org-specific module (department is not applicable)",
+                "value" : {
+                  "name" : "Doctor 1",
+                  "layout" : {
+                    "id" : "1000003000004"
+                  },
+                  "owner" : {
+                    "id" : "1000000000375"
+                  },
+                  "cf" : {
+                    "cf_doctor_description" : "Doctor 1 description"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "editRecordPayload" : {
+        "description" : "Request body for updating a record. If moduleApiName refers to a department-specific module, the department field is accepted for reassignment. If it refers to an org-specific module, department is not applicable and should be omitted.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "null", "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "name" : {
+                  "$ref" : "#/components/schemas/nameField"
+                },
+                "layout" : {
+                  "$ref" : "#/components/schemas/layoutInput"
+                },
+                "owner" : {
+                  "$ref" : "#/components/schemas/ownerInput"
+                },
+                "cf" : {
+                  "$ref" : "#/components/schemas/cfInput"
+                },
+                "department" : {
+                  "$ref" : "#/components/schemas/departmentInput",
+                  "description" : "Department to associate with the record."
+                }
+              }
+            },
+            "examples" : {
+              "Department-specific module" : {
+                "summary" : "Update record in a department-specific module (department can be reassigned)",
+                "value" : {
+                  "name" : "Doctor 1",
+                  "layout" : {
+                    "id" : "1000003000004"
+                  },
+                  "owner" : {
+                    "id" : "1000000000375"
+                  },
+                  "cf" : {
+                    "cf_doctor_description" : "Doctor 1 description change"
+                  },
+                  "department" : {
+                    "id" : "1000000025632"
+                  }
+                }
+              },
+              "Org-specific module" : {
+                "summary" : "Update record in an org-specific module (department is not applicable)",
+                "value" : {
+                  "name" : "Doctor 1",
+                  "cf" : {
+                    "cf_doctor_description" : "Doctor 1 description change"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "updateManyPayload" : {
+        "description" : "Request body for updating a single field across multiple records simultaneously.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "fieldName" : {
+                  "type" : [ "string" ],
+                  "description" : "Name of the field to update",
+                  "maxLength" : 320,
+                  "minLength" : 0,
+                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                },
+                "ids" : {
+                  "description" : "ID(s) of the record(s) to update. Note: A maximum of 50 IDs can be provided as comma-separated values",
+                  "$ref" : "#/components/schemas/recordIdsArray"
+                },
+                "fieldValue" : {
+                  "type" : [ "string" ],
+                  "description" : "New value for the specified field",
+                  "maxLength" : 320,
+                  "minLength" : 0,
+                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                }
+              },
+              "required" : [ "fieldName", "ids" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "fieldName" : "cf_doctor_description",
+                  "ids" : [ "1000003019070", "1000003019058" ],
+                  "fieldValue" : "Doctor description"
+                }
+              }
+            }
+          }
+        }
+      },
+      "recordIdsPayload" : {
+        "description" : "Request body containing the IDs of the records to process. A maximum of 50 IDs can be provided.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "null", "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "recordIds" : {
+                  "description" : "ID(s) of the record(s) to process. A maximum of 50 IDs can be provided",
+                  "$ref" : "#/components/schemas/recordIdsArray"
+                }
+              },
+              "required" : [ "recordIds" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "recordIds" : [ "5000000055070", "5000000055072" ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "NewRecords"
+}

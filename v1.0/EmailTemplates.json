@@ -2,69 +2,93 @@
   "openapi" : "3.1.0",
   "info" : {
     "title" : "EmailTemplates",
+    "description" : "Email templates provide the data needed to construct email content for various modules. Templates define the subject, body, and metadata used for notifications, replies, and automated communications across tickets, contacts, accounts, products, and tasks.",
     "version" : "1.0.0"
   },
   "paths" : {
     "/api/v1/templates" : {
       "get" : {
         "tags" : [ "EmailTemplates" ],
-        "summary" : "Listing Templates",
-        "description" : "List all Templates",
+        "summary" : "Get Templates",
+        "description" : "Retrieves a list of email templates for the specified department, with pagination support.",
         "operationId" : "getTemplates",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "searchStr",
           "in" : "query",
-          "description" : "String to search for templates by name. The string must contain at least one character. Three search methods are supported: 1) string* - Searches for templates whose name start with the string, 2) *string* - Searches for templates whose name contain the string, 3) string - Searches for templates whose name is an exact match for the string",
+          "description" : "String to search for templates by name. The string must contain at least one character. Three search methods are supported: prefix search (append a trailing wildcard character to match names that start with the string), substring search (wrap the string with leading and trailing wildcard characters to match names that contain the string), and exact match (pass the string with no wildcard characters).",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "String to search for templates by name. The string must contain at least one character. Three search methods are supported: 1) string* - Searches for templates whose name start with the string, 2) *string* - Searches for templates whose name contain the string, 3) string - Searches for templates whose name is an exact match for the string",
+            "type" : [ "string" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "minLength" : 1
           }
         }, {
-          "$ref" : "#/components/parameters/departmentId"
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "Unique ID of the department for which placeholders are retrieved.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/module"
+          "name" : "module",
+          "in" : "query",
+          "description" : "Name of the module to filter templates.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "tickets", "tasks", "contacts", "accounts", "products", "solutions", "calls", "events" ],
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+          }
         }, {
           "name" : "limit",
           "in" : "query",
-          "description" : "number of templates to be retrieved Range 1-50, @DEFAULT 50@",
+          "description" : "Number of templates to retrieve. Valid range is 1 to 1000.",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "integer" ],
             "format" : "int32",
-            "description" : "number of templates to be retrieved Range 1-50, @DEFAULT 50@",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "maximum" : 1000,
+            "default" : 1000
           }
         }, {
           "name" : "from",
           "in" : "query",
-          "description" : "from index, @DEFAULT 1@",
+          "description" : "Index number from which templates must be fetched.",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "integer" ],
             "format" : "int32",
-            "description" : "from index, @DEFAULT 1@",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "maximum" : 1000,
+            "default" : 1
           }
         }, {
           "name" : "folderId",
           "in" : "query",
-          "description" : "the corresponding folder to be fetched",
+          "description" : "Unique ID of the folder from which templates must be fetched.",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : "string",
             "format" : "int64",
-            "description" : "the corresponding folder to be fetched",
             "pattern" : "([0-9]+)"
           }
         }, {
@@ -79,15 +103,16 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.templates.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
       },
       "post" : {
         "tags" : [ "EmailTemplates" ],
-        "summary" : "Add Template ",
-        "description" : "Add a new Template ",
+        "summary" : "Create Template",
+        "description" : "Creates a new email template.",
         "operationId" : "addTemplate",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -103,7 +128,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.CREATE" ]
+          "iam-oauth2-schema" : [ "Desk.settings.CREATE", "Desk.templates.CREATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -111,11 +136,23 @@
     "/api/v1/templates/{emailTemplateId}/cloneAttachments" : {
       "post" : {
         "tags" : [ "EmailTemplates" ],
-        "summary" : "Cloning a Email Template Attachments",
-        "description" : "Cloning an exisiting Template's attachments ",
+        "summary" : "Clone Template Attachments",
+        "description" : "Clones the attachments of an existing template for reuse.",
         "operationId" : "cloneTemplateAttachments",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/emailTemplateId"
+          "name" : "emailTemplateId",
+          "in" : "path",
+          "description" : "Unique ID of the template.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "maxLength" : 100
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -125,7 +162,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.CREATE" ]
+          "iam-oauth2-schema" : [ "Desk.settings.CREATE", "Desk.templates.CREATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -133,13 +170,34 @@
     "/api/v1/templates/placeHolders" : {
       "get" : {
         "tags" : [ "EmailTemplates" ],
-        "summary" : "Fetching placeholders ",
-        "description" : "List the placeholders supported in emailTemplates",
+        "summary" : "Get Placeholders",
+        "description" : "Retrieves the list of placeholders supported in email templates for the specified module and department.",
         "operationId" : "getPlaceHolders",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/departmentId"
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "Unique ID of the department for which placeholders are retrieved.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/module"
+          "name" : "module",
+          "in" : "query",
+          "description" : "Module for which placeholders are retrieved. Possible values: tickets, tasks, contacts, accounts, products, solutions, calls, events.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "tickets", "tasks", "contacts", "accounts", "products", "solutions", "calls", "events" ],
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -152,7 +210,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.templates.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -160,11 +218,23 @@
     "/api/v1/templates/{emailTemplateId}" : {
       "get" : {
         "tags" : [ "EmailTemplates" ],
-        "summary" : "View Template",
-        "description" : "View a particular Template",
+        "summary" : "Get Template",
+        "description" : "Retrieves details of a specific email template.",
         "operationId" : "getTemplate",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/emailTemplateId"
+          "name" : "emailTemplateId",
+          "in" : "path",
+          "description" : "Unique ID of the template.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "maxLength" : 100
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -174,17 +244,29 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.templates.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
       },
       "put" : {
         "tags" : [ "EmailTemplates" ],
-        "summary" : "Update Template ",
-        "description" : "Update an existing Template ",
+        "summary" : "Update Template",
+        "description" : "Updates an existing email template.",
         "operationId" : "updateTemplate",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/emailTemplateId"
+          "name" : "emailTemplateId",
+          "in" : "path",
+          "description" : "Unique ID of the template.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "maxLength" : 100
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -200,17 +282,66 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.settings.UPDATE", "Desk.templates.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      },
+      "patch" : {
+        "tags" : [ "EmailTemplates" ],
+        "summary" : "Update Template",
+        "description" : "Updates an existing email template.",
+        "operationId" : "patchTemplate",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "emailTemplateId",
+          "in" : "path",
+          "description" : "Unique ID of the template.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "maxLength" : 100
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/updateTemplate_templatejson"
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/templateAttachmentResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.UPDATE", "Desk.templates.UPDATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       },
       "delete" : {
         "tags" : [ "EmailTemplates" ],
-        "summary" : "Delete Template ",
-        "description" : "Delete a Template ",
+        "summary" : "Delete Template",
+        "description" : "Deletes a specific email template.",
         "operationId" : "deleteTemplate",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/emailTemplateId"
+          "name" : "emailTemplateId",
+          "in" : "path",
+          "description" : "Unique ID of the template.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "maxLength" : 100
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -220,7 +351,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.DELETE" ]
+          "iam-oauth2-schema" : [ "Desk.settings.DELETE", "Desk.templates.DELETE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -228,22 +359,36 @@
     "/api/v1/templates/{emailTemplateId}/render" : {
       "post" : {
         "tags" : [ "EmailTemplates" ],
-        "summary" : "Rendering a Template ",
-        "description" : "Render an exisiting Template into reply ",
+        "summary" : "Render Template",
+        "description" : "Renders an existing template by replacing placeholders with actual entity data.",
         "operationId" : "applyTemplate",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "entityId",
           "in" : "query",
+          "description" : "Unique ID of the entity (contact, ticket, or account) for which the template is rendered.",
           "required" : true,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : "string",
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "maxLength" : 100
           }
         }, {
-          "$ref" : "#/components/parameters/emailTemplateId"
+          "name" : "emailTemplateId",
+          "in" : "path",
+          "description" : "Unique ID of the template.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "maxLength" : 100
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -268,21 +413,24 @@
   "components" : {
     "schemas" : {
       "attachmentResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "size" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "null" ],
+            "description" : "Size of the attachment in bytes.",
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "name" : {
             "type" : [ "string", "null" ],
+            "description" : "File name of the attachment.",
             "maxLength" : 100,
             "minLength" : 0
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "null" ],
+            "description" : "Unique ID of the attachment.",
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
@@ -290,179 +438,199 @@
         "required" : [ "id", "name", "size" ]
       },
       "attachmentsResponse" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./EmailTemplates.json#/components/schemas/attachmentResponse"
+          "$ref" : "#/components/schemas/attachmentResponse"
         }
       },
       "folderJson" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
+        "description" : "Details of the folder containing the template.",
         "properties" : {
           "folderName" : {
             "type" : [ "string", "null" ],
             "maxLength" : 250,
             "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "Name of the folder."
           },
           "folderId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the folder."
           }
         },
         "required" : [ "folderId", "folderName" ]
       },
       "templateResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "replyToAddr" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "(^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$|^$|null)"
+            "pattern" : "(^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$|^$|null)",
+            "description" : "Reply-to email address of the template."
           },
           "folder" : {
-            "$ref" : "./EmailTemplates.json#/components/schemas/folderJson"
+            "description" : "Details of the folder containing the template.",
+            "$ref" : "#/components/schemas/folderJson"
           },
           "templateName" : {
             "type" : [ "string", "null" ],
             "maxLength" : 250,
             "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "Name of the template."
           },
           "recordType" : {
             "type" : [ "string", "null" ],
             "enum" : [ "tickets", "tasks", "contacts", "accounts", "products", "solutions", "calls", "events" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "description" : "Module type associated with the template. Possible values: tickets, contacts, accounts, products, tasks."
           },
           "subject" : {
             "type" : [ "string", "null" ],
             "maxLength" : 1000,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Subject line of the template."
           },
           "departmentId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the department associated with the template."
           },
           "templateId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the template."
           },
           "body" : {
             "type" : [ "string", "null" ],
             "maxLength" : 64000,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "HTML body content of the template."
           },
           "category" : {
             "type" : [ "string", "null" ],
             "enum" : [ "CUSTOM_TEMPLATE", "DEFAULT_TEMPLATE" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "description" : "Category of the template. Possible values: DEFAULT_TEMPLATE, CUSTOM_TEMPLATE."
           },
           "fromId" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "(^((.*?)((<)*?[a-zA-Z0-9]([\\w\\-.+]*)@([\\w\\-.]*)(\\.[a-zA-Z]{2,22}(.[a-zA-Z]{2}){0,2})(>)*?(\\s)*((,|;)\\s*)?))+|^$)"
+            "pattern" : "(^((.*?)((<)*?[a-zA-Z0-9]([\\w\\-.+]*)@([\\w\\-.]*)(\\.[a-zA-Z]{2,22}(.[a-zA-Z]{2}){0,2})(>)*?(\\s)*((,|;)\\s*)?))+|^$)",
+            "description" : "Sender email address of the template."
           },
           "contentType" : {
             "type" : [ "string", "null" ],
             "enum" : [ "plaintext", "richtext" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "description" : "Content type of the template. Possible values: plaintext, richtext."
           },
           "folderId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the folder containing the template."
           }
         },
         "required" : [ "body", "category", "contentType", "departmentId", "folder", "folderId", "fromId", "recordType", "replyToAddr", "subject", "templateId", "templateName" ]
       },
       "attachmentIds" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
+        "description" : "List of file attachment IDs to include in the template.",
         "items" : {
-          "type" : [ "string", "null", "integer" ],
+          "type" : [ "string", "null" ],
           "format" : "int64",
           "pattern" : "([0-9]+)"
         }
       },
       "cloneTemplateAttachments" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "size" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Size of the cloned attachment in bytes."
           },
           "name" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "File name of the cloned attachment."
           },
           "parentAttachmentId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the original attachment."
           },
           "href" : {
             "type" : [ "string", "null" ],
             "maxLength" : 500,
             "minLength" : 0,
-            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+            "description" : "URL to access the cloned attachment content."
           },
           "clonedAttachmentId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the cloned attachment."
           }
         },
         "required" : [ "clonedAttachmentId", "href", "name", "parentAttachmentId", "size" ]
       },
       "cloneTemplateAttachmentsArr" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./EmailTemplates.json#/components/schemas/cloneTemplateAttachments"
+          "$ref" : "#/components/schemas/cloneTemplateAttachments"
         }
       },
       "placeHolderJson" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "supportedPlaceHolders" : {
-            "type" : [ "null", "array" ],
+            "type" : [ "array", "null" ],
+            "description" : "List of placeholder entries for the module.",
             "items" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "maxProperties" : 4,
               "minProperties" : 4,
               "properties" : {
                 "apiName" : {
                   "type" : [ "string", "null" ],
+                  "description" : "API name of the placeholder field.",
                   "maxLength" : 250,
                   "minLength" : 0,
                   "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                 },
                 "i18nFieldLabel" : {
                   "type" : [ "string", "null" ],
+                  "description" : "Display label of the placeholder field.",
                   "maxLength" : 100,
                   "minLength" : 0,
                   "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                 },
                 "fieldLabel" : {
                   "type" : [ "string", "null" ],
+                  "description" : "Internal field label of the placeholder.",
                   "maxLength" : 100,
                   "minLength" : 0,
                   "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                 },
                 "placeHolder" : {
                   "type" : [ "string", "null" ],
+                  "description" : "Placeholder syntax to use in templates.",
                   "maxLength" : 100,
                   "minLength" : 0,
                   "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
@@ -474,23 +642,23 @@
           },
           "i18nModule" : {
             "type" : [ "string", "null" ],
+            "description" : "Display name of the module.",
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "module" : {
             "type" : [ "string", "null" ],
-            "enum" : [ "tickets", "Case Owner", "tasks", "Task Owner", "contacts", "Contact Owner", "accounts", "Account Owner", "products", "Product Owner", "solutions", "Solution Owner", "calls", "Call Owner", "events", "Event Owner", "User", "Organization" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "description" : "Internal module name.",
+            "enum" : [ "tickets", "Case Owner", "tasks", "Task Owner", "contacts", "Contact Owner", "accounts", "Account Owner", "products", "Product Owner", "solutions", "Solution Owner", "calls", "Call Owner", "events", "Event Owner", "User", "Organization" ]
           }
         },
         "required" : [ "i18nModule", "module", "supportedPlaceHolders" ]
       },
       "placeHolderList" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./EmailTemplates.json#/components/schemas/placeHolderJson"
+          "$ref" : "#/components/schemas/placeHolderJson"
         }
       }
     },
@@ -502,15 +670,17 @@
             "schema" : {
               "additionalProperties" : false,
               "allOf" : [ {
-                "$ref" : "./EmailTemplates.json#/components/schemas/templateResponse"
+                "$ref" : "#/components/schemas/templateResponse"
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "properties" : {
                   "attachments" : {
-                    "$ref" : "./EmailTemplates.json#/components/schemas/attachmentsResponse"
+                    "description" : "List of file attachments associated with the template.",
+                    "$ref" : "#/components/schemas/attachmentsResponse"
                   }
                 },
-                "required" : [ "attachments" ]
+                "required" : [ "attachments" ],
+                "additionalProperties" : false
               } ]
             },
             "examples" : {
@@ -547,11 +717,12 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./EmailTemplates.json#/components/schemas/cloneTemplateAttachmentsArr"
+                  "description" : "List of cloned attachment entries.",
+                  "$ref" : "#/components/schemas/cloneTemplateAttachmentsArr"
                 }
               },
               "required" : [ "data" ]
@@ -583,11 +754,12 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./EmailTemplates.json#/components/schemas/placeHolderList"
+                  "description" : "List of placeholder groups organized by module.",
+                  "$ref" : "#/components/schemas/placeHolderList"
                 }
               },
               "required" : [ "data" ]
@@ -675,19 +847,22 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "attachments" : {
-                  "$ref" : "./EmailTemplates.json#/components/schemas/attachmentsResponse"
+                  "description" : "List of file attachments associated with the template.",
+                  "$ref" : "#/components/schemas/attachmentsResponse"
                 },
                 "subject" : {
                   "type" : [ "string", "null" ],
+                  "description" : "Rendered subject line with placeholders replaced.",
                   "maxLength" : 1000,
                   "minLength" : 0
                 },
                 "body" : {
                   "type" : [ "string", "null" ],
+                  "description" : "Rendered HTML body content with placeholders replaced.",
                   "maxLength" : 64000,
                   "minLength" : 0
                 }
@@ -703,7 +878,7 @@
                     "id" : "4000000132047"
                   } ],
                   "subject" : "My support Template",
-                  "body" : "lakshmansupport1lakshmanvignesh<a target=\"_blank\" href=\"https://support.zoho.com/support/lakshmansupport1/ShowHomePage.do#Cases/dv/51123033fe97b2f8922ba57825f2f328\">MEOW Ticket</a> newuser+1105/30/2016 09:57 AMI am containing a content"
+                  "body" : "lakshmansupport1lakshmanvignesh<a target=\"_blank\" href=\"https://support.zoho.com/support/zylker/ShowHomePage.do#Cases/dv/51123033fe97b2f8922ba57825f2f328\">MEOW Ticket</a> newuser+1105/30/2016 09:57 AMI am containing a content"
                 }
               }
             }
@@ -715,9 +890,9 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "array" ],
+              "type" : [ "array", "null" ],
               "items" : {
-                "$ref" : "./EmailTemplates.json#/components/schemas/templateResponse"
+                "$ref" : "#/components/schemas/templateResponse"
               }
             },
             "examples" : {
@@ -793,107 +968,67 @@
         }
       }
     },
-    "parameters" : {
-      "departmentId" : {
-        "name" : "departmentId",
-        "in" : "query",
-        "description" : "the corresponding department to be fetched",
-        "required" : true,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "description" : "the corresponding department to be fetched",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "module" : {
-        "name" : "module",
-        "in" : "query",
-        "description" : "The name of the module",
-        "required" : true,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null" ],
-          "description" : "The name of the module",
-          "enum" : [ "tickets", "tasks", "contacts", "accounts", "products", "solutions", "calls", "events" ],
-          "maxLength" : 100,
-          "minLength" : 0
-        }
-      },
-      "emailTemplateId" : {
-        "name" : "emailTemplateId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      }
-    },
     "requestBodies" : {
       "templatejson" : {
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "templateName" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "maxLength" : 250,
-                  "minLength" : 0,
-                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+                  "description" : "Name of the template.",
+                  "x-unique" : true
                 },
                 "subject" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 1000,
-                  "minLength" : 0
+                  "type" : [ "string" ],
+                  "description" : "Subject line of the template.",
+                  "maxLength" : 1000
                 },
                 "recordType" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "enum" : [ "tickets", "tasks", "contacts", "accounts", "products", "calls", "events" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+",
+                  "description" : "Module type associated with the template. Possible values: contacts, accounts, tickets, products, tasks."
                 },
                 "departmentId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : "string",
+                  "description" : "Unique ID of the department to associate the template.",
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "replyTo" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "maxLength" : 100,
-                  "minLength" : 0,
-                  "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+                  "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$",
+                  "description" : "Reply-to email address."
                 },
                 "attachmentIds" : {
-                  "$ref" : "./EmailTemplates.json#/components/schemas/attachmentIds"
+                  "description" : "List of file attachment IDs to include in the template.",
+                  "$ref" : "#/components/schemas/attachmentIds"
                 },
                 "body" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "maxLength" : 64000,
-                  "minLength" : 0
+                  "description" : "HTML body content of the template."
                 },
                 "fromId" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "maxLength" : 100,
-                  "minLength" : 0,
-                  "pattern" : "(^((.*?)((<)*?[a-zA-Z0-9]([\\w\\-.+]*)@([\\w\\-.]*)(\\.[a-zA-Z]{2,22}(.[a-zA-Z]{2}){0,2})(>)*?(\\s)*((,|;)\\s*)?))+|^$)"
+                  "pattern" : "^((.*?)((<)*?[a-zA-Z0-9]([\\w\\-.+\\'\\/]*)@([\\w\\-.]*)(\\.[a-zA-Z]{2,22}(.[a-zA-Z]{2}){0,2})(>)*?(\\s)*((,|;)\\s*)?))+",
+                  "description" : "Sender email address for the template."
                 },
                 "contentType" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "enum" : [ "plaintext", "richtext" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "description" : "Content type of the template. Possible values: plaintext, richtext."
                 },
                 "folderId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : "string",
+                  "description" : "Unique ID of the folder to place the template.",
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 }
@@ -922,61 +1057,67 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "templateName" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "maxLength" : 250,
                   "minLength" : 0,
-                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+                  "description" : "Name of the template."
                 },
                 "subject" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "maxLength" : 1000,
-                  "minLength" : 0
+                  "minLength" : 0,
+                  "description" : "Subject line of the template."
                 },
                 "recordType" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "enum" : [ "tickets", "tasks", "contacts", "accounts", "products", "calls", "events" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "description" : "Module type associated with the template. Possible values: contacts, accounts, tickets, products, tasks."
                 },
                 "departmentId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string" ],
                   "format" : "int64",
-                  "pattern" : "([0-9]+)"
+                  "pattern" : "([0-9]+)",
+                  "description" : "Unique ID of the department to associate the template."
                 },
                 "replyTo" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "maxLength" : 100,
                   "minLength" : 0,
-                  "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+                  "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$",
+                  "description" : "Reply-to email address."
                 },
                 "attachmentIds" : {
-                  "$ref" : "./EmailTemplates.json#/components/schemas/attachmentIds"
+                  "description" : "List of file attachment IDs to include in the template.",
+                  "$ref" : "#/components/schemas/attachmentIds"
                 },
                 "body" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "maxLength" : 64000,
-                  "minLength" : 0
+                  "minLength" : 0,
+                  "description" : "HTML body content of the template."
                 },
                 "fromId" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "maxLength" : 100,
                   "minLength" : 0,
-                  "pattern" : "(^((.*?)((<)*?[a-zA-Z0-9]([\\w\\-.+]*)@([\\w\\-.]*)(\\.[a-zA-Z]{2,22}(.[a-zA-Z]{2}){0,2})(>)*?(\\s)*((,|;)\\s*)?))+|^$)"
+                  "pattern" : "(^((.*?)((<)*?[a-zA-Z0-9]([\\w\\-.+]*)@([\\w\\-.]*)(\\.[a-zA-Z]{2,22}(.[a-zA-Z]{2}){0,2})(>)*?(\\s)*((,|;)\\s*)?))+|^$)",
+                  "description" : "Sender email address for the template."
                 },
                 "contentType" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "enum" : [ "plaintext", "richtext" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "description" : "Content type of the template. Possible values: plaintext, richtext."
                 },
                 "folderId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string" ],
                   "format" : "int64",
-                  "pattern" : "([0-9]+)"
+                  "pattern" : "([0-9]+)",
+                  "description" : "Unique ID of the folder to place the template."
                 }
               }
             },
@@ -996,14 +1137,13 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "source" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "TICKET_REPLY", "SLA", "AUTOMATION_ALERTS", "NOTIFICATIONS" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "type" : [ "string" ],
+                  "description" : "Source from which template content is rendered.",
+                  "enum" : [ "TICKET_REPLY", "SLA", "AUTOMATION_ALERTS", "NOTIFICATIONS" ]
                 }
               }
             },
@@ -1019,6 +1159,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

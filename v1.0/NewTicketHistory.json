@@ -8,61 +8,59 @@
     "/api/v1/tickets/{ticketId}/History" : {
       "get" : {
         "tags" : [ "NewTicketHistory" ],
-        "summary" : "Get ticket history",
-        "description" : "This API fetches details of all actions — called events — performed on a ticket and in the sub-tabs on the ticket detail page. To view a detailed documentation for this API, visit <a href='https://help.zoho.com/portal/en/kb/desk/for-developers/rest-apis/articles/get-ticket-history-api-explained-in-detail' target='_blank'>this page</a>.",
+        "summary" : "Get Ticket History",
+        "description" : "Retrieves details of all actions(called events) performed on a ticket and in the sub-tabs on the ticket detail page, with pagination support.",
         "operationId" : "getTicketHistory",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "agentId",
           "in" : "query",
-          "description" : "Key that filters details of actions performed by a particular agent. Value allowed is the agent's ID in Zoho Desk.",
+          "description" : "ID of the agent whose actions must be included in the ticket history",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
-            "description" : "Key that filters details of actions performed by a particular agent. Value allowed is the agent's ID in Zoho Desk.",
             "pattern" : "([0-9]+)"
           }
         }, {
           "name" : "fieldName",
           "in" : "query",
-          "description" : "Key that filters the history of a particular field. The value for this key must be the apiName of the field.",
+          "description" : "Name of the field to filter the ticket history. Note: The value must be the API name of the field.",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Key that filters the history of a particular field. The value for this key must be the apiName of the field.",
+            "type" : [ "string" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
           }
         }, {
           "name" : "eventFilter",
           "in" : "query",
-          "description" : " Key that filters events, based on their type. Values allowed are: @CommentHistory@, @TimeEntryHistory@, @TaskHistory@, @CallHistory@, @EventHistory@, @AttachmentHistory@, @ApprovalHistory@, @SuperviseHistory@, @WorkflowHistory@, @MacroHistory@, @AssignmentRuleHistory@, @NotificationRuleHistory@, @SLAHistory@, @BlueprintHistory@ and @SkillRelatedHistory@",
+          "description" : "Filters events based on their type Possible values: CommentHistory, TimeEntryHistory, TaskHistory, CallHistory, EventHistory, AttachmentHistory, ApprovalHistory, SuperviseHistory, WorkflowHistory, MacroHistory, AssignmentRuleHistory, NotificationRuleHistory, SLAHistory, BlueprintHistory and SkillRelatedHistory",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : " Key that filters events, based on their type. Values allowed are: @CommentHistory@, @TimeEntryHistory@, @TaskHistory@, @CallHistory@, @EventHistory@, @AttachmentHistory@, @ApprovalHistory@, @SuperviseHistory@, @WorkflowHistory@, @MacroHistory@, @AssignmentRuleHistory@, @NotificationRuleHistory@, @SLAHistory@, @BlueprintHistory@ and @SkillRelatedHistory@",
+            "type" : [ "string" ],
             "enum" : [ "CommentHistory", "TimeEntryHistory", "TaskHistory", "CallHistory", "EventHistory", "AttachmentHistory", "ApprovalHistory", "SuperviseHistory", "WorkflowHistory", "MacroHistory", "AssignmentRuleHistory", "NotificationRuleHistory", "SLAHistory", "BlueprintHistory", "SkillRelatedHistory", "ZiaRelatedHistory" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "pattern" : "^(CommentHistory|TimeEntryHistory|TaskHistory|CallHistory|EventHistory|AttachmentHistory|ApprovalHistory|SuperviseHistory|WorkflowHistory|MacroHistory|AssignmentRuleHistory|NotificationRuleHistory|SLAHistory|BlueprintHistory|SkillRelatedHistory|ZiaRelatedHistory)$"
           }
         }, {
           "name" : "limit",
           "in" : "query",
-          "description" : "Number of events to list",
+          "description" : "Number of events to fetch",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "integer" ],
             "format" : "int32",
-            "description" : "Number of events to list",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "maximum" : 50
           }
         }, {
           "name" : "from",
@@ -72,10 +70,10 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "integer" ],
             "format" : "int32",
-            "description" : "Index number, starting from which the events must be fetched",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "default" : 0
           }
         }, {
           "name" : "ticketId",
@@ -84,7 +82,7 @@
           "style" : "simple",
           "explode" : false,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }

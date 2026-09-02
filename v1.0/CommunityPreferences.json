@@ -8,9 +8,10 @@
     "/api/v1/communityPreferences" : {
       "get" : {
         "tags" : [ "CommunityPreferences" ],
-        "summary" : "Get community preferences",
-        "description" : "This API fetches the settings defined for the user community in your help desk portal.",
+        "summary" : "Get Community Preferences",
+        "description" : "Retrieves the settings defined for the user community.",
         "operationId" : "getCommunityPreferences",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -32,9 +33,10 @@
       },
       "post" : {
         "tags" : [ "CommunityPreferences" ],
-        "summary" : "Set community preferences",
-        "description" : "This API helps define the settings for the user community in your help desk portal.",
+        "summary" : "Set Community Preferences",
+        "description" : "Defines the settings for the user community.",
         "operationId" : "updateCommunityPreferences",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -49,7 +51,7 @@
             "$ref" : "./Common.json#/components/responses/internalErrorResponse"
           },
           "204" : {
-            "$ref" : "./Common.json#/components/responses/emptyResponse"
+            "$ref" : "#/components/responses/emptyResponse"
           },
           "403" : {
             "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
@@ -68,6 +70,18 @@
         "description" : "This API fetches statistics related to topic/comment moderation in the user community.",
         "operationId" : "getModerationCounts",
         "parameters" : [ {
+          "name" : "categoryId",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "ID of the community category for which the statistics must be fetched"
+        }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
@@ -91,16 +105,16 @@
   "components" : {
     "schemas" : {
       "countDetails" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "comments" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           },
           "topics" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           }
@@ -108,16 +122,16 @@
         "required" : [ "comments", "topics" ]
       },
       "moderatedCountDetails" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "topics" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           },
           "users" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           }
@@ -126,19 +140,21 @@
       }
     },
     "responses" : {
+      "emptyResponse" : {
+        "description" : "This API returns a 204 status code with no response body."
+      },
       "getCommunityPrefereneces" : {
         "description" : "getCommunityPrefereneces template definitions",
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "landingPage" : {
                   "type" : [ "string", "null" ],
                   "enum" : [ "ALLCATEGORY", "RECENTPOST" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "description" : "Content layout configured for the community home page. Possible values: ALL_CATEGORY."
                 }
               },
               "required" : [ "landingPage" ]
@@ -158,20 +174,20 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "awaitingApproval" : {
-                  "$ref" : "./CommunityPreferences.json#/components/schemas/countDetails"
+                  "$ref" : "#/components/schemas/countDetails"
                 },
                 "moderated" : {
-                  "$ref" : "./CommunityPreferences.json#/components/schemas/moderatedCountDetails"
+                  "$ref" : "#/components/schemas/moderatedCountDetails"
                 },
                 "spam" : {
-                  "$ref" : "./CommunityPreferences.json#/components/schemas/countDetails"
+                  "$ref" : "#/components/schemas/countDetails"
                 },
                 "trashed" : {
-                  "$ref" : "./CommunityPreferences.json#/components/schemas/countDetails"
+                  "$ref" : "#/components/schemas/countDetails"
                 }
               },
               "required" : [ "awaitingApproval", "moderated", "spam", "trashed" ]
@@ -206,15 +222,13 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "landingPage" : {
-                  "type" : [ "string", "null" ],
-                  "description" : "Key that determines the content to display on the home page of the user community. Values allowed are: @ALLCATEGORIES@ (all community categories are displayed), and @RECENTPOSTS@ (only the latest topics in the community are displayed).",
-                  "enum" : [ "ALLCATEGORY", "RECENTPOST" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "type" : [ "string" ],
+                  "description" : "Content to display on the home page of the user community. Possible values: ALLCATEGORIES, RECENTPOSTS. Note: ALLCATEGORIES — All community categories are displayed, RECENTPOSTS — Only the latest topics in the community are displayed",
+                  "enum" : [ "ALLCATEGORY", "RECENTPOST" ]
                 }
               },
               "required" : [ "landingPage" ]
@@ -231,6 +245,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

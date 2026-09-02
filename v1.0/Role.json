@@ -8,11 +8,21 @@
     "/api/v1/roles/{roleId}" : {
       "get" : {
         "tags" : [ "Role" ],
-        "summary" : "Get role",
-        "description" : "This API fetches the details of a particular role.",
+        "summary" : "Get Role",
+        "description" : "Retrieves details of a specific role.",
         "operationId" : "getRole",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/roleId"
+          "name" : "roleId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the role"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -22,17 +32,28 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.basic.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.permissions.READ", "Desk.settings.READ" ]
         } ],
-        "x-audience" : [ "external-public" ]
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
       },
       "patch" : {
         "tags" : [ "Role" ],
-        "summary" : "Update role",
-        "description" : "This API updates details of an existing role.",
+        "summary" : "Update Role",
+        "description" : "Updates details of an existing role.",
         "operationId" : "updateRole",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/roleId"
+          "name" : "roleId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the role"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -48,7 +69,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE", "Desk.basic.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.basic.UPDATE", "Desk.permissions.UPDATE", "Desk.settings.UPDATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -56,21 +77,20 @@
     "/api/v1/rolesByIds" : {
       "get" : {
         "tags" : [ "Role" ],
-        "summary" : "List roles by role IDs",
-        "description" : "This API lists details of the roles whose IDs are passed in the API request.",
+        "summary" : "Get Roles by Role IDs",
+        "description" : "Retrieves details of the roles whose IDs are passed in the request.",
         "operationId" : "getRolesByIds",
         "parameters" : [ {
           "name" : "roleIds",
           "in" : "query",
-          "description" : "Comma separated role ids. Maximum allowed count is 50",
+          "description" : "Comma-separated role IDs",
           "required" : true,
-          "style" : "simple",
+          "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "null", "array" ],
-            "description" : "Comma separated role ids. Maximum allowed count is 50",
+            "type" : [ "array" ],
             "items" : {
-              "type" : [ "string", "null", "integer" ],
+              "type" : [ "string", "integer" ],
               "format" : "int64",
               "pattern" : "([0-9]+)"
             },
@@ -91,16 +111,17 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.basic.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.permissions.READ", "Desk.settings.READ" ]
         } ],
-        "x-audience" : [ "external-public" ]
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
       }
     },
     "/api/v1/personalRole" : {
       "get" : {
         "tags" : [ "Role" ],
-        "summary" : "Get personal role",
-        "description" : "This API fetches the details of the personal role configured in your help desk. Agents with personal role can view only the tickets assigned to them and unassigned tickets.",
+        "summary" : "Get Personal Role",
+        "description" : "Retrieves details of the personal role configured in the help desk portal.<p><b>Note:</b> Agents with the personal role can view only tickets assigned to them and unassigned tickets.</p>",
         "operationId" : "getPersonalRole",
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -111,43 +132,71 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.basic.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.permissions.READ", "Desk.settings.READ" ]
         } ],
-        "x-audience" : [ "external-public" ]
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
       }
     },
     "/api/v1/roles/count" : {
       "get" : {
         "tags" : [ "Role" ],
-        "summary" : "Get role count",
-        "description" : "This API fetches the number of roles configured in your help desk.",
+        "summary" : "Get Role Count",
+        "description" : "Retrieves the number of roles configured in the help desk portal.",
         "operationId" : "getRoleCount",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/isDefault"
+          "name" : "isDefault",
+          "in" : "query",
+          "description" : "Filters roles according to whether they are default or custom roles",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "boolean" ]
+          }
         }, {
-          "$ref" : "#/components/parameters/isVisible"
+          "name" : "isVisible",
+          "in" : "query",
+          "description" : "Filters roles according to their visibility in the UI",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "boolean" ]
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
           "200" : {
-            "$ref" : "./Department.json#/components/responses/deptCountResponse"
+            "$ref" : "#/components/responses/roleCountResponse"
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.basic.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.permissions.READ", "Desk.settings.READ" ]
         } ],
-        "x-audience" : [ "external-public" ]
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
       }
     },
     "/api/v1/roles/{roleId}/agents" : {
       "get" : {
         "tags" : [ "Role" ],
-        "summary" : "List agents by role",
-        "description" : "This API lists agents mapped to a particular role.",
+        "summary" : "Get Agents by Role",
+        "description" : "Retrieves agents mapped to a specific role.",
         "operationId" : "getAgentsByRole",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/roleId"
+          "name" : "roleId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the role"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -160,19 +209,30 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.basic.READ" ]
+          "iam-oauth2-schema" : [ "Desk.agents.READ", "Desk.basic.READ", "Desk.settings.READ" ]
         } ],
-        "x-audience" : [ "external-public" ]
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
       }
     },
     "/api/v1/roles/{roleId}/delete" : {
       "post" : {
         "tags" : [ "Role" ],
-        "summary" : "Delete role",
-        "description" : "This API deletes a role from your help desk.",
+        "summary" : "Delete Role",
+        "description" : "Deletes a role from the help desk portal.",
         "operationId" : "deleteRole",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/roleId"
+          "name" : "roleId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the role"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -188,7 +248,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.DELETE", "Desk.basic.DELETE" ]
+          "iam-oauth2-schema" : [ "Desk.basic.DELETE", "Desk.permissions.DELETE", "Desk.settings.DELETE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -196,55 +256,70 @@
     "/api/v1/roles" : {
       "get" : {
         "tags" : [ "Role" ],
-        "summary" : "List roles",
-        "description" : "This API lists a particular number of roles, based on the limit specified.",
+        "summary" : "Get Roles",
+        "description" : "Retrieves roles in the help desk portal, with pagination support.",
         "operationId" : "getRoles",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/isDefault"
-        }, {
-          "name" : "searchStr",
+          "name" : "isDefault",
           "in" : "query",
-          "description" : "String to search for roles by name or description. The string must contain at least one character. Three search methods are supported: 1) string* - Searches for roles whose name or description start with the string, 2) *string* - Searches for roles whose name or description contain the string, 3) string -  Searches for roles whose name or description is an exact match for the string",
+          "description" : "Filters roles according to whether they are default or custom roles",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "String to search for roles by name or description. The string must contain at least one character. Three search methods are supported: 1) string* - Searches for roles whose name or description start with the string, 2) *string* - Searches for roles whose name or description contain the string, 3) string -  Searches for roles whose name or description is an exact match for the string",
+            "type" : [ "boolean" ]
+          }
+        }, {
+          "name" : "searchStr",
+          "in" : "query",
+          "description" : "Searches roles by name or description. <p><b>Note:</b> The string must contain at least one character. Supported search methods are string* for starts with, *string* for contains, and string for exact match.</p>",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
             "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "minLength" : 1,
+            "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+"
           }
         }, {
           "name" : "limit",
           "in" : "query",
-          "description" : "Number of roles to display. The default value is 15 and the maximum value allowed is 500.",
+          "description" : "Number of roles to display",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "integer" ],
             "format" : "int32",
-            "description" : "Number of roles to display. The default value is 15 and the maximum value allowed is 500.",
             "maximum" : 500,
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "minimum" : 0
           }
         }, {
           "name" : "from",
           "in" : "query",
-          "description" : "Index number, starting from which the roles must be listed",
+          "description" : "Index number from which the roles must be listed",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "integer" ],
             "format" : "int32",
-            "description" : "Index number, starting from which the roles must be listed",
             "minimum" : 0,
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "default" : 0
           }
         }, {
-          "$ref" : "#/components/parameters/isVisible"
+          "name" : "isVisible",
+          "in" : "query",
+          "description" : "Filters roles according to their visibility in the UI",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "boolean" ]
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -257,14 +332,15 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.basic.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.permissions.READ", "Desk.settings.READ" ]
         } ],
-        "x-audience" : [ "external-public" ]
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
       },
       "post" : {
         "tags" : [ "Role" ],
-        "summary" : "Create role",
-        "description" : "This API creates a role in your help desk.",
+        "summary" : "Create Role",
+        "description" : "Creates a role in the help desk portal.",
         "operationId" : "addRole",
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -281,86 +357,98 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.CREATE", "Desk.basic.CREATE" ]
+          "iam-oauth2-schema" : [ "Desk.basic.CREATE", "Desk.permissions.CREATE", "Desk.settings.CREATE" ]
         } ],
-        "x-audience" : [ "external-public" ]
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
       }
     }
   },
   "components" : {
     "schemas" : {
       "roleupdateJson" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "shareDataWithPeers" : {
-            "type" : [ "boolean", "null" ]
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the role shares data with peer roles. <p><b>Possible values:</b> true, false</p>"
           },
           "name" : {
             "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 50,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+",
+            "description" : "Name of the role"
           },
           "description" : {
             "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 3200,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+",
+            "description" : "Short description of the role"
           }
         },
-        "required" : [ "description", "name", "shareDataWithPeers" ]
+        "required" : [ "name", "shareDataWithPeers" ]
       },
       "roleJson" : {
         "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Role.json#/components/schemas/roleupdateJson"
+          "$ref" : "#/components/schemas/roleupdateJson"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "reportsTo" : {
-              "type" : [ "string", "null", "integer" ],
+              "type" : [ "string", "integer", "null" ],
               "format" : "int64",
-              "pattern" : "([0-9]+)"
+              "pattern" : "([0-9]+)",
+              "description" : "Unique ID of the role to which the current role reports"
             }
           },
-          "required" : [ "reportsTo" ]
+          "required" : [ "reportsTo" ],
+          "additionalProperties" : false
         } ]
       },
       "roleResponse" : {
         "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Role.json#/components/schemas/roleJson"
+          "$ref" : "#/components/schemas/roleJson"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isDefault" : {
-              "type" : [ "boolean", "null" ]
+              "type" : [ "boolean", "null" ],
+              "description" : "Indicates whether the role is the default role. <p><b>Possible values:</b> true, false</p>"
             },
             "immediateSubRoles" : {
-              "type" : [ "null", "array" ],
+              "type" : [ "array", "null" ],
               "items" : {
-                "type" : [ "string", "null", "integer" ],
+                "type" : [ "string", "integer", "null" ],
                 "format" : "int64",
                 "pattern" : "([0-9]+)"
               },
-              "uniqueItems" : false
+              "uniqueItems" : false,
+              "description" : "ID(s) of the role(s) that directly report to the current role"
             },
             "id" : {
-              "type" : [ "string", "null", "integer" ],
+              "type" : [ "string", "integer", "null" ],
               "format" : "int64",
-              "pattern" : "([0-9]+)"
+              "pattern" : "([0-9]+)",
+              "description" : "Unique ID of the role"
             },
             "isVisible" : {
-              "type" : [ "boolean", "null" ]
+              "type" : [ "boolean", "null" ],
+              "description" : "Short description of the role"
             }
           },
-          "required" : [ "id", "immediateSubRoles", "isDefault", "isVisible" ]
+          "required" : [ "id", "immediateSubRoles", "isDefault", "isVisible" ],
+          "additionalProperties" : false
         } ]
       },
       "roleArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./Role.json#/components/schemas/roleResponse"
-        }
+          "$ref" : "#/components/schemas/roleResponse"
+        },
+        "description" : "List of role entries that match the requested role IDs"
       }
     },
     "responses" : {
@@ -371,32 +459,37 @@
             "schema" : {
               "additionalProperties" : false,
               "allOf" : [ {
-                "$ref" : "./Role.json#/components/schemas/roleJson"
+                "$ref" : "#/components/schemas/roleJson"
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "properties" : {
                   "isDefault" : {
-                    "type" : [ "boolean", "null" ]
+                    "type" : [ "boolean", "null" ],
+                    "description" : "Indicates whether the role is the default role.<p><b>Possible values:</b> true, false</p>"
                   },
                   "immediateSubRoles" : {
-                    "type" : [ "null", "array" ],
+                    "type" : [ "array", "null" ],
                     "items" : {
-                      "type" : [ "string", "null", "integer" ],
+                      "type" : [ "string", "integer", "null" ],
                       "format" : "int64",
                       "pattern" : "([0-9]+)"
                     },
-                    "uniqueItems" : false
+                    "uniqueItems" : false,
+                    "description" : "ID(s) of the role(s) that directly report to the current role"
                   },
                   "id" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
-                    "pattern" : "([0-9]+)"
+                    "pattern" : "([0-9]+)",
+                    "description" : "Unique ID of the role"
                   },
                   "isVisible" : {
-                    "type" : [ "boolean", "null" ]
+                    "type" : [ "boolean", "null" ],
+                    "description" : "Indicates whether the role is visible in the UI.<p><b>Possible values:</b> true, false</p>"
                   }
                 },
-                "required" : [ "id", "immediateSubRoles", "isDefault", "isVisible" ]
+                "required" : [ "id", "immediateSubRoles", "isDefault", "isVisible" ],
+                "additionalProperties" : false
               } ]
             },
             "examples" : {
@@ -421,11 +514,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./Role.json#/components/schemas/roleArray"
+                  "$ref" : "#/components/schemas/roleArray"
                 }
               },
               "required" : [ "data" ]
@@ -483,7 +576,6 @@
                     "shareDataWithPeers" : true,
                     "immediateSubRoles" : [ ],
                     "name" : "Sales Team Member",
-                    "description" : "",
                     "reportsTo" : "50000000008337",
                     "id" : "50000000779019",
                     "isVisible" : true
@@ -501,7 +593,6 @@
                     "shareDataWithPeers" : false,
                     "immediateSubRoles" : [ ],
                     "name" : "Marketing Team Member",
-                    "description" : "",
                     "reportsTo" : "50000000008337",
                     "id" : "50000009610999",
                     "isVisible" : true
@@ -526,17 +617,18 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "associatedAgents" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array", "null" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
-                  "uniqueItems" : false
+                  "uniqueItems" : false,
+                  "description" : "ID(s) of the agent(s) associated with the role"
                 }
               },
               "required" : [ "associatedAgents" ]
@@ -550,43 +642,32 @@
             }
           }
         }
-      }
-    },
-    "parameters" : {
-      "isDefault" : {
-        "name" : "isDefault",
-        "in" : "query",
-        "description" : "Key that denotes whether the roles must be default roles or custom roles",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "boolean", "null" ],
-          "description" : "Key that denotes whether the roles must be default roles or custom roles"
-        }
       },
-      "roleId" : {
-        "name" : "roleId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "isVisible" : {
-        "name" : "isVisible",
-        "in" : "query",
-        "description" : "Key that filters roles according to their visibility in the UI",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "boolean", "null" ],
-          "description" : "Key that filters roles according to their visibility in the UI"
+      "roleCountResponse" : {
+        "description" : "roleCountResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "count" : {
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)",
+                  "description" : "Number of roles configured in the help desk portal"
+                }
+              },
+              "required" : [ "count" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "count" : 5
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -595,21 +676,30 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "shareDataWithPeers" : {
-                  "type" : [ "boolean", "null" ]
+                  "type" : [ "boolean" ],
+                  "description" : "Indicates whether the role shares data with peer roles"
                 },
                 "name" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "type" : [ "string" ],
+                  "maxLength" : 50,
+                  "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+",
+                  "description" : "Name of the role"
                 },
                 "description" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "type" : [ "string" ],
+                  "maxLength" : 3200,
+                  "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+",
+                  "description" : "Short description of the role"
+                },
+                "reportsTo" : {
+                  "type" : [ "string", "integer" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)",
+                  "description" : "Unique ID of the role to which the current role reports"
                 }
               }
             },
@@ -630,13 +720,14 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "transferToRoleId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer" ],
                   "format" : "int64",
-                  "pattern" : "([0-9]+)"
+                  "pattern" : "([0-9]+)",
+                  "description" : "Unique ID of the role to which the child roles must be transferred"
                 }
               },
               "required" : [ "transferToRoleId" ]
@@ -657,19 +748,18 @@
             "schema" : {
               "additionalProperties" : false,
               "allOf" : [ {
-                "$ref" : "./Role.json#/components/schemas/roleupdateJson"
+                "$ref" : "#/components/schemas/roleupdateJson"
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object" ],
                 "properties" : {
                   "reportsTo" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
-                    "pattern" : "([0-9]+)"
+                    "pattern" : "([0-9]+)",
+                    "description" : "Unique ID of the role to which the current role reports"
                   }
-                }
-              }, {
-                "type" : "object",
-                "required" : [ "name", "shareDataWithPeers" ]
+                },
+                "additionalProperties" : false
               } ]
             },
             "examples" : {
@@ -687,6 +777,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

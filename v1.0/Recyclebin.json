@@ -68,16 +68,13 @@
           "in" : "query",
           "description" : "Additional information related to the resources. Values allowed are: @department@ and @deletedBy@. You can pass multiple values by separating them with commas in the API request.",
           "required" : false,
-          "style" : "simple",
+          "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "null", "array" ],
-            "description" : "Additional information related to the resources. Values allowed are: @department@ and @deletedBy@. You can pass multiple values by separating them with commas in the API request.",
+            "type" : [ "array" ],
             "items" : {
-              "type" : [ "string", "null" ],
-              "enum" : [ "deletedBy", "department" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "type" : [ "string" ],
+              "enum" : [ "deletedBy", "department" ]
             },
             "uniqueItems" : true
           }
@@ -89,9 +86,8 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
-            "description" : "ID of the department to which the deleted resources belong.",
             "pattern" : "([0-9]+)"
           }
         }, {
@@ -102,10 +98,9 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "integer" ],
             "format" : "int32",
-            "description" : "Number of resources to list. The default value is 10 and the maximum value supported is 100.",
-            "maximum" : 50,
+            "maximum" : 100,
             "minimum" : 1,
             "pattern" : "([0-9]+)"
           }
@@ -117,10 +112,11 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "integer" ],
             "format" : "int32",
-            "description" : "Index number, starting from which the resources must be fetched.",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "minimum" : 0,
+            "default" : 0
           }
         }, {
           "name" : "moduleId",
@@ -130,11 +126,33 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
-            "description" : "ID of the module to which the deleted resources belong.",
             "pattern" : "([0-9]+)"
           }
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "pattern" : "-?(name|type|department|deletedBy|deletedTime)"
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Sort by a specific attribute: @name@, @type@, @department@, @deletedBy@, or @deletedTime@. The default sorting order is ascending. A @-@ prefix denotes descending order of sorting."
+        }, {
+          "name" : "module",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "accounts", "contacts", "tickets", "tasks", "timeEntry", "calls", "events", "contracts", "products", "topics", "solutions" ]
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Filter by a specific module: @accounts@, @contacts@, @tickets@, @tasks@, @timeEntry@, @calls@, @events@, @contracts@, @products@, @topics@, or @solutions@",
+          "deprecated" : true
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -208,15 +226,15 @@
   "components" : {
     "schemas" : {
       "ids" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "type" : [ "string", "null", "integer" ],
+          "type" : [ "string", "integer", "null" ],
           "format" : "int64",
           "pattern" : "([0-9]+)"
         }
       },
       "recycleBinKeys" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "displayName" : {
@@ -225,17 +243,17 @@
             "minLength" : 0
           },
           "departmentId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "deletedById" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
@@ -253,9 +271,9 @@
         "required" : [ "deletedById", "deletedTime", "departmentId", "displayName", "id", "type" ]
       },
       "data" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./Recyclebin.json#/components/schemas/recycleBinKeys"
+          "$ref" : "#/components/schemas/recycleBinKeys"
         }
       }
     },
@@ -266,15 +284,15 @@
           "application/json" : {
             "schema" : {
               "allOf" : [ {
-                "type" : "object",
+                "type" : [ "object" ],
                 "properties" : {
                   "data" : {
-                    "type" : "array",
+                    "type" : [ "array" ],
                     "items" : {
-                      "type" : "object",
+                      "type" : [ "object" ],
                       "properties" : {
                         "department" : {
-                          "type" : [ "null", "object" ],
+                          "type" : [ "object", "null" ],
                           "additionalProperties" : false,
                           "maxProperties" : 2,
                           "minProperties" : 2,
@@ -286,7 +304,7 @@
                               "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                             },
                             "id" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
                               "pattern" : "([0-9]+)"
                             }
@@ -294,7 +312,7 @@
                           "required" : [ "id", "name" ]
                         },
                         "deletedBy" : {
-                          "type" : [ "null", "object" ],
+                          "type" : [ "object", "null" ],
                           "additionalProperties" : false,
                           "maxProperties" : 5,
                           "minProperties" : 5,
@@ -316,7 +334,7 @@
                               "minLength" : 0
                             },
                             "id" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
                               "pattern" : "([0-9]+)"
                             },
@@ -329,16 +347,18 @@
                           },
                           "required" : [ "email", "firstName", "id", "lastName", "photoURL" ]
                         }
-                      }
+                      },
+                      "additionalProperties" : false
                     }
                   }
-                }
+                },
+                "additionalProperties" : false
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "data" : {
-                    "$ref" : "./Recyclebin.json#/components/schemas/data"
+                    "$ref" : "#/components/schemas/data"
                   }
                 },
                 "required" : [ "data" ]
@@ -352,56 +372,56 @@
                     "departmentId" : null,
                     "deletedById" : "4000000000059",
                     "id" : "4000000046163",
-                    "type" : "Attachments",
+                    "type" : [ "Attachments" ],
                     "deletedTime" : "2020-06-21T16:16:16.000Z"
                   }, {
                     "displayName" : "Sample display name",
                     "departmentId" : "4000000013244",
                     "deletedById" : "4000000000059",
                     "id" : "4000000046093",
-                    "type" : "Calls",
+                    "type" : [ "Calls" ],
                     "deletedTime" : "2020-06-21T16:16:16.000Z"
                   }, {
                     "displayName" : "Sample display name",
                     "departmentId" : "4000000013244",
                     "deletedById" : "4000000000059",
                     "id" : "4000000017184",
-                    "type" : "Tickets",
+                    "type" : [ "Tickets" ],
                     "deletedTime" : "2020-06-21T16:16:16.000Z"
                   }, {
                     "displayName" : "Sample display name",
                     "departmentId" : "4000000013244",
                     "deletedById" : "4000000000059",
                     "id" : "4000000046029",
-                    "type" : "Tickets",
+                    "type" : [ "Tickets" ],
                     "deletedTime" : "2020-06-21T16:16:16.000Z"
                   }, {
                     "displayName" : "Sample display name",
                     "departmentId" : null,
                     "deletedById" : "4000000000059",
                     "id" : "4000000019005",
-                    "type" : "Contacts",
+                    "type" : [ "Contacts" ],
                     "deletedTime" : "2020-06-21T16:16:16.000Z"
                   }, {
                     "displayName" : "Sample display name",
                     "departmentId" : "4000000013244",
                     "deletedById" : "4000000000059",
                     "id" : "4000000046131",
-                    "type" : "Events",
+                    "type" : [ "Events" ],
                     "deletedTime" : "2020-06-21T16:16:16.000Z"
                   }, {
                     "displayName" : "Sample display name",
                     "departmentId" : "4000000013244",
                     "deletedById" : "4000000000059",
                     "id" : "4000000046111",
-                    "type" : "Tasks",
+                    "type" : [ "Tasks" ],
                     "deletedTime" : "2020-06-21T16:16:16.000Z"
                   }, {
                     "displayName" : "Sample display name",
                     "departmentId" : "4000000013244",
                     "deletedById" : "4000000000059",
                     "id" : "4000000046153",
-                    "type" : "Time Entry",
+                    "type" : [ "Time Entry" ],
                     "deletedTime" : "2020-06-21T16:16:16.000Z"
                   } ]
                 }
@@ -416,14 +436,14 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "isChildNeedToBeRestored" : {
-                  "type" : [ "boolean", "null" ]
+                  "type" : [ "boolean" ]
                 },
                 "ids" : {
-                  "$ref" : "./Recyclebin.json#/components/schemas/ids"
+                  "$ref" : "#/components/schemas/ids"
                 }
               },
               "required" : [ "ids" ]
@@ -443,11 +463,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "ids" : {
-                  "$ref" : "./Recyclebin.json#/components/schemas/ids"
+                  "$ref" : "#/components/schemas/ids"
                 }
               },
               "required" : [ "ids" ]
@@ -464,6 +484,15 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "jwt-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/jwt-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

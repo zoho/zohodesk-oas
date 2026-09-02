@@ -12,7 +12,16 @@
         "description" : "This API executes an action with the given input values.",
         "operationId" : "executeAction",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/id"
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -31,7 +40,7 @@
           }
         },
         "security" : [ {
-          "oAuth2" : [ "settings.CREATE" ]
+          "iam-oauth2-schema" : [ "Desk.settings.CREATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -50,12 +59,10 @@
           },
           "status" : {
             "type" : [ "string", "null" ],
-            "enum" : [ "SUCCESS", "FAILURE", "OFFLOADED" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "SUCCESS", "FAILURE", "OFFLOADED" ]
           },
           "actionResult" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
             "additionalProperties" : false,
             "patternProperties" : {
               "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
@@ -113,48 +120,32 @@
         }
       }
     },
-    "parameters" : {
-      "id" : {
-        "name" : "id",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      }
-    },
     "requestBodies" : {
       "executeActionPayloadJson" : {
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "object", "null" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "executionType" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "description" : "Specifies the type of action execution. The allowed values are SYNC and ASYNC.",
-                  "enum" : [ "SYNC", "ASYNC" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "enum" : [ "SYNC", "ASYNC" ]
                 },
                 "actionParamMappings" : {
                   "$ref" : "./GenericActionMapping.json#/components/schemas/inputParamPayloadJsonArray"
                 },
                 "moduleId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer" ],
                   "format" : "int64",
                   "description" : "ID of the module to which the entities belong. It could be a system or custom module.",
-                  "pattern" : "([0-9]+)"
+                  "pattern" : "([0-9]*|null|undefined)"
                 },
                 "entityIds" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
@@ -163,7 +154,7 @@
                   "uniqueItems" : false
                 }
               },
-              "required" : [ "actionParamMappings", "entityIds", "moduleId" ]
+              "required" : [ "actionParamMappings", "entityIds" ]
             },
             "examples" : {
               "Valid requestBody Definitions" : {
@@ -186,7 +177,7 @@
                     "placeHolderContext" : null,
                     "origin" : "STATIC",
                     "length" : "100",
-                    "type" : "TEXT",
+                    "type" : [ "TEXT" ],
                     "isEncrypted" : false,
                     "name" : "Dynamic Param",
                     "uiType" : null,
@@ -206,6 +197,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

@@ -8,7 +8,7 @@
   "components" : {
     "schemas" : {
       "helpCenter" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "name" : {
@@ -18,7 +18,7 @@
             "pattern" : "^[0-9a-zA-Z\\!\\$\\|\\%&amp;\\#\\-\\*\\+\\,\\^\\_\\`\\~\\s\\.\\P{InBasicLatin}]+$"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
@@ -30,19 +30,17 @@
           },
           "status" : {
             "type" : [ "string", "null" ],
-            "enum" : [ "ACTIVE", "DISABLED" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "ACTIVE", "DISABLED" ]
           }
         },
         "required" : [ "id", "name", "status", "url" ]
       },
       "helpCenterInfo" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "helpCenter" : {
-            "$ref" : "./ResponseHelpCenterUser.json#/components/schemas/helpCenter"
+            "$ref" : "#/components/schemas/helpCenter"
           },
           "userStatus" : {
             "type" : [ "string", "null" ],
@@ -50,17 +48,17 @@
             "minLength" : 0
           },
           "userId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
         },
         "required" : [ "helpCenter", "userId", "userStatus" ]
       },
-      "data" : {
-        "type" : [ "null", "array" ],
+      "helpCenterInfoData" : {
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./ResponseHelpCenterUser.json#/components/schemas/helpCenterInfo"
+          "$ref" : "#/components/schemas/helpCenterInfo"
         }
       }
     },
@@ -70,11 +68,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./ResponseHelpCenterUser.json#/components/schemas/data"
+                  "$ref" : "#/components/schemas/helpCenterInfoData"
                 }
               },
               "required" : [ "data" ]
@@ -109,6 +107,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

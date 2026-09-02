@@ -5,16 +5,36 @@
     "version" : "1.0.0"
   },
   "paths" : {
-    "/api/v1/tickets/{ticketId}/transitions/{transitionId}/discardDraft" : {
+    "/api/v1/tickets/{ticket_id}/transitions/{transition_id}/discardDraft" : {
       "post" : {
         "tags" : [ "EntityBlueprints" ],
         "summary" : "Delete the during actions transition draft",
-        "description" : "To delete the during actions transition draft",
+        "description" : "Deletes the during-actions transition draft for a specific transition on a ticket.",
         "operationId" : "deleteDuringActionTransitionDraft",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/transitionId"
+          "name" : "transition_id",
+          "description" : "Unique ID of the transition.",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/ticketId"
+          "name" : "ticket_id",
+          "description" : "Unique ID of the ticket.",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -41,16 +61,37 @@
         "x-audience" : [ "external-public" ]
       }
     },
-    "/api/v1/tickets/{ticketId}/transitions/{transitionId}/saveDraft" : {
+    "/api/v1/tickets/{ticket_id}/transitions/{transition_id}/saveDraft" : {
       "post" : {
         "tags" : [ "EntityBlueprints" ],
         "summary" : "Save the during actions transition draft",
-        "description" : "To save the during actions transition draft",
+        "description" : "Saves the during-actions transition draft for a specific transition on a ticket.",
         "operationId" : "saveDuringActionTransitionDraft",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/transitionId"
+          "name" : "transition_id",
+          "description" : "Unique ID of the transition.",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/ticketId"
+          "name" : "ticket_id",
+          "description" : "Unique ID of the ticket.",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -84,16 +125,18 @@
   "components" : {
     "schemas" : {
       "draftByJson" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "name" : {
+            "description" : "Name of the user who saved the draft",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the user who saved the draft",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
@@ -101,26 +144,29 @@
         "required" : [ "id", "name" ]
       },
       "draftedApprovalJson" : {
-        "type" : [ "null", "object" ],
+        "type" : "object",
         "additionalProperties" : false,
         "properties" : {
           "approverIds" : {
-            "type" : [ "null", "array" ],
+            "description" : "Unique IDs of the approvers configured for the approval",
+            "type" : "array",
             "items" : {
-              "type" : [ "string", "null", "integer" ],
+              "type" : [ "string", "integer" ],
               "format" : "int64",
               "pattern" : "([0-9]+)"
             },
             "uniqueItems" : false
           },
           "subject" : {
-            "type" : [ "string", "null" ],
+            "description" : "Subject of the approval",
+            "type" : "string",
             "maxLength" : 1000,
             "minLength" : 0,
             "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]*"
           },
           "description" : {
-            "type" : [ "string", "null" ],
+            "description" : "Description of the approval",
+            "type" : "string",
             "maxLength" : 32000,
             "minLength" : 0,
             "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]*"
@@ -129,14 +175,16 @@
         "required" : [ "approverIds", "description", "subject" ]
       },
       "draftedResolutionJson" : {
-        "type" : [ "null", "object" ],
+        "type" : "object",
         "additionalProperties" : false,
         "properties" : {
           "toNotifyContactForResolution" : {
-            "type" : [ "boolean", "null" ]
+            "description" : "Indicates whether the contact must be notified about the resolution. Possible values: @true@ - notify the contact, @false@ - do not notify the contact",
+            "type" : "boolean"
           },
           "content" : {
-            "type" : [ "string", "null" ],
+            "description" : "Content of the resolution",
+            "type" : "string",
             "maxLength" : 32000,
             "minLength" : 0,
             "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]*"
@@ -145,14 +193,16 @@
         "required" : [ "content", "toNotifyContactForResolution" ]
       },
       "duringTransUploadJson" : {
-        "type" : [ "null", "object" ],
+        "type" : "object",
         "additionalProperties" : false,
         "properties" : {
           "isPublic" : {
-            "type" : [ "boolean", "null" ]
+            "description" : "Indicates whether the upload is public. Possible values: @true@ - upload is public, @false@ - upload is private",
+            "type" : "boolean"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the upload",
+            "type" : [ "string", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
@@ -160,102 +210,137 @@
         "required" : [ "id", "isPublic" ]
       },
       "duringTransUploadJsonArr" : {
-        "type" : [ "null", "array" ],
+        "type" : "array",
         "items" : {
-          "$ref" : "./EntityBlueprints.json#/components/schemas/duringTransUploadJson"
+          "$ref" : "#/components/schemas/duringTransUploadJson"
         }
       },
       "attachmentJson" : {
-        "type" : [ "null", "object" ],
+        "type" : "object",
         "additionalProperties" : false,
         "properties" : {
           "uploads" : {
-            "$ref" : "./EntityBlueprints.json#/components/schemas/duringTransUploadJsonArr"
+            "description" : "Uploads attached as attachments",
+            "$ref" : "#/components/schemas/duringTransUploadJsonArr"
           }
         },
         "required" : [ "uploads" ]
       },
       "replyJson" : {
-        "type" : [ "null", "object" ],
+        "type" : "object",
         "additionalProperties" : false,
         "properties" : {
           "cc" : {
-            "type" : [ "string", "null" ],
+            "description" : "CC recipients of the reply",
+            "type" : "string",
             "maxLength" : 13000,
             "minLength" : 0,
             "pattern" : "(^((.*?)((<)*?[a-zA-Z0-9]([\\w\\-.+]*)@([\\w\\-.]*)(\\.[a-zA-Z]{2,22}(.[a-zA-Z]{2}){0,2})(>)*?(\\s)*((,|;)\\s*)?))+|^$)"
           },
           "inReplyToThreadId" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the thread to which the reply is sent",
+            "type" : [ "string", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "bcc" : {
-            "type" : [ "string", "null" ],
+            "description" : "BCC recipients of the reply",
+            "type" : "string",
             "maxLength" : 13000,
             "minLength" : 0,
             "pattern" : "(^((.*?)((<)*?[a-zA-Z0-9]([\\w\\-.+]*)@([\\w\\-.]*)(\\.[a-zA-Z]{2,22}(.[a-zA-Z]{2}){0,2})(>)*?(\\s)*((,|;)\\s*)?))+|^$)"
           },
           "channel" : {
-            "type" : [ "string", "null" ],
-            "enum" : [ "FACEBOOK", "FACEBOOK_DM", "TWITTER", "TWITTER_DM", "EMAIL", "FORUMS", "INSTAGRAM", "INSTAGRAM_DM" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "description" : "Channel through which the reply is sent",
+            "type" : "string",
+            "enum" : [ "FACEBOOK", "FACEBOOK_DM", "TWITTER", "TWITTER_DM", "EMAIL", "FORUMS", "INSTAGRAM", "INSTAGRAM_DM" ]
           },
           "to" : {
-            "type" : [ "string", "null" ],
+            "description" : "To recipients of the reply",
+            "type" : "string",
             "maxLength" : 13000,
             "minLength" : 0,
             "pattern" : "(^((.*?)((<)*?[a-zA-Z0-9]([\\w\\-.+]*)@([\\w\\-.]*)(\\.[a-zA-Z]{2,22}(.[a-zA-Z]{2}){0,2})(>)*?(\\s)*((,|;)\\s*)?))+|^$)"
           },
           "isPrivate" : {
-            "type" : [ "boolean", "null" ]
+            "description" : "Indicates whether the reply is private. Possible values: @true@ - reply is private, @false@ - reply is public",
+            "type" : "boolean"
           },
           "fromEmailAddress" : {
-            "type" : [ "string", "null" ],
+            "description" : "From email address of the reply",
+            "type" : "string",
             "maxLength" : 13000,
             "minLength" : 0,
             "pattern" : "(^((.*?)((<)*?[a-zA-Z0-9]([\\w\\-.+]*)@([\\w\\-.]*)(\\.[a-zA-Z]{2,22}(.[a-zA-Z]{2}){0,2})(>)*?(\\s)*((,|;)\\s*)?))+|^$)"
           },
           "contentType" : {
-            "type" : [ "string", "null" ],
-            "enum" : [ "html", "plainText", "text/html" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "description" : "Content type of the reply",
+            "type" : "string",
+            "enum" : [ "html", "plainText", "text/html" ]
           },
           "content" : {
-            "type" : [ "string", "null" ],
+            "description" : "Content of the reply",
+            "type" : "string",
             "maxLength" : 16000000,
             "minLength" : 0
           },
           "uploads" : {
-            "type" : [ "null", "array" ],
+            "description" : "Uploads attached to the reply",
+            "type" : "array",
             "items" : {
-              "type" : [ "string", "null", "integer" ],
+              "type" : [ "string", "integer" ],
               "format" : "int64",
               "pattern" : "([0-9]+)"
             },
             "uniqueItems" : false
+          },
+          "attachments" : {
+            "type" : "array",
+            "description" : "Attachment details",
+            "items" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "properties" : {
+                "fileId" : {
+                  "description" : "Unique ID of the attachment file",
+                  "type" : "integer",
+                  "format" : "int64"
+                },
+                "size" : {
+                  "description" : "Size of the attachment file",
+                  "type" : "integer",
+                  "format" : "int64"
+                },
+                "name" : {
+                  "description" : "Name of the attachment file",
+                  "type" : "string",
+                  "maxLength" : 255
+                }
+              }
+            }
           }
         },
         "required" : [ "bcc", "cc", "channel", "content", "contentType", "fromEmailAddress", "inReplyToThreadId", "isPrivate", "to", "uploads" ]
       },
       "commentJson" : {
-        "type" : [ "null", "object" ],
+        "type" : "object",
         "additionalProperties" : false,
         "properties" : {
           "isPublicComment" : {
-            "type" : [ "boolean", "null" ]
+            "description" : "Indicates whether the comment is public. Possible values: @true@ - comment is public, @false@ - comment is private",
+            "type" : "boolean"
           },
           "content" : {
-            "type" : [ "string", "null" ],
+            "description" : "Content of the comment",
+            "type" : "string",
             "maxLength" : 32000,
             "minLength" : 0
           },
           "uploads" : {
-            "type" : [ "null", "array" ],
+            "description" : "Uploads attached to the comment",
+            "type" : "array",
             "items" : {
-              "type" : [ "string", "null", "integer" ],
+              "type" : [ "string", "integer" ],
               "format" : "int64",
               "pattern" : "([0-9]+)"
             },
@@ -265,20 +350,22 @@
         "required" : [ "content", "isPublicComment", "uploads" ]
       },
       "fieldJson" : {
-        "type" : [ "null", "object" ],
+        "type" : "object",
         "additionalProperties" : false,
         "properties" : {
           "productId" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the product associated with the ticket",
+            "type" : [ "string", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "customFields" : {
-            "type" : [ "null", "object" ],
+            "description" : "Custom field values to update during the transition",
+            "type" : "object",
             "additionalProperties" : false,
             "patternProperties" : {
               "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
-                "type" : [ "string", "null" ],
+                "type" : "string",
                 "maxLength" : 100,
                 "minLength" : 0,
                 "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
@@ -286,39 +373,45 @@
             }
           },
           "teamId" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the team to assign the ticket to",
+            "type" : [ "string", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "dueDate" : {
-            "type" : [ "string", "null" ],
+            "description" : "Due date to set on the ticket",
+            "type" : "string",
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "channel" : {
-            "type" : [ "string", "null" ],
+            "description" : "Channel of the ticket",
+            "type" : "string",
             "x-dynamic-enum" : true
           },
           "language" : {
-            "type" : [ "string", "null" ],
+            "description" : "Language to set on the ticket",
+            "type" : "string",
             "x-dynamic-enum" : true
           },
           "priority" : {
-            "type" : [ "string", "null" ],
+            "description" : "Priority to set on the ticket",
+            "type" : "string",
             "x-dynamic-enum" : true
           },
           "classification" : {
-            "type" : [ "string", "null" ],
+            "description" : "Classification to set on the ticket",
+            "type" : "string",
             "x-dynamic-enum" : true
           },
           "assigneeId" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the agent to assign the ticket to",
+            "type" : [ "string", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
-        },
-        "required" : [ "assigneeId", "channel", "classification", "customFields", "dueDate", "language", "priority", "productId", "teamId" ]
+        }
       }
     },
     "responses" : {
@@ -327,25 +420,29 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "totalNoOfDraftActions" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Number of drafted actions",
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int32",
                   "minimum" : 1,
                   "pattern" : "([0-9]+)"
                 },
                 "draftBy" : {
-                  "$ref" : "./EntityBlueprints.json#/components/schemas/draftByJson"
+                  "description" : "User who saved the draft",
+                  "$ref" : "#/components/schemas/draftByJson"
                 },
                 "totalNoOfActions" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Total number of actions in the transition",
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int32",
                   "minimum" : 1,
                   "pattern" : "([0-9]+)"
                 },
                 "draftAt" : {
+                  "description" : "Time at which the draft was saved",
                   "type" : [ "string", "null" ],
                   "maxLength" : 100,
                   "minLength" : 0,
@@ -357,41 +454,17 @@
             "examples" : {
               "Valid responses Definitions" : {
                 "value" : {
+                  "totalNoOfDraftActions" : "6",
+                  "totalNoOfActions" : "6",
                   "draftBy" : {
                     "name" : "Sandeep Ghemire",
                     "id" : "8000000000053"
                   },
-                  "draftAt" : 1605284320000
+                  "draftAt" : "2020-11-13T16:18:40.000Z"
                 }
               }
             }
           }
-        }
-      }
-    },
-    "parameters" : {
-      "transitionId" : {
-        "name" : "transitionId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "ticketId" : {
-        "name" : "ticketId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
         }
       }
     },
@@ -400,26 +473,89 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : "object",
               "additionalProperties" : false,
               "properties" : {
                 "ATTACHMENT" : {
-                  "$ref" : "./EntityBlueprints.json#/components/schemas/attachmentJson"
+                  "description" : "Drafted attachment details",
+                  "$ref" : "#/components/schemas/attachmentJson"
                 },
                 "RESOLUTION" : {
-                  "$ref" : "./EntityBlueprints.json#/components/schemas/draftedResolutionJson"
+                  "description" : "Drafted resolution details",
+                  "$ref" : "#/components/schemas/draftedResolutionJson"
                 },
                 "FIELD_UPDATE" : {
-                  "$ref" : "./EntityBlueprints.json#/components/schemas/fieldJson"
+                  "description" : "Drafted field update details",
+                  "$ref" : "#/components/schemas/fieldJson"
                 },
                 "APPROVAL" : {
-                  "$ref" : "./EntityBlueprints.json#/components/schemas/draftedApprovalJson"
+                  "description" : "Drafted approval details",
+                  "$ref" : "#/components/schemas/draftedApprovalJson"
                 },
                 "REPLY" : {
-                  "$ref" : "./EntityBlueprints.json#/components/schemas/replyJson"
+                  "description" : "Drafted reply content details",
+                  "$ref" : "#/components/schemas/replyJson"
                 },
                 "COMMENT" : {
-                  "$ref" : "./EntityBlueprints.json#/components/schemas/commentJson"
+                  "description" : "Drafted comment details",
+                  "$ref" : "#/components/schemas/commentJson"
+                },
+                "SHARING" : {
+                  "description" : "Drafted sharing details",
+                  "type" : "object",
+                  "properties" : {
+                    "owners" : {
+                      "description" : "Owners with whom the transition is shared",
+                      "type" : "array",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "departmentId" : {
+                            "description" : "Unique ID of the department with which the transition is shared",
+                            "type" : [ "string", "integer" ],
+                            "format" : "int64",
+                            "pattern" : "([0-9]+)"
+                          },
+                          "deptSharingType" : {
+                            "description" : "Sharing type for the department. Possible values: @READ_ONLY@, @READ_WRITE@, @RESTRICTED_ACCESS@",
+                            "type" : "string",
+                            "enum" : [ "READ_ONLY", "READ_WRITE", "RESTRICTED_ACCESS" ]
+                          },
+                          "isManualSharing" : {
+                            "description" : "Indicates whether the sharing is manual. Possible values: @true@ - sharing is manual, @false@ - sharing is automatic",
+                            "type" : "boolean"
+                          },
+                          "agentIds" : {
+                            "description" : "Agent IDs configured as transition owners",
+                            "type" : "array",
+                            "items" : {
+                              "type" : [ "string", "integer" ],
+                              "format" : "int64",
+                              "pattern" : "([0-9]+)"
+                            },
+                            "minItems" : 0,
+                            "maxItems" : 10,
+                            "x-template" : "automationRulesList"
+                          },
+                          "teamIds" : {
+                            "description" : "Team IDs configured as transition owners",
+                            "type" : "array",
+                            "items" : {
+                              "type" : [ "string", "integer" ],
+                              "format" : "int64",
+                              "pattern" : "([0-9]+)"
+                            },
+                            "minItems" : 0,
+                            "maxItems" : 10,
+                            "x-template" : "automationRulesList"
+                          }
+                        }
+                      },
+                      "minItems" : 1,
+                      "maxItems" : 4,
+                      "x-template" : "transitionOwnerJSON"
+                    }
+                  }
                 }
               }
             },
@@ -457,22 +593,34 @@
                   },
                   "APPROVAL" : {
                     "approverIds" : [ 1000000012635 ],
-                    "subject" : "Has to be sent for approval"
+                    "subject" : "Has to be sent for approval",
+                    "description" : "Approval required before completing this transition"
                   },
                   "REPLY" : {
                     "channel" : "EMAIL",
                     "to" : "carol@zylker.com",
-                    "isPrivate" : false,
+                    "cc" : "",
+                    "bcc" : "",
                     "fromEmailAddress" : "support@zylker.com",
                     "contentType" : "plainText",
                     "content" : "Hi Sandeep here!",
-                    "isForward" : false,
+                    "isPrivate" : false,
+                    "inReplyToThreadId" : null,
                     "uploads" : [ 1000000096035 ]
                   },
                   "COMMENT" : {
                     "isPublicComment" : false,
                     "content" : "Comment is to test transition Draft",
                     "uploads" : [ 1000000096035 ]
+                  },
+                  "SHARING" : {
+                    "owners" : [ {
+                      "departmentId" : 1000000010712,
+                      "deptSharingType" : "READ_ONLY",
+                      "isManualSharing" : true,
+                      "agentIds" : [ 1000000012635 ],
+                      "teamIds" : [ ]
+                    } ]
                   }
                 }
               }
@@ -482,6 +630,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

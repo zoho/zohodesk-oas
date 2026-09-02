@@ -15,11 +15,13 @@
           "name" : "mappingId",
           "in" : "path",
           "required" : true,
+          "description" : "Unique ID of the account-contact mapping",
           "style" : "simple",
           "explode" : false,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
+            "maxLength" : 100,
             "pattern" : "([0-9]+)"
           }
         }, {
@@ -46,32 +48,35 @@
   "components" : {
     "schemas" : {
       "mappingInfo" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "mappingId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the account-contact mapping"
           },
           "accountId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the account in the mapping"
           },
           "contactId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the contact in the mapping"
           },
           "mappingType" : {
             "type" : [ "string", "null" ],
             "enum" : [ "PRIMARY", "SECONDARY" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "description" : "Type of mapping connection between the contact and the account. Accepted values: PRIMARY, SECONDARY"
           },
           "isAccountTicketsViewable" : {
-            "type" : [ "boolean", "null" ]
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the contact can access all tickets related to the account"
           }
         },
         "required" : [ "accountId", "contactId", "isAccountTicketsViewable", "mappingId", "mappingType" ]
@@ -83,11 +88,12 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./AccountContactMappingInfo.json#/components/schemas/mappingInfo"
+                  "$ref" : "#/components/schemas/mappingInfo",
+                  "description" : "Account-contact mapping details"
                 }
               },
               "required" : [ "data" ]
@@ -112,17 +118,17 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "mappingType" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "enum" : [ "PRIMARY" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "description" : "Accepted values: PRIMARY"
                 },
                 "isAccountTicketsViewable" : {
-                  "type" : [ "boolean", "null" ]
+                  "type" : [ "boolean" ],
+                  "description" : "Whether the contact can access all tickets related to the account"
                 }
               }
             },
@@ -139,6 +145,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

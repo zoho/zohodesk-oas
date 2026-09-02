@@ -1,5 +1,6 @@
 {
   "openapi" : "3.1.0",
+  "x-mcp-group" : [ "Layouts" ],
   "info" : {
     "title" : "Layout",
     "version" : "1.0.0"
@@ -11,10 +12,78 @@
         "summary" : "Get Layouts",
         "description" : "This API lists all the layouts configured for a module.",
         "operationId" : "getLayouts",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/module"
+          "name" : "status",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "active", "inactive", "all" ],
+            "default" : "active"
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Status of the layout. The allowed values are active, inactive, and all"
         }, {
-          "$ref" : "#/components/parameters/departmentId"
+          "name" : "from",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "default" : 0
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "The starting index number from where the layouts should be fetched"
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 99,
+            "default" : 99
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "The number of layouts to be fetched"
+        }, {
+          "name" : "layoutName",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "maxLength" : 200
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Name of the layout"
+        }, {
+          "name" : "module",
+          "in" : "query",
+          "description" : "Name of the module whose layouts must be fetched. Standard values: tickets, contacts, accounts, calls, events, tasks, timeEntry, products, contracts. Custom modules are also supported.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "examples" : [ "tickets", "contacts", "accounts", "tasks", "calls", "events", "timeEntry", "products", "contracts" ],
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+          }
+        }, {
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "ID of the department in which the layouts are configured",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "name" : "id",
           "in" : "query",
@@ -23,9 +92,7 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
-            "description" : "ID of the layout",
+            "type" : [ "string", "integer" ],
             "pattern" : "([0-9]+)"
           }
         }, {
@@ -43,15 +110,16 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.basic.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.layouts.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
       },
       "post" : {
         "tags" : [ "Layout" ],
         "summary" : "Create Layout",
-        "description" : "This API creates the layout",
+        "description" : "This API creates a new layout. To build the request body, first call getStandardLayoutFormat (GET /api/v1/layouts/standardLayoutFormat with the module) to obtain the sections and fields, then set departmentId, module, layoutName, layoutDisplayName, and isDefaultLayout.",
         "operationId" : "createLayout",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -62,12 +130,24 @@
           "200" : {
             "$ref" : "#/components/responses/createLayoutResponse"
           },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/licenseErrorResponse"
+          },
           "422" : {
-            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.CREATE" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.CREATE", "Desk.settings.CREATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -76,31 +156,46 @@
       "get" : {
         "tags" : [ "Layout" ],
         "summary" : "Get Standard Layout Format",
-        "description" : "This Api provides the standrd layout format for the given module with organisations fields that can be used for create layout",
+        "description" : "Provides the standard layout format (sections and organization fields) for the given module. Use this response as the basis for the createLayout request body: unwrap data into sections, keep each field id and isMandatory (and allowedValues for pick lists), then set departmentId, module, layoutName, layoutDisplayName, and isDefaultLayout.",
         "operationId" : "getStandardLayoutFormat",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "module",
           "in" : "query",
+          "description" : "Name of the module to fetch the standard layout format for. Standard values: tickets, contacts, accounts, tasks, calls, events, timeEntry, products, contracts. Custom modules are also supported.",
           "required" : true,
+          "style" : "form",
+          "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "enum" : [ "tickets", "contacts", "accounts", "products", "calls", "tasks", "events", "timeEntry" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "type" : [ "string" ],
+            "examples" : [ "tickets", "contacts", "accounts", "tasks", "calls", "events", "timeEntry", "products", "contracts" ],
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/getStandardLayoutFormatResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/licenseErrorResponse"
+          },
           "422" : {
             "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
           },
-          "200" : {
-            "$ref" : "#/components/responses/getStandardLayoutFormatResponse"
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.basic.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.layouts.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -111,27 +206,58 @@
         "summary" : "Clone Layout",
         "description" : "This API creates new Layout by cloning existing layout.",
         "operationId" : "cloneLayout",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/layoutId"
+          "name" : "layoutId",
+          "in" : "path",
+          "description" : "ID of the layout",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
+        }, {
+          "name" : "featureFlags",
+          "in" : "header",
+          "description" : "Optional feature flags that opt into additional response properties or behaviour. Multiple flags may be supplied as a comma-separated value.",
+          "required" : false,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "enum" : [ "apiName", "formulaField", "expression", "lookUp", "autonumber" ]
+          }
         } ],
         "requestBody" : {
           "$ref" : "#/components/requestBodies/cloneLayoutJson"
         },
         "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/cloneLayoutResponse"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/licenseErrorResponse"
+          },
           "422" : {
             "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
           },
           "500" : {
             "$ref" : "./Common.json#/components/responses/internalErrorResponse"
-          },
-          "200" : {
-            "$ref" : "#/components/responses/cloneLayoutResponse"
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.CREATE" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.CREATE", "Desk.settings.CREATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -157,9 +283,26 @@
             "minLength" : 0
           }
         }, {
-          "$ref" : "#/components/parameters/layoutId"
+          "name" : "layoutId",
+          "in" : "path",
+          "description" : "ID of the layout",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/fieldId"
+          "name" : "fieldId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -175,7 +318,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.READ", "Desk.settings.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -186,8 +329,18 @@
         "summary" : "Deactivate Layout",
         "description" : "This Api deactivates existing layout",
         "operationId" : "deactivateLayout",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/layoutId"
+          "name" : "layoutId",
+          "in" : "path",
+          "description" : "ID of the layout",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -197,10 +350,25 @@
         "responses" : {
           "200" : {
             "$ref" : "#/components/responses/layoutJson"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/licenseErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.UPDATE", "Desk.settings.UPDATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -211,12 +379,25 @@
         "summary" : "Get Layout",
         "description" : "This API fetches a layout configured for a module",
         "operationId" : "getLayout",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/layoutId"
+          "name" : "layoutId",
+          "in" : "path",
+          "description" : "ID of the layout",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
           "422" : {
             "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
           },
@@ -225,37 +406,74 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.basic.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.layouts.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
       },
       "delete" : {
         "tags" : [ "Layout" ],
         "summary" : "Delete Layout",
-        "description" : " This API deletes a layout",
+        "description" : "This API deletes a layout",
         "operationId" : "deleteLayout",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/layoutId"
+          "name" : "layoutId",
+          "in" : "path",
+          "description" : "ID of the layout",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
           "204" : {
             "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/licenseErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.DELETE" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.DELETE", "Desk.settings.DELETE" ]
         } ],
-        "x-audience" : [ "external-public" ]
+        "x-audience" : [ "external-public" ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/layoutTransferJson"
+        }
       },
       "patch" : {
         "tags" : [ "Layout" ],
         "summary" : "Update Layout",
         "description" : "This API updates details of an existing layout.",
         "operationId" : "updateLayout",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/layoutId"
+          "name" : "layoutId",
+          "in" : "path",
+          "description" : "ID of the layout",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -263,18 +481,27 @@
           "$ref" : "#/components/requestBodies/updateLayout_layoutRequestJSON"
         },
         "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/updateLayoutResponse"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/licenseErrorResponse"
+          },
           "422" : {
-            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
           },
           "500" : {
             "$ref" : "./Common.json#/components/responses/internalErrorResponse"
-          },
-          "200" : {
-            "$ref" : "#/components/responses/updateLayoutResponse"
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.UPDATE", "Desk.settings.UPDATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -285,18 +512,43 @@
         "summary" : "Activate Layout",
         "description" : "This api activates the deactivated Layout.",
         "operationId" : "activateLayout",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/layoutId"
+          "name" : "layoutId",
+          "in" : "path",
+          "description" : "ID of the layout",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
           "200" : {
             "$ref" : "#/components/responses/layoutJson"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/licenseErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.UPDATE", "Desk.settings.UPDATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -307,10 +559,28 @@
         "summary" : "Clone Fields to other Layouts",
         "description" : "This API is to clone a field to other layouts.",
         "operationId" : "cloneFieldsToOtherLayouts",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/layoutId"
+          "name" : "layoutId",
+          "in" : "path",
+          "description" : "ID of the layout",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/fieldId"
+          "name" : "fieldId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -320,10 +590,13 @@
         "responses" : {
           "200" : {
             "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.CREATE" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.UPDATE", "Desk.settings.UPDATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -334,18 +607,43 @@
         "summary" : "Get Layout Profiles",
         "description" : "This api returns the profiles associated with a layout",
         "operationId" : "getLayoutProfiles",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/layoutId"
+          "name" : "layoutId",
+          "in" : "path",
+          "description" : "ID of the layout",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
           "200" : {
             "$ref" : "#/components/responses/layoutProfilesData"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/licenseErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.READ", "Desk.settings.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
       },
@@ -354,8 +652,18 @@
         "summary" : "Associate Profiles To Layout",
         "description" : "This api Associates the given profiles to the layout",
         "operationId" : "associateProfilesToLayout",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/layoutId"
+          "name" : "layoutId",
+          "in" : "path",
+          "description" : "ID of the layout",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -365,10 +673,25 @@
         "responses" : {
           "204" : {
             "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/licenseErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.UPDATE", "Desk.settings.UPDATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -387,9 +710,7 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
-            "description" : "ID of the layout",
+            "type" : [ "string", "integer" ],
             "pattern" : "([0-9]+)"
           }
         }, {
@@ -404,7 +725,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.basic.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.layouts.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -416,7 +737,16 @@
         "description" : "This API replaces the old value with the new value for the PickList field type in all existing records only.<p><b>Note</b>: When a value that does not exist in the PickList values is provided as new value, then this API will create the new value without deleting the old one.</p>",
         "operationId" : "replacePickListValue",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/layoutId"
+          "name" : "layoutId",
+          "in" : "path",
+          "description" : "ID of the layout",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -432,7 +762,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.UPDATE", "Desk.settings.UPDATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -443,19 +773,28 @@
         "summary" : "Update Layout Field",
         "description" : "This API updates details of a field in the layout.",
         "operationId" : "updateLayoutField",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "name" : "isMandatory",
-          "in" : "query",
+          "name" : "layoutId",
+          "in" : "path",
+          "description" : "ID of the layout",
           "required" : true,
-          "style" : "form",
-          "explode" : true,
+          "style" : "simple",
+          "explode" : false,
           "schema" : {
-            "type" : [ "boolean", "null" ]
+            "type" : [ "string", "integer" ],
+            "pattern" : "([0-9]+)"
           }
         }, {
-          "$ref" : "#/components/parameters/layoutId"
-        }, {
-          "$ref" : "#/components/parameters/fieldId"
+          "name" : "fieldId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -465,10 +804,25 @@
         "responses" : {
           "200" : {
             "$ref" : "#/components/responses/commonFieldResponse"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/licenseErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.UPDATE", "Desk.settings.UPDATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -478,21 +832,44 @@
         "tags" : [ "Layout" ],
         "summary" : "Remove Field From Layout",
         "description" : "This API is to remove fields from a layout.",
-        "operationId" : "removeFieldFromLayout",
+        "operationId" : "unAssociateLayoutField",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/layoutId"
+          "name" : "layoutId",
+          "in" : "path",
+          "description" : "ID of the layout",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/fieldId"
+          "name" : "fieldId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
           "200" : {
             "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.CREATE" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.UPDATE", "Desk.settings.UPDATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -500,93 +877,118 @@
   },
   "components" : {
     "schemas" : {
-      "basicLayoutJson" : {
-        "type" : [ "null", "object" ],
+      "layoutCountDetailsJson" : {
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
+          "maximumLimit" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "available" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          }
+        },
+        "required" : [ "available", "maximumLimit" ]
+      },
+      "basicLayoutJson" : {
+        "type" : [ "object", "null" ],
+        "properties" : {
           "modifiedTime" : {
+            "description" : "Timestamp when the layout was last modified",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "isStandardLayout" : {
+            "description" : "Whether this is the standard system layout",
             "type" : [ "boolean", "null" ]
           },
           "hasLogo" : {
+            "description" : "Whether the layout has a logo",
             "type" : [ "boolean", "null" ]
           },
           "layoutDisplayName" : {
+            "description" : "Display name of the layout",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "isDefaultLayout" : {
+            "description" : "Whether this is the default layout",
             "type" : [ "boolean", "null" ]
           },
           "layoutDesc" : {
+            "description" : "Description of the layout",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "layoutName" : {
+            "description" : "Name of the layout",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "skipDeptAccessValidation" : {
+            "description" : "Whether department-level access validation is skipped",
             "type" : [ "boolean", "null" ]
           },
           "photoURL" : {
+            "description" : "URL of the layout photo",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
           },
           "createdBy" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
+            "description" : "ID of the user who created this layout",
+            "type" : [ "string", "integer", "null" ],
             "pattern" : "([0-9]+)"
           },
           "createdTime" : {
+            "description" : "Timestamp when the layout was created",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "modifiedBy" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
+            "description" : "ID of the user who last modified this layout",
+            "type" : [ "string", "integer", "null" ],
             "pattern" : "([0-9]+)"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
+            "description" : "ID of the layout",
+            "type" : [ "string", "integer", "null" ],
             "pattern" : "([0-9]+)"
           },
           "status" : {
+            "description" : "Status of the layout. The allowed values are active, inactive, and all",
             "type" : [ "string", "null" ],
-            "enum" : [ "active", "inactive" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "active", "inactive" ]
           }
         },
         "required" : [ "createdBy", "createdTime", "hasLogo", "id", "isDefaultLayout", "isStandardLayout", "layoutDesc", "layoutDisplayName", "layoutName", "modifiedBy", "modifiedTime", "photoURL", "skipDeptAccessValidation", "status" ]
       },
       "layoutJson" : {
-        "additionalProperties" : false,
+        "type" : "object",
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/basicLayoutJson"
+          "$ref" : "#/components/schemas/basicLayoutJson"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "layoutProfiles" : {
-              "type" : [ "null", "array" ],
+              "type" : [ "array", "null" ],
               "items" : {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "maxProperties" : 4,
                 "minProperties" : 4,
@@ -600,52 +1002,45 @@
                     "type" : [ "boolean", "null" ]
                   },
                   "id" : {
-                    "type" : [ "string", "null", "integer" ],
-                    "format" : "int64",
+                    "type" : [ "string", "integer", "null" ],
                     "pattern" : "([0-9]+)"
                   },
                   "type" : {
                     "type" : [ "string", "null" ],
-                    "enum" : [ "Administrator", "Standard", "Light", "Portal", "Custom" ],
-                    "maxLength" : 100,
-                    "minLength" : 0
+                    "enum" : [ "Administrator", "Standard", "Light", "Portal", "Custom" ]
                   }
                 },
                 "required" : [ "id", "isDefault", "profileName", "type" ]
               },
               "uniqueItems" : false
             }
-          },
-          "required" : [ "layoutProfiles" ]
+          }
         } ]
       },
       "layoutCommonResponse" : {
-        "additionalProperties" : false,
+        "type" : "object",
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/layoutJson"
+          "$ref" : "#/components/schemas/layoutJson"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "module" : {
-              "type" : [ "string", "null" ],
-              "enum" : [ "Cases", "Contacts", "Accounts", "Tasks", "Calls", "Events", "TimeEntry", "Contracts", "Products" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "description" : "Module the layout belongs to. Standard values: Cases, Contacts, Accounts, Tasks, Calls, Events, TimeEntry, Contracts, Products. Custom modules are also supported.",
+              "type" : [ "string", "null" ]
             }
           },
           "required" : [ "module" ]
         } ]
       },
       "getLayoutSpecificModuleResponse" : {
-        "additionalProperties" : false,
+        "type" : "object",
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/layoutCommonResponse"
+          "$ref" : "#/components/schemas/layoutCommonResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "departmentId" : {
-              "type" : [ "string", "null", "integer" ],
-              "format" : "int64",
+              "type" : [ "string", "integer", "null" ],
               "pattern" : "([0-9]+)"
             }
           },
@@ -653,21 +1048,20 @@
         } ]
       },
       "layoutData" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
           "anyOf" : [ {
-            "$ref" : "./Layout.json#/components/schemas/layoutCommonResponse"
+            "$ref" : "#/components/schemas/layoutCommonResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/getLayoutSpecificModuleResponse"
+            "$ref" : "#/components/schemas/getLayoutSpecificModuleResponse"
           } ]
         }
       },
       "commonFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Field.json#/components/schemas/commonFieldResponse"
+          "$ref" : "./FieldOld.json#/components/schemas/commonFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isRemovable" : {
               "type" : [ "boolean", "null" ]
@@ -680,11 +1074,10 @@
         } ]
       },
       "testFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/commonFieldResponse"
+          "$ref" : "#/components/schemas/commonFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isRemovable" : {
               "type" : [ "boolean", "null" ]
@@ -697,11 +1090,10 @@
         } ]
       },
       "myFormTextFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/testFieldResponse"
+          "$ref" : "#/components/schemas/testFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isReadOnly" : {
               "type" : [ "boolean", "null" ]
@@ -711,11 +1103,10 @@
         } ]
       },
       "integerFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/commonFieldResponse"
+          "$ref" : "#/components/schemas/commonFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isRemovable" : {
               "type" : [ "boolean", "null" ]
@@ -728,11 +1119,10 @@
         } ]
       },
       "myFormIntegerFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/integerFieldResponse"
+          "$ref" : "#/components/schemas/integerFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isReadOnly" : {
               "type" : [ "boolean", "null" ]
@@ -742,11 +1132,10 @@
         } ]
       },
       "percentFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/commonFieldResponse"
+          "$ref" : "#/components/schemas/commonFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isRemovable" : {
               "type" : [ "boolean", "null" ]
@@ -759,11 +1148,10 @@
         } ]
       },
       "myFormPercentFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/percentFieldResponse"
+          "$ref" : "#/components/schemas/percentFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isReadOnly" : {
               "type" : [ "boolean", "null" ]
@@ -773,14 +1161,13 @@
         } ]
       },
       "decimalFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/commonFieldResponse"
+          "$ref" : "#/components/schemas/commonFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "decimalPlaces" : {
-              "type" : [ "string", "null", "integer" ],
+              "type" : [ "string", "integer", "null" ],
               "format" : "int32",
               "maximum" : 9,
               "minimum" : 0,
@@ -791,11 +1178,10 @@
         } ]
       },
       "myFormDecimalFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/decimalFieldResponse"
+          "$ref" : "#/components/schemas/decimalFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isReadOnly" : {
               "type" : [ "boolean", "null" ]
@@ -805,14 +1191,13 @@
         } ]
       },
       "currencyFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/commonFieldResponse"
+          "$ref" : "#/components/schemas/commonFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "decimalPlaces" : {
-              "type" : [ "string", "null", "integer" ],
+              "type" : [ "string", "integer", "null" ],
               "format" : "int32",
               "maximum" : 9,
               "minimum" : 0,
@@ -820,12 +1205,10 @@
             },
             "roundingOption" : {
               "type" : [ "string", "null" ],
-              "enum" : [ "roundOff", "roundDown", "roundUp", "normal" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "enum" : [ "roundOff", "roundDown", "roundUp", "normal" ]
             },
             "roundingPrecision" : {
-              "type" : [ "string", "null", "integer" ],
+              "type" : [ "string", "integer", "null" ],
               "format" : "int32",
               "maximum" : 30,
               "minimum" : 0,
@@ -836,11 +1219,10 @@
         } ]
       },
       "myFormCurrencyFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/currencyFieldResponse"
+          "$ref" : "#/components/schemas/currencyFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isReadOnly" : {
               "type" : [ "boolean", "null" ]
@@ -850,11 +1232,10 @@
         } ]
       },
       "dateFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/commonFieldResponse"
+          "$ref" : "#/components/schemas/commonFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isRemovable" : {
               "type" : [ "boolean", "null" ]
@@ -867,11 +1248,10 @@
         } ]
       },
       "myFormDateFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/dateFieldResponse"
+          "$ref" : "#/components/schemas/dateFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isReadOnly" : {
               "type" : [ "boolean", "null" ]
@@ -881,11 +1261,10 @@
         } ]
       },
       "dateTimeFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/commonFieldResponse"
+          "$ref" : "#/components/schemas/commonFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isRemovable" : {
               "type" : [ "boolean", "null" ]
@@ -898,11 +1277,10 @@
         } ]
       },
       "myFormDateTimeFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/dateTimeFieldResponse"
+          "$ref" : "#/components/schemas/dateTimeFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isReadOnly" : {
               "type" : [ "boolean", "null" ]
@@ -912,11 +1290,10 @@
         } ]
       },
       "emailFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/commonFieldResponse"
+          "$ref" : "#/components/schemas/commonFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isRemovable" : {
               "type" : [ "boolean", "null" ]
@@ -929,11 +1306,10 @@
         } ]
       },
       "myFormEmailFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/emailFieldResponse"
+          "$ref" : "#/components/schemas/emailFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isReadOnly" : {
               "type" : [ "boolean", "null" ]
@@ -943,11 +1319,10 @@
         } ]
       },
       "phoneFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/commonFieldResponse"
+          "$ref" : "#/components/schemas/commonFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isRemovable" : {
               "type" : [ "boolean", "null" ]
@@ -960,11 +1335,10 @@
         } ]
       },
       "myFormPhoneFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/phoneFieldResponse"
+          "$ref" : "#/components/schemas/phoneFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isReadOnly" : {
               "type" : [ "boolean", "null" ]
@@ -974,14 +1348,13 @@
         } ]
       },
       "pickListFieldBasicResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/commonFieldResponse"
+          "$ref" : "#/components/schemas/commonFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "allowedValues" : {
-              "type" : [ "null", "array" ],
+              "type" : [ "array", "null" ],
               "items" : {
                 "type" : [ "string", "null" ],
                 "maxLength" : 120,
@@ -1001,28 +1374,24 @@
         } ]
       },
       "pickListFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/pickListFieldBasicResponse"
+          "$ref" : "#/components/schemas/pickListFieldBasicResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "sortBy" : {
               "type" : [ "string", "null" ],
-              "enum" : [ "alphabetical", "userDefined" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "enum" : [ "alphabetical", "userDefined" ]
             }
           },
           "required" : [ "sortBy" ]
         } ]
       },
       "myFormPickListFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/pickListFieldResponse"
+          "$ref" : "#/components/schemas/pickListFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isReadOnly" : {
               "type" : [ "boolean", "null" ]
@@ -1032,14 +1401,13 @@
         } ]
       },
       "pickListFieldSimpleResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/commonFieldResponse"
+          "$ref" : "#/components/schemas/commonFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "allowedValues" : {
-              "type" : [ "null", "array" ],
+              "type" : [ "array", "null" ],
               "items" : {
                 "type" : [ "string", "null" ],
                 "maxLength" : 120,
@@ -1053,11 +1421,10 @@
         } ]
       },
       "urlFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/commonFieldResponse"
+          "$ref" : "#/components/schemas/commonFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isRemovable" : {
               "type" : [ "boolean", "null" ]
@@ -1070,11 +1437,10 @@
         } ]
       },
       "myFormUrlFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/urlFieldResponse"
+          "$ref" : "#/components/schemas/urlFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isReadOnly" : {
               "type" : [ "boolean", "null" ]
@@ -1084,11 +1450,10 @@
         } ]
       },
       "textAreaFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/commonFieldResponse"
+          "$ref" : "#/components/schemas/commonFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isRemovable" : {
               "type" : [ "boolean", "null" ]
@@ -1101,11 +1466,10 @@
         } ]
       },
       "myFormTextAreaFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/textAreaFieldResponse"
+          "$ref" : "#/components/schemas/textAreaFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isReadOnly" : {
               "type" : [ "boolean", "null" ]
@@ -1115,28 +1479,24 @@
         } ]
       },
       "booleanFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/commonFieldResponse"
+          "$ref" : "#/components/schemas/commonFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "defaultValue" : {
               "type" : [ "string", "null" ],
-              "enum" : [ "true", "false" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "enum" : [ "true", "false" ]
             }
           },
           "required" : [ "defaultValue" ]
         } ]
       },
       "myFormBooleanFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/booleanFieldResponse"
+          "$ref" : "#/components/schemas/booleanFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isReadOnly" : {
               "type" : [ "boolean", "null" ]
@@ -1146,14 +1506,13 @@
         } ]
       },
       "multiPickListFieldBasicResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/commonFieldResponse"
+          "$ref" : "#/components/schemas/commonFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "allowedValues" : {
-              "type" : [ "null", "array" ],
+              "type" : [ "array", "null" ],
               "items" : {
                 "type" : [ "string", "null" ],
                 "maxLength" : 120,
@@ -1173,28 +1532,24 @@
         } ]
       },
       "multiPickListFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/multiPickListFieldBasicResponse"
+          "$ref" : "#/components/schemas/multiPickListFieldBasicResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "sortBy" : {
               "type" : [ "string", "null" ],
-              "enum" : [ "alphabetical", "userDefined" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "enum" : [ "alphabetical", "userDefined" ]
             }
           },
           "required" : [ "sortBy" ]
         } ]
       },
       "myFormMultiPickListFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/multiPickListFieldResponse"
+          "$ref" : "#/components/schemas/multiPickListFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isReadOnly" : {
               "type" : [ "boolean", "null" ]
@@ -1204,14 +1559,13 @@
         } ]
       },
       "multiPickListFieldSimpleResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/commonFieldResponse"
+          "$ref" : "#/components/schemas/commonFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "allowedValues" : {
-              "type" : [ "null", "array" ],
+              "type" : [ "array", "null" ],
               "items" : {
                 "type" : [ "string", "null" ],
                 "maxLength" : 120,
@@ -1225,11 +1579,10 @@
         } ]
       },
       "faxFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/commonFieldResponse"
+          "$ref" : "#/components/schemas/commonFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isRemovable" : {
               "type" : [ "boolean", "null" ]
@@ -1242,11 +1595,10 @@
         } ]
       },
       "myFormFaxFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/faxFieldResponse"
+          "$ref" : "#/components/schemas/faxFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isReadOnly" : {
               "type" : [ "boolean", "null" ]
@@ -1256,11 +1608,10 @@
         } ]
       },
       "autoNumberFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/commonFieldResponse"
+          "$ref" : "#/components/schemas/commonFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isRemovable" : {
               "type" : [ "boolean", "null" ]
@@ -1273,11 +1624,10 @@
         } ]
       },
       "myFormAutoNumberFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/autoNumberFieldResponse"
+          "$ref" : "#/components/schemas/autoNumberFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isReadOnly" : {
               "type" : [ "boolean", "null" ]
@@ -1287,11 +1637,10 @@
         } ]
       },
       "lookUpFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/commonFieldResponse"
+          "$ref" : "#/components/schemas/commonFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isRemovable" : {
               "type" : [ "boolean", "null" ]
@@ -1304,11 +1653,10 @@
         } ]
       },
       "myFormLookUpFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/lookUpFieldResponse"
+          "$ref" : "#/components/schemas/lookUpFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isReadOnly" : {
               "type" : [ "boolean", "null" ]
@@ -1318,14 +1666,13 @@
         } ]
       },
       "statusFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/commonFieldResponse"
+          "$ref" : "#/components/schemas/commonFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "allowedValues" : {
-              "type" : [ "null", "array" ],
+              "type" : [ "array", "null" ],
               "items" : {
                 "type" : [ "string", "null" ],
                 "maxLength" : 120,
@@ -1342,20 +1689,17 @@
             },
             "sortBy" : {
               "type" : [ "string", "null" ],
-              "enum" : [ "alphabetical", "userDefined" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "enum" : [ "alphabetical", "userDefined" ]
             }
           },
           "required" : [ "allowedValues", "defaultValue", "sortBy" ]
         } ]
       },
       "myFormStatusFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/statusFieldResponse"
+          "$ref" : "#/components/schemas/statusFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isReadOnly" : {
               "type" : [ "boolean", "null" ]
@@ -1365,14 +1709,13 @@
         } ]
       },
       "ticketStatusFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/statusFieldResponse"
+          "$ref" : "#/components/schemas/statusFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "restoreOnReplyValues" : {
-              "type" : [ "null", "array" ],
+              "type" : [ "array", "null" ],
               "items" : {
                 "type" : [ "string", "null" ],
                 "maxLength" : 120,
@@ -1386,11 +1729,10 @@
         } ]
       },
       "myFormTicketStatusFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/ticketStatusFieldResponse"
+          "$ref" : "#/components/schemas/ticketStatusFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isReadOnly" : {
               "type" : [ "boolean", "null" ]
@@ -1400,17 +1742,14 @@
         } ]
       },
       "layoutFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/testFieldResponse"
+          "$ref" : "#/components/schemas/testFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "toolTipType" : {
               "type" : [ "string", "null" ],
-              "enum" : [ "placeHolder", "icon" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "enum" : [ "placeHolder", "icon" ]
             },
             "toolTip" : {
               "type" : [ "string", "null" ],
@@ -1422,14 +1761,13 @@
         } ]
       },
       "productDepartmentFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/commonFieldResponse"
+          "$ref" : "#/components/schemas/commonFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "allowedValues" : {
-              "type" : [ "null", "array" ],
+              "type" : [ "array", "null" ],
               "items" : {
                 "type" : [ "string", "null" ],
                 "maxLength" : 120,
@@ -1443,11 +1781,10 @@
         } ]
       },
       "myFormProductDepartmentFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/productDepartmentFieldResponse"
+          "$ref" : "#/components/schemas/productDepartmentFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isReadOnly" : {
               "type" : [ "boolean", "null" ]
@@ -1457,11 +1794,10 @@
         } ]
       },
       "secondaryContactFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/commonFieldResponse"
+          "$ref" : "#/components/schemas/commonFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isRemovable" : {
               "type" : [ "boolean", "null" ]
@@ -1474,11 +1810,10 @@
         } ]
       },
       "nestedPickListFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/pickListFieldResponse"
+          "$ref" : "#/components/schemas/pickListFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isNested" : {
               "type" : [ "boolean", "null" ]
@@ -1488,11 +1823,10 @@
         } ]
       },
       "nestedMultiPickListFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/multiPickListFieldResponse"
+          "$ref" : "#/components/schemas/multiPickListFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isNested" : {
               "type" : [ "boolean", "null" ]
@@ -1502,11 +1836,10 @@
         } ]
       },
       "nestedTicketStatusFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/ticketStatusFieldResponse"
+          "$ref" : "#/components/schemas/ticketStatusFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isNested" : {
               "type" : [ "boolean", "null" ]
@@ -1516,11 +1849,10 @@
         } ]
       },
       "myFormNestedTicketStatusFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/myFormTicketStatusFieldResponse"
+          "$ref" : "#/components/schemas/myFormTicketStatusFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isNested" : {
               "type" : [ "boolean", "null" ]
@@ -1530,11 +1862,10 @@
         } ]
       },
       "myFormNestedPickListFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/myFormPickListFieldResponse"
+          "$ref" : "#/components/schemas/myFormPickListFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isNested" : {
               "type" : [ "boolean", "null" ]
@@ -1544,11 +1875,10 @@
         } ]
       },
       "myFormNestedMultiPickListFieldResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/myFormMultiPickListFieldResponse"
+          "$ref" : "#/components/schemas/myFormMultiPickListFieldResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isNested" : {
               "type" : [ "boolean", "null" ]
@@ -1558,149 +1888,150 @@
         } ]
       },
       "layoutFieldsJson" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
           "anyOf" : [ {
-            "$ref" : "./Layout.json#/components/schemas/testFieldResponse"
+            "$ref" : "#/components/schemas/testFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/myFormTextFieldResponse"
+            "$ref" : "#/components/schemas/myFormTextFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/integerFieldResponse"
+            "$ref" : "#/components/schemas/integerFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/myFormIntegerFieldResponse"
+            "$ref" : "#/components/schemas/myFormIntegerFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/percentFieldResponse"
+            "$ref" : "#/components/schemas/percentFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/myFormPercentFieldResponse"
+            "$ref" : "#/components/schemas/myFormPercentFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/decimalFieldResponse"
+            "$ref" : "#/components/schemas/decimalFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/myFormDecimalFieldResponse"
+            "$ref" : "#/components/schemas/myFormDecimalFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/currencyFieldResponse"
+            "$ref" : "#/components/schemas/currencyFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/myFormCurrencyFieldResponse"
+            "$ref" : "#/components/schemas/myFormCurrencyFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/dateFieldResponse"
+            "$ref" : "#/components/schemas/dateFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/myFormDateFieldResponse"
+            "$ref" : "#/components/schemas/myFormDateFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/dateTimeFieldResponse"
+            "$ref" : "#/components/schemas/dateTimeFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/myFormDateTimeFieldResponse"
+            "$ref" : "#/components/schemas/myFormDateTimeFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/emailFieldResponse"
+            "$ref" : "#/components/schemas/emailFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/myFormEmailFieldResponse"
+            "$ref" : "#/components/schemas/myFormEmailFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/phoneFieldResponse"
+            "$ref" : "#/components/schemas/phoneFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/myFormPhoneFieldResponse"
+            "$ref" : "#/components/schemas/myFormPhoneFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/pickListFieldResponse"
+            "$ref" : "#/components/schemas/pickListFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/myFormPickListFieldResponse"
+            "$ref" : "#/components/schemas/myFormPickListFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/pickListFieldBasicResponse"
+            "$ref" : "#/components/schemas/pickListFieldBasicResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/pickListFieldSimpleResponse"
+            "$ref" : "#/components/schemas/pickListFieldSimpleResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/urlFieldResponse"
+            "$ref" : "#/components/schemas/urlFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/myFormUrlFieldResponse"
+            "$ref" : "#/components/schemas/myFormUrlFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/textAreaFieldResponse"
+            "$ref" : "#/components/schemas/textAreaFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/myFormTextAreaFieldResponse"
+            "$ref" : "#/components/schemas/myFormTextAreaFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/booleanFieldResponse"
+            "$ref" : "#/components/schemas/booleanFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/myFormBooleanFieldResponse"
+            "$ref" : "#/components/schemas/myFormBooleanFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/multiPickListFieldResponse"
+            "$ref" : "#/components/schemas/multiPickListFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/myFormMultiPickListFieldResponse"
+            "$ref" : "#/components/schemas/myFormMultiPickListFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/multiPickListFieldBasicResponse"
+            "$ref" : "#/components/schemas/multiPickListFieldBasicResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/multiPickListFieldSimpleResponse"
+            "$ref" : "#/components/schemas/multiPickListFieldSimpleResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/faxFieldResponse"
+            "$ref" : "#/components/schemas/faxFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/myFormFaxFieldResponse"
+            "$ref" : "#/components/schemas/myFormFaxFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/autoNumberFieldResponse"
+            "$ref" : "#/components/schemas/autoNumberFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/myFormAutoNumberFieldResponse"
+            "$ref" : "#/components/schemas/myFormAutoNumberFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/lookUpFieldResponse"
+            "$ref" : "#/components/schemas/lookUpFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/myFormLookUpFieldResponse"
+            "$ref" : "#/components/schemas/myFormLookUpFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/statusFieldResponse"
+            "$ref" : "#/components/schemas/statusFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/myFormStatusFieldResponse"
+            "$ref" : "#/components/schemas/myFormStatusFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/ticketStatusFieldResponse"
+            "$ref" : "#/components/schemas/ticketStatusFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/myFormTicketStatusFieldResponse"
+            "$ref" : "#/components/schemas/myFormTicketStatusFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/layoutFieldResponse"
+            "$ref" : "#/components/schemas/layoutFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/productDepartmentFieldResponse"
+            "$ref" : "#/components/schemas/productDepartmentFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/myFormProductDepartmentFieldResponse"
+            "$ref" : "#/components/schemas/myFormProductDepartmentFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/secondaryContactFieldResponse"
+            "$ref" : "#/components/schemas/secondaryContactFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/nestedPickListFieldResponse"
+            "$ref" : "#/components/schemas/nestedPickListFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/nestedMultiPickListFieldResponse"
+            "$ref" : "#/components/schemas/nestedMultiPickListFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/nestedTicketStatusFieldResponse"
+            "$ref" : "#/components/schemas/nestedTicketStatusFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/myFormNestedTicketStatusFieldResponse"
+            "$ref" : "#/components/schemas/myFormNestedTicketStatusFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/myFormNestedPickListFieldResponse"
+            "$ref" : "#/components/schemas/myFormNestedPickListFieldResponse"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/myFormNestedMultiPickListFieldResponse"
+            "$ref" : "#/components/schemas/myFormNestedMultiPickListFieldResponse"
           } ]
         }
       },
       "sectionJSON" : {
-        "type" : [ "null", "object" ],
-        "additionalProperties" : false,
+        "type" : [ "object", "null" ],
         "properties" : {
           "name" : {
+            "description" : "Name of the section",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the section",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           },
           "fields" : {
-            "$ref" : "./Layout.json#/components/schemas/layoutFieldsJson"
+            "$ref" : "#/components/schemas/layoutFieldsJson"
           }
         },
         "required" : [ "fields", "id", "name" ]
       },
       "sectionList" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./Layout.json#/components/schemas/sectionJSON"
+          "$ref" : "#/components/schemas/sectionJSON"
         }
       },
       "sectionJSONForLayout" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/sectionJSON"
+          "$ref" : "#/components/schemas/sectionJSON"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isCustomSection" : {
+              "description" : "Whether this is a custom section",
               "type" : [ "boolean", "null" ]
             }
           },
@@ -1708,13 +2039,13 @@
         } ]
       },
       "i18NSectionJSONForLayout" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/sectionJSONForLayout"
+          "$ref" : "#/components/schemas/sectionJSONForLayout"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "i18NLabel" : {
+              "description" : "Internationalized (localized) label of the section",
               "type" : [ "string", "null" ],
               "maxLength" : 100,
               "minLength" : 0,
@@ -1725,77 +2056,151 @@
         } ]
       },
       "sectionListForLayout" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
           "anyOf" : [ {
-            "$ref" : "./Layout.json#/components/schemas/sectionJSONForLayout"
+            "$ref" : "#/components/schemas/sectionJSONForLayout"
           }, {
-            "$ref" : "./Layout.json#/components/schemas/i18NSectionJSONForLayout"
+            "$ref" : "#/components/schemas/i18NSectionJSONForLayout"
           } ]
         }
       },
       "cloneLayoutCommonResponse" : {
-        "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/basicLayoutJson"
+          "$ref" : "#/components/schemas/basicLayoutJson"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "module" : {
-              "type" : [ "string", "null" ],
-              "enum" : [ "Cases", "Contacts", "Accounts", "Tasks", "Calls", "Events", "TimeEntry", "Contracts", "Products" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "description" : "Module the layout belongs to. Standard values: Cases, Contacts, Accounts, Tasks, Calls, Events, TimeEntry, Contracts, Products. Custom modules are also supported.",
+              "type" : [ "string", "null" ]
             },
             "sections" : {
-              "$ref" : "./Layout.json#/components/schemas/sectionListForLayout"
+              "$ref" : "#/components/schemas/sectionListForLayout"
             }
           },
           "required" : [ "module", "sections" ]
         } ]
       },
-      "commonInputFieldJson" : {
-        "type" : [ "null", "object" ],
+      "textFieldRequestJson" : {
+        "type" : "object",
         "additionalProperties" : false,
         "properties" : {
           "id" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
+            "description" : "ID of the field in the layout. Send as a string (IDs can exceed safe integer precision).",
+            "type" : [ "string", "integer", "null" ],
             "pattern" : "([0-9]+)"
           },
           "isMandatory" : {
+            "description" : "Whether this field is mandatory in the layout",
             "type" : [ "boolean", "null" ]
+          },
+          "allowedValues" : {
+            "description" : "Allowed values for the field. Applicable to pick list fields.",
+            "type" : [ "array", "null" ],
+            "items" : {
+              "type" : [ "string" ]
+            }
+          },
+          "defaultValue" : {
+            "description" : "Default value set for the field. Applicable to pick list and checkbox fields.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 120
+          },
+          "sortBy" : {
+            "description" : "Order in which pick list values are sorted. Accepted values: userDefined, alphabetical",
+            "type" : [ "string" ],
+            "enum" : [ "userDefined", "alphabetical" ]
+          },
+          "isNested" : {
+            "description" : "Whether the pick list field is nested",
+            "type" : [ "boolean", "null" ]
+          },
+          "restoreOnReplyValues" : {
+            "description" : "Values in the Status field that are set to fall back to the default value.",
+            "type" : [ "array", "null" ],
+            "items" : {
+              "type" : [ "string" ],
+              "maxLength" : 120
+            }
+          },
+          "type" : {
+            "description" : "Data type of the field. Values include Text, Number, Percent, Decimal, Currency, Date, Date Time, Email, Phone, PickList, Website, Textarea, Checkbox, Multiselect, Boolean.",
+            "type" : [ "string" ],
+            "readOnly" : true
+          },
+          "name" : {
+            "description" : "Name of the key that refers to the field.",
+            "type" : [ "string" ],
+            "readOnly" : true
+          },
+          "displayLabel" : {
+            "description" : "Name of the field shown on the UI.",
+            "type" : [ "string" ],
+            "readOnly" : true
+          },
+          "apiName" : {
+            "description" : "Unique read-only name of the custom field used to update the field value via API.",
+            "type" : [ "string" ],
+            "readOnly" : true
+          },
+          "i18NLabel" : {
+            "description" : "Internationalized label for the field label.",
+            "type" : [ "string" ],
+            "readOnly" : true
+          },
+          "maxLength" : {
+            "description" : "Maximum permissible length of the value in the field. Applicable to Text, Number, Decimal, and Currency fields.",
+            "type" : [ "integer" ],
+            "readOnly" : true
+          },
+          "decimalPlaces" : {
+            "description" : "Number of decimal places the value in the field can take. Applicable to Decimal and Currency fields.",
+            "type" : [ "integer" ],
+            "readOnly" : true
+          },
+          "roundingPrecision" : {
+            "description" : "Total number of digits in a decimal number. Applicable to Currency fields.",
+            "type" : [ "integer" ],
+            "readOnly" : true
+          },
+          "roundingOption" : {
+            "description" : "Option to round off decimal numbers. Values include roundOff, roundDown, roundUp, and normal.",
+            "type" : [ "string" ],
+            "readOnly" : true
+          },
+          "isSystemMandatory" : {
+            "description" : "Whether a built-in field in the system is mandatory in the layout.",
+            "type" : [ "boolean" ],
+            "readOnly" : true
+          },
+          "isRemovable" : {
+            "description" : "Whether the field can be deleted.",
+            "type" : [ "boolean" ],
+            "readOnly" : true
+          },
+          "isCustomField" : {
+            "description" : "Whether the field is user-defined.",
+            "type" : [ "boolean" ],
+            "readOnly" : true
+          },
+          "isEncryptedField" : {
+            "description" : "Whether the value in the field is encrypted.",
+            "type" : [ "boolean" ],
+            "readOnly" : true
           }
         },
         "required" : [ "id", "isMandatory" ]
       },
-      "textFieldRequestJson" : {
-        "additionalProperties" : false,
-        "allOf" : [ {
-          "$ref" : "./Layout.json#/components/schemas/commonInputFieldJson"
-        }, {
-          "type" : [ "null", "object" ],
-          "properties" : {
-            "id" : {
-              "type" : [ "string", "null", "integer" ],
-              "format" : "int64",
-              "pattern" : "([0-9]+)"
-            },
-            "isMandatory" : {
-              "type" : [ "boolean", "null" ]
-            }
-          },
-          "required" : [ "id", "isMandatory" ]
-        } ]
-      },
       "layoutFieldRequestJson" : {
-        "type" : [ "null", "array" ],
+        "description" : "Array of field objects in this section. Each element must be an object with 'id' (the field ID, sent as a string to preserve precision for large IDs) and 'isMandatory' (boolean).",
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./Layout.json#/components/schemas/textFieldRequestJson"
+          "$ref" : "#/components/schemas/textFieldRequestJson"
         }
       },
       "sectionRequestJSON" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "name" : {
@@ -1804,82 +2209,110 @@
             "minLength" : 0
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           },
           "fields" : {
-            "$ref" : "./Layout.json#/components/schemas/layoutFieldRequestJson"
+            "description" : "Array of field objects in this section. Each element must be an object with 'id' (the field ID, sent as a string to preserve precision for large IDs) and 'isMandatory' (boolean).",
+            "$ref" : "#/components/schemas/layoutFieldRequestJson"
           }
         },
         "required" : [ "fields", "id", "name" ]
       },
       "sectionRequestArr" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./Layout.json#/components/schemas/sectionRequestJSON"
+          "$ref" : "#/components/schemas/sectionRequestJSON"
         }
       },
       "layoutIdsArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
+          "type" : [ "string", "integer", "null" ],
           "pattern" : "([0-9]+)"
         }
       },
       "layoutProfileIdsJson" : {
-        "type" : [ "null", "array" ],
+        "description" : "List of profile IDs to associate with the layout",
+        "type" : [ "array" ],
         "items" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
+          "type" : [ "string", "integer" ],
           "pattern" : "([0-9]+)"
         }
       },
       "layoutProfileJson" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "profileName" : {
+            "description" : "Name of the profile",
             "type" : [ "string", "null" ],
             "maxLength" : 50,
             "minLength" : 0
           },
           "isDefault" : {
+            "description" : "Whether this is a default profile",
             "type" : [ "boolean", "null" ]
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
+            "description" : "Unique ID of the profile",
+            "type" : [ "string", "integer", "null" ],
             "pattern" : "([0-9]+)"
           },
           "type" : {
+            "description" : "Type of the profile.",
             "type" : [ "string", "null" ],
-            "enum" : [ "Administrator", "Standard", "Light", "Portal", "Custom" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "Administrator", "Standard", "Light", "Portal", "Custom" ]
           }
         },
         "required" : [ "id", "isDefault", "profileName", "type" ]
       },
       "layoutProfileJsonArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./Layout.json#/components/schemas/layoutProfileJson"
+          "$ref" : "#/components/schemas/layoutProfileJson"
         }
       }
     },
     "responses" : {
+      "layoutCountDetails" : {
+        "description" : "layoutCountDetails template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "#/components/schemas/layoutCountDetailsJson"
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "data" : {
+                    "maximumLimit" : 10,
+                    "available" : 10
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
       "getLayouts" : {
         "description" : "getLayouts template definitions",
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./Layout.json#/components/schemas/layoutData"
+                  "$ref" : "#/components/schemas/layoutData"
                 }
               },
               "required" : [ "data" ]
@@ -1900,17 +2333,17 @@
                       "profileName" : "Support Administrator",
                       "isDefault" : true,
                       "id" : "4000000015183",
-                      "type" : "ADMIN"
+                      "type" : "Administrator"
                     }, {
                       "profileName" : "Agent",
                       "isDefault" : true,
                       "id" : "4000000015186",
-                      "type" : "STANDARD"
+                      "type" : "Standard"
                     }, {
                       "profileName" : "Help Center",
                       "isDefault" : true,
                       "id" : "4000000015189",
-                      "type" : "PORTAL"
+                      "type" : "Portal"
                     } ],
                     "createdBy" : "4000000015894",
                     "createdTime" : 1556865393000,
@@ -1930,37 +2363,37 @@
                       "profileName" : "Support Administrator",
                       "isDefault" : true,
                       "id" : "4000000015183",
-                      "type" : "ADMIN"
+                      "type" : "Administrator"
                     }, {
                       "profileName" : "Agent",
                       "isDefault" : true,
                       "id" : "4000000015186",
-                      "type" : "STANDARD"
+                      "type" : "Standard"
                     }, {
                       "profileName" : "Help Center",
                       "isDefault" : true,
                       "id" : "4000000015189",
-                      "type" : "PORTAL"
+                      "type" : "Portal"
                     }, {
                       "profileName" : "Supervisor",
                       "isDefault" : false,
                       "id" : "4000000015192",
-                      "type" : "CUSTOM"
+                      "type" : "Custom"
                     }, {
                       "profileName" : "Support Manager",
                       "isDefault" : false,
                       "id" : "4000000015195",
-                      "type" : "CUSTOM"
+                      "type" : "Custom"
                     }, {
                       "profileName" : "Newbie Agent",
                       "isDefault" : false,
                       "id" : "4000000015198",
-                      "type" : "CUSTOM"
+                      "type" : "Custom"
                     }, {
                       "profileName" : "Light Agent",
                       "isDefault" : true,
                       "id" : "4000000015201",
-                      "type" : "LIGHT"
+                      "type" : "Light"
                     } ],
                     "createdBy" : "4000000015894",
                     "createdTime" : 1557107158000,
@@ -1979,11 +2412,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./Layout.json#/components/schemas/sectionList"
+                  "$ref" : "#/components/schemas/sectionList"
                 }
               },
               "required" : [ "data" ]
@@ -2001,7 +2434,7 @@
                       "id" : "4000000000556",
                       "isSystemMandatory" : false,
                       "isRemovable" : false,
-                      "type" : "LookUp",
+                      "type" : [ "LookUp" ],
                       "maxLength" : 50,
                       "isMandatory" : true
                     }, {
@@ -2011,7 +2444,7 @@
                       "id" : "4000000000558",
                       "isSystemMandatory" : false,
                       "isRemovable" : true,
-                      "type" : "LookUp",
+                      "type" : [ "LookUp" ],
                       "maxLength" : 300,
                       "isMandatory" : false
                     }, {
@@ -2021,7 +2454,7 @@
                       "id" : "4000000000560",
                       "isSystemMandatory" : true,
                       "isRemovable" : false,
-                      "type" : "LookUp",
+                      "type" : [ "LookUp" ],
                       "maxLength" : 300,
                       "isMandatory" : true
                     }, {
@@ -2031,7 +2464,7 @@
                       "id" : "4000000000562",
                       "isSystemMandatory" : false,
                       "isRemovable" : false,
-                      "type" : "Email",
+                      "type" : [ "Email" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     }, {
@@ -2041,7 +2474,7 @@
                       "id" : "4000000000564",
                       "isSystemMandatory" : false,
                       "isRemovable" : true,
-                      "type" : "Phone",
+                      "type" : [ "Phone" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     }, {
@@ -2051,7 +2484,7 @@
                       "id" : "4000000000566",
                       "isSystemMandatory" : true,
                       "isRemovable" : false,
-                      "type" : "Text",
+                      "type" : [ "Text" ],
                       "maxLength" : 255,
                       "isMandatory" : true
                     }, {
@@ -2061,7 +2494,7 @@
                       "id" : "4000000000568",
                       "isSystemMandatory" : false,
                       "isRemovable" : false,
-                      "type" : "Textarea",
+                      "type" : [ "Textarea" ],
                       "maxLength" : 1000000,
                       "isMandatory" : false
                     }, {
@@ -2070,7 +2503,7 @@
                       "isCustomField" : false,
                       "defaultValue" : "Open",
                       "isSystemMandatory" : true,
-                      "type" : "Picklist",
+                      "type" : [ "Picklist" ],
                       "restoreOnReplyValues" : [ "Open", "On Hold", "Escalated", "Closed" ],
                       "name" : "status",
                       "sortBy" : "userDefined",
@@ -2085,7 +2518,7 @@
                       "id" : "4000000000572",
                       "isSystemMandatory" : false,
                       "isRemovable" : true,
-                      "type" : "LookUp",
+                      "type" : [ "LookUp" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     }, {
@@ -2095,7 +2528,7 @@
                       "id" : "4000000000574",
                       "isSystemMandatory" : false,
                       "isRemovable" : false,
-                      "type" : "LookUp",
+                      "type" : [ "LookUp" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     } ]
@@ -2109,7 +2542,7 @@
                       "id" : "4000000000610",
                       "isSystemMandatory" : false,
                       "isRemovable" : false,
-                      "type" : "DateTime",
+                      "type" : [ "DateTime" ],
                       "maxLength" : 300,
                       "isMandatory" : false
                     }, {
@@ -2122,7 +2555,7 @@
                       "id" : "4000000000614",
                       "isSystemMandatory" : false,
                       "isRemovable" : false,
-                      "type" : "Picklist",
+                      "type" : [ "Picklist" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     }, {
@@ -2135,7 +2568,7 @@
                       "id" : "4000000000616",
                       "isSystemMandatory" : false,
                       "isRemovable" : false,
-                      "type" : "Picklist",
+                      "type" : [ "Picklist" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     }, {
@@ -2148,7 +2581,7 @@
                       "id" : "4000000000622",
                       "isSystemMandatory" : false,
                       "isRemovable" : true,
-                      "type" : "Picklist",
+                      "type" : [ "Picklist" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     }, {
@@ -2158,7 +2591,7 @@
                       "id" : "4000000000624",
                       "isSystemMandatory" : false,
                       "isRemovable" : false,
-                      "type" : "Textarea",
+                      "type" : [ "Textarea" ],
                       "maxLength" : 1000000,
                       "isMandatory" : false
                     } ]
@@ -2166,6 +2599,12 @@
                 }
               }
             }
+          }
+        },
+        "links" : {
+          "createLayout" : {
+            "operationId" : "createLayout",
+            "description" : "Use this response to build the createLayout request body: unwrap data into sections, keep each field id and isMandatory (and allowedValues for pick lists), then set departmentId, module, layoutName, layoutDisplayName, and isDefaultLayout."
           }
         }
       },
@@ -2175,34 +2614,29 @@
           "application/json" : {
             "schema" : {
               "oneOf" : [ {
-                "additionalProperties" : false,
                 "allOf" : [ {
-                  "$ref" : "./Layout.json#/components/schemas/basicLayoutJson"
+                  "$ref" : "#/components/schemas/basicLayoutJson"
                 }, {
-                  "type" : [ "null", "object" ],
+                  "type" : [ "object", "null" ],
                   "properties" : {
                     "module" : {
-                      "type" : [ "string", "null" ],
-                      "enum" : [ "Cases", "Contacts", "Accounts", "Tasks", "Calls", "Events", "TimeEntry", "Contracts", "Products" ],
-                      "maxLength" : 100,
-                      "minLength" : 0
+                      "description" : "Module the layout belongs to. Standard values: Cases, Contacts, Accounts, Tasks, Calls, Events, TimeEntry, Contracts, Products. Custom modules are also supported.",
+                      "type" : [ "string", "null" ]
                     },
                     "sections" : {
-                      "$ref" : "./Layout.json#/components/schemas/sectionListForLayout"
+                      "$ref" : "#/components/schemas/sectionListForLayout"
                     }
                   },
                   "required" : [ "module", "sections" ]
                 } ]
               }, {
-                "additionalProperties" : false,
                 "allOf" : [ {
-                  "$ref" : "./Layout.json#/components/schemas/cloneLayoutCommonResponse"
+                  "$ref" : "#/components/schemas/cloneLayoutCommonResponse"
                 }, {
-                  "type" : [ "null", "object" ],
+                  "type" : [ "object", "null" ],
                   "properties" : {
                     "departmentId" : {
-                      "type" : [ "string", "null", "integer" ],
-                      "format" : "int64",
+                      "type" : [ "string", "integer", "null" ],
                       "pattern" : "([0-9]+)"
                     }
                   },
@@ -2229,7 +2663,7 @@
                       "id" : "4000000000404",
                       "isSystemMandatory" : true,
                       "isRemovable" : false,
-                      "type" : "Text",
+                      "type" : [ "Text" ],
                       "maxLength" : 200,
                       "isMandatory" : true
                     }, {
@@ -2239,7 +2673,7 @@
                       "id" : "4000000000408",
                       "isSystemMandatory" : false,
                       "isRemovable" : true,
-                      "type" : "Email",
+                      "type" : [ "Email" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     }, {
@@ -2249,7 +2683,7 @@
                       "id" : "4000000000406",
                       "isSystemMandatory" : false,
                       "isRemovable" : true,
-                      "type" : "Phone",
+                      "type" : [ "Phone" ],
                       "maxLength" : 30,
                       "isMandatory" : false
                     }, {
@@ -2259,7 +2693,7 @@
                       "id" : "4000000000410",
                       "isSystemMandatory" : false,
                       "isRemovable" : true,
-                      "type" : "URL",
+                      "type" : [ "URL" ],
                       "maxLength" : 2083,
                       "isMandatory" : false
                     }, {
@@ -2269,7 +2703,7 @@
                       "id" : "4000000000438",
                       "isSystemMandatory" : false,
                       "isRemovable" : true,
-                      "type" : "Text",
+                      "type" : [ "Text" ],
                       "maxLength" : 30,
                       "isMandatory" : false
                     }, {
@@ -2279,7 +2713,7 @@
                       "id" : "4000000000412",
                       "isSystemMandatory" : false,
                       "isRemovable" : false,
-                      "type" : "LookUp",
+                      "type" : [ "LookUp" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     }, {
@@ -2290,7 +2724,7 @@
                       "defaultValue" : "Education :: University :: Private",
                       "isNested" : true,
                       "isSystemMandatory" : false,
-                      "type" : "Picklist",
+                      "type" : [ "Picklist" ],
                       "isEncryptedField" : false,
                       "sortBy" : "userDefined",
                       "id" : "4000000009999",
@@ -2318,34 +2752,31 @@
           "application/json" : {
             "schema" : {
               "anyOf" : [ {
-                "additionalProperties" : false,
+                "type" : "object",
                 "allOf" : [ {
-                  "$ref" : "./Layout.json#/components/schemas/basicLayoutJson"
+                  "$ref" : "#/components/schemas/basicLayoutJson"
                 }, {
-                  "type" : [ "null", "object" ],
+                  "type" : [ "object", "null" ],
                   "properties" : {
                     "module" : {
-                      "type" : [ "string", "null" ],
-                      "enum" : [ "Cases", "Contacts", "Accounts", "Tasks", "Calls", "Events", "TimeEntry", "Contracts", "Products" ],
-                      "maxLength" : 100,
-                      "minLength" : 0
+                      "description" : "Module the layout belongs to. Standard values: Cases, Contacts, Accounts, Tasks, Calls, Events, TimeEntry, Contracts, Products. Custom modules are also supported.",
+                      "type" : [ "string", "null" ]
                     },
                     "sections" : {
-                      "$ref" : "./Layout.json#/components/schemas/sectionListForLayout"
+                      "$ref" : "#/components/schemas/sectionListForLayout"
                     }
                   },
                   "required" : [ "module", "sections" ]
                 } ]
               }, {
-                "additionalProperties" : false,
+                "type" : "object",
                 "allOf" : [ {
-                  "$ref" : "./Layout.json#/components/schemas/cloneLayoutCommonResponse"
+                  "$ref" : "#/components/schemas/cloneLayoutCommonResponse"
                 }, {
-                  "type" : [ "null", "object" ],
+                  "type" : [ "object", "null" ],
                   "properties" : {
                     "departmentId" : {
-                      "type" : [ "string", "null", "integer" ],
-                      "format" : "int64",
+                      "type" : [ "string", "integer", "null" ],
                       "pattern" : "([0-9]+)"
                     }
                   },
@@ -2373,7 +2804,7 @@
                       "id" : "4000000000404",
                       "isSystemMandatory" : true,
                       "isRemovable" : false,
-                      "type" : "Text",
+                      "type" : [ "Text" ],
                       "maxLength" : 200,
                       "isMandatory" : true
                     }, {
@@ -2383,7 +2814,7 @@
                       "id" : "4000000000408",
                       "isSystemMandatory" : false,
                       "isRemovable" : true,
-                      "type" : "Email",
+                      "type" : [ "Email" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     }, {
@@ -2393,7 +2824,7 @@
                       "id" : "4000000000406",
                       "isSystemMandatory" : false,
                       "isRemovable" : true,
-                      "type" : "Phone",
+                      "type" : [ "Phone" ],
                       "maxLength" : 30,
                       "isMandatory" : false
                     }, {
@@ -2403,7 +2834,7 @@
                       "id" : "4000000000410",
                       "isSystemMandatory" : false,
                       "isRemovable" : true,
-                      "type" : "URL",
+                      "type" : [ "URL" ],
                       "maxLength" : 2083,
                       "isMandatory" : false
                     }, {
@@ -2413,7 +2844,7 @@
                       "id" : "4000000000438",
                       "isSystemMandatory" : false,
                       "isRemovable" : true,
-                      "type" : "Text",
+                      "type" : [ "Text" ],
                       "maxLength" : 30,
                       "isMandatory" : false
                     }, {
@@ -2423,7 +2854,7 @@
                       "id" : "4000000000412",
                       "isSystemMandatory" : false,
                       "isRemovable" : false,
-                      "type" : "LookUp",
+                      "type" : [ "LookUp" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     } ]
@@ -2446,16 +2877,15 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "additionalProperties" : false,
               "allOf" : [ {
-                "$ref" : "./Layout.json#/components/schemas/basicLayoutJson"
+                "$ref" : "#/components/schemas/basicLayoutJson"
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "properties" : {
                   "layoutProfiles" : {
-                    "type" : [ "null", "array" ],
+                    "type" : [ "array", "null" ],
                     "items" : {
-                      "type" : [ "null", "object" ],
+                      "type" : [ "object", "null" ],
                       "additionalProperties" : false,
                       "maxProperties" : 4,
                       "minProperties" : 4,
@@ -2469,15 +2899,12 @@
                           "type" : [ "boolean", "null" ]
                         },
                         "id" : {
-                          "type" : [ "string", "null", "integer" ],
-                          "format" : "int64",
+                          "type" : [ "string", "integer", "null" ],
                           "pattern" : "([0-9]+)"
                         },
                         "type" : {
                           "type" : [ "string", "null" ],
-                          "enum" : [ "Administrator", "Standard", "Light", "Portal", "Custom" ],
-                          "maxLength" : 100,
-                          "minLength" : 0
+                          "enum" : [ "Administrator", "Standard", "Light", "Portal", "Custom" ]
                         }
                       },
                       "required" : [ "id", "isDefault", "profileName", "type" ]
@@ -2508,7 +2935,7 @@
                       "id" : "4000000000556",
                       "isSystemMandatory" : false,
                       "isRemovable" : false,
-                      "type" : "LookUp",
+                      "type" : [ "LookUp" ],
                       "maxLength" : 50,
                       "isMandatory" : true
                     }, {
@@ -2518,7 +2945,7 @@
                       "id" : "4000000000560",
                       "isSystemMandatory" : true,
                       "isRemovable" : false,
-                      "type" : "LookUp",
+                      "type" : [ "LookUp" ],
                       "maxLength" : 300,
                       "isMandatory" : true
                     }, {
@@ -2528,7 +2955,7 @@
                       "id" : "4000000000558",
                       "isSystemMandatory" : false,
                       "isRemovable" : true,
-                      "type" : "LookUp",
+                      "type" : [ "LookUp" ],
                       "maxLength" : 300,
                       "isMandatory" : false
                     }, {
@@ -2538,7 +2965,7 @@
                       "id" : "4000000000562",
                       "isSystemMandatory" : false,
                       "isRemovable" : false,
-                      "type" : "Email",
+                      "type" : [ "Email" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     }, {
@@ -2548,7 +2975,7 @@
                       "id" : "4000000000564",
                       "isSystemMandatory" : false,
                       "isRemovable" : true,
-                      "type" : "Phone",
+                      "type" : [ "Phone" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     }, {
@@ -2558,7 +2985,7 @@
                       "id" : "4000000000566",
                       "isSystemMandatory" : true,
                       "isRemovable" : false,
-                      "type" : "Text",
+                      "type" : [ "Text" ],
                       "maxLength" : 255,
                       "isMandatory" : true
                     }, {
@@ -2568,7 +2995,7 @@
                       "id" : "4000000000568",
                       "isSystemMandatory" : false,
                       "isRemovable" : false,
-                      "type" : "Textarea",
+                      "type" : [ "Textarea" ],
                       "maxLength" : 1000000,
                       "isMandatory" : false
                     }, {
@@ -2578,7 +3005,7 @@
                       "defaultValue" : "Open",
                       "isNested" : false,
                       "isSystemMandatory" : true,
-                      "type" : "Picklist",
+                      "type" : [ "Picklist" ],
                       "restoreOnReplyValues" : [ "Open", "On Hold", "Escalated", "Closed" ],
                       "name" : "status",
                       "sortBy" : "userDefined",
@@ -2593,7 +3020,7 @@
                       "id" : "4000000000574",
                       "isSystemMandatory" : false,
                       "isRemovable" : false,
-                      "type" : "LookUp",
+                      "type" : [ "LookUp" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     }, {
@@ -2603,7 +3030,7 @@
                       "id" : "4000000000572",
                       "isSystemMandatory" : false,
                       "isRemovable" : true,
-                      "type" : "LookUp",
+                      "type" : [ "LookUp" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     } ]
@@ -2618,7 +3045,7 @@
                       "id" : "4000000000610",
                       "isSystemMandatory" : false,
                       "isRemovable" : false,
-                      "type" : "DateTime",
+                      "type" : [ "DateTime" ],
                       "maxLength" : 300,
                       "isMandatory" : false
                     }, {
@@ -2628,7 +3055,7 @@
                       "defaultValue" : "-None-",
                       "isNested" : false,
                       "isSystemMandatory" : false,
-                      "type" : "Picklist",
+                      "type" : [ "Picklist" ],
                       "name" : "priority",
                       "sortBy" : "userDefined",
                       "id" : "4000000000614",
@@ -2642,7 +3069,7 @@
                       "defaultValue" : "Phone",
                       "isNested" : false,
                       "isSystemMandatory" : false,
-                      "type" : "Picklist",
+                      "type" : [ "Picklist" ],
                       "name" : "channel",
                       "sortBy" : "userDefined",
                       "id" : "4000000000616",
@@ -2656,7 +3083,7 @@
                       "defaultValue" : "-None-",
                       "isNested" : false,
                       "isSystemMandatory" : false,
-                      "type" : "Picklist",
+                      "type" : [ "Picklist" ],
                       "name" : "classification",
                       "sortBy" : "userDefined",
                       "id" : "4000000000622",
@@ -2670,7 +3097,7 @@
                       "id" : "4000000000624",
                       "isSystemMandatory" : false,
                       "isRemovable" : false,
-                      "type" : "Textarea",
+                      "type" : [ "Textarea" ],
                       "maxLength" : 1000000,
                       "isMandatory" : false
                     } ]
@@ -2694,34 +3121,32 @@
           "application/json" : {
             "schema" : {
               "anyOf" : [ {
-                "additionalProperties" : false,
+                "type" : "object",
                 "allOf" : [ {
-                  "$ref" : "./Layout.json#/components/schemas/basicLayoutJson"
+                  "$ref" : "#/components/schemas/basicLayoutJson"
                 }, {
-                  "type" : [ "null", "object" ],
+                  "type" : [ "object", "null" ],
                   "properties" : {
                     "module" : {
-                      "type" : [ "string", "null" ],
-                      "enum" : [ "Cases", "Contacts", "Accounts", "Tasks", "Calls", "Events", "TimeEntry", "Contracts", "Products" ],
-                      "maxLength" : 100,
-                      "minLength" : 0
+                      "description" : "Module the layout belongs to. Standard values: Cases, Contacts, Accounts, Tasks, Calls, Events, TimeEntry, Contracts, Products. Custom modules are also supported.",
+                      "type" : [ "string", "null" ]
                     },
                     "sections" : {
-                      "$ref" : "./Layout.json#/components/schemas/sectionListForLayout"
+                      "$ref" : "#/components/schemas/sectionListForLayout"
                     }
                   },
                   "required" : [ "module", "sections" ]
                 } ]
               }, {
-                "additionalProperties" : false,
+                "type" : "object",
                 "allOf" : [ {
-                  "$ref" : "./Layout.json#/components/schemas/cloneLayoutCommonResponse"
+                  "$ref" : "#/components/schemas/cloneLayoutCommonResponse"
                 }, {
-                  "type" : [ "null", "object" ],
+                  "type" : [ "object", "null" ],
                   "properties" : {
                     "departmentId" : {
-                      "type" : [ "string", "null", "integer" ],
-                      "format" : "int64",
+                      "description" : "ID of the department the layout belongs to",
+                      "type" : [ "string", "integer", "null" ],
                       "pattern" : "([0-9]+)"
                     }
                   },
@@ -2753,7 +3178,7 @@
                       "id" : "4000000000353",
                       "isSystemMandatory" : false,
                       "isRemovable" : false,
-                      "type" : "LookUp",
+                      "type" : [ "LookUp" ],
                       "maxLength" : 50,
                       "isMandatory" : true
                     }, {
@@ -2764,7 +3189,7 @@
                       "id" : "4000000000357",
                       "isSystemMandatory" : true,
                       "isRemovable" : false,
-                      "type" : "LookUp",
+                      "type" : [ "LookUp" ],
                       "maxLength" : 300,
                       "isMandatory" : true
                     }, {
@@ -2775,7 +3200,7 @@
                       "id" : "4000000000355",
                       "isSystemMandatory" : false,
                       "isRemovable" : true,
-                      "type" : "LookUp",
+                      "type" : [ "LookUp" ],
                       "maxLength" : 300,
                       "isMandatory" : false
                     }, {
@@ -2786,7 +3211,7 @@
                       "id" : "4000000000359",
                       "isSystemMandatory" : false,
                       "isRemovable" : false,
-                      "type" : "Email",
+                      "type" : [ "Email" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     }, {
@@ -2797,7 +3222,7 @@
                       "id" : "4000000000361",
                       "isSystemMandatory" : false,
                       "isRemovable" : true,
-                      "type" : "Phone",
+                      "type" : [ "Phone" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     }, {
@@ -2808,7 +3233,7 @@
                       "defaultValue" : "Education :: University :: Private",
                       "isNested" : true,
                       "isSystemMandatory" : false,
-                      "type" : "Picklist",
+                      "type" : [ "Picklist" ],
                       "isEncryptedField" : false,
                       "sortBy" : "userDefined",
                       "id" : "4000000009999",
@@ -2823,7 +3248,7 @@
                       "defaultValue" : "Sub General",
                       "isNested" : false,
                       "isSystemMandatory" : false,
-                      "type" : "Picklist",
+                      "type" : [ "Picklist" ],
                       "isEncryptedField" : false,
                       "sortBy" : "userDefined",
                       "id" : "4000000000423",
@@ -2838,7 +3263,7 @@
                       "defaultValue" : "General",
                       "isNested" : false,
                       "isSystemMandatory" : false,
-                      "type" : "Picklist",
+                      "type" : [ "Picklist" ],
                       "isEncryptedField" : false,
                       "sortBy" : "userDefined",
                       "id" : "4000000000421",
@@ -2853,7 +3278,7 @@
                       "id" : "4000000000363",
                       "isSystemMandatory" : true,
                       "isRemovable" : false,
-                      "type" : "Text",
+                      "type" : [ "Text" ],
                       "maxLength" : 255,
                       "isMandatory" : true
                     }, {
@@ -2864,7 +3289,7 @@
                       "id" : "4000000000365",
                       "isSystemMandatory" : false,
                       "isRemovable" : false,
-                      "type" : "Textarea",
+                      "type" : [ "Textarea" ],
                       "maxLength" : 1000000,
                       "isMandatory" : false
                     }, {
@@ -2875,7 +3300,7 @@
                       "defaultValue" : "Open",
                       "isNested" : false,
                       "isSystemMandatory" : true,
-                      "type" : "Picklist",
+                      "type" : [ "Picklist" ],
                       "restoreOnReplyValues" : [ "Open_july", "newDeptClosed", "Escalated", "On Hold", "Closed", "Closed1", "Open" ],
                       "isEncryptedField" : false,
                       "sortBy" : "userDefined",
@@ -2891,7 +3316,7 @@
                       "id" : "4000000000371",
                       "isSystemMandatory" : false,
                       "isRemovable" : false,
-                      "type" : "LookUp",
+                      "type" : [ "LookUp" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     }, {
@@ -2902,7 +3327,7 @@
                       "id" : "4000000000369",
                       "isSystemMandatory" : false,
                       "isRemovable" : true,
-                      "type" : "LookUp",
+                      "type" : [ "LookUp" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     } ]
@@ -2918,7 +3343,7 @@
                       "id" : "4000000000405",
                       "isSystemMandatory" : false,
                       "isRemovable" : false,
-                      "type" : "DateTime",
+                      "type" : [ "DateTime" ],
                       "maxLength" : 300,
                       "isMandatory" : false
                     }, {
@@ -2929,7 +3354,7 @@
                       "defaultValue" : "-None-",
                       "isNested" : false,
                       "isSystemMandatory" : false,
-                      "type" : "Picklist",
+                      "type" : [ "Picklist" ],
                       "isEncryptedField" : false,
                       "sortBy" : "userDefined",
                       "id" : "4000000000407",
@@ -2944,7 +3369,7 @@
                       "defaultValue" : "Phone",
                       "isNested" : false,
                       "isSystemMandatory" : false,
-                      "type" : "Picklist",
+                      "type" : [ "Picklist" ],
                       "isEncryptedField" : false,
                       "sortBy" : "userDefined",
                       "id" : "4000000000409",
@@ -2960,7 +3385,7 @@
                       "id" : "4000000000411",
                       "isSystemMandatory" : false,
                       "isRemovable" : true,
-                      "type" : "Boolean",
+                      "type" : [ "Boolean" ],
                       "maxLength" : 50,
                       "isMandatory" : false
                     }, {
@@ -2972,7 +3397,7 @@
                       "id" : "4000000000413",
                       "isSystemMandatory" : false,
                       "isRemovable" : true,
-                      "type" : "Boolean",
+                      "type" : [ "Boolean" ],
                       "maxLength" : 50,
                       "isMandatory" : false
                     }, {
@@ -2983,7 +3408,7 @@
                       "defaultValue" : "-None-",
                       "isNested" : false,
                       "isSystemMandatory" : false,
-                      "type" : "Picklist",
+                      "type" : [ "Picklist" ],
                       "isEncryptedField" : false,
                       "sortBy" : "userDefined",
                       "id" : "4000000000415",
@@ -2998,7 +3423,7 @@
                       "id" : "4000000000417",
                       "isSystemMandatory" : false,
                       "isRemovable" : false,
-                      "type" : "Textarea",
+                      "type" : [ "Textarea" ],
                       "maxLength" : 1000000,
                       "isMandatory" : false
                     }, {
@@ -3011,7 +3436,7 @@
                       "id" : "4000000000447",
                       "isSystemMandatory" : false,
                       "isRemovable" : false,
-                      "type" : "Textarea",
+                      "type" : [ "Textarea" ],
                       "maxLength" : 1000000,
                       "isMandatory" : false
                     } ]
@@ -3030,34 +3455,29 @@
           "application/json" : {
             "schema" : {
               "anyOf" : [ {
-                "additionalProperties" : false,
                 "allOf" : [ {
-                  "$ref" : "./Layout.json#/components/schemas/basicLayoutJson"
+                  "$ref" : "#/components/schemas/basicLayoutJson"
                 }, {
-                  "type" : [ "null", "object" ],
+                  "type" : [ "object", "null" ],
                   "properties" : {
                     "module" : {
                       "type" : [ "string", "null" ],
-                      "enum" : [ "Cases", "Contacts", "Accounts", "Tasks", "Calls", "Events", "TimeEntry", "Contracts", "Products" ],
-                      "maxLength" : 100,
-                      "minLength" : 0
+                      "enum" : [ "Cases", "Contacts", "Accounts", "Tasks", "Calls", "Events", "TimeEntry", "Contracts", "Products" ]
                     },
                     "sections" : {
-                      "$ref" : "./Layout.json#/components/schemas/sectionListForLayout"
+                      "$ref" : "#/components/schemas/sectionListForLayout"
                     }
                   },
                   "required" : [ "module", "sections" ]
                 } ]
               }, {
-                "additionalProperties" : false,
                 "allOf" : [ {
-                  "$ref" : "./Layout.json#/components/schemas/cloneLayoutCommonResponse"
+                  "$ref" : "#/components/schemas/cloneLayoutCommonResponse"
                 }, {
-                  "type" : [ "null", "object" ],
+                  "type" : [ "object", "null" ],
                   "properties" : {
                     "departmentId" : {
-                      "type" : [ "string", "null", "integer" ],
-                      "format" : "int64",
+                      "type" : [ "string", "integer", "null" ],
                       "pattern" : "([0-9]+)"
                     }
                   },
@@ -3086,7 +3506,7 @@
                       "isCustomField" : false,
                       "isEncryptedField" : false,
                       "id" : "4000000000353",
-                      "type" : "LookUp",
+                      "type" : [ "LookUp" ],
                       "maxLength" : 50,
                       "isMandatory" : true
                     }, {
@@ -3096,7 +3516,7 @@
                       "isCustomField" : false,
                       "isEncryptedField" : false,
                       "id" : "4000000000357",
-                      "type" : "LookUp",
+                      "type" : [ "LookUp" ],
                       "maxLength" : 300,
                       "isMandatory" : true
                     }, {
@@ -3106,7 +3526,7 @@
                       "isCustomField" : false,
                       "isEncryptedField" : false,
                       "id" : "4000000000355",
-                      "type" : "LookUp",
+                      "type" : [ "LookUp" ],
                       "maxLength" : 300,
                       "isMandatory" : false
                     }, {
@@ -3116,7 +3536,7 @@
                       "isCustomField" : false,
                       "isEncryptedField" : false,
                       "id" : "4000000000359",
-                      "type" : "Email",
+                      "type" : [ "Email" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     }, {
@@ -3126,7 +3546,7 @@
                       "isCustomField" : false,
                       "isEncryptedField" : false,
                       "id" : "4000000000361",
-                      "type" : "Phone",
+                      "type" : [ "Phone" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     }, {
@@ -3137,7 +3557,7 @@
                       "defaultValue" : "Education :: University :: Private",
                       "isNested" : true,
                       "isSystemMandatory" : false,
-                      "type" : "Picklist",
+                      "type" : [ "Picklist" ],
                       "isEncryptedField" : false,
                       "sortBy" : "userDefined",
                       "id" : "4000000009999",
@@ -3154,7 +3574,7 @@
                       "isNested" : false,
                       "isEncryptedField" : false,
                       "id" : "4000000000423",
-                      "type" : "Picklist",
+                      "type" : [ "Picklist" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     }, {
@@ -3167,7 +3587,7 @@
                       "isNested" : false,
                       "isEncryptedField" : false,
                       "id" : "4000000000421",
-                      "type" : "Picklist",
+                      "type" : [ "Picklist" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     }, {
@@ -3177,7 +3597,7 @@
                       "isCustomField" : false,
                       "isEncryptedField" : false,
                       "id" : "4000000000363",
-                      "type" : "Text",
+                      "type" : [ "Text" ],
                       "maxLength" : 255,
                       "isMandatory" : true
                     }, {
@@ -3187,7 +3607,7 @@
                       "isCustomField" : false,
                       "isEncryptedField" : false,
                       "id" : "4000000000365",
-                      "type" : "Textarea",
+                      "type" : [ "Textarea" ],
                       "maxLength" : 1000000,
                       "isMandatory" : false
                     }, {
@@ -3197,7 +3617,7 @@
                       "isCustomField" : false,
                       "defaultValue" : "Open",
                       "isNested" : false,
-                      "type" : "Picklist",
+                      "type" : [ "Picklist" ],
                       "isReadOnly" : false,
                       "restoreOnReplyValues" : [ "Open_july", "newDeptClosed", "Open_newDept", "Escalated", "On Hold", "Closed", "Closed1", "julyDeptClosed", "julyDeptClosed1", "Open" ],
                       "isEncryptedField" : false,
@@ -3211,7 +3631,7 @@
                       "isCustomField" : false,
                       "isEncryptedField" : false,
                       "id" : "4000000000371",
-                      "type" : "LookUp",
+                      "type" : [ "LookUp" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     }, {
@@ -3221,7 +3641,7 @@
                       "isCustomField" : false,
                       "isEncryptedField" : false,
                       "id" : "4000000000369",
-                      "type" : "LookUp",
+                      "type" : [ "LookUp" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     } ]
@@ -3236,7 +3656,7 @@
                       "isCustomField" : false,
                       "isEncryptedField" : false,
                       "id" : "4000000000405",
-                      "type" : "DateTime",
+                      "type" : [ "DateTime" ],
                       "maxLength" : 300,
                       "isMandatory" : false
                     }, {
@@ -3249,7 +3669,7 @@
                       "isNested" : false,
                       "isEncryptedField" : false,
                       "id" : "4000000000407",
-                      "type" : "Picklist",
+                      "type" : [ "Picklist" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     }, {
@@ -3262,7 +3682,7 @@
                       "isNested" : false,
                       "isEncryptedField" : false,
                       "id" : "4000000000409",
-                      "type" : "Picklist",
+                      "type" : [ "Picklist" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     }, {
@@ -3273,7 +3693,7 @@
                       "defaultValue" : "true",
                       "isEncryptedField" : false,
                       "id" : "4000000000411",
-                      "type" : "Boolean",
+                      "type" : [ "Boolean" ],
                       "maxLength" : 50,
                       "isMandatory" : false
                     }, {
@@ -3284,7 +3704,7 @@
                       "defaultValue" : "true",
                       "isEncryptedField" : false,
                       "id" : "4000000000413",
-                      "type" : "Boolean",
+                      "type" : [ "Boolean" ],
                       "maxLength" : 50,
                       "isMandatory" : false
                     }, {
@@ -3297,7 +3717,7 @@
                       "isNested" : false,
                       "isEncryptedField" : false,
                       "id" : "4000000000415",
-                      "type" : "Picklist",
+                      "type" : [ "Picklist" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     }, {
@@ -3307,7 +3727,7 @@
                       "isCustomField" : false,
                       "isEncryptedField" : false,
                       "id" : "4000000000417",
-                      "type" : "Textarea",
+                      "type" : [ "Textarea" ],
                       "maxLength" : 1000000,
                       "isMandatory" : false
                     }, {
@@ -3320,7 +3740,7 @@
                       "id" : "4000000000447",
                       "isSystemMandatory" : false,
                       "isRemovable" : false,
-                      "type" : "Textarea",
+                      "type" : [ "Textarea" ],
                       "maxLength" : 1000000,
                       "isMandatory" : false
                     } ]
@@ -3337,35 +3757,32 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "oneOf" : [ {
-                "additionalProperties" : false,
+              "anyOf" : [ {
+                "type" : "object",
                 "allOf" : [ {
-                  "$ref" : "./Layout.json#/components/schemas/basicLayoutJson"
+                  "$ref" : "#/components/schemas/basicLayoutJson"
                 }, {
-                  "type" : [ "null", "object" ],
+                  "type" : [ "object", "null" ],
                   "properties" : {
                     "module" : {
-                      "type" : [ "string", "null" ],
-                      "enum" : [ "Cases", "Contacts", "Accounts", "Tasks", "Calls", "Events", "TimeEntry", "Contracts", "Products" ],
-                      "maxLength" : 100,
-                      "minLength" : 0
+                      "description" : "Module the layout belongs to. Standard values: Cases, Contacts, Accounts, Tasks, Calls, Events, TimeEntry, Contracts, Products. Custom modules are also supported.",
+                      "type" : [ "string", "null" ]
                     },
                     "sections" : {
-                      "$ref" : "./Layout.json#/components/schemas/sectionListForLayout"
+                      "$ref" : "#/components/schemas/sectionListForLayout"
                     }
                   },
                   "required" : [ "module", "sections" ]
                 } ]
               }, {
-                "additionalProperties" : false,
+                "type" : "object",
                 "allOf" : [ {
-                  "$ref" : "./Layout.json#/components/schemas/cloneLayoutCommonResponse"
+                  "$ref" : "#/components/schemas/cloneLayoutCommonResponse"
                 }, {
-                  "type" : [ "null", "object" ],
+                  "type" : [ "object", "null" ],
                   "properties" : {
                     "departmentId" : {
-                      "type" : [ "string", "null", "integer" ],
-                      "format" : "int64",
+                      "type" : [ "string", "integer", "null" ],
                       "pattern" : "([0-9]+)"
                     }
                   },
@@ -3397,7 +3814,7 @@
                       "id" : "4000000000353",
                       "isSystemMandatory" : false,
                       "isRemovable" : false,
-                      "type" : "LookUp",
+                      "type" : [ "LookUp" ],
                       "maxLength" : 50,
                       "isMandatory" : true
                     }, {
@@ -3408,7 +3825,7 @@
                       "id" : "4000000000357",
                       "isSystemMandatory" : true,
                       "isRemovable" : false,
-                      "type" : "LookUp",
+                      "type" : [ "LookUp" ],
                       "maxLength" : 300,
                       "isMandatory" : true
                     }, {
@@ -3419,7 +3836,7 @@
                       "id" : "4000000000355",
                       "isSystemMandatory" : false,
                       "isRemovable" : true,
-                      "type" : "LookUp",
+                      "type" : [ "LookUp" ],
                       "maxLength" : 300,
                       "isMandatory" : false
                     }, {
@@ -3430,7 +3847,7 @@
                       "id" : "4000000000359",
                       "isSystemMandatory" : false,
                       "isRemovable" : false,
-                      "type" : "Email",
+                      "type" : [ "Email" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     }, {
@@ -3441,7 +3858,7 @@
                       "id" : "4000000000361",
                       "isSystemMandatory" : false,
                       "isRemovable" : true,
-                      "type" : "Phone",
+                      "type" : [ "Phone" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     }, {
@@ -3452,7 +3869,7 @@
                       "defaultValue" : "Education :: University :: Private",
                       "isNested" : true,
                       "isSystemMandatory" : false,
-                      "type" : "Picklist",
+                      "type" : [ "Picklist" ],
                       "isEncryptedField" : false,
                       "sortBy" : "userDefined",
                       "id" : "4000000009999",
@@ -3467,7 +3884,7 @@
                       "defaultValue" : "Sub General",
                       "isNested" : false,
                       "isSystemMandatory" : false,
-                      "type" : "Picklist",
+                      "type" : [ "Picklist" ],
                       "isEncryptedField" : false,
                       "sortBy" : "userDefined",
                       "id" : "4000000000423",
@@ -3482,7 +3899,7 @@
                       "defaultValue" : "General",
                       "isNested" : false,
                       "isSystemMandatory" : false,
-                      "type" : "Picklist",
+                      "type" : [ "Picklist" ],
                       "isEncryptedField" : false,
                       "sortBy" : "userDefined",
                       "id" : "4000000000421",
@@ -3497,7 +3914,7 @@
                       "id" : "4000000000363",
                       "isSystemMandatory" : true,
                       "isRemovable" : false,
-                      "type" : "Text",
+                      "type" : [ "Text" ],
                       "maxLength" : 255,
                       "isMandatory" : true
                     }, {
@@ -3508,7 +3925,7 @@
                       "id" : "4000000000365",
                       "isSystemMandatory" : false,
                       "isRemovable" : false,
-                      "type" : "Textarea",
+                      "type" : [ "Textarea" ],
                       "maxLength" : 1000000,
                       "isMandatory" : false
                     }, {
@@ -3519,7 +3936,7 @@
                       "defaultValue" : "Open",
                       "isNested" : false,
                       "isSystemMandatory" : true,
-                      "type" : "Picklist",
+                      "type" : [ "Picklist" ],
                       "restoreOnReplyValues" : [ "Open_july", "newDeptClosed", "Escalated", "On Hold", "Closed", "Closed1", "Open" ],
                       "isEncryptedField" : false,
                       "sortBy" : "userDefined",
@@ -3535,7 +3952,7 @@
                       "id" : "4000000000371",
                       "isSystemMandatory" : false,
                       "isRemovable" : false,
-                      "type" : "LookUp",
+                      "type" : [ "LookUp" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     }, {
@@ -3546,7 +3963,7 @@
                       "id" : "4000000000369",
                       "isSystemMandatory" : false,
                       "isRemovable" : true,
-                      "type" : "LookUp",
+                      "type" : [ "LookUp" ],
                       "maxLength" : 120,
                       "isMandatory" : false
                     } ]
@@ -3562,7 +3979,7 @@
                       "id" : "4000000000405",
                       "isSystemMandatory" : false,
                       "isRemovable" : false,
-                      "type" : "DateTime",
+                      "type" : [ "DateTime" ],
                       "maxLength" : 300,
                       "isMandatory" : false
                     }, {
@@ -3573,7 +3990,7 @@
                       "defaultValue" : "-None-",
                       "isNested" : false,
                       "isSystemMandatory" : false,
-                      "type" : "Picklist",
+                      "type" : [ "Picklist" ],
                       "isEncryptedField" : false,
                       "sortBy" : "userDefined",
                       "id" : "4000000000407",
@@ -3588,7 +4005,7 @@
                       "defaultValue" : "Phone",
                       "isNested" : false,
                       "isSystemMandatory" : false,
-                      "type" : "Picklist",
+                      "type" : [ "Picklist" ],
                       "isEncryptedField" : false,
                       "sortBy" : "userDefined",
                       "id" : "4000000000409",
@@ -3604,7 +4021,7 @@
                       "id" : "4000000000411",
                       "isSystemMandatory" : false,
                       "isRemovable" : true,
-                      "type" : "Boolean",
+                      "type" : [ "Boolean" ],
                       "maxLength" : 50,
                       "isMandatory" : false
                     }, {
@@ -3616,7 +4033,7 @@
                       "id" : "4000000000413",
                       "isSystemMandatory" : false,
                       "isRemovable" : true,
-                      "type" : "Boolean",
+                      "type" : [ "Boolean" ],
                       "maxLength" : 50,
                       "isMandatory" : false
                     }, {
@@ -3627,7 +4044,7 @@
                       "defaultValue" : "-None-",
                       "isNested" : false,
                       "isSystemMandatory" : false,
-                      "type" : "Picklist",
+                      "type" : [ "Picklist" ],
                       "isEncryptedField" : false,
                       "sortBy" : "userDefined",
                       "id" : "4000000000415",
@@ -3642,7 +4059,7 @@
                       "id" : "4000000000417",
                       "isSystemMandatory" : false,
                       "isRemovable" : false,
-                      "type" : "Textarea",
+                      "type" : [ "Textarea" ],
                       "maxLength" : 1000000,
                       "isMandatory" : false
                     }, {
@@ -3655,7 +4072,7 @@
                       "id" : "4000000000447",
                       "isSystemMandatory" : false,
                       "isRemovable" : false,
-                      "type" : "Textarea",
+                      "type" : [ "Textarea" ],
                       "maxLength" : 1000000,
                       "isMandatory" : false
                     } ]
@@ -3673,11 +4090,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./Layout.json#/components/schemas/layoutProfileJsonArray"
+                  "$ref" : "#/components/schemas/layoutProfileJsonArray"
                 }
               },
               "required" : [ "data" ]
@@ -3689,37 +4106,37 @@
                     "profileName" : "Support Administrator",
                     "isDefault" : true,
                     "id" : "4000000015183",
-                    "type" : "ADMIN"
+                    "type" : "Administrator"
                   }, {
                     "profileName" : "Agent",
                     "isDefault" : true,
                     "id" : "4000000015186",
-                    "type" : "STANDARD"
+                    "type" : "Standard"
                   }, {
                     "profileName" : "Help Center",
                     "isDefault" : true,
                     "id" : "4000000015189",
-                    "type" : "PORTAL"
+                    "type" : "Portal"
                   }, {
                     "profileName" : "Supervisor",
                     "isDefault" : false,
                     "id" : "4000000015192",
-                    "type" : "CUSTOM"
+                    "type" : "Custom"
                   }, {
                     "profileName" : "Support Manager",
                     "isDefault" : false,
                     "id" : "4000000015195",
-                    "type" : "CUSTOM"
+                    "type" : "Custom"
                   }, {
                     "profileName" : "Newbie Agent",
                     "isDefault" : false,
                     "id" : "4000000015198",
-                    "type" : "CUSTOM"
+                    "type" : "Custom"
                   }, {
                     "profileName" : "Light Agent",
                     "isDefault" : true,
                     "id" : "4000000015201",
-                    "type" : "LIGHT"
+                    "type" : "Light"
                   } ]
                 }
               }
@@ -3732,11 +4149,10 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "additionalProperties" : false,
               "allOf" : [ {
-                "$ref" : "./Field.json#/components/schemas/commonFieldResponse"
+                "$ref" : "./FieldOld.json#/components/schemas/commonFieldResponse"
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "properties" : {
                   "isRemovable" : {
                     "type" : [ "boolean", "null" ]
@@ -3759,7 +4175,7 @@
                   "isNested" : true,
                   "i18NLabel" : "Education Type",
                   "isSystemMandatory" : false,
-                  "type" : "Picklist",
+                  "type" : [ "Picklist" ],
                   "name" : "Education Type",
                   "isEncryptedField" : false,
                   "sortBy" : "userDefined",
@@ -3774,103 +4190,46 @@
         }
       }
     },
-    "parameters" : {
-      "module" : {
-        "name" : "module",
-        "in" : "query",
-        "description" : " Name of the module whose layouts must be fetched. The allowed values are !@tickets, contacts, accounts, calls, events, tasks, timeEntry, products, and contracts@!",
-        "required" : true,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null" ],
-          "description" : " Name of the module whose layouts must be fetched. The allowed values are !@tickets, contacts, accounts, calls, events, tasks, timeEntry, products, and contracts@!",
-          "enum" : [ "tickets", "contacts", "contracts", "accounts", "products", "calls", "tasks", "events", "timeEntry" ],
-          "maxLength" : 100,
-          "minLength" : 0
-        }
-      },
-      "departmentId" : {
-        "name" : "departmentId",
-        "in" : "query",
-        "description" : "ID of the department in which the layouts are configured",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "description" : "ID of the department in which the layouts are configured",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "layoutId" : {
-        "name" : "layoutId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "fieldId" : {
-        "name" : "fieldId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      }
-    },
     "requestBodies" : {
       "cloneLayoutJson" : {
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "skipDeptAccessValidation" : {
-                  "type" : [ "boolean", "null" ]
+                  "type" : [ "boolean" ],
+                  "description" : "Whether to skip department access validation when cloning the layout"
                 },
                 "layoutDisplayName" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0,
-                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                  "type" : [ "string" ],
+                  "description" : "Display name of the cloned layout",
+                  "maxLength" : 150,
+                  "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+"
                 },
                 "departmentId" : {
-                  "type" : [ "string", "null", "integer" ],
-                  "format" : "int64",
-                  "pattern" : "([0-9]+)"
+                  "type" : [ "integer" ],
+                  "description" : "ID of the department in which the cloned layout is created."
                 },
                 "isDefaultLayout" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "false" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "type" : [ "boolean" ],
+                  "description" : "Whether the cloned layout becomes the default layout for its module/department."
                 },
                 "layoutDesc" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0,
-                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                  "type" : [ "string" ],
+                  "description" : "Description of the cloned layout",
+                  "maxLength" : 500,
+                  "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+"
                 },
                 "layoutName" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0,
-                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                  "type" : [ "string" ],
+                  "description" : "Name of the cloned layout",
+                  "maxLength" : 150,
+                  "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+"
                 }
               },
-              "required" : [ "layoutName" ]
+              "required" : [ "isDefaultLayout", "layoutDisplayName", "layoutName", "skipDeptAccessValidation" ]
             },
             "examples" : {
               "Valid requestBody Definitions" : {
@@ -3887,49 +4246,53 @@
         }
       },
       "layoutRequestJSON" : {
+        "required" : true,
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "skipDeptAccessValidation" : {
-                  "type" : [ "boolean", "null" ],
+                  "type" : [ "boolean" ],
                   "description" : "Key that returns if the layout is common to all profiles of the organisation and not specific to the department"
                 },
                 "departmentId" : {
-                  "type" : [ "string", "null", "integer" ],
-                  "format" : "int64",
+                  "type" : [ "string", "integer" ],
                   "description" : "ID of department in which the layout is configured",
                   "pattern" : "([0-9]+)"
                 },
                 "layoutDisplayName" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "description" : "Display Name of the layout in HelpCenter",
-                  "maxLength" : 100,
+                  "maxLength" : 150,
                   "minLength" : 0,
                   "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                 },
                 "module" : {
-                  "type" : [ "string", "null" ],
-                  "description" : "mdoule name",
-                  "enum" : [ "tickets", "contacts", "accounts", "tasks", "calls", "events", "timeEntry", "contracts", "products" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "type" : [ "string" ],
+                  "description" : "Name of the module the layout is created for. Standard values: tickets, contacts, accounts, tasks, calls, events, timeEntry, contracts, products. Custom modules are also supported."
                 },
                 "isDefaultLayout" : {
-                  "type" : [ "boolean", "null" ],
+                  "type" : [ "boolean" ],
                   "description" : "Key that returns if the layout is the default layout in the module"
                 },
                 "sections" : {
-                  "$ref" : "./Layout.json#/components/schemas/sectionRequestArr"
+                  "$ref" : "#/components/schemas/sectionRequestArr"
                 },
                 "layoutName" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "description" : "Name of the layout",
-                  "maxLength" : 100,
+                  "maxLength" : 150,
                   "minLength" : 0,
                   "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                },
+                "layoutDesc" : {
+                  "type" : [ "string" ],
+                  "description" : "Description of the layout",
+                  "maxLength" : 500,
+                  "minLength" : 0,
+                  "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+"
                 }
               },
               "required" : [ "departmentId", "isDefaultLayout", "layoutDisplayName", "layoutName", "module", "sections", "skipDeptAccessValidation" ]
@@ -3978,15 +4341,16 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "transferToLayoutId" : {
-                  "type" : [ "string", "null", "integer" ],
-                  "format" : "int64",
+                  "description" : "ID of the layout to which existing records are transferred before this layout is deactivated",
+                  "type" : [ "string", "integer" ],
                   "pattern" : "([0-9]+)"
                 }
-              }
+              },
+              "required" : [ "transferToLayoutId" ]
             },
             "examples" : {
               "Valid requestBody Definitions" : {
@@ -3999,14 +4363,15 @@
         }
       },
       "layoutIdsJson" : {
+        "required" : true,
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "layoutIds" : {
-                  "$ref" : "./Layout.json#/components/schemas/layoutIdsArray"
+                  "$ref" : "#/components/schemas/layoutIdsArray"
                 }
               },
               "required" : [ "layoutIds" ]
@@ -4022,14 +4387,15 @@
         }
       },
       "layoutProfileIdsJsonObject" : {
+        "required" : true,
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "layoutProfileIds" : {
-                  "$ref" : "./Layout.json#/components/schemas/layoutProfileIdsJson"
+                  "$ref" : "#/components/schemas/layoutProfileIdsJson"
                 }
               },
               "required" : [ "layoutProfileIds" ]
@@ -4045,52 +4411,55 @@
         }
       },
       "updateLayout_layoutRequestJSON" : {
+        "required" : true,
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "skipDeptAccessValidation" : {
-                  "type" : [ "boolean", "null" ],
+                  "type" : [ "boolean" ],
                   "description" : "Key that returns if the layout is common to all profiles of the organisation and not specific to the department"
                 },
                 "departmentId" : {
-                  "type" : [ "string", "null", "integer" ],
-                  "format" : "int64",
+                  "type" : [ "string", "integer" ],
                   "description" : "ID of department in which the layout is configured",
                   "pattern" : "([0-9]+)"
                 },
                 "layoutDisplayName" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "description" : "Display Name of the layout in HelpCenter",
-                  "maxLength" : 100,
+                  "maxLength" : 150,
                   "minLength" : 0,
                   "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                 },
                 "module" : {
-                  "type" : [ "string", "null" ],
-                  "description" : "mdoule name",
-                  "enum" : [ "tickets", "contacts", "accounts", "tasks", "calls", "events", "timeEntry", "contracts", "products" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "type" : [ "string" ],
+                  "description" : "Name of the module the layout belongs to. Standard values: tickets, contacts, accounts, tasks, calls, events, timeEntry, contracts, products. Custom modules are also supported."
                 },
                 "isDefaultLayout" : {
-                  "type" : [ "boolean", "null" ],
+                  "type" : [ "boolean" ],
                   "description" : "Key that returns if the layout is the default layout in the module"
                 },
                 "sections" : {
-                  "$ref" : "./Layout.json#/components/schemas/sectionRequestArr"
+                  "$ref" : "#/components/schemas/sectionRequestArr"
                 },
                 "layoutName" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "description" : "Name of the layout",
-                  "maxLength" : 100,
+                  "maxLength" : 150,
                   "minLength" : 0,
                   "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                },
+                "layoutDesc" : {
+                  "type" : [ "string" ],
+                  "description" : "Description of the layout",
+                  "maxLength" : 500,
+                  "minLength" : 0,
+                  "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+"
                 }
-              },
-              "required" : [ "departmentId", "isDefaultLayout", "layoutName", "module", "sections", "skipDeptAccessValidation" ]
+              }
             },
             "examples" : {
               "Valid requestBody Definitions" : {
@@ -4210,24 +4579,21 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "newValue" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 120,
-                  "minLength" : 0,
+                  "type" : [ "string" ],
+                  "maxLength" : 100,
                   "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
                 },
                 "oldValue" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 120,
-                  "minLength" : 0,
+                  "type" : [ "string" ],
+                  "maxLength" : 100,
                   "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
                 },
                 "fieldId" : {
-                  "type" : [ "string", "null", "integer" ],
-                  "format" : "int64",
+                  "type" : [ "string", "integer" ],
                   "pattern" : "([0-9]+)"
                 }
               },
@@ -4249,13 +4615,14 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "allowedValues" : {
-                  "type" : [ "null", "array" ],
+                  "description" : "Allowed values for the field. Applicable to multi-level pick list fields.",
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null" ],
+                    "type" : [ "string" ],
                     "maxLength" : 120,
                     "minLength" : 0,
                     "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
@@ -4263,22 +4630,26 @@
                   "uniqueItems" : false
                 },
                 "defaultValue" : {
-                  "type" : [ "string", "null" ],
+                  "description" : "Default value assigned to the field.",
+                  "type" : [ "string" ],
                   "maxLength" : 120,
                   "minLength" : 0,
                   "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
                 },
                 "sortBy" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "alphabetical", "userDefined" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "description" : "Order in which pick list values are sorted. Accepted values: alphabetical, userDefined",
+                  "type" : [ "string" ],
+                  "enum" : [ "alphabetical", "userDefined" ]
                 },
                 "isMandatory" : {
-                  "type" : [ "boolean", "null" ]
+                  "description" : "Whether the field is mandatory in the layout.",
+                  "type" : [ "boolean" ]
+                },
+                "isNested" : {
+                  "description" : "Whether the field is a nested pick list field.",
+                  "type" : [ "boolean" ]
                 }
-              },
-              "required" : [ "allowedValues", "defaultValue", "isMandatory", "sortBy" ]
+              }
             },
             "examples" : {
               "Valid requestBody Definitions" : {
@@ -4293,9 +4664,33 @@
             }
           }
         }
+      },
+      "layoutTransferJson" : {
+        "required" : true,
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "properties" : {
+                "transferToLayoutId" : {
+                  "description" : "ID of the layout to which existing records are transferred before this layout is deleted",
+                  "type" : [ "string", "integer" ],
+                  "pattern" : "([0-9]+)"
+                }
+              },
+              "required" : [ "transferToLayoutId" ]
+            }
+          }
+        }
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

@@ -8,22 +8,26 @@
   "components" : {
     "schemas" : {
       "permalinkJson" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "createdBy" : {
+            "description" : "Details of the user who created the permalink",
             "$ref" : "./ArticleTranslation.json#/components/schemas/createdBy"
           },
           "isPrimary" : {
+            "description" : "Indicates whether the permalink is the primary permalink. Possible values: • true = primary permalink • false = secondary permalink",
             "type" : [ "boolean", "null" ]
           },
           "createdTime" : {
+            "description" : "Time when the permalink was created",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "permalink" : {
+            "description" : "URL-friendly slug for the category translation",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
@@ -33,13 +37,13 @@
         "required" : [ "createdBy", "createdTime", "isPrimary", "permalink" ]
       },
       "permalinkJsonArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./KBCategoryPermalink.json#/components/schemas/permalinkJson"
+          "$ref" : "#/components/schemas/permalinkJson"
         }
       },
       "permalinksArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
           "type" : [ "string", "null" ],
           "maxLength" : 100,
@@ -54,20 +58,23 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./KBCategoryPermalink.json#/components/schemas/permalinkJsonArray"
+                  "description" : "List of permalink entries for the translation",
+                  "$ref" : "#/components/schemas/permalinkJsonArray"
                 },
                 "primaryPermalink" : {
+                  "description" : "Primary permalink of the translation",
                   "type" : [ "string", "null" ],
                   "maxLength" : 100,
                   "minLength" : 0,
                   "pattern" : "[a-zA-Z0-9%\\-._/?\\P{InBasicLatin}]*"
                 },
                 "secondaryPermalinks" : {
-                  "$ref" : "./KBCategoryPermalink.json#/components/schemas/permalinksArray"
+                  "description" : "Secondary permalinks of the translation",
+                  "$ref" : "#/components/schemas/permalinksArray"
                 }
               },
               "required" : [ "data", "primaryPermalink", "secondaryPermalinks" ]
@@ -81,7 +88,7 @@
                       "name" : "Zylker",
                       "id" : "6000000016514",
                       "status" : "ACTIVE",
-                      "zuid" : "343224"
+                      "zuid" : "1234567890"
                     },
                     "isPrimary" : true,
                     "createdTime" : 1588342603000,
@@ -92,7 +99,7 @@
                       "name" : "Zylker",
                       "id" : "6000000016514",
                       "status" : "ACTIVE",
-                      "zuid" : "343224"
+                      "zuid" : "1234567890"
                     },
                     "isPrimary" : false,
                     "createdTime" : 1588342349000,
@@ -103,7 +110,7 @@
                       "name" : "Zylker",
                       "id" : "6000000016514",
                       "status" : "ACTIVE",
-                      "zuid" : "343224"
+                      "zuid" : "1234567890"
                     },
                     "isPrimary" : false,
                     "createdTime" : 1588342344000,
@@ -114,9 +121,70 @@
             }
           }
         }
+      },
+      "permalinkJsonDataArray" : {
+        "description" : "permalinkJsonDataArray template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "description" : "List of permalink entries for the translation after update",
+                  "$ref" : "#/components/schemas/permalinkJsonArray"
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "data" : [ {
+                    "createdBy" : {
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000016508/photo?orgId=1234567890",
+                      "name" : "Charlie",
+                      "id" : "4000000016508",
+                      "status" : "ACTIVE"
+                    },
+                    "isPrimary" : true,
+                    "createdTime" : 1595494232000,
+                    "permalink" : "primary-analyser"
+                  }, {
+                    "createdBy" : {
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000016508/photo?orgId=1234567890",
+                      "name" : "Charlie",
+                      "id" : "4000000016508",
+                      "status" : "ACTIVE"
+                    },
+                    "isPrimary" : false,
+                    "createdTime" : 1595657875000,
+                    "permalink" : "quality-analyst"
+                  }, {
+                    "createdBy" : {
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000016508/photo?orgId=1234567890",
+                      "name" : "Charlie",
+                      "id" : "4000000016508",
+                      "status" : "ACTIVE"
+                    },
+                    "isPrimary" : false,
+                    "createdTime" : 1595657875000,
+                    "permalink" : "modulizer"
+                  } ]
+                }
+              }
+            }
+          }
+        }
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

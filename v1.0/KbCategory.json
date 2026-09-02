@@ -11,8 +11,20 @@
         "summary" : "Get articles for manual sorting",
         "description" : "This API lists the positions of help articles to enable manual sorting. Only leaf categories that have a maximum of 1000 articles can be repositioned.",
         "operationId" : "getArticlesForRepositioning",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/categoryId"
+          "name" : "categoryId",
+          "in" : "path",
+          "description" : "To get individual category details",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "To get individual category details"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -34,8 +46,20 @@
         "summary" : "Update article position",
         "description" : "This API helps you manually sort articles in your knowledge base. Only leaf categories that have a maximum of 1000 articles can be repositioned.",
         "operationId" : "updateKBArticlesRepositioning",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/categoryId"
+          "name" : "categoryId",
+          "in" : "path",
+          "description" : "To get individual category details",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "To get individual category details"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -55,12 +79,54 @@
         } ],
         "x-audience" : [ "external-public" ]
       }
+    },
+    "/api/v1/kbCategory/{categoryId}" : {
+      "delete" : {
+        "tags" : [ "KBCategory" ],
+        "summary" : "Delete category",
+        "description" : "Deletes a KB category.",
+        "operationId" : "deleteCategory",
+        "parameters" : [ {
+          "name" : "categoryId",
+          "in" : "path",
+          "description" : "To get individual category details",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "To get individual category details"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "200" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.DELETE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
     }
   },
   "components" : {
     "schemas" : {
       "groupJson" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "name" : {
@@ -70,7 +136,7 @@
             "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
@@ -84,29 +150,19 @@
         "required" : [ "id", "logoUrl", "name" ]
       },
       "groupJsonArr" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./KbCategory.json#/components/schemas/groupJson"
-        }
-      }
-    },
-    "parameters" : {
-      "categoryId" : {
-        "name" : "categoryId",
-        "in" : "path",
-        "description" : "To get individual category details",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "description" : "To get individual category details",
-          "pattern" : "([0-9]+)"
+          "$ref" : "#/components/schemas/groupJson"
         }
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

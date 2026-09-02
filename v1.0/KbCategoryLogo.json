@@ -11,6 +11,7 @@
         "summary" : "Upload KB logo image",
         "description" : "This API is used to upload an image to be used as logo",
         "operationId" : "updateKBCategoryLogo",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -18,14 +19,15 @@
           "content" : {
             "multipart/form-data" : {
               "schema" : {
-                "type" : "object",
+                "type" : [ "object" ],
                 "properties" : {
                   "file" : {
-                    "type" : "string",
+                    "type" : [ "string" ],
                     "format" : "binary"
                   }
                 },
-                "required" : [ "file" ]
+                "required" : [ "file" ],
+                "additionalProperties" : false
               }
             }
           }
@@ -46,22 +48,27 @@
     }
   },
   "components" : {
+    "schemas" : {
+      "kbCategoryLogoUploadResponseSchema" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        },
+        "required" : [ "id" ]
+      }
+    },
     "responses" : {
       "kbCategoryLogoUploadResponse" : {
         "description" : "kbCategoryLogoUploadResponse template definitions",
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
-              "additionalProperties" : false,
-              "properties" : {
-                "id" : {
-                  "type" : [ "string", "null", "integer" ],
-                  "format" : "int64",
-                  "pattern" : "([0-9]+)"
-                }
-              },
-              "required" : [ "id" ]
+              "$ref" : "#/components/schemas/kbCategoryLogoUploadResponseSchema"
             },
             "examples" : {
               "Valid responses Definitions" : {
@@ -75,6 +82,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

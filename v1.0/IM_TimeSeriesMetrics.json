@@ -1,0 +1,724 @@
+{
+  "openapi" : "3.1.0",
+  "x-mcp-group" : [ "IM Metrics" ],
+  "info" : {
+    "title" : "IM_TimeSeriesMetrics",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/im/metrics/messages/timeseries" : {
+      "get" : {
+        "tags" : [ "IM_TimeSeriesMetrics" ],
+        "summary" : "Get Message Time-Series Metrics",
+        "description" : "Retrieves IM message metrics over time by direction, with time-series granularity.",
+        "operationId" : "getMessagesTimeSeriesMetrics",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "startDate",
+          "in" : "query",
+          "description" : "Start date for metrics. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the start time as a Unix timestamp in milliseconds.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "Start date for metrics. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the start time as a Unix timestamp in milliseconds.",
+            "pattern" : "[0-9\\-]+",
+            "x-regex-name" : "reportCustomTime",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "endDate",
+          "in" : "query",
+          "description" : "End date for metrics. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the end time as a Unix timestamp in milliseconds.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "End date for metrics. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the end time as a Unix timestamp in milliseconds.",
+            "pattern" : "[0-9\\-]+",
+            "x-regex-name" : "reportCustomTime",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "duration",
+          "in" : "query",
+          "description" : "Duration to filter the metrics. Possible values: LAST24HOURS, TODAY, YESTERDAY, LAST_7_DAYS, LAST_30_DAYS, THIS_WEEK, LAST_WEEK, THIS_MONTH, LAST_MONTH, CUSTOM_IN_DATE, CUSTOM_IN_MILLIS, LAST_1_HOUR.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "LAST24HOURS", "TODAY", "YESTERDAY", "LAST_7_DAYS", "LAST_30_DAYS", "THIS_WEEK", "LAST_WEEK", "THIS_MONTH", "LAST_MONTH", "CUSTOM_IN_DATE", "CUSTOM_IN_MILLIS", "LAST_1_HOUR" ],
+            "pattern" : "(LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR)",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "granularity",
+          "in" : "query",
+          "description" : "Time granularity for trend data. Use HOURLY when the range is within 24 hours, otherwise DAY.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "HOURLY", "DAY" ],
+            "pattern" : "HOURLY|DAY",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "dimension",
+          "in" : "query",
+          "description" : "Metric dimension for message direction counts.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "const" : "DIRECTION",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "dimensionValue",
+          "in" : "query",
+          "description" : "Direction values to include in the response. This is a list-based parameter; pass one or more comma-separated values. Possible values: TOTAL, INCOMING, OUTGOING.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "^(TOTAL|INCOMING|OUTGOING)(,(TOTAL|INCOMING|OUTGOING))*$",
+            "example" : "TOTAL,INCOMING",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "integrationService",
+          "in" : "query",
+          "description" : "Filter message metrics by integration service. Possible values: TELEGRAM, TWILIO, IM_TALK, LINE, WECHAT, WECOM, WHATSAPP, FACEBOOKMESSENGER, INSTAGRAM.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "TELEGRAM", "TWILIO", "IM_TALK", "LINE", "WECHAT", "WECOM", "WHATSAPP", "FACEBOOKMESSENGER", "INSTAGRAM" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "Filter message metrics for channels in the given department.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "channelIds",
+          "in" : "query",
+          "description" : "Filter message metrics by channel IDs. Comma-separated list of channel IDs.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "^([0-9]+)(,([0-9]+))*$",
+            "maxLength" : 1000
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/MessagesTimeSeriesResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.InstantMessages.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/im/metrics/conversations/timeseries" : {
+      "get" : {
+        "tags" : [ "IM_TimeSeriesMetrics" ],
+        "summary" : "Get Conversation Time-Series Metrics",
+        "description" : "Retrieves IM conversation metrics over time by status or contact type, with time-series granularity.",
+        "operationId" : "getConversationTimeSeriesMetrics",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "startDate",
+          "in" : "query",
+          "description" : "Start date for metrics. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the start time as a Unix timestamp in milliseconds.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "Start date for metrics. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the start time as a Unix timestamp in milliseconds.",
+            "pattern" : "[0-9\\-]+",
+            "x-regex-name" : "reportCustomTime",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "endDate",
+          "in" : "query",
+          "description" : "End date for metrics. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the end time as a Unix timestamp in milliseconds.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "End date for metrics. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the end time as a Unix timestamp in milliseconds.",
+            "pattern" : "[0-9\\-]+",
+            "x-regex-name" : "reportCustomTime",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "duration",
+          "in" : "query",
+          "description" : "Duration to filter the metrics. Possible values: LAST24HOURS, TODAY, YESTERDAY, LAST_7_DAYS, LAST_30_DAYS, THIS_WEEK, LAST_WEEK, THIS_MONTH, LAST_MONTH, CUSTOM_IN_DATE, CUSTOM_IN_MILLIS, LAST_1_HOUR.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "LAST24HOURS", "TODAY", "YESTERDAY", "LAST_7_DAYS", "LAST_30_DAYS", "THIS_WEEK", "LAST_WEEK", "THIS_MONTH", "LAST_MONTH", "CUSTOM_IN_DATE", "CUSTOM_IN_MILLIS", "LAST_1_HOUR" ],
+            "pattern" : "(LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR)",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "granularity",
+          "in" : "query",
+          "description" : "Time granularity for trend data. Use HOURLY when the range is within 24 hours, otherwise DAY.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "HOURLY", "DAY" ],
+            "pattern" : "HOURLY|DAY",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "dimension",
+          "in" : "query",
+          "description" : "Metric dimension for conversation counts. Use STATUS for TOTAL, ATTENDED, or UNASSIGNED counts, or CONTACT_TYPE for NEW or EXISTING contacts.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "STATUS", "CONTACT_TYPE" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "dimensionValue",
+          "in" : "query",
+          "description" : "Dimension values to include in the response. This is a list-based parameter; pass one or more comma-separated values. When dimension is STATUS, possible values: TOTAL, ATTENDED, UNASSIGNED. When dimension is CONTACT_TYPE, possible values: NEW, EXISTING.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "^(TOTAL|ATTENDED|UNASSIGNED|NEW|EXISTING)(,(TOTAL|ATTENDED|UNASSIGNED|NEW|EXISTING))*$",
+            "example" : "ATTENDED,UNASSIGNED,TOTAL",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "basedOn",
+          "in" : "query",
+          "description" : "Criteria used to apply the time range. CONTACT_LASTACTIVE uses contact last active time. AGENT_LASTACTIVE uses agent last active time.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "CONTACT_LASTACTIVE", "AGENT_LASTACTIVE" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "integrationService",
+          "in" : "query",
+          "description" : "Filter conversation metrics by integration service. Possible values: TELEGRAM, TWILIO, IM_TALK, LINE, WECHAT, WECOM, WHATSAPP, FACEBOOKMESSENGER, INSTAGRAM.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "TELEGRAM", "TWILIO", "IM_TALK", "LINE", "WECHAT", "WECOM", "WHATSAPP", "FACEBOOKMESSENGER", "INSTAGRAM" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "Filter conversation metrics for channels in the given department.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "channelIds",
+          "in" : "query",
+          "description" : "Filter conversation metrics by channel IDs. Comma-separated list of channel IDs.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "^([0-9]+)(,([0-9]+))*$",
+            "maxLength" : 1000
+          }
+        }, {
+          "name" : "agentIds",
+          "in" : "query",
+          "description" : "Filter conversation metrics by agent IDs. Comma-separated list of agent IDs.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "^([0-9]+)(,([0-9]+))*$",
+            "maxLength" : 1000
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/ConversationsTimeSeriesResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.InstantMessages.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/im/metrics/payment/timeseries" : {
+      "get" : {
+        "tags" : [ "IM_TimeSeriesMetrics" ],
+        "summary" : "Get Payment Time-Series Metrics",
+        "description" : "Retrieves IM WhatsApp credit usage metrics over time, with time-series granularity.",
+        "operationId" : "getPaymentTimeSeriesMetrics",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "startDate",
+          "in" : "query",
+          "description" : "Start date for metrics. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the start time as a Unix timestamp in milliseconds.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "Start date for metrics. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the start time as a Unix timestamp in milliseconds.",
+            "pattern" : "[0-9\\-]+",
+            "x-regex-name" : "reportCustomTime",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "endDate",
+          "in" : "query",
+          "description" : "End date for metrics. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the end time as a Unix timestamp in milliseconds.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "End date for metrics. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the end time as a Unix timestamp in milliseconds.",
+            "pattern" : "[0-9\\-]+",
+            "x-regex-name" : "reportCustomTime",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "duration",
+          "in" : "query",
+          "description" : "Duration to filter the metrics. Possible values: LAST24HOURS, TODAY, YESTERDAY, LAST_7_DAYS, LAST_30_DAYS, THIS_WEEK, LAST_WEEK, THIS_MONTH, LAST_MONTH, CUSTOM_IN_DATE, CUSTOM_IN_MILLIS, LAST_1_HOUR.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "LAST24HOURS", "TODAY", "YESTERDAY", "LAST_7_DAYS", "LAST_30_DAYS", "THIS_WEEK", "LAST_WEEK", "THIS_MONTH", "LAST_MONTH", "CUSTOM_IN_DATE", "CUSTOM_IN_MILLIS", "LAST_1_HOUR" ],
+            "pattern" : "(LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR)",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "granularity",
+          "in" : "query",
+          "description" : "Time granularity for trend data. Use HOURLY when the range is within 24 hours, otherwise DAY.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "HOURLY", "DAY" ],
+            "pattern" : "HOURLY|DAY",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "dimension",
+          "in" : "query",
+          "description" : "Metric dimension for WhatsApp credit usage.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "const" : "WA_CREDIT_USAGE",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "dimensionValue",
+          "in" : "query",
+          "description" : "Credit usage categories to include in the response. This is a list-based parameter; pass one or more comma-separated values. Possible values: TOTAL, WA_BUSINESS_INITIATED, WA_USER_INITIATED, WA_MARKETING, WA_UTILITY, WA_AUTHENTICATION, WA_SERVICE.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "^(TOTAL|WA_BUSINESS_INITIATED|WA_USER_INITIATED|WA_MARKETING|WA_UTILITY|WA_AUTHENTICATION|WA_SERVICE)(,(TOTAL|WA_BUSINESS_INITIATED|WA_USER_INITIATED|WA_MARKETING|WA_UTILITY|WA_AUTHENTICATION|WA_SERVICE))*$",
+            "example" : "WA_UTILITY,WA_AUTHENTICATION,WA_MARKETING",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "Filter payment metrics for channels in the given department.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "channelIds",
+          "in" : "query",
+          "description" : "Filter payment metrics by channel IDs. Comma-separated list of channel IDs.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "^([0-9]+)(,([0-9]+))*$",
+            "maxLength" : 1000
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/PaymentTimeSeriesResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.InstantMessages.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "IMMessageMetric" : {
+        "type" : [ "null", "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "dimension" : {
+            "description" : "Message direction dimension for the metric count.",
+            "type" : [ "string", "null" ],
+            "enum" : [ "TOTAL", "INCOMING", "OUTGOING" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "value" : {
+            "description" : "Metric count as a string.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "dimension", "value" ]
+      },
+      "IMMessageMetricList" : {
+        "type" : [ "null", "array" ],
+        "items" : {
+          "$ref" : "./IM_TimeSeriesMetrics.json#/components/schemas/IMMessageMetric"
+        }
+      },
+      "IMMessageTrendData" : {
+        "type" : [ "null", "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "data" : {
+            "description" : "Message metric values for the time bucket.",
+            "$ref" : "./IM_TimeSeriesMetrics.json#/components/schemas/IMMessageMetricList"
+          },
+          "time" : {
+            "description" : "Date or datetime label for the trend data point. When granularity is DAY, the format is yyyy-MM-dd. When granularity is HOURLY, the format is yyyy-MM-dd HH:mm.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "data", "time" ]
+      },
+      "IMMessageTrendDataList" : {
+        "type" : [ "null", "array" ],
+        "items" : {
+          "$ref" : "./IM_TimeSeriesMetrics.json#/components/schemas/IMMessageTrendData"
+        }
+      },
+      "IMConversationMetric" : {
+        "type" : [ "null", "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "dimension" : {
+            "description" : "Conversation metric dimension value. When the request dimension is STATUS, values are TOTAL, ATTENDED, or UNASSIGNED. When the request dimension is CONTACT_TYPE, values are NEW or EXISTING.",
+            "type" : [ "string", "null" ],
+            "enum" : [ "TOTAL", "ATTENDED", "UNASSIGNED", "NEW", "EXISTING" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "value" : {
+            "description" : "Metric count as a string.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "dimension", "value" ]
+      },
+      "IMConversationMetricList" : {
+        "type" : [ "null", "array" ],
+        "items" : {
+          "$ref" : "./IM_TimeSeriesMetrics.json#/components/schemas/IMConversationMetric"
+        }
+      },
+      "IMConversationTrendData" : {
+        "type" : [ "null", "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "data" : {
+            "description" : "Conversation metric values for the time bucket.",
+            "$ref" : "./IM_TimeSeriesMetrics.json#/components/schemas/IMConversationMetricList"
+          },
+          "time" : {
+            "description" : "Date or datetime label for the trend data point. When granularity is DAY, the format is yyyy-MM-dd. When granularity is HOURLY, the format is yyyy-MM-dd HH:mm.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "data", "time" ]
+      },
+      "IMConversationTrendDataList" : {
+        "type" : [ "null", "array" ],
+        "items" : {
+          "$ref" : "./IM_TimeSeriesMetrics.json#/components/schemas/IMConversationTrendData"
+        }
+      },
+      "IMPaymentMetric" : {
+        "type" : [ "null", "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "dimension" : {
+            "description" : "WhatsApp credit usage dimension for the metric value.",
+            "type" : [ "string", "null" ],
+            "enum" : [ "TOTAL", "WA_BUSINESS_INITIATED", "WA_USER_INITIATED", "WA_MARKETING", "WA_UTILITY", "WA_AUTHENTICATION", "WA_SERVICE" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "value" : {
+            "description" : "Credit usage amount as a currency string, for example 50.4 INR.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "dimension", "value" ]
+      },
+      "IMPaymentMetricList" : {
+        "type" : [ "null", "array" ],
+        "items" : {
+          "$ref" : "./IM_TimeSeriesMetrics.json#/components/schemas/IMPaymentMetric"
+        }
+      },
+      "IMPaymentTrendData" : {
+        "type" : [ "null", "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "data" : {
+            "description" : "Payment metric values for the time bucket.",
+            "$ref" : "./IM_TimeSeriesMetrics.json#/components/schemas/IMPaymentMetricList"
+          },
+          "time" : {
+            "description" : "Date or datetime label for the trend data point. When granularity is DAY, the format is yyyy-MM-dd. When granularity is HOURLY, the format is yyyy-MM-dd HH:mm.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "data", "time" ]
+      },
+      "IMPaymentTrendDataList" : {
+        "type" : [ "null", "array" ],
+        "items" : {
+          "$ref" : "./IM_TimeSeriesMetrics.json#/components/schemas/IMPaymentTrendData"
+        }
+      }
+    },
+    "responses" : {
+      "MessagesTimeSeriesResponse" : {
+        "description" : "Message time-series metrics with aggregated counts and trend data by direction.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "properties" : {
+                "aggregatedMetrics" : {
+                  "description" : "Aggregated message counts across the entire duration.",
+                  "$ref" : "./IM_TimeSeriesMetrics.json#/components/schemas/IMMessageMetricList"
+                },
+                "trendDataList" : {
+                  "description" : "Time-series trend buckets with message counts per direction.",
+                  "$ref" : "./IM_TimeSeriesMetrics.json#/components/schemas/IMMessageTrendDataList"
+                }
+              },
+              "required" : [ "aggregatedMetrics", "trendDataList" ]
+            },
+            "examples" : {
+              "GetMessagesTimeSeriesMetrics_200" : {
+                "$ref" : "./examples/IM_TimeSeriesMetrics.json#/components/examples/GetMessagesTimeSeriesMetrics_200"
+              }
+            }
+          }
+        }
+      },
+      "ConversationsTimeSeriesResponse" : {
+        "description" : "Conversation time-series metrics with aggregated counts and trend data by status or contact type.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "aggregatedMetrics" : {
+                  "description" : "Aggregated conversation counts across the entire duration.",
+                  "$ref" : "./IM_TimeSeriesMetrics.json#/components/schemas/IMConversationMetricList"
+                },
+                "trendDataList" : {
+                  "description" : "Time-series trend buckets with conversation counts per dimension value.",
+                  "$ref" : "./IM_TimeSeriesMetrics.json#/components/schemas/IMConversationTrendDataList"
+                }
+              },
+              "required" : [ "aggregatedMetrics", "trendDataList" ]
+            },
+            "examples" : {
+              "GetConversationTimeSeriesMetrics_200_status" : {
+                "$ref" : "./examples/IM_TimeSeriesMetrics.json#/components/examples/GetConversationTimeSeriesMetrics_200_status"
+              },
+              "GetConversationTimeSeriesMetrics_200_contactType" : {
+                "$ref" : "./examples/IM_TimeSeriesMetrics.json#/components/examples/GetConversationTimeSeriesMetrics_200_contactType"
+              }
+            }
+          }
+        }
+      },
+      "PaymentTimeSeriesResponse" : {
+        "description" : "Payment time-series metrics with aggregated WhatsApp credit usage and trend data by dimension value.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "properties" : {
+                "aggregatedMetrics" : {
+                  "description" : "Aggregated credit usage across the entire duration.",
+                  "$ref" : "./IM_TimeSeriesMetrics.json#/components/schemas/IMPaymentMetricList"
+                },
+                "trendDataList" : {
+                  "description" : "Time-series trend buckets with credit usage per dimension value.",
+                  "$ref" : "./IM_TimeSeriesMetrics.json#/components/schemas/IMPaymentTrendDataList"
+                }
+              },
+              "required" : [ "aggregatedMetrics", "trendDataList" ]
+            },
+            "examples" : {
+              "GetPaymentTimeSeriesMetrics_200_waCategories" : {
+                "$ref" : "./examples/IM_TimeSeriesMetrics.json#/components/examples/GetPaymentTimeSeriesMetrics_200_waCategories"
+              },
+              "GetPaymentTimeSeriesMetrics_200_waService" : {
+                "$ref" : "./examples/IM_TimeSeriesMetrics.json#/components/examples/GetPaymentTimeSeriesMetrics_200_waService"
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "IM_TimeSeriesMetrics"
+}

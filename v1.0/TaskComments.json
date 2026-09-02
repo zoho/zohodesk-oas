@@ -11,16 +11,49 @@
         "summary" : "Get a task comment",
         "description" : "This API fetches a task comment from the portal.",
         "operationId" : "getTaskComment",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/commentId"
+          "name" : "include",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "enum" : [ "mentions" ]
+            }
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Secondary information related to the comments. Value allowed is @mentions@, which returns the details of users mentioned in the comments."
         }, {
-          "$ref" : "#/components/parameters/entityId"
+          "name" : "commentId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "entityId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
           "200" : {
-            "$ref" : "#/components/responses/addTaskComment"
+            "$ref" : "#/components/responses/getTaskComment"
           }
         },
         "security" : [ {
@@ -33,10 +66,29 @@
         "summary" : "Update a task comment",
         "description" : "This API updates an existing task comment.",
         "operationId" : "updateTaskComment",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/commentId"
+          "name" : "commentId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/entityId"
+          "name" : "entityId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -63,7 +115,36 @@
         "summary" : "List all task comments",
         "description" : "This API lists a particular number of comments recorded on a task, based on the limit specified.",
         "operationId" : "getTaskComments",
+        "x-mcp-ready" : true,
         "parameters" : [ {
+          "name" : "include",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "enum" : [ "mentions" ]
+            },
+            "maxItems" : 2
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Secondary information related to the comments. Value allowed is @mentions@, which returns the details of users mentioned in the comments."
+        }, {
+          "name" : "entityId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        }, {
           "name" : "limit",
           "in" : "query",
           "description" : "No. of comments to fetch",
@@ -103,10 +184,6 @@
             "minLength" : 0,
             "pattern" : "-?(commentedTime)"
           }
-        }, {
-          "$ref" : "#/components/parameters/entityId"
-        }, {
-          "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
           "200" : {
@@ -123,8 +200,18 @@
         "summary" : "Create a task comment",
         "description" : "This API adds a comment to a task.",
         "operationId" : "createTaskComment",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/entityId"
+          "name" : "entityId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -149,7 +236,7 @@
   "components" : {
     "schemas" : {
       "addTaskComment" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "modifiedTime" : {
@@ -159,10 +246,38 @@
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "attachments" : {
-            "type" : [ "null", "array" ],
+            "type" : [ "array", "null" ],
             "items" : {
-              "type" : [ "null", "object" ],
-              "additionalProperties" : false
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "id" : {
+                  "type" : [ "string", "null", "integer" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "name" : {
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 255,
+                  "minLength" : 0
+                },
+                "size" : {
+                  "type" : [ "string", "null", "integer" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "href" : {
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 16000000,
+                  "minLength" : 0
+                },
+                "previewurl" : {
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 16000000,
+                  "minLength" : 0
+                }
+              },
+              "required" : [ "id", "name", "size", "href" ]
             },
             "uniqueItems" : false
           },
@@ -178,7 +293,7 @@
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
@@ -194,7 +309,7 @@
             "minLength" : 0
           },
           "commenterId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
@@ -203,15 +318,113 @@
           },
           "impersonatedUser" : {
             "$ref" : "./TicketComment.json#/components/schemas/impersonatedUser"
+          },
+          "attachmentIds" : {
+            "type" : [ "null", "array" ],
+            "description" : "IDs of uploaded attachments associated with this comment (when returned by the server alongside attachments).",
+            "items" : {
+              "type" : [ "string", "null", "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "uniqueItems" : false
           }
         },
         "required" : [ "attachments", "commentedTime", "commenter", "commenterId", "content", "contentType", "encodedContent", "id", "impersonatedUser", "modifiedTime" ]
       },
       "data" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./TaskComments.json#/components/schemas/addTaskComment"
+          "$ref" : "#/components/schemas/addTaskComment"
         }
+      },
+      "task_response_json" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "modifiedTime" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+          },
+          "attachments" : {
+            "type" : [ "array", "null" ],
+            "items" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "id" : {
+                  "type" : [ "string", "null", "integer" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "name" : {
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 255,
+                  "minLength" : 0
+                },
+                "size" : {
+                  "type" : [ "string", "null", "integer" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "href" : {
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 16000000,
+                  "minLength" : 0
+                },
+                "previewurl" : {
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 16000000,
+                  "minLength" : 0
+                }
+              },
+              "required" : [ "id", "name", "size", "href" ]
+            },
+            "uniqueItems" : false
+          },
+          "encodedContent" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 32000,
+            "minLength" : 0
+          },
+          "commentedTime" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+          },
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "contentType" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "html", "plainText" ]
+          },
+          "content" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 32000,
+            "minLength" : 0
+          },
+          "commenterId" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "commenter" : {
+            "$ref" : "./TicketComment.json#/components/schemas/commenter"
+          },
+          "impersonatedUser" : {
+            "$ref" : "./TicketComment.json#/components/schemas/impersonatedUser"
+          },
+          "mention" : {
+            "$ref" : "./AccountComments.json#/components/schemas/mentions"
+          }
+        },
+        "required" : [ "attachments", "commentedTime", "commenter", "commenterId", "content", "contentType", "encodedContent", "id", "impersonatedUser", "modifiedTime" ]
       }
     },
     "responses" : {
@@ -220,63 +433,7 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
-              "additionalProperties" : false,
-              "properties" : {
-                "modifiedTime" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0,
-                  "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
-                },
-                "attachments" : {
-                  "type" : [ "null", "array" ],
-                  "items" : {
-                    "type" : [ "null", "object" ],
-                    "additionalProperties" : false
-                  },
-                  "uniqueItems" : false
-                },
-                "encodedContent" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 32000,
-                  "minLength" : 0
-                },
-                "commentedTime" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0,
-                  "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
-                },
-                "id" : {
-                  "type" : [ "string", "null", "integer" ],
-                  "format" : "int64",
-                  "pattern" : "([0-9]+)"
-                },
-                "contentType" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "html", "plainText" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                },
-                "content" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 32000,
-                  "minLength" : 0
-                },
-                "commenterId" : {
-                  "type" : [ "string", "null", "integer" ],
-                  "format" : "int64",
-                  "pattern" : "([0-9]+)"
-                },
-                "commenter" : {
-                  "$ref" : "./TicketComment.json#/components/schemas/commenter"
-                },
-                "impersonatedUser" : {
-                  "$ref" : "./TicketComment.json#/components/schemas/impersonatedUser"
-                }
-              },
-              "required" : [ "attachments", "commentedTime", "commenter", "commenterId", "content", "contentType", "encodedContent", "id", "impersonatedUser", "modifiedTime" ]
+              "$ref" : "#/components/schemas/task_response_json"
             },
             "examples" : {
               "Valid responses Definitions" : {
@@ -286,7 +443,7 @@
                     "size" : "12734",
                     "name" : "Attachment.png",
                     "id" : "4000000008994",
-                    "href" : "https://desk.zoho.com/api/v1/tasks/4000000528005/comments/4000000529001/attachments/4000000008994/content"
+                    "href" : "https://desk.example.com/api/v1/tasks/4000000528005/comments/4000000529001/attachments/4000000008994/content"
                   } ],
                   "commentedTime" : 1485269673534,
                   "id" : "4000000530003",
@@ -296,10 +453,47 @@
                   "commenter" : {
                     "firstName" : "Jade",
                     "lastName" : "Tywin",
-                    "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000008692/photo?orgId=292828",
+                    "photoURL" : "https://desk.example.com/api/v1/agents/4000000008692/photo?orgId=1234567890",
                     "name" : "Jade Tywin",
                     "roleName" : "LightAgent",
-                    "type" : "AGENT",
+                    "type" : [ "AGENT" ],
+                    "email" : "jade12tywin@zylker.com"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "getTaskComment" : {
+        "description" : "addTaskComment template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/task_response_json"
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "modifiedTime" : null,
+                  "attachments" : [ {
+                    "size" : "12734",
+                    "name" : "Attachment.png",
+                    "id" : "4000000008994",
+                    "href" : "https://desk.example.com/api/v1/tasks/4000000528005/comments/4000000529001/attachments/4000000008994/content"
+                  } ],
+                  "commentedTime" : 1485269673534,
+                  "id" : "4000000530003",
+                  "contentType" : "html",
+                  "content" : "First Task comment.",
+                  "commenterId" : "4000000008692",
+                  "commenter" : {
+                    "firstName" : "Jade",
+                    "lastName" : "Tywin",
+                    "photoURL" : "https://desk.example.com/api/v1/agents/4000000008692/photo?orgId=1234567890",
+                    "name" : "Jade Tywin",
+                    "roleName" : "LightAgent",
+                    "type" : [ "AGENT" ],
                     "email" : "jade12tywin@zylker.com"
                   }
                 }
@@ -313,11 +507,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./TaskComments.json#/components/schemas/data"
+                  "$ref" : "#/components/schemas/data"
                 }
               },
               "required" : [ "data" ]
@@ -336,7 +530,47 @@
                     "commenter" : {
                       "firstName" : "Jade",
                       "lastName" : "Tywin",
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000008692/photo?orgId=292828",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000008692/photo?orgId=1234567890",
+                      "name" : "Jade Tywin",
+                      "roleName" : "LightAgent",
+                      "type" : [ "AGENT" ],
+                      "email" : "jade12tywin@zylker.com"
+                    }
+                  }, {
+                    "modifiedTime" : 1485269780000,
+                    "attachments" : [ {
+                      "size" : "12734",
+                      "name" : "Attachment_list.png",
+                      "id" : "4000000008994",
+                      "href" : "https://desk.example.com/api/v1/tasks/4000000528005/comments/4000000529001/attachments/4000000008994/content"
+                    } ],
+                    "commentedTime" : 1485269673000,
+                    "id" : "4000000530003",
+                    "contentType" : "html",
+                    "commenterId" : "4000000008692",
+                    "content" : "Edit Task comment",
+                    "mention" : [ ],
+                    "commenter" : {
+                      "firstName" : "Jade",
+                      "lastName" : "Tywin",
+                      "photoURL" : "https://desk.example.com/api/v1/portalUser/4000000008692/photo?orgId=1234567890",
+                      "name" : "Jade Tywin",
+                      "roleName" : "PortalUser",
+                      "type" : [ "END_USER" ],
+                      "email" : "jade12tywin@zylker.com"
+                    }
+                  }, {
+                    "modifiedTime" : null,
+                    "commentedTime" : 1485270287000,
+                    "id" : "4000000530005",
+                    "contentType" : "plainText",
+                    "commenterId" : "4000000008692",
+                    "content" : "Second Task Comment......",
+                    "mention" : [ ],
+                    "commenter" : {
+                      "firstName" : "Jade",
+                      "lastName" : "Tywin",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000008692/photo?orgId=1234567890",
                       "name" : "Jade Tywin",
                       "roleName" : "LightAgent",
                       "type" : "AGENT",
@@ -348,7 +582,7 @@
                       "size" : "12734",
                       "name" : "Attachment_list.png",
                       "id" : "4000000008994",
-                      "href" : "https://desk.zoho.com/api/v1/tasks/4000000528005/comments/4000000529001/attachments/4000000008994/content"
+                      "href" : "https://desk.example.com/api/v1/tasks/4000000528005/comments/4000000529001/attachments/4000000008994/content"
                     } ],
                     "commentedTime" : 1485269673000,
                     "id" : "4000000530003",
@@ -359,7 +593,7 @@
                     "commenter" : {
                       "firstName" : "Jade",
                       "lastName" : "Tywin",
-                      "photoURL" : "https://desk.zoho.com/api/v1/portalUser/4000000008692/photo?orgId=292828",
+                      "photoURL" : "https://desk.example.com/api/v1/portalUser/4000000008692/photo?orgId=1234567890",
                       "name" : "Jade Tywin",
                       "roleName" : "PortalUser",
                       "type" : "END_USER",
@@ -373,38 +607,12 @@
         }
       }
     },
-    "parameters" : {
-      "commentId" : {
-        "name" : "commentId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "entityId" : {
-        "name" : "entityId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      }
-    },
     "requestBodies" : {
       "addTaskCommentRequest" : {
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "contentType" : {
@@ -417,6 +625,14 @@
                   "type" : [ "string", "null" ],
                   "maxLength" : 32000,
                   "minLength" : 0
+                },
+                "attachmentIds" : {
+                  "type" : [ "array" ],
+                  "items" : {
+                    "type" : [ "string", "integer" ],
+                    "format" : "int64",
+                    "pattern" : "([0-9]+)"
+                  }
                 }
               }
             },
@@ -434,12 +650,13 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "contentType" : {
                   "type" : [ "string", "null" ],
                   "enum" : [ "html", "plainText" ],
+                  "default" : "html",
                   "maxLength" : 100,
                   "minLength" : 0
                 },
@@ -447,6 +664,16 @@
                   "type" : [ "string", "null" ],
                   "maxLength" : 32000,
                   "minLength" : 0
+                },
+                "attachmentIds" : {
+                  "type" : [ "array", "null" ],
+                  "items" : {
+                    "type" : [ "string", "integer", "null" ],
+                    "format" : "int64",
+                    "pattern" : "([0-9]+)"
+                  },
+                  "description" : "IDs of uploaded attachments to be associated with this comment.",
+                  "uniqueItems" : false
                 }
               },
               "required" : [ "content" ]
@@ -464,6 +691,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

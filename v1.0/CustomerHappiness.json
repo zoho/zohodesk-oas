@@ -11,8 +11,22 @@
         "summary" : "Get the customer feedback placeholder link",
         "description" : "This API provides an html placeholder to insert the customer feedback link into the reply mail. The link, when clicked by the email recipient, leads them to a feedback form where they can provide their feedback.",
         "operationId" : "GetCustomerHappinessLinkHolder",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/departmentId"
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "Mandatory param to fetch the customer-happiness list for a given ID of the department. You can also provide department as @allDepartment@ to fetch customer happiness from all departments",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "allDepartment|[0-9]+",
+            "description" : "Mandatory param to fetch the customer-happiness list for a given ID of the department. You can also provide department as @allDepartment@ to fetch customer happiness from all departments"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
         }, {
           "name" : "languageCode",
           "in" : "query",
@@ -27,8 +41,6 @@
             "maxLength" : 100,
             "minLength" : 0
           }
-        }, {
-          "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
           "422" : {
@@ -48,21 +60,21 @@
   "components" : {
     "schemas" : {
       "customerHappiness" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "badCount" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           },
           "goodCount" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           },
           "okCount" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           }
@@ -76,7 +88,7 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "linkHolder" : {
@@ -98,23 +110,13 @@
         }
       }
     },
-    "parameters" : {
-      "departmentId" : {
-        "name" : "departmentId",
-        "in" : "query",
-        "description" : "Mandatory param to fetch the customer-happiness list for a given ID of the department. You can also provide department as @allDepartment@ to fetch customer happiness from all departments",
-        "required" : true,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "description" : "Mandatory param to fetch the customer-happiness list for a given ID of the department. You can also provide department as @allDepartment@ to fetch customer happiness from all departments",
-          "pattern" : "([0-9]+)"
-        }
-      }
-    },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

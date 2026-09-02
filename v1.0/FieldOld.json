@@ -1,0 +1,2676 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "FieldOld",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/organizationFields/{fieldId}/criteriaReferences" : {
+      "get" : {
+        "tags" : [ "OrganizationFields" ],
+        "summary" : "Get organization custom fields criteria references",
+        "description" : "This API fetches criteria references of a custom field",
+        "operationId" : "criteriaReferences",
+        "parameters" : [ {
+          "name" : "fieldId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "featureType",
+          "in" : "query",
+          "description" : "Feature name from which criteria references has to be fetched - DirectAssignment, RoundRobin, WorkFlow, SLA, Supervise, BluePrint, CustomView, Report, GameTrophy, GameBadge, LayoutRules, ValidationRules",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "DirectAssignment", "RoundRobin", "WorkFlow", "SLA", "Supervise", "BluePrint", "BluePrintTransition", "CustomView", "Report", "GameTrophy", "GameBadge", "LayoutRules", "ValidationRules" ]
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number, starting from which the rules must be listed",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int32",
+            "minimum" : 0,
+            "default" : 0,
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of references to fetch",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int32",
+            "minimum" : 1,
+            "maximum" : 50,
+            "default" : 50,
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/criteriaReferencesResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/organizationFields/{fieldId}" : {
+      "get" : {
+        "tags" : [ "FieldOld" ],
+        "summary" : "Get Field",
+        "description" : "This API get a field",
+        "operationId" : "getFieldOld",
+        "parameters" : [ {
+          "name" : "fieldId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "getField Response definition",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "discriminator" : {
+                    "propertyName" : "type",
+                    "mapping" : {
+                      "Text" : "#/components/schemas/getTextFieldResponse",
+                      "Number" : "#/components/schemas/getIntegerFieldResponse",
+                      "Percent" : "#/components/schemas/getPercentFieldResponse",
+                      "Decimal" : "#/components/schemas/getDecimalFieldResponse",
+                      "Currency" : "#/components/schemas/getCurrencyFieldResponse",
+                      "Date" : "#/components/schemas/getDateFieldResponse",
+                      "DateTime" : "#/components/schemas/getDateTimeFieldResponse",
+                      "Email" : "#/components/schemas/getEmailFieldResponse",
+                      "Phone" : "#/components/schemas/getPhoneFieldResponse",
+                      "Picklist" : "#/components/schemas/getPickListFieldResponse",
+                      "URL" : "#/components/schemas/getURLFieldResponse",
+                      "Textarea" : "#/components/schemas/getTextAreaFieldResponse",
+                      "Boolean" : "#/components/schemas/getBooleanFieldResponse",
+                      "Multiselect" : "#/components/schemas/getMultiPickListFieldResponse",
+                      "LargeText" : "#/components/schemas/getLargeTextFieldResponse"
+                    }
+                  },
+                  "anyOf" : [ {
+                    "$ref" : "#/components/schemas/commonFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/getTextFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/integerFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/getIntegerFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/percentFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/getPercentFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/decimalFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/getDecimalFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/currencyFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/getCurrencyFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/dateFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/getDateFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/dateTimeFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/getDateTimeFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/emailFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/getEmailFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/phoneFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/getPhoneFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/pickListFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/getPickListFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/urlFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/getURLFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/textAreaFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/getTextAreaFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/booleanFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/getBooleanFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/multiPickListFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/getMultiPickListFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/largeTextFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/getLargeTextFieldResponse"
+                  } ]
+                }
+              }
+            }
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.fields.READ", "Desk.settings.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ],
+        "deprecated" : true,
+        "x-deprecated" : true,
+        "x-deprecated-on" : "01/07/2026"
+      },
+      "patch" : {
+        "tags" : [ "FieldOld" ],
+        "summary" : "Update Field",
+        "description" : "This API edits a field",
+        "operationId" : "updateFieldOld",
+        "parameters" : [ {
+          "name" : "fieldId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "discriminator" : {
+                  "propertyName" : "type",
+                  "mapping" : {
+                    "Text" : "#/components/schemas/textFieldJson",
+                    "Number" : "#/components/schemas/integerFieldJson",
+                    "Percent" : "#/components/schemas/percentFieldJson",
+                    "Decimal" : "#/components/schemas/decimalFieldJson",
+                    "Currency" : "#/components/schemas/currencyFieldJson",
+                    "Date" : "#/components/schemas/dateFieldJson",
+                    "DateTime" : "#/components/schemas/dateTimeFieldJson",
+                    "Email" : "#/components/schemas/emailFieldJson",
+                    "Phone" : "#/components/schemas/phoneFieldJson",
+                    "Picklist" : "#/components/schemas/pickListFieldRequestJson",
+                    "URL" : "#/components/schemas/urlFieldJson",
+                    "Textarea" : "#/components/schemas/textAreaFieldJson",
+                    "Boolean" : "#/components/schemas/booleanFieldJson",
+                    "Multiselect" : "#/components/schemas/multiPickListFieldJson",
+                    "LargeText" : "#/components/schemas/largeTextFieldJson"
+                  }
+                },
+                "oneOf" : [ {
+                  "$ref" : "#/components/schemas/textFieldJson"
+                }, {
+                  "$ref" : "#/components/schemas/integerFieldJson"
+                }, {
+                  "$ref" : "#/components/schemas/percentFieldJson"
+                }, {
+                  "$ref" : "#/components/schemas/decimalFieldJson"
+                }, {
+                  "$ref" : "#/components/schemas/currencyFieldJson"
+                }, {
+                  "$ref" : "#/components/schemas/dateFieldJson"
+                }, {
+                  "$ref" : "#/components/schemas/dateTimeFieldJson"
+                }, {
+                  "$ref" : "#/components/schemas/emailFieldJson"
+                }, {
+                  "$ref" : "#/components/schemas/phoneFieldJson"
+                }, {
+                  "$ref" : "#/components/schemas/pickListFieldRequestJson"
+                }, {
+                  "$ref" : "#/components/schemas/urlFieldJson"
+                }, {
+                  "$ref" : "#/components/schemas/textAreaFieldJson"
+                }, {
+                  "$ref" : "#/components/schemas/booleanFieldJson"
+                }, {
+                  "$ref" : "#/components/schemas/multiPickListFieldJson"
+                }, {
+                  "$ref" : "#/components/schemas/largeTextFieldJson"
+                } ]
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "editField Response definition",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "discriminator" : {
+                    "propertyName" : "type",
+                    "mapping" : {
+                      "Text" : "#/components/schemas/editTextFieldResponse",
+                      "Number" : "#/components/schemas/editIntegerFieldResponse",
+                      "Percent" : "#/components/schemas/editPercentFieldResponse",
+                      "Decimal" : "#/components/schemas/editDecimalFieldResponse",
+                      "Currency" : "#/components/schemas/editCurrencyFieldResponse",
+                      "Date" : "#/components/schemas/editDateFieldResponse",
+                      "DateTime" : "#/components/schemas/editDateTimeFieldResponse",
+                      "Email" : "#/components/schemas/editEmailFieldResponse",
+                      "Phone" : "#/components/schemas/editPhoneFieldResponse",
+                      "Picklist" : "#/components/schemas/editPickListFieldResponse",
+                      "URL" : "#/components/schemas/editURLFieldResponse",
+                      "Textarea" : "#/components/schemas/editTextAreaFieldResponse",
+                      "Boolean" : "#/components/schemas/editBooleanFieldResponse",
+                      "Multiselect" : "#/components/schemas/editMultiPickListFieldResponse",
+                      "LargeText" : "#/components/schemas/editLargeTextFieldResponse"
+                    }
+                  },
+                  "anyOf" : [ {
+                    "$ref" : "#/components/schemas/commonFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/editTextFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/integerFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/editIntegerFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/percentFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/editPercentFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/decimalFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/editDecimalFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/currencyFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/editCurrencyFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/dateFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/editDateFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/dateTimeFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/editDateTimeFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/emailFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/editEmailFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/phoneFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/editPhoneFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/pickListFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/editPickListFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/urlFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/editURLFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/textAreaFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/editTextAreaFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/booleanFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/editBooleanFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/multiPickListFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/editMultiPickListFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/largeTextFieldResponse"
+                  }, {
+                    "$ref" : "#/components/schemas/editLargeTextFieldResponse"
+                  } ]
+                }
+              }
+            }
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.fields.UPDATE", "Desk.settings.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ],
+        "deprecated" : true,
+        "x-deprecated" : true,
+        "x-deprecated-on" : "01/07/2026"
+      },
+      "delete" : {
+        "tags" : [ "FieldOld" ],
+        "summary" : "Delete Field",
+        "description" : "This API delete a custom field ",
+        "operationId" : "deleteFieldOld",
+        "parameters" : [ {
+          "name" : "fieldId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "200" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.fields.DELETE", "Desk.settings.DELETE" ]
+        } ],
+        "x-audience" : [ "external-public" ],
+        "deprecated" : true,
+        "x-deprecated" : true,
+        "x-deprecated-on" : "01/07/2026"
+      }
+    },
+    "/api/v1/customFieldCount" : {
+      "get" : {
+        "tags" : [ "FieldOld" ],
+        "summary" : "Get Custom Field Count",
+        "description" : "This API returns the custom field count allowed and available in a module.",
+        "operationId" : "getCustomFieldCount",
+        "parameters" : [ {
+          "name" : "departmentId",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "ID of the department in which the layout is configured."
+        }, {
+          "name" : "module",
+          "in" : "query",
+          "description" : "the module name with in which search to be done. Value may be tickets, contacts , accounts  ,tasks , timeEntry,products, contracts",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "tickets", "contacts", "accounts", "tasks", "calls", "events", "contracts", "products" ]
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/getCustomFieldCountResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          }
+        },
+        "x-audience" : [ "external-public" ],
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.fields.READ" ]
+        } ]
+      }
+    },
+    "/api/v1/organizationFields" : {
+      "get" : {
+        "tags" : [ "FieldOld" ],
+        "summary" : "Get Fields",
+        "description" : "This API fetches fields in a module",
+        "operationId" : "getFieldsOld",
+        "parameters" : [ {
+          "name" : "apiNames",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+            },
+            "maxItems" : 300
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Key that fetches only the fields whose apiNames are given. Multiple values can be passed, with commas for separation."
+        }, {
+          "name" : "module",
+          "in" : "query",
+          "description" : "the module name with in which search to be done. Value may be tickets, contacts , accounts  ,tasks , timeEntry,products, contracts",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "tickets", "contacts", "accounts", "tasks", "calls", "events", "contracts", "products" ]
+          }
+        }, {
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "ID of the department in which the layouts are configured",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/getFieldsResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.fields.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ],
+        "deprecated" : true,
+        "x-deprecated" : true,
+        "x-deprecated-on" : "01/07/2026"
+      },
+      "post" : {
+        "tags" : [ "FieldOld" ],
+        "summary" : "Create Field",
+        "description" : "This API creates a field",
+        "operationId" : "createFieldOld",
+        "parameters" : [ {
+          "name" : "module",
+          "in" : "query",
+          "description" : "the module name with in which search to be done. Value may be tickets, contacts , accounts  ,tasks , timeEntry,products, contracts",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "tickets", "contacts", "accounts", "tasks", "calls", "events", "contracts", "products" ]
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/createFieldOldRequest"
+        },
+        "responses" : {
+          "201" : {
+            "$ref" : "#/components/responses/createFieldOldResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/licenseErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/unprocessableEntityErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.fields.CREATE", "Desk.settings.CREATE" ]
+        } ],
+        "x-audience" : [ "external-public" ],
+        "deprecated" : true,
+        "x-deprecated" : true,
+        "x-deprecated-on" : "01/07/2026"
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "commonFieldResponse" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "displayLabel" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "apiName" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "isCustomField" : {
+            "type" : [ "boolean", "null" ]
+          },
+          "i18NLabel" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "isEncryptedField" : {
+            "type" : [ "boolean", "null" ]
+          },
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "isTrackLastActivityTime" : {
+            "type" : [ "boolean", "null" ]
+          },
+          "type" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "Text", "URL", "Textarea", "Email", "Phone", "Multiselect", "Date", "DateTime", "Number", "Checkbox", "Percent", "Decimal", "Currency", "Picklist", "LookUp", "MultiLookup", "AutoNumber", "Boolean", "Fax", "LargeText" ]
+          },
+          "isMandatory" : {
+            "type" : [ "boolean", "null" ]
+          },
+          "maxLength" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "minimum" : 1,
+            "pattern" : "([0-9]+)"
+          }
+        },
+        "required" : [ "apiName", "displayLabel", "i18NLabel", "id", "isCustomField", "isEncryptedField", "isMandatory", "isTrackLastActivityTime", "maxLength", "name", "type" ]
+      },
+      "textFieldResponseForTickets" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/commonFieldResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "showToHelpCenter" : {
+              "type" : [ "boolean", "null" ]
+            }
+          },
+          "required" : [ "showToHelpCenter" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "integerFieldResponse" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/commonFieldResponse"
+        } ]
+      },
+      "integerFieldResponseForTickets" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/integerFieldResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "showToHelpCenter" : {
+              "type" : [ "boolean", "null" ]
+            }
+          },
+          "required" : [ "showToHelpCenter" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "percentFieldResponse" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/commonFieldResponse"
+        } ]
+      },
+      "percentFieldResponseForTickets" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/percentFieldResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "showToHelpCenter" : {
+              "type" : [ "boolean", "null" ]
+            }
+          },
+          "required" : [ "showToHelpCenter" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "decimalFieldResponse" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/commonFieldResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "decimalPlaces" : {
+              "type" : [ "string", "integer", "null" ],
+              "format" : "int32",
+              "maximum" : 9,
+              "minimum" : 0,
+              "pattern" : "([0-9]+)"
+            }
+          },
+          "required" : [ "decimalPlaces" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "decimalFieldResponseForTickets" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/decimalFieldResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "showToHelpCenter" : {
+              "type" : [ "boolean", "null" ]
+            }
+          },
+          "required" : [ "showToHelpCenter" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "currencyFieldResponse" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/commonFieldResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "decimalPlaces" : {
+              "type" : [ "string", "integer", "null" ],
+              "format" : "int32",
+              "maximum" : 9,
+              "minimum" : 0,
+              "pattern" : "([0-9]+)"
+            },
+            "roundingOption" : {
+              "type" : [ "string", "null" ],
+              "enum" : [ "roundOff", "roundDown", "roundUp", "normal" ]
+            },
+            "roundingPrecision" : {
+              "type" : [ "string", "integer", "null" ],
+              "format" : "int32",
+              "maximum" : 30,
+              "minimum" : 0,
+              "pattern" : "([0-9]+)"
+            }
+          },
+          "required" : [ "decimalPlaces", "roundingOption", "roundingPrecision" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "currencyFieldResponseForTickets" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/currencyFieldResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "showToHelpCenter" : {
+              "type" : [ "boolean", "null" ]
+            }
+          },
+          "required" : [ "showToHelpCenter" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "dateFieldResponse" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/commonFieldResponse"
+        } ]
+      },
+      "dateFieldResponseForTickets" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/dateFieldResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "showToHelpCenter" : {
+              "type" : [ "boolean", "null" ]
+            }
+          },
+          "required" : [ "showToHelpCenter" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "dateTimeFieldResponse" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/commonFieldResponse"
+        } ]
+      },
+      "dateTimeFieldResponseForTickets" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/dateTimeFieldResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "showToHelpCenter" : {
+              "type" : [ "boolean", "null" ]
+            }
+          },
+          "required" : [ "showToHelpCenter" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "emailFieldResponse" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/commonFieldResponse"
+        } ]
+      },
+      "emailFieldResponseForTickets" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/emailFieldResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "showToHelpCenter" : {
+              "type" : [ "boolean", "null" ]
+            }
+          },
+          "required" : [ "showToHelpCenter" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "phoneFieldResponse" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/commonFieldResponse"
+        } ]
+      },
+      "phoneFieldResponseForTickets" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/phoneFieldResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "showToHelpCenter" : {
+              "type" : [ "boolean", "null" ]
+            }
+          },
+          "required" : [ "showToHelpCenter" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "pickListFieldResponse" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/commonFieldResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "allowedValues" : {
+              "type" : [ "array", "null" ],
+              "items" : {
+                "type" : [ "object", "null" ],
+                "additionalProperties" : false,
+                "maxProperties" : 1,
+                "minProperties" : 1,
+                "properties" : {
+                  "value" : {
+                    "type" : [ "string", "null" ],
+                    "maxLength" : 120,
+                    "minLength" : 0,
+                    "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
+                  }
+                },
+                "required" : [ "value" ]
+              },
+              "uniqueItems" : false
+            }
+          },
+          "required" : [ "allowedValues" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "pickListFieldResponseForTickets" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/commonFieldResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "allowedValues" : {
+              "type" : [ "array", "null" ],
+              "items" : {
+                "type" : [ "object", "null" ],
+                "additionalProperties" : false,
+                "maxProperties" : 1,
+                "minProperties" : 1,
+                "properties" : {
+                  "value" : {
+                    "type" : [ "string", "null" ],
+                    "maxLength" : 120,
+                    "minLength" : 0,
+                    "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
+                  }
+                },
+                "required" : [ "value" ]
+              },
+              "uniqueItems" : false
+            },
+            "showToHelpCenter" : {
+              "type" : [ "boolean", "null" ]
+            }
+          },
+          "required" : [ "allowedValues", "showToHelpCenter" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "pickListFieldBasicResponse" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/commonFieldResponse"
+        } ]
+      },
+      "pickListFieldBasicResponseForTickets" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/pickListFieldBasicResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "showToHelpCenter" : {
+              "type" : [ "boolean", "null" ]
+            }
+          },
+          "required" : [ "showToHelpCenter" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "urlFieldResponse" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/commonFieldResponse"
+        } ]
+      },
+      "urlFieldResponseForTickets" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/urlFieldResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "showToHelpCenter" : {
+              "type" : [ "boolean", "null" ]
+            }
+          },
+          "required" : [ "showToHelpCenter" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "textAreaFieldResponse" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/commonFieldResponse"
+        } ]
+      },
+      "textAreaFieldResponseForTickets" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/textAreaFieldResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "showToHelpCenter" : {
+              "type" : [ "boolean", "null" ]
+            }
+          },
+          "required" : [ "showToHelpCenter" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "booleanFieldResponse" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/commonFieldResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "defaultValue" : {
+              "type" : [ "string", "null" ],
+              "enum" : [ "true", "false" ]
+            }
+          },
+          "required" : [ "defaultValue" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "booleanFieldResponseForTickets" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/booleanFieldResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "showToHelpCenter" : {
+              "type" : [ "boolean", "null" ]
+            }
+          },
+          "required" : [ "showToHelpCenter" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "multiPickListFieldResponse" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/commonFieldResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "allowedValues" : {
+              "type" : [ "array", "null" ],
+              "items" : {
+                "type" : [ "object", "null" ],
+                "additionalProperties" : false,
+                "maxProperties" : 1,
+                "minProperties" : 1,
+                "properties" : {
+                  "value" : {
+                    "type" : [ "string", "null" ],
+                    "maxLength" : 120,
+                    "minLength" : 0,
+                    "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
+                  }
+                },
+                "required" : [ "value" ]
+              },
+              "uniqueItems" : false
+            }
+          },
+          "required" : [ "allowedValues" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "multiPickListFieldResponseForTickets" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/multiPickListFieldResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "showToHelpCenter" : {
+              "type" : [ "boolean", "null" ]
+            }
+          },
+          "required" : [ "showToHelpCenter" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "multiPickListFieldBasicResponse" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/commonFieldResponse"
+        } ]
+      },
+      "multiPickListFieldBasicResponseForTickets" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/multiPickListFieldBasicResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "showToHelpCenter" : {
+              "type" : [ "boolean", "null" ]
+            }
+          },
+          "required" : [ "showToHelpCenter" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "faxFieldResponse" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/commonFieldResponse"
+        } ]
+      },
+      "autoNumberFieldResponse" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/commonFieldResponse"
+        } ]
+      },
+      "lookUpFieldResponse" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/commonFieldResponse"
+        } ]
+      },
+      "lookUpFieldNewResponse" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/commonFieldResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "lookup" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "maxProperties" : 3,
+              "minProperties" : 3,
+              "properties" : {
+                "onDelete" : {
+                  "type" : [ "string", "null" ],
+                  "enum" : [ "SET_NULL", "CASCADE", "CHILD_EMPTY" ]
+                },
+                "relatedListLabel" : {
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 255,
+                  "minLength" : 0
+                },
+                "module" : {
+                  "type" : [ "object", "null" ],
+                  "additionalProperties" : false,
+                  "maxProperties" : 3,
+                  "minProperties" : 3,
+                  "properties" : {
+                    "apiName" : {
+                      "type" : [ "string", "null" ],
+                      "maxLength" : 100,
+                      "minLength" : 0
+                    },
+                    "nameField" : {
+                      "type" : [ "string", "null" ],
+                      "maxLength" : 100,
+                      "minLength" : 0
+                    },
+                    "id" : {
+                      "type" : [ "string", "integer", "null" ],
+                      "format" : "int64",
+                      "pattern" : "([0-9]+)"
+                    }
+                  },
+                  "required" : [ "apiName", "id", "nameField" ]
+                }
+              },
+              "required" : [ "module", "onDelete", "relatedListLabel" ]
+            }
+          },
+          "required" : [ "lookup" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "lookUpFieldOldResponse" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/commonFieldResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "lookupProperties" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "maxProperties" : 4,
+              "minProperties" : 4,
+              "properties" : {
+                "relatedModule" : {
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 100,
+                  "minLength" : 0,
+                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                },
+                "onDelete" : {
+                  "type" : [ "string", "null" ],
+                  "enum" : [ "0", "1", "2" ]
+                },
+                "nameFieldInRelatedModule" : {
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 100,
+                  "minLength" : 0
+                },
+                "labelInRelatedModule" : {
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 100,
+                  "minLength" : 0
+                }
+              },
+              "required" : [ "labelInRelatedModule", "nameFieldInRelatedModule", "onDelete", "relatedModule" ]
+            }
+          },
+          "required" : [ "lookupProperties" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "statusFieldResponse" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/commonFieldResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "allowedValues" : {
+              "type" : [ "array", "null" ],
+              "items" : {
+                "type" : [ "object", "null" ],
+                "additionalProperties" : false,
+                "maxProperties" : 2,
+                "minProperties" : 2,
+                "properties" : {
+                  "statusType" : {
+                    "type" : [ "string", "null" ],
+                    "maxLength" : 100,
+                    "minLength" : 0
+                  },
+                  "value" : {
+                    "type" : [ "string", "null" ],
+                    "maxLength" : 120,
+                    "minLength" : 0,
+                    "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
+                  }
+                },
+                "required" : [ "statusType", "value" ]
+              },
+              "uniqueItems" : false
+            }
+          },
+          "required" : [ "allowedValues" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "lookUpFieldResponseForTickets" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/lookUpFieldResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "showToHelpCenter" : {
+              "type" : [ "boolean", "null" ]
+            }
+          },
+          "required" : [ "showToHelpCenter" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "lookUpFieldNewResponseForTickets" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/lookUpFieldResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "lookup" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "maxProperties" : 3,
+              "minProperties" : 3,
+              "properties" : {
+                "onDelete" : {
+                  "type" : [ "string", "null" ],
+                  "enum" : [ "SET_NULL", "CASCADE", "CHILD_EMPTY" ]
+                },
+                "relatedListLabel" : {
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 255,
+                  "minLength" : 0
+                },
+                "module" : {
+                  "type" : [ "object", "null" ],
+                  "additionalProperties" : false,
+                  "maxProperties" : 3,
+                  "minProperties" : 3,
+                  "properties" : {
+                    "apiName" : {
+                      "type" : [ "string", "null" ],
+                      "maxLength" : 100,
+                      "minLength" : 0
+                    },
+                    "nameField" : {
+                      "type" : [ "string", "null" ],
+                      "maxLength" : 100,
+                      "minLength" : 0
+                    },
+                    "id" : {
+                      "type" : [ "string", "integer", "null" ],
+                      "format" : "int64",
+                      "pattern" : "([0-9]+)"
+                    }
+                  },
+                  "required" : [ "apiName", "id", "nameField" ]
+                }
+              },
+              "required" : [ "module", "onDelete", "relatedListLabel" ]
+            },
+            "showToHelpCenter" : {
+              "type" : [ "boolean", "null" ]
+            }
+          },
+          "required" : [ "lookup", "showToHelpCenter" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "lookUpFieldOldResponseForTickets" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/lookUpFieldResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "lookupProperties" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "maxProperties" : 4,
+              "minProperties" : 4,
+              "properties" : {
+                "relatedModule" : {
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 100,
+                  "minLength" : 0,
+                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                },
+                "onDelete" : {
+                  "type" : [ "string", "null" ],
+                  "enum" : [ "0", "1", "2" ]
+                },
+                "nameFieldInRelatedModule" : {
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 100,
+                  "minLength" : 0
+                },
+                "labelInRelatedModule" : {
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 100,
+                  "minLength" : 0
+                }
+              },
+              "required" : [ "labelInRelatedModule", "nameFieldInRelatedModule", "onDelete", "relatedModule" ]
+            },
+            "showToHelpCenter" : {
+              "type" : [ "boolean", "null" ]
+            }
+          },
+          "required" : [ "lookupProperties", "showToHelpCenter" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "faxFieldResponseForTickets" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/faxFieldResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "showToHelpCenter" : {
+              "type" : [ "boolean", "null" ]
+            }
+          },
+          "required" : [ "showToHelpCenter" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "autoNumberFieldResponseForTickets" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/autoNumberFieldResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "showToHelpCenter" : {
+              "type" : [ "boolean", "null" ]
+            }
+          },
+          "required" : [ "showToHelpCenter" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "statusFieldResponseForTickets" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/statusFieldResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "showToHelpCenter" : {
+              "type" : [ "boolean", "null" ]
+            }
+          },
+          "required" : [ "showToHelpCenter" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "productDepartmentFieldResponse" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/commonFieldResponse"
+        } ]
+      },
+      "largeTextFieldProperties" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "translatable" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the field supports translation. Accepted values: true (supports translation), false (does not support translation)."
+          }
+        },
+        "required" : [ "translatable" ]
+      },
+      "largeTextFieldResponse" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/commonFieldResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "properties" : {
+              "$ref" : "#/components/schemas/largeTextFieldProperties"
+            }
+          },
+          "required" : [ "properties" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "largeTextFieldResponseForTickets" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/largeTextFieldResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "showToHelpCenter" : {
+              "type" : [ "boolean", "null" ]
+            }
+          },
+          "required" : [ "showToHelpCenter" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "fieldsData" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "anyOf" : [ {
+            "$ref" : "#/components/schemas/commonFieldResponse"
+          }, {
+            "$ref" : "#/components/schemas/integerFieldResponse"
+          }, {
+            "$ref" : "#/components/schemas/percentFieldResponse"
+          }, {
+            "$ref" : "#/components/schemas/decimalFieldResponse"
+          }, {
+            "$ref" : "#/components/schemas/currencyFieldResponse"
+          }, {
+            "$ref" : "#/components/schemas/dateFieldResponse"
+          }, {
+            "$ref" : "#/components/schemas/dateTimeFieldResponse"
+          }, {
+            "$ref" : "#/components/schemas/emailFieldResponse"
+          }, {
+            "$ref" : "#/components/schemas/phoneFieldResponse"
+          }, {
+            "$ref" : "#/components/schemas/pickListFieldBasicResponse"
+          }, {
+            "$ref" : "#/components/schemas/pickListFieldResponse"
+          }, {
+            "$ref" : "#/components/schemas/urlFieldResponse"
+          }, {
+            "$ref" : "#/components/schemas/textAreaFieldResponse"
+          }, {
+            "$ref" : "#/components/schemas/booleanFieldResponse"
+          }, {
+            "$ref" : "#/components/schemas/multiPickListFieldBasicResponse"
+          }, {
+            "$ref" : "#/components/schemas/multiPickListFieldResponse"
+          }, {
+            "$ref" : "#/components/schemas/faxFieldResponse"
+          }, {
+            "$ref" : "#/components/schemas/autoNumberFieldResponse"
+          }, {
+            "$ref" : "#/components/schemas/lookUpFieldResponse"
+          }, {
+            "$ref" : "#/components/schemas/lookUpFieldNewResponse"
+          }, {
+            "$ref" : "#/components/schemas/lookUpFieldOldResponse"
+          }, {
+            "$ref" : "#/components/schemas/statusFieldResponse"
+          }, {
+            "$ref" : "#/components/schemas/textFieldResponseForTickets"
+          }, {
+            "$ref" : "#/components/schemas/integerFieldResponseForTickets"
+          }, {
+            "$ref" : "#/components/schemas/percentFieldResponseForTickets"
+          }, {
+            "$ref" : "#/components/schemas/decimalFieldResponseForTickets"
+          }, {
+            "$ref" : "#/components/schemas/currencyFieldResponseForTickets"
+          }, {
+            "$ref" : "#/components/schemas/dateFieldResponseForTickets"
+          }, {
+            "$ref" : "#/components/schemas/dateTimeFieldResponseForTickets"
+          }, {
+            "$ref" : "#/components/schemas/emailFieldResponseForTickets"
+          }, {
+            "$ref" : "#/components/schemas/phoneFieldResponseForTickets"
+          }, {
+            "$ref" : "#/components/schemas/pickListFieldBasicResponseForTickets"
+          }, {
+            "$ref" : "#/components/schemas/pickListFieldResponseForTickets"
+          }, {
+            "$ref" : "#/components/schemas/urlFieldResponseForTickets"
+          }, {
+            "$ref" : "#/components/schemas/textAreaFieldResponseForTickets"
+          }, {
+            "$ref" : "#/components/schemas/booleanFieldResponseForTickets"
+          }, {
+            "$ref" : "#/components/schemas/multiPickListFieldBasicResponseForTickets"
+          }, {
+            "$ref" : "#/components/schemas/multiPickListFieldResponseForTickets"
+          }, {
+            "$ref" : "#/components/schemas/lookUpFieldResponseForTickets"
+          }, {
+            "$ref" : "#/components/schemas/lookUpFieldNewResponseForTickets"
+          }, {
+            "$ref" : "#/components/schemas/lookUpFieldOldResponseForTickets"
+          }, {
+            "$ref" : "#/components/schemas/faxFieldResponseForTickets"
+          }, {
+            "$ref" : "#/components/schemas/autoNumberFieldResponseForTickets"
+          }, {
+            "$ref" : "#/components/schemas/statusFieldResponseForTickets"
+          }, {
+            "$ref" : "#/components/schemas/productDepartmentFieldResponse"
+          }, {
+            "$ref" : "#/components/schemas/largeTextFieldResponse"
+          }, {
+            "$ref" : "#/components/schemas/largeTextFieldResponseForTickets"
+          } ]
+        }
+      },
+      "getTextFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/commonFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/textFieldResponseForTickets"
+        } ]
+      },
+      "getIntegerFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/integerFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/integerFieldResponseForTickets"
+        } ]
+      },
+      "getPercentFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/percentFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/percentFieldResponseForTickets"
+        } ]
+      },
+      "getDecimalFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/decimalFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/decimalFieldResponseForTickets"
+        } ]
+      },
+      "getCurrencyFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/currencyFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/currencyFieldResponseForTickets"
+        } ]
+      },
+      "getDateFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/dateFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/dateFieldResponseForTickets"
+        } ]
+      },
+      "getDateTimeFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/dateTimeFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/dateTimeFieldResponseForTickets"
+        } ]
+      },
+      "getEmailFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/emailFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/emailFieldResponseForTickets"
+        } ]
+      },
+      "getPhoneFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/phoneFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/phoneFieldResponseForTickets"
+        } ]
+      },
+      "getPickListFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/pickListFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/pickListFieldResponseForTickets"
+        }, {
+          "$ref" : "#/components/schemas/pickListFieldBasicResponse"
+        }, {
+          "$ref" : "#/components/schemas/pickListFieldBasicResponseForTickets"
+        } ]
+      },
+      "getURLFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/urlFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/urlFieldResponseForTickets"
+        } ]
+      },
+      "getTextAreaFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/textAreaFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/textAreaFieldResponseForTickets"
+        } ]
+      },
+      "getBooleanFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/booleanFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/booleanFieldResponseForTickets"
+        } ]
+      },
+      "getMultiPickListFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/multiPickListFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/multiPickListFieldResponseForTickets"
+        }, {
+          "$ref" : "#/components/schemas/multiPickListFieldBasicResponse"
+        }, {
+          "$ref" : "#/components/schemas/multiPickListFieldBasicResponseForTickets"
+        } ]
+      },
+      "getLargeTextFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/largeTextFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/largeTextFieldResponseForTickets"
+        } ]
+      },
+      "basicCustomFieldCountJson" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "maximumLimit" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "available" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "type" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "Varchar", "Integer", "Double", "Text", "Date", "DateTime", "Boolean", "DESK_SEARCHABLE_CTEXT_OEK", "Formula", "BigInt_WF" ]
+          }
+        },
+        "required" : [ "available", "maximumLimit", "type" ]
+      },
+      "customFieldCountJson" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/basicCustomFieldCountJson"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "types" : {
+              "type" : [ "array", "null" ],
+              "items" : {
+                "type" : [ "string", "null" ],
+                "enum" : [ "Text", "PickList", "Email", "Phone", "Website", "Textarea", "Multiselect", "Number", "Percent", "Decimal", "Currency", "Date", "DateTime", "Checkbox" ]
+              },
+              "uniqueItems" : false
+            }
+          },
+          "required" : [ "types" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "customFieldCountsArr" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "anyOf" : [ {
+            "$ref" : "#/components/schemas/customFieldCountJson"
+          }, {
+            "$ref" : "#/components/schemas/basicCustomFieldCountJson"
+          } ]
+        }
+      },
+      "textFieldJson" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "displayLabel" : {
+            "type" : [ "string" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "isTrackLastActivityTime" : {
+            "type" : [ "boolean" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "type" : {
+            "type" : [ "string" ],
+            "enum" : [ "Text" ]
+          },
+          "maxLength" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int32",
+            "maximum" : 255,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)"
+          },
+          "isEncryptedField" : {
+            "type" : [ "boolean" ],
+            "description" : "Whether the field is encrypted"
+          },
+          "name" : {
+            "type" : [ "string" ],
+            "description" : "Name of the custom field",
+            "maxLength" : 250
+          }
+        },
+        "required" : [ "displayLabel", "maxLength", "type" ]
+      },
+      "editTextFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/commonFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/textFieldResponseForTickets"
+        } ]
+      },
+      "integerFieldJson" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "displayLabel" : {
+            "type" : [ "string" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "isTrackLastActivityTime" : {
+            "type" : [ "boolean" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "type" : {
+            "type" : [ "string" ],
+            "enum" : [ "Number" ]
+          },
+          "maxLength" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int32",
+            "maximum" : 9,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)"
+          },
+          "isEncryptedField" : {
+            "type" : [ "boolean" ],
+            "description" : "Whether the field is encrypted"
+          },
+          "name" : {
+            "type" : [ "string" ],
+            "description" : "Name of the custom field",
+            "maxLength" : 250
+          }
+        },
+        "required" : [ "displayLabel", "maxLength", "type" ]
+      },
+      "editIntegerFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/integerFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/integerFieldResponseForTickets"
+        } ]
+      },
+      "percentFieldJson" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "displayLabel" : {
+            "type" : [ "string" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "isTrackLastActivityTime" : {
+            "type" : [ "boolean" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "type" : {
+            "type" : [ "string" ],
+            "enum" : [ "Percent" ]
+          },
+          "isEncryptedField" : {
+            "type" : [ "boolean" ],
+            "description" : "Whether the field is encrypted"
+          },
+          "name" : {
+            "type" : [ "string" ],
+            "description" : "Name of the custom field",
+            "maxLength" : 250
+          }
+        },
+        "required" : [ "displayLabel", "type", "type" ]
+      },
+      "editPercentFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/percentFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/percentFieldResponseForTickets"
+        } ]
+      },
+      "decimalFieldJson" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "displayLabel" : {
+            "type" : [ "string" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "decimalPlaces" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int32",
+            "maximum" : 9,
+            "minimum" : 0,
+            "pattern" : "([0-9]+)"
+          },
+          "isTrackLastActivityTime" : {
+            "type" : [ "boolean" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "type" : {
+            "type" : [ "string" ],
+            "enum" : [ "Decimal" ]
+          },
+          "maxLength" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int32",
+            "maximum" : 16,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)"
+          },
+          "isEncryptedField" : {
+            "type" : [ "boolean" ],
+            "description" : "Whether the field is encrypted"
+          },
+          "name" : {
+            "type" : [ "string" ],
+            "description" : "Name of the custom field",
+            "maxLength" : 250
+          }
+        },
+        "required" : [ "decimalPlaces", "displayLabel", "maxLength", "type", "type" ]
+      },
+      "editDecimalFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/decimalFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/decimalFieldResponseForTickets"
+        } ]
+      },
+      "currencyFieldJson" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "displayLabel" : {
+            "type" : [ "string" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "decimalPlaces" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int32",
+            "maximum" : 9,
+            "minimum" : 0,
+            "pattern" : "([0-9]+)"
+          },
+          "roundingOption" : {
+            "type" : [ "string" ],
+            "enum" : [ "roundOff", "roundDown", "roundUp", "normal" ]
+          },
+          "roundingPrecision" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int32",
+            "maximum" : 30,
+            "minimum" : 0,
+            "pattern" : "([0-9]+)"
+          },
+          "isTrackLastActivityTime" : {
+            "type" : [ "boolean" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "type" : {
+            "type" : [ "string" ],
+            "enum" : [ "Currency" ]
+          },
+          "maxLength" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int32",
+            "maximum" : 16,
+            "minimum" : 3,
+            "pattern" : "([0-9]+)"
+          },
+          "name" : {
+            "type" : [ "string" ],
+            "description" : "Name of the custom field",
+            "maxLength" : 250
+          }
+        },
+        "required" : [ "decimalPlaces", "displayLabel", "maxLength", "type" ]
+      },
+      "editCurrencyFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/currencyFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/currencyFieldResponseForTickets"
+        } ]
+      },
+      "dateFieldJson" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "displayLabel" : {
+            "type" : [ "string" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "isTrackLastActivityTime" : {
+            "type" : [ "boolean" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "type" : {
+            "type" : [ "string" ],
+            "enum" : [ "Date" ]
+          },
+          "name" : {
+            "type" : [ "string" ],
+            "description" : "Name of the custom field",
+            "maxLength" : 250
+          }
+        },
+        "required" : [ "displayLabel", "type", "type" ]
+      },
+      "editDateFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/dateFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/dateFieldResponseForTickets"
+        } ]
+      },
+      "dateTimeFieldJson" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "displayLabel" : {
+            "type" : [ "string" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "isTrackLastActivityTime" : {
+            "type" : [ "boolean" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "type" : {
+            "type" : [ "string" ],
+            "enum" : [ "DateTime" ]
+          },
+          "name" : {
+            "type" : [ "string" ],
+            "description" : "Name of the custom field",
+            "maxLength" : 250
+          }
+        },
+        "required" : [ "displayLabel", "type", "type" ]
+      },
+      "editDateTimeFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/dateTimeFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/dateTimeFieldResponseForTickets"
+        } ]
+      },
+      "emailFieldJson" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "displayLabel" : {
+            "type" : [ "string" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "isTrackLastActivityTime" : {
+            "type" : [ "boolean" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "type" : {
+            "type" : [ "string" ],
+            "enum" : [ "Email" ]
+          },
+          "isEncryptedField" : {
+            "type" : [ "boolean" ],
+            "description" : "Whether the field is encrypted"
+          },
+          "name" : {
+            "type" : [ "string" ],
+            "description" : "Name of the custom field",
+            "maxLength" : 250
+          }
+        },
+        "required" : [ "displayLabel", "type", "type" ]
+      },
+      "editEmailFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/emailFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/emailFieldResponseForTickets"
+        } ]
+      },
+      "phoneFieldJson" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "displayLabel" : {
+            "type" : [ "string" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "isTrackLastActivityTime" : {
+            "type" : [ "boolean" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "type" : {
+            "type" : [ "string" ],
+            "enum" : [ "Phone" ]
+          },
+          "maxLength" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int32",
+            "maximum" : 255,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)"
+          },
+          "isEncryptedField" : {
+            "type" : [ "boolean" ],
+            "description" : "Whether the field is encrypted"
+          },
+          "name" : {
+            "type" : [ "string" ],
+            "description" : "Name of the custom field",
+            "maxLength" : 250
+          }
+        },
+        "required" : [ "displayLabel", "maxLength", "type", "type" ]
+      },
+      "editPhoneFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/phoneFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/phoneFieldResponseForTickets"
+        } ]
+      },
+      "pickListFieldRequestJson" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "displayLabel" : {
+            "type" : [ "string" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "isTrackLastActivityTime" : {
+            "type" : [ "boolean" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "type" : {
+            "type" : [ "string" ],
+            "enum" : [ "Picklist" ]
+          },
+          "name" : {
+            "type" : [ "string" ],
+            "description" : "Name of the custom field",
+            "maxLength" : 250
+          }
+        },
+        "required" : [ "displayLabel", "type", "type" ]
+      },
+      "editPickListFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/pickListFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/pickListFieldResponseForTickets"
+        }, {
+          "$ref" : "#/components/schemas/pickListFieldBasicResponse"
+        }, {
+          "$ref" : "#/components/schemas/pickListFieldBasicResponseForTickets"
+        } ]
+      },
+      "urlFieldJson" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "displayLabel" : {
+            "type" : [ "string" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "isTrackLastActivityTime" : {
+            "type" : [ "boolean" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "type" : {
+            "type" : [ "string" ],
+            "enum" : [ "URL" ]
+          },
+          "isEncryptedField" : {
+            "type" : [ "boolean" ],
+            "description" : "Whether the field is encrypted"
+          },
+          "name" : {
+            "type" : [ "string" ],
+            "description" : "Name of the custom field",
+            "maxLength" : 250
+          }
+        },
+        "required" : [ "displayLabel", "type", "type" ]
+      },
+      "editURLFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/urlFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/urlFieldResponseForTickets"
+        } ]
+      },
+      "textAreaFieldJson" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "displayLabel" : {
+            "type" : [ "string" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "isTrackLastActivityTime" : {
+            "type" : [ "boolean" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "type" : {
+            "type" : [ "string" ],
+            "enum" : [ "Textarea" ]
+          },
+          "name" : {
+            "type" : [ "string" ],
+            "description" : "Name of the custom field",
+            "maxLength" : 250
+          }
+        },
+        "required" : [ "displayLabel", "type", "type" ]
+      },
+      "editTextAreaFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/textAreaFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/textAreaFieldResponseForTickets"
+        } ]
+      },
+      "booleanFieldJson" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "displayLabel" : {
+            "type" : [ "string" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "defaultValue" : {
+            "type" : [ "string" ],
+            "enum" : [ "true", "false" ]
+          },
+          "isTrackLastActivityTime" : {
+            "type" : [ "boolean" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "type" : {
+            "type" : [ "string" ],
+            "enum" : [ "Boolean" ]
+          },
+          "name" : {
+            "type" : [ "string" ],
+            "description" : "Name of the custom field",
+            "maxLength" : 250
+          }
+        },
+        "required" : [ "displayLabel", "type", "type" ]
+      },
+      "editBooleanFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/booleanFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/booleanFieldResponseForTickets"
+        } ]
+      },
+      "multiPickListFieldJson" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "displayLabel" : {
+            "type" : [ "string" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "isTrackLastActivityTime" : {
+            "type" : [ "boolean" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "type" : {
+            "type" : [ "string" ],
+            "enum" : [ "Multiselect" ]
+          },
+          "name" : {
+            "type" : [ "string" ],
+            "description" : "Name of the custom field",
+            "maxLength" : 250
+          }
+        },
+        "required" : [ "displayLabel", "type", "type" ]
+      },
+      "editMultiPickListFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/multiPickListFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/multiPickListFieldResponseForTickets"
+        }, {
+          "$ref" : "#/components/schemas/multiPickListFieldBasicResponse"
+        }, {
+          "$ref" : "#/components/schemas/multiPickListFieldBasicResponseForTickets"
+        } ]
+      },
+      "largeTextFieldJson" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "displayLabel" : {
+            "type" : [ "string" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "isTrackLastActivityTime" : {
+            "type" : [ "boolean" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "type" : {
+            "type" : [ "string" ],
+            "enum" : [ "LargeText" ]
+          },
+          "properties" : {
+            "$ref" : "#/components/schemas/largeTextFieldProperties"
+          }
+        },
+        "required" : [ "displayLabel", "type", "type" ]
+      },
+      "editLargeTextFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/largeTextFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/largeTextFieldResponseForTickets"
+        } ]
+      },
+      "createTextFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/commonFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/textFieldResponseForTickets"
+        } ]
+      },
+      "createIntegerFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/integerFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/integerFieldResponseForTickets"
+        } ]
+      },
+      "createPercentFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/percentFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/percentFieldResponseForTickets"
+        } ]
+      },
+      "createDecimalFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/decimalFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/decimalFieldResponseForTickets"
+        } ]
+      },
+      "createCurrencyFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/currencyFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/currencyFieldResponseForTickets"
+        } ]
+      },
+      "createDateFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/dateFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/dateFieldResponseForTickets"
+        } ]
+      },
+      "createDateTimeFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/dateTimeFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/dateTimeFieldResponseForTickets"
+        } ]
+      },
+      "createEmailFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/emailFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/emailFieldResponseForTickets"
+        } ]
+      },
+      "createPhoneFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/phoneFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/phoneFieldResponseForTickets"
+        } ]
+      },
+      "createPickListFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/pickListFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/pickListFieldResponseForTickets"
+        }, {
+          "$ref" : "#/components/schemas/pickListFieldBasicResponse"
+        }, {
+          "$ref" : "#/components/schemas/pickListFieldBasicResponseForTickets"
+        } ]
+      },
+      "createURLFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/urlFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/urlFieldResponseForTickets"
+        } ]
+      },
+      "createTextAreaFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/textAreaFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/textAreaFieldResponseForTickets"
+        } ]
+      },
+      "createBooleanFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/booleanFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/booleanFieldResponseForTickets"
+        } ]
+      },
+      "createMultiPickListFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/multiPickListFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/multiPickListFieldResponseForTickets"
+        }, {
+          "$ref" : "#/components/schemas/multiPickListFieldBasicResponse"
+        }, {
+          "$ref" : "#/components/schemas/multiPickListFieldBasicResponseForTickets"
+        } ]
+      },
+      "createLargeTextFieldResponse" : {
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/largeTextFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/largeTextFieldResponseForTickets"
+        } ]
+      }
+    },
+    "responses" : {
+      "getFieldsResponse" : {
+        "description" : "getFieldsResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "#/components/schemas/fieldsData"
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : { }
+              }
+            }
+          }
+        }
+      },
+      "getCustomFieldCountResponse" : {
+        "description" : "getCustomFieldCountResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "customFieldCounts" : {
+                  "$ref" : "#/components/schemas/customFieldCountsArr"
+                },
+                "totalAvailableCount" : {
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                }
+              },
+              "required" : [ "customFieldCounts", "totalAvailableCount" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : { }
+              }
+            }
+          }
+        }
+      },
+      "criteriaReferencesResponse" : {
+        "description" : "criteriaReferencesResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : {
+                "type" : "array",
+                "items" : {
+                  "type" : "object",
+                  "properties" : {
+                    "encryptedId" : {
+                      "type" : [ "string" ]
+                    },
+                    "name" : {
+                      "type" : [ "string" ]
+                    },
+                    "id" : {
+                      "type" : [ "string", "integer" ],
+                      "format" : "int64"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "createFieldOldResponse" : {
+        "description" : "createField Response definition",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "discriminator" : {
+                "propertyName" : "type",
+                "mapping" : {
+                  "Text" : "#/components/schemas/createTextFieldResponse",
+                  "Number" : "#/components/schemas/createIntegerFieldResponse",
+                  "Percent" : "#/components/schemas/createPercentFieldResponse",
+                  "Decimal" : "#/components/schemas/createDecimalFieldResponse",
+                  "Currency" : "#/components/schemas/createCurrencyFieldResponse",
+                  "Date" : "#/components/schemas/createDateFieldResponse",
+                  "DateTime" : "#/components/schemas/createDateTimeFieldResponse",
+                  "Email" : "#/components/schemas/createEmailFieldResponse",
+                  "Phone" : "#/components/schemas/createPhoneFieldResponse",
+                  "Picklist" : "#/components/schemas/createPickListFieldResponse",
+                  "URL" : "#/components/schemas/createURLFieldResponse",
+                  "Textarea" : "#/components/schemas/createTextAreaFieldResponse",
+                  "Boolean" : "#/components/schemas/createBooleanFieldResponse",
+                  "Multiselect" : "#/components/schemas/createMultiPickListFieldResponse",
+                  "LargeText" : "#/components/schemas/createLargeTextFieldResponse"
+                }
+              },
+              "anyOf" : [ {
+                "$ref" : "#/components/schemas/commonFieldResponse"
+              }, {
+                "$ref" : "#/components/schemas/createTextFieldResponse"
+              }, {
+                "$ref" : "#/components/schemas/integerFieldResponse"
+              }, {
+                "$ref" : "#/components/schemas/createIntegerFieldResponse"
+              }, {
+                "$ref" : "#/components/schemas/percentFieldResponse"
+              }, {
+                "$ref" : "#/components/schemas/createPercentFieldResponse"
+              }, {
+                "$ref" : "#/components/schemas/decimalFieldResponse"
+              }, {
+                "$ref" : "#/components/schemas/createDecimalFieldResponse"
+              }, {
+                "$ref" : "#/components/schemas/currencyFieldResponse"
+              }, {
+                "$ref" : "#/components/schemas/createCurrencyFieldResponse"
+              }, {
+                "$ref" : "#/components/schemas/dateFieldResponse"
+              }, {
+                "$ref" : "#/components/schemas/createDateFieldResponse"
+              }, {
+                "$ref" : "#/components/schemas/dateTimeFieldResponse"
+              }, {
+                "$ref" : "#/components/schemas/createDateTimeFieldResponse"
+              }, {
+                "$ref" : "#/components/schemas/emailFieldResponse"
+              }, {
+                "$ref" : "#/components/schemas/createEmailFieldResponse"
+              }, {
+                "$ref" : "#/components/schemas/phoneFieldResponse"
+              }, {
+                "$ref" : "#/components/schemas/createPhoneFieldResponse"
+              }, {
+                "$ref" : "#/components/schemas/pickListFieldResponse"
+              }, {
+                "$ref" : "#/components/schemas/createPickListFieldResponse"
+              }, {
+                "$ref" : "#/components/schemas/urlFieldResponse"
+              }, {
+                "$ref" : "#/components/schemas/createURLFieldResponse"
+              }, {
+                "$ref" : "#/components/schemas/textAreaFieldResponse"
+              }, {
+                "$ref" : "#/components/schemas/createTextAreaFieldResponse"
+              }, {
+                "$ref" : "#/components/schemas/booleanFieldResponse"
+              }, {
+                "$ref" : "#/components/schemas/createBooleanFieldResponse"
+              }, {
+                "$ref" : "#/components/schemas/multiPickListFieldResponse"
+              }, {
+                "$ref" : "#/components/schemas/createMultiPickListFieldResponse"
+              }, {
+                "$ref" : "#/components/schemas/largeTextFieldResponse"
+              }, {
+                "$ref" : "#/components/schemas/createLargeTextFieldResponse"
+              } ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "requestBodies" : {
+      "createFieldOldRequest" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "discriminator" : {
+                "propertyName" : "type",
+                "mapping" : {
+                  "Text" : "#/components/schemas/textFieldJson",
+                  "Number" : "#/components/schemas/integerFieldJson",
+                  "Percent" : "#/components/schemas/percentFieldJson",
+                  "Decimal" : "#/components/schemas/decimalFieldJson",
+                  "Currency" : "#/components/schemas/currencyFieldJson",
+                  "Date" : "#/components/schemas/dateFieldJson",
+                  "DateTime" : "#/components/schemas/dateTimeFieldJson",
+                  "Email" : "#/components/schemas/emailFieldJson",
+                  "Phone" : "#/components/schemas/phoneFieldJson",
+                  "Picklist" : "#/components/schemas/pickListFieldRequestJson",
+                  "URL" : "#/components/schemas/urlFieldJson",
+                  "Textarea" : "#/components/schemas/textAreaFieldJson",
+                  "Boolean" : "#/components/schemas/booleanFieldJson",
+                  "Multiselect" : "#/components/schemas/multiPickListFieldJson",
+                  "LargeText" : "#/components/schemas/largeTextFieldJson"
+                }
+              },
+              "oneOf" : [ {
+                "$ref" : "#/components/schemas/textFieldJson"
+              }, {
+                "$ref" : "#/components/schemas/integerFieldJson"
+              }, {
+                "$ref" : "#/components/schemas/percentFieldJson"
+              }, {
+                "$ref" : "#/components/schemas/decimalFieldJson"
+              }, {
+                "$ref" : "#/components/schemas/currencyFieldJson"
+              }, {
+                "$ref" : "#/components/schemas/dateFieldJson"
+              }, {
+                "$ref" : "#/components/schemas/dateTimeFieldJson"
+              }, {
+                "$ref" : "#/components/schemas/emailFieldJson"
+              }, {
+                "$ref" : "#/components/schemas/phoneFieldJson"
+              }, {
+                "$ref" : "#/components/schemas/pickListFieldRequestJson"
+              }, {
+                "$ref" : "#/components/schemas/urlFieldJson"
+              }, {
+                "$ref" : "#/components/schemas/textAreaFieldJson"
+              }, {
+                "$ref" : "#/components/schemas/booleanFieldJson"
+              }, {
+                "$ref" : "#/components/schemas/multiPickListFieldJson"
+              }, {
+                "$ref" : "#/components/schemas/largeTextFieldJson"
+              } ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "FieldOld"
+}

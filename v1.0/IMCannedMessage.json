@@ -1,18 +1,34 @@
 {
   "openapi" : "3.1.0",
+  "x-mcp-group" : [ "IM Canned Messages" ],
   "info" : {
     "title" : "IMCannedMessage",
-    "version" : "1.0.0"
+    "version" : "1.0.0",
+    "description" : "An IM template message is a predefined common message used to send while initiating a session. Template messages support translations, interactive buttons, headers, and footers for rich messaging across instant messaging channels."
   },
   "paths" : {
-    "/api/v1/im/cannedMessages/{id}" : {
+    "/api/v1/im/cannedMessages/{template_message_id}" : {
       "get" : {
         "tags" : [ "IMCannedMessage" ],
-        "summary" : "Get a Template Message",
-        "description" : "This API fetches details of a template message.",
+        "summary" : "Get IM Template Message",
+        "description" : "Retrieves details of a specific template message.",
         "operationId" : "getCannedMessage",
+        "x-mcp-group" : [ "Initiate Session" ],
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/id"
+          "name" : "template_message_id",
+          "in" : "path",
+          "description" : "Unique ID of the template message.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Unique ID of the template message.",
+            "maxLength" : 100,
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -36,91 +52,296 @@
         "x-audience" : [ "external-public" ]
       }
     },
-    "/api/v1/im/cannedMessages" : {
-      "get" : {
+    "/api/v1/im/cannedMessages/{template_message_id}/apply" : {
+      "post" : {
         "tags" : [ "IMCannedMessage" ],
-        "summary" : "List Template Message",
-        "description" : "This API lists all sessions",
-        "operationId" : "getCannedMessages",
+        "summary" : "Apply template message",
+        "description" : "Retrieves a template message with contact information applied to the placeholders.",
+        "operationId" : "applyCannedMessage",
+        "x-mcp-group" : [ "Initiate Session" ],
+        "x-mcp-ready" : true,
+        "x-system-description" : "Call this API before Initiate Session to replace ticket and contact placeholders in a template message. Pass contactId to replace contact placeholders; contactId can be fetched from the Get Session API if not already available. Pass either ticketId or sessionId to replace ticket placeholders, but not both. If sessionId is passed, the latest ticket associated with that session is used. If a placeholder is not present in the template, it is replaced with an empty string.",
         "parameters" : [ {
-          "name" : "modifiedAfter",
+          "name" : "contactId",
           "in" : "query",
-          "description" : "After which date entities to be included. Enter a date in the ISO date format of yyyy-MM-ddThh:mm:ss.SSSZ.",
+          "description" : "Unique ID of the contact for which the template message must be applied or filtered.",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "After which date entities to be included. Enter a date in the ISO date format of yyyy-MM-ddThh:mm:ss.SSSZ.",
-            "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Unique ID of the contact for which the template message must be applied or filtered.",
+            "pattern" : "([0-9]+)"
           }
         }, {
-          "$ref" : "#/components/parameters/contactId"
+          "name" : "sessionId",
+          "in" : "query",
+          "description" : "Unique ID of the session for which template messages must be applied or filtered.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Unique ID of the session for which template messages must be applied or filtered.",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "ticketId",
+          "in" : "query",
+          "description" : "Unique ID of the ticket for which template messages must be applied or filtered.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Unique ID of the ticket for which template messages must be applied or filtered.",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "language",
+          "in" : "query",
+          "description" : "Language in ISO language code (e.g., en, fr, de, bn, ta) to filter or apply template messages.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "Language in ISO language code (e.g., en, fr, de, bn, ta) to filter or apply template messages.",
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(^([a-zA-Z0-9\\s\\.\\?\\_\\-\\,\\@\\:/+\\(\\)])*$|null|undefined)"
+          }
+        }, {
+          "name" : "template_message_id",
+          "in" : "path",
+          "description" : "Unique ID of the template message.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Unique ID of the template message.",
+            "maxLength" : 100,
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/getCannedMessage"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.basic.CREATE", "Desk.InstantMessages.CREATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/im/cannedMessages" : {
+      "get" : {
+        "tags" : [ "IMCannedMessage" ],
+        "summary" : "Get IM Template Messages",
+        "description" : "Retrieves a list of IM template messages for the specified department, with pagination support.",
+        "operationId" : "getCannedMessages",
+        "x-mcp-group" : [ "Initiate Session" ],
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "modifiedAfter",
+          "in" : "query",
+          "description" : "Filters entities modified after the specified date. Enter a date in ISO format: yyyy-MM-ddThh:mm:ss.SSSZ.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "Filters entities modified after the specified date. Enter a date in ISO format: yyyy-MM-ddThh:mm:ss.SSSZ.",
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "((19|20)\\d\\d)-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z"
+          }
+        }, {
+          "name" : "tag",
+          "in" : "query",
+          "description" : "Search keyword to filter template messages by template name or template content.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "Search keyword to filter template messages by template name or template content.",
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "[a-zA-Z0-9\\_\\-\\+\\?\\!\\#\\.\\:\\,@\\;\\P{InBasicLatin}\\(\\)\\s]+"
+          }
+        }, {
+          "name" : "contactId",
+          "in" : "query",
+          "description" : "Unique ID of the contact for which the template message must be applied or filtered.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Unique ID of the contact for which the template message must be applied or filtered.",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "name" : "departmentId",
           "in" : "query",
-          "description" : "Department ID for which the canned messages to be fetched",
+          "description" : "Unique ID of the department for which template messages must be fetched.",
           "required" : true,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
-            "description" : "Department ID for which the canned messages to be fetched",
+            "description" : "Unique ID of the department for which template messages must be fetched.",
             "pattern" : "([0-9]+)"
           }
         }, {
           "name" : "limit",
           "in" : "query",
-          "description" : "Number of canned messages to fetch",
+          "description" : "Number of template messages to fetch. Defaults to 0 when omitted.",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int32",
-            "description" : "Number of canned messages to fetch",
+            "description" : "Number of template messages to fetch. Defaults to 0 when omitted.",
             "pattern" : "([0-9]+)"
           }
         }, {
           "name" : "from",
           "in" : "query",
-          "description" : "Index number, starting from which the canned messages must be fetched",
+          "description" : "Index number from which template messages must be fetched. Defaults to 0 when omitted.",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int32",
-            "description" : "Index number, starting from which the canned messages must be fetched",
+            "description" : "Index number from which template messages must be fetched. Defaults to 0 when omitted.",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "wabaId",
+          "in" : "query",
+          "description" : "WhatsApp Business Account ID for which template messages must be fetched.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "WhatsApp Business Account ID for which template messages must be fetched.",
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "channelId",
+          "in" : "query",
+          "description" : "Unique ID of the channel for which template messages must be fetched.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Unique ID of the channel for which template messages must be fetched.",
             "pattern" : "([0-9]+)"
           }
         }, {
           "name" : "type",
           "in" : "query",
-          "description" : "Filter by MessageType. Allowed values are @TEMPLATE@",
+          "description" : "Filter by message type. Possible values: TEMPLATE, CANNED, WELCOMEMSG, AWAY.",
           "required" : true,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Filter by MessageType. Allowed values are @TEMPLATE@",
+            "type" : "string",
+            "description" : "Filter by message type. Possible values: TEMPLATE, CANNED, WELCOMEMSG, AWAY.",
             "enum" : [ "TEMPLATE", "CANNED", "WELCOMEMSG", "AWAY" ],
             "maxLength" : 100,
             "minLength" : 0
           }
         }, {
-          "name" : "isActive",
+          "name" : "status",
           "in" : "query",
-          "description" : "Canned Message Active Status",
+          "description" : "Filters by status of the message. Possible values: SUBMITTED, FAILED, APPROVED, REJECTED. Applicable only if type is TEMPLATE.",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "boolean", "null" ],
-            "description" : "Canned Message Active Status"
+            "type" : "string",
+            "description" : "Filters by status of the message. Possible values: SUBMITTED, FAILED, APPROVED, REJECTED. Applicable only if type is TEMPLATE.",
+            "enum" : [ "SUBMITTED", "FAILED", "APPROVED", "REJECTED" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "SUBMITTED|FAILED|APPROVED|REJECTED"
+          }
+        }, {
+          "name" : "language",
+          "in" : "query",
+          "description" : "Language in ISO language code (e.g., en, fr, de, bn, ta) to filter or apply template messages.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "Language in ISO language code (e.g., en, fr, de, bn, ta) to filter or apply template messages.",
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(^([a-zA-Z0-9\\s\\.\\?\\_\\-\\,\\@\\:/+\\(\\)])*$|null|undefined)"
+          }
+        }, {
+          "name" : "sessionId",
+          "in" : "query",
+          "description" : "Unique ID of the session for which template messages must be applied or filtered.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Unique ID of the session for which template messages must be applied or filtered.",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "ticketId",
+          "in" : "query",
+          "description" : "Unique ID of the ticket for which template messages must be applied or filtered.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Unique ID of the ticket for which template messages must be applied or filtered.",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "isActive",
+          "in" : "query",
+          "description" : "Filters by active status of the template message.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "boolean",
+            "description" : "Filters by active status of the template message."
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -145,33 +366,44 @@
   },
   "components" : {
     "schemas" : {
+      "whatsAppTemplateTagCategory" : {
+        "description" : "WhatsApp Cloud API template category values returned for template tag listings (UTILITY vs MARKETING).",
+        "type" : "string",
+        "enum" : [ "UTILITY", "MARKETING" ]
+      },
       "cannedMessageActor" : {
         "type" : [ "null", "object" ],
+        "description" : "Details of the user who created or modified the template message.",
         "additionalProperties" : false,
         "properties" : {
           "photoURL" : {
+            "description" : "Photo URL of the actor.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "name" : {
+            "description" : "Name of the actor.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "id" : {
+            "description" : "Unique ID of the actor.",
             "type" : [ "string", "null", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "type" : {
+            "description" : "Type of the actor.",
             "type" : [ "string", "null" ],
-            "enum" : [ "END_USER", "AGENT", "BOT" ],
+            "enum" : [ "ENDUSER", "AGENT", "BOT" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "email" : {
+            "description" : "Email address of the actor.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
@@ -185,12 +417,14 @@
         "additionalProperties" : false,
         "properties" : {
           "language" : {
+            "description" : "ISO language code of the translation.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "af|sq|ar|az|bn|bg|ca|zh_CN|zh_HK|zh_TW|hr|cs|da|nl|en_GB|en_US|et|fil|fi|fr|ka|de|el|gu|ha|he|hi|hu|id|ga|it|ja|kn|kk|rw_RW|ko|ky_KG|lo|lv|lt|mk|ms|ml|mr|nb|fa|pl|pt_BR|pt_PT|pa|ro|ru|sr|sk|sl|es|es_AR|es_ES|es_MX|sw|sv|ta|te|th|tr|uk|ur|uz|vi|zu|en"
           },
           "message" : {
+            "description" : "Message content of the translation.",
             "type" : [ "string", "null" ],
             "maxLength" : 65535,
             "minLength" : 0
@@ -206,20 +440,168 @@
           "type" : [ "null", "object" ],
           "properties" : {
             "displayMessage" : {
+              "description" : "Display message for the translation.",
               "type" : [ "string", "null" ],
               "maxLength" : 65535,
               "minLength" : 0
             },
             "id" : {
+              "description" : "Unique ID of the translation.",
               "type" : [ "string", "null", "integer" ],
               "format" : "int64",
               "pattern" : "([0-9]+)"
             },
             "status" : {
+              "description" : "Status of the translation. Possible values: SUBMITTED, PENDING, FAILED, APPROVED, REJECTED, DELETION_IN_PROGRESS.",
               "type" : [ "string", "null" ],
-              "enum" : [ "SUBMITTED", "FAILED", "APPROVED", "REJECTED", "PENDING" ],
+              "enum" : [ "SUBMITTED", "FAILED", "APPROVED", "REJECTED", "PENDING", "DELETION_IN_PROGRESS" ],
               "maxLength" : 100,
               "minLength" : 0
+            },
+            "rejectionReason" : {
+              "description" : "Reason for rejection if the translation was rejected.",
+              "type" : [ "string", "null" ],
+              "maxLength" : 65535,
+              "minLength" : 0
+            },
+            "uuid" : {
+              "description" : "UUID of the translation (returned when placeholders are applied).",
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "modifiedTime" : {
+              "description" : "Time when the translation was last modified.",
+              "type" : [ "string", "null" ],
+              "format" : "date-time",
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "failedReason" : {
+              "description" : "Reason for failure if the translation failed (returned when placeholders are applied).",
+              "type" : [ "string", "null" ],
+              "maxLength" : 65535,
+              "minLength" : 0
+            },
+            "templateItems" : {
+              "description" : "Template items including buttons, footer, and header.",
+              "type" : [ "null", "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "header" : {
+                  "description" : "Header section of the template.",
+                  "type" : [ "null", "object" ],
+                  "additionalProperties" : false,
+                  "properties" : {
+                    "type" : {
+                      "description" : "Type of the header content. Possible values: TEXT, IMAGE, DOCUMENT, VIDEO.",
+                      "type" : [ "string", "null" ],
+                      "enum" : [ "TEXT", "IMAGE", "DOCUMENT", "VIDEO" ],
+                      "maxLength" : 100,
+                      "minLength" : 0
+                    },
+                    "message" : {
+                      "description" : "Header message text.",
+                      "type" : [ "string", "null" ],
+                      "maxLength" : 60,
+                      "minLength" : 0
+                    },
+                    "attachment" : {
+                      "description" : "Attachment in the header.",
+                      "type" : [ "null", "object" ],
+                      "additionalProperties" : false,
+                      "properties" : {
+                        "id" : {
+                          "description" : "Unique ID of the attachment.",
+                          "type" : [ "string", "null", "integer" ],
+                          "format" : "int64",
+                          "pattern" : "([0-9]+)"
+                        },
+                        "name" : {
+                          "description" : "File name of the attachment.",
+                          "type" : [ "string", "null" ],
+                          "maxLength" : 255,
+                          "minLength" : 0
+                        },
+                        "size" : {
+                          "description" : "Size of the attachment in bytes.",
+                          "type" : [ "string", "null" ],
+                          "maxLength" : 100,
+                          "minLength" : 0
+                        },
+                        "type" : {
+                          "description" : "MIME type of the attachment.",
+                          "type" : [ "string", "null" ],
+                          "maxLength" : 100,
+                          "minLength" : 0
+                        },
+                        "uuid" : {
+                          "description" : "UUID of the attachment.",
+                          "type" : [ "string", "null" ],
+                          "maxLength" : 100,
+                          "minLength" : 0
+                        },
+                        "url" : {
+                          "description" : "URL to access the attachment.",
+                          "type" : [ "string", "null" ],
+                          "maxLength" : 2000,
+                          "minLength" : 0
+                        }
+                      }
+                    }
+                  }
+                },
+                "footer" : {
+                  "description" : "Footer section of the template.",
+                  "type" : [ "null", "object" ],
+                  "additionalProperties" : false,
+                  "properties" : {
+                    "type" : {
+                      "description" : "Type of the footer content.",
+                      "type" : [ "string", "null" ],
+                      "enum" : [ "TEXT" ],
+                      "maxLength" : 100,
+                      "minLength" : 0
+                    },
+                    "message" : {
+                      "description" : "Footer message text.",
+                      "type" : [ "string", "null" ],
+                      "maxLength" : 60,
+                      "minLength" : 0
+                    }
+                  }
+                },
+                "buttons" : {
+                  "description" : "List of interactive buttons in the template.",
+                  "type" : [ "null", "array" ],
+                  "items" : {
+                    "type" : [ "null", "object" ],
+                    "additionalProperties" : false,
+                    "properties" : {
+                      "type" : {
+                        "description" : "Type of the button. Possible values: QUICK_REPLY, PHONE_NUMBER, URL, CALL_PERMISSION_REQUEST, VOICE_CALL.",
+                        "type" : [ "string", "null" ],
+                        "enum" : [ "QUICK_REPLY", "PHONE_NUMBER", "URL", "CALL_PERMISSION_REQUEST", "VOICE_CALL" ],
+                        "maxLength" : 100,
+                        "minLength" : 0
+                      },
+                      "message" : {
+                        "description" : "Display text of the button.",
+                        "type" : [ "string", "null" ],
+                        "maxLength" : 200,
+                        "minLength" : 0
+                      },
+                      "action" : {
+                        "description" : "Action value of the button (phone number or URL).",
+                        "type" : [ "string", "null" ],
+                        "maxLength" : 2000,
+                        "minLength" : 0
+                      }
+                    }
+                  },
+                  "maxItems" : 10
+                }
+              }
             }
           },
           "required" : [ "displayMessage", "id", "status" ]
@@ -236,63 +618,89 @@
         "additionalProperties" : false,
         "properties" : {
           "actor" : {
+            "description" : "Details of the user who created or modified the template message.",
             "$ref" : "./IMCannedMessage.json#/components/schemas/cannedMessageActor"
           },
           "modifiedTime" : {
+            "description" : "Time when the template message was last modified.",
             "type" : [ "string", "null" ],
+            "format" : "date-time",
             "maxLength" : 100,
             "minLength" : 0
           },
           "displayMessage" : {
+            "description" : "Display message shown to the recipient.",
             "type" : [ "string", "null" ],
             "maxLength" : 65535,
             "minLength" : 0
           },
           "translations" : {
+            "description" : "List of translations for the template message.",
             "$ref" : "./IMCannedMessage.json#/components/schemas/listOfCannedMessageTranslations"
           },
           "departmentId" : {
+            "description" : "Unique ID of the department.",
             "type" : [ "string", "null", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "id" : {
+            "description" : "Unique ID of the template message.",
             "type" : [ "string", "null", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "title" : {
+            "description" : "Title of the message.",
             "type" : [ "string", "null" ],
             "maxLength" : 65535,
             "minLength" : 0
           },
           "message" : {
+            "description" : "Content of the message.",
             "type" : [ "string", "null" ],
             "maxLength" : 65535,
             "minLength" : 0
           },
           "type" : {
+            "description" : "Type of the message. Possible values: TEMPLATE, CANNED, WELCOMEMSG, AWAY.",
             "type" : [ "string", "null" ],
             "enum" : [ "TEMPLATE", "CANNED", "WELCOMEMSG", "AWAY" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "isActive" : {
+            "description" : "Indicates whether the template message is active. Possible values: true = active, false = inactive.",
             "type" : [ "boolean", "null" ]
           },
           "tags" : {
+            "description" : "Tags associated with the message.",
             "type" : [ "string", "null" ],
             "maxLength" : 65535,
             "minLength" : 0
           },
           "status" : {
+            "description" : "Status of the template message. Possible values: SUBMITTED, PENDING, FAILED, APPROVED, REJECTED, DELETION_IN_PROGRESS.",
             "type" : [ "string", "null" ],
-            "enum" : [ "SUBMITTED", "FAILED", "APPROVED", "REJECTED", "PENDING" ],
+            "enum" : [ "SUBMITTED", "FAILED", "APPROVED", "REJECTED", "PENDING", "DELETION_IN_PROGRESS" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "wabaId" : {
+            "description" : "WhatsApp Business Account ID.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "([0-9]+)"
+          },
+          "primaryLanguage" : {
+            "description" : "Primary language of the template message in ISO language code (returned when placeholders are applied).",
+            "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           }
         },
-        "required" : [ "actor", "departmentId", "displayMessage", "id", "isActive", "message", "modifiedTime", "status", "tags", "title", "translations", "type" ]
+        "required" : [ "actor", "departmentId", "displayMessage", "id", "isActive", "message", "modifiedTime", "primaryLanguage", "status", "tags", "title", "translations", "type", "wabaId" ]
       },
       "listofCannedMessages" : {
         "type" : [ "null", "array" ],
@@ -303,7 +711,7 @@
     },
     "responses" : {
       "getCannedMessage" : {
-        "description" : "getCannedMessage template definitions",
+        "description" : "IM template message details returned by Get IM Template Message and Get Applied Template Message.",
         "content" : {
           "application/json" : {
             "schema" : {
@@ -311,74 +719,115 @@
               "additionalProperties" : false,
               "properties" : {
                 "actor" : {
+                  "description" : "Details of the user who created or modified the template message.",
                   "$ref" : "./IMCannedMessage.json#/components/schemas/cannedMessageActor"
                 },
                 "modifiedTime" : {
+                  "description" : "Time when the template message was last modified.",
                   "type" : [ "string", "null" ],
+                  "format" : "date-time",
                   "maxLength" : 100,
                   "minLength" : 0
                 },
                 "displayMessage" : {
+                  "description" : "Display message shown to the recipient. Rendered with placeholders replaced when returned by Get Applied Template Message.",
                   "type" : [ "string", "null" ],
                   "maxLength" : 65535,
                   "minLength" : 0
                 },
                 "translations" : {
+                  "description" : "List of translations for the template message.",
                   "$ref" : "./IMCannedMessage.json#/components/schemas/listOfCannedMessageTranslations"
                 },
                 "departmentId" : {
+                  "description" : "Unique ID of the department.",
                   "type" : [ "string", "null", "integer" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "id" : {
+                  "description" : "Unique ID of the template message.",
                   "type" : [ "string", "null", "integer" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "title" : {
+                  "description" : "Title of the message.",
                   "type" : [ "string", "null" ],
                   "maxLength" : 65535,
                   "minLength" : 0
                 },
                 "message" : {
+                  "description" : "Content of the message. Rendered with placeholders replaced when returned by Get Applied Template Message.",
                   "type" : [ "string", "null" ],
                   "maxLength" : 65535,
                   "minLength" : 0
                 },
                 "type" : {
+                  "description" : "Type of the message. Possible values: TEMPLATE, CANNED, WELCOMEMSG, AWAY.",
                   "type" : [ "string", "null" ],
                   "enum" : [ "TEMPLATE", "CANNED", "WELCOMEMSG", "AWAY" ],
                   "maxLength" : 100,
                   "minLength" : 0
                 },
                 "isActive" : {
+                  "description" : "Indicates whether the template message is active. Possible values: true = active, false = inactive.",
                   "type" : [ "boolean", "null" ]
                 },
                 "tags" : {
+                  "description" : "Tags associated with the message.",
                   "type" : [ "string", "null" ],
                   "maxLength" : 65535,
                   "minLength" : 0
                 },
                 "status" : {
+                  "description" : "Status of the template message. Possible values: SUBMITTED, PENDING, FAILED, APPROVED, REJECTED, DELETION_IN_PROGRESS.",
                   "type" : [ "string", "null" ],
-                  "enum" : [ "SUBMITTED", "FAILED", "APPROVED", "REJECTED", "PENDING" ],
+                  "enum" : [ "SUBMITTED", "FAILED", "APPROVED", "REJECTED", "PENDING", "DELETION_IN_PROGRESS" ],
+                  "maxLength" : 100,
+                  "minLength" : 0
+                },
+                "wabaId" : {
+                  "description" : "WhatsApp Business Account ID.",
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 100,
+                  "minLength" : 0,
+                  "pattern" : "([0-9]+)"
+                },
+                "primaryLanguage" : {
+                  "description" : "Primary language of the template message in ISO language code (returned when placeholders are applied).",
+                  "type" : [ "string", "null" ],
                   "maxLength" : 100,
                   "minLength" : 0
                 }
               },
-              "required" : [ "actor", "departmentId", "displayMessage", "id", "isActive", "message", "modifiedTime", "status", "tags", "title", "translations", "type" ]
+              "required" : [ "actor", "departmentId", "displayMessage", "id", "isActive", "message", "modifiedTime", "primaryLanguage", "status", "tags", "title", "translations", "type", "wabaId" ]
             },
             "examples" : {
-              "Valid responses Definitions" : {
-                "value" : null
+              "GetIMCannedMessage_200_TEMPLATE" : {
+                "$ref" : "./examples/IMCannedMessage.json#/components/examples/GetIMCannedMessage_200_TEMPLATE"
+              },
+              "GetIMCannedMessage_200_CANNED" : {
+                "$ref" : "./examples/IMCannedMessage.json#/components/examples/GetIMCannedMessage_200_CANNED"
+              },
+              "GetIMCannedMessage_200_WELCOMEMSG" : {
+                "$ref" : "./examples/IMCannedMessage.json#/components/examples/GetIMCannedMessage_200_WELCOMEMSG"
+              },
+              "GetIMCannedMessage_200_AWAY" : {
+                "$ref" : "./examples/IMCannedMessage.json#/components/examples/GetIMCannedMessage_200_AWAY"
+              },
+              "ApplyCannedMessage_200_TEMPLATE" : {
+                "$ref" : "./examples/IMCannedMessage.json#/components/examples/ApplyCannedMessage_200_TEMPLATE"
+              },
+              "ApplyCannedMessage_200_CANNED" : {
+                "$ref" : "./examples/IMCannedMessage.json#/components/examples/ApplyCannedMessage_200_CANNED"
               }
             }
           }
         }
       },
       "getCannedMessages" : {
-        "description" : "getCannedMessages template definitions",
+        "description" : "List of IM template message entries returned by Get IM Template Messages.",
         "content" : {
           "application/json" : {
             "schema" : {
@@ -386,183 +835,41 @@
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
+                  "description" : "List of IM template message entries.",
                   "$ref" : "./IMCannedMessage.json#/components/schemas/listofCannedMessages"
                 },
                 "hasMore" : {
+                  "description" : "Indicates whether more records are available for pagination. Possible values: true = more records available, false = no more records.",
                   "type" : [ "boolean", "null" ]
                 }
               },
               "required" : [ "data", "hasMore" ]
             },
             "examples" : {
-              "Valid responses Definitions" : {
-                "value" : {
-                  "data" : [ {
-                    "modifiedTime" : 1711085762000,
-                    "departmentId" : "186543000000006907",
-                    "title" : "fb marketing",
-                    "message" : "Welcome to Tasty Bakery. What would you like to eat?",
-                    "type" : "TEMPLATE",
-                    "isActive" : true,
-                    "tags" : "MARKETING",
-                    "actor" : {
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/186543000000190001/photo?orgId=78412359",
-                      "name" : "Abhishek Aich",
-                      "id" : "186543000000190001",
-                      "type" : "AGENT",
-                      "email" : "zykler@sales.com"
-                    },
-                    "wabaId" : "102086489526176",
-                    "displayMessage" : "Welcome to Tasty Bakery. What would you like to eat?",
-                    "translations" : [ {
-                      "displayMessage" : "Welcome to Tasty Bakery. What would you like to eat?",
-                      "templateItems" : {
-                        "buttons" : [ {
-                          "action" : null,
-                          "type" : "QUICK_REPLY",
-                          "message" : "Cakes"
-                        }, {
-                          "action" : null,
-                          "type" : "QUICK_REPLY",
-                          "message" : "pizza"
-                        } ],
-                        "footer" : null,
-                        "header" : null
-                      },
-                      "language" : "en",
-                      "id" : "3942000001074177",
-                      "message" : "Welcome to Tasty Bakery. What would you like to eat?",
-                      "rejectionReason" : null,
-                      "status" : "APPROVED"
-                    } ],
-                    "id" : "3942000001074175",
-                    "status" : "APPROVED"
-                  }, {
-                    "modifiedTime" : 1711085753000,
-                    "departmentId" : "186543000000006907",
-                    "title" : "Rice Marketing",
-                    "message" : "Hello please select our new rice items",
-                    "type" : "TEMPLATE",
-                    "isActive" : true,
-                    "tags" : "MARKETING",
-                    "actor" : {
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/186543000000190001/photo?orgId=78412359",
-                      "name" : "Abhishek Aich",
-                      "id" : "186543000000190001",
-                      "type" : "AGENT",
-                      "email" : "zykler@sales.com"
-                    },
-                    "wabaId" : "102086489526176",
-                    "displayMessage" : "Hello please select our new rice items",
-                    "translations" : [ {
-                      "displayMessage" : "Hello please select our new rice items",
-                      "templateItems" : {
-                        "buttons" : [ {
-                          "action" : null,
-                          "type" : "QUICK_REPLY",
-                          "message" : "Boiled Rice"
-                        }, {
-                          "action" : null,
-                          "type" : "QUICK_REPLY",
-                          "message" : "Rice Cake"
-                        }, {
-                          "action" : null,
-                          "type" : "QUICK_REPLY",
-                          "message" : "Fried Rice"
-                        } ],
-                        "footer" : null,
-                        "header" : {
-                          "attachment" : null,
-                          "type" : "TEXT",
-                          "message" : "Welcome Back"
-                        }
-                      },
-                      "language" : "en",
-                      "id" : "3942000001423160",
-                      "message" : "Hello please select our new rice items",
-                      "rejectionReason" : null,
-                      "status" : "APPROVED"
-                    } ],
-                    "id" : "3942000001423158",
-                    "status" : "APPROVED"
-                  }, {
-                    "modifiedTime" : 1711082873000,
-                    "departmentId" : "186543000000006907",
-                    "title" : "Whatsapp marketing",
-                    "message" : "Welcome to Tasty Bakery. What would you like to eat?\nHere are our new products",
-                    "type" : "TEMPLATE",
-                    "isActive" : true,
-                    "tags" : "UTILITY",
-                    "actor" : {
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/186543000000190001/photo?orgId=78412359",
-                      "name" : "Abhishek Aich",
-                      "id" : "186543000000190001",
-                      "type" : "AGENT",
-                      "email" : "zykler@sales.com"
-                    },
-                    "wabaId" : "102086489526176",
-                    "displayMessage" : "Welcome to Tasty Bakery. What would you like to eat?\nHere are our new products",
-                    "translations" : [ {
-                      "displayMessage" : "Welcome to Tasty Bakery. What would you like to eat?\nHere are our new products",
-                      "templateItems" : {
-                        "buttons" : [ {
-                          "action" : null,
-                          "type" : "QUICK_REPLY",
-                          "message" : "Croissants"
-                        }, {
-                          "action" : null,
-                          "type" : "QUICK_REPLY",
-                          "message" : "Pizza"
-                        } ],
-                        "footer" : null,
-                        "header" : null
-                      },
-                      "language" : "en",
-                      "id" : "3942000001262607",
-                      "message" : "Welcome to Tasty Bakery. What would you like to eat?\nHere are our new products",
-                      "rejectionReason" : null,
-                      "status" : "APPROVED"
-                    } ],
-                    "id" : "3942000001262605",
-                    "status" : "APPROVED"
-                  } ],
-                  "hasMore" : false
-                }
+              "GetIMCannedMessages_200_TEMPLATE" : {
+                "$ref" : "./examples/IMCannedMessage.json#/components/examples/GetIMCannedMessages_200_TEMPLATE"
+              },
+              "GetIMCannedMessages_200_WELCOMEMSG" : {
+                "$ref" : "./examples/IMCannedMessage.json#/components/examples/GetIMCannedMessages_200_WELCOMEMSG"
+              },
+              "GetIMCannedMessages_200_AWAY" : {
+                "$ref" : "./examples/IMCannedMessage.json#/components/examples/GetIMCannedMessages_200_AWAY"
+              },
+              "GetIMCannedMessages_200_CANNED" : {
+                "$ref" : "./examples/IMCannedMessage.json#/components/examples/GetIMCannedMessages_200_CANNED"
               }
             }
           }
         }
       }
     },
-    "parameters" : {
-      "contactId" : {
-        "name" : "contactId",
-        "in" : "query",
-        "description" : "Contact id for which the canned message has to be applied",
-        "required" : true,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "description" : "Contact id for which the canned message has to be applied",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "id" : {
-        "name" : "id",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      }
-    },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

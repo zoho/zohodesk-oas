@@ -11,8 +11,43 @@
         "summary" : "Get User Details",
         "description" : "This API fetches the details of a particular help center user.",
         "operationId" : "getUserDetails",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/userId"
+          "name" : "include",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "contact" ],
+            "maxItems" : 1,
+            "pattern" : "(contact)"
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Additional information related to the user. Value allowed is @contact@."
+        }, {
+          "name" : "helpCenterId",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "ID of the help center from which the user must be fetched"
+        }, {
+          "name" : "userId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -40,8 +75,30 @@
         "summary" : "Update User Details",
         "description" : "This API helps update the details of a particular help center user. ",
         "operationId" : "updateUserDetails",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/userId"
+          "name" : "helpCenterId",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "ID of the help center from which the user must be updated"
+        }, {
+          "name" : "userId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -74,8 +131,30 @@
         "summary" : "Associate Groups To Users",
         "description" : "This API adds a user to the groups specified.",
         "operationId" : "associateGroupsToUsers",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/userId"
+          "name" : "helpCenterId",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "ID of the help center from which the groups must be validated"
+        }, {
+          "name" : "userId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -102,8 +181,90 @@
         "summary" : "Get User Labels",
         "description" : "This API lists a particular number of labels associated with a user, based on the limit defined.",
         "operationId" : "getUserLabels",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/userId"
+          "name" : "isPrimary",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "boolean" ]
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Key that filters the primary label assigned to the user"
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "minimum" : 1,
+            "default" : 1
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Index number, starting from which the labels must be fetched. The default value is 1"
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "minimum" : 1,
+            "maximum" : 50,
+            "default" : 50
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Number of labels to list. The default value and the maximum value allowed is 50"
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "pattern" : "-?(assignedTime)"
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Key that sorts the list of labels by a particular attribute: -(@assignedTime@)"
+        }, {
+          "name" : "searchBy",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+",
+            "x-regex-name" : "cleartextampersand"
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Search keyword to use for finding a particular user. The keyword must contain at least two characters."
+        }, {
+          "name" : "helpCenterId",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "ID of the help center from which the labels must be fetched"
+        }, {
+          "name" : "userId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -133,8 +294,30 @@
         "summary" : "Remove Labels From User",
         "description" : "This API removes the labels you specify from a particular user.",
         "operationId" : "removeLabelsFromUser",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/userId"
+          "name" : "helpCenterId",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "ID of the help center from which the labels must be removed"
+        }, {
+          "name" : "userId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -161,8 +344,30 @@
         "summary" : "Delete Groups From Users",
         "description" : "This API removes a user from the groups specified.",
         "operationId" : "deleteGroupsFromUsers",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/userId"
+          "name" : "helpCenterId",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "ID of the help center from which the groups must be removed"
+        }, {
+          "name" : "userId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -189,8 +394,18 @@
         "summary" : "Delete End User",
         "description" : "This API permanently deletes all identifying information about a user from your help center.",
         "operationId" : "deleteEndUser",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/userId"
+          "name" : "userId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -226,7 +441,83 @@
         "summary" : "Get Users",
         "description" : "This API lists a particular number of help center users, based on the limit defined. It also helps you search for specific users.",
         "operationId" : "getUsers",
+        "x-mcp-ready" : true,
         "parameters" : [ {
+          "name" : "from",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "minimum" : 1,
+            "default" : 1
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Index number, starting from which the users must be fetched. The default value is 1"
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "minimum" : 1,
+            "maximum" : 50,
+            "default" : 50
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Number of users to be listed. The default and the maximum allowed value is 50"
+        }, {
+          "name" : "searchBy",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+",
+            "x-regex-name" : "cleartextampersand"
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Search keyword to find a particular user. Note: The keyword must contain at least two characters"
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "pattern" : "-?(email|modifiedTime)"
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Key that sorts the list of users by a particular attribute: -(@email@ or @modifiedTime@)"
+        }, {
+          "name" : "status",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "ACTIVE", "DISABLED", "DELETED", "ALL" ]
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Activation status of the users to list"
+        }, {
+          "name" : "helpCenterId",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "ID of the help center from which the users must be fetched"
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        }, {
           "name" : "include",
           "in" : "query",
           "description" : "Additional information related to the user. Value allowed is @count@.",
@@ -245,7 +536,33 @@
             "uniqueItems" : true
           }
         }, {
-          "$ref" : "./Common.json#/components/parameters/orgId"
+          "name" : "lastActivityStartTime",
+          "in" : "query",
+          "description" : "Starting time of the time range in which the comments should have been created. The value must be expressed according to the GMT time zone.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "null" ],
+            "description" : "Starting time of the time range in which the comments should have been created. The value must be expressed according to the GMT time zone.",
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "^(202[0-9]|20[3-9][0-9])-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]{3})?Z$"
+          }
+        }, {
+          "name" : "lastActivityEndTime",
+          "in" : "query",
+          "description" : "Starting time of the time range in which the comments should have been created. The value must be expressed according to the GMT time zone.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "null" ],
+            "description" : "Starting time of the time range in which the comments should have been created. The value must be expressed according to the GMT time zone.",
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "^(202[0-9]|20[3-9][0-9])-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]{3})?Z$"
+          }
         } ],
         "responses" : {
           "200" : {
@@ -273,8 +590,30 @@
         "summary" : "Assign Labels To User",
         "description" : "This API assigns the labels you specify to a particular user. ",
         "operationId" : "assignLabelsToUser",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/userId"
+          "name" : "helpCenterId",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "ID of the help center from which the labels must be validated"
+        }, {
+          "name" : "userId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -301,8 +640,80 @@
         "summary" : "Get User Groups",
         "description" : "This API lists a particular number of user groups in a help center, based on the limit defined.",
         "operationId" : "getUserGroups",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/userId"
+          "name" : "from",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "minimum" : 1,
+            "default" : 1
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Index number, starting from which the groups must be fetched. The default value is 1"
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "minimum" : 1,
+            "maximum" : 50,
+            "default" : 50
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Number of groups to list. The default value and the maximum value allowed is 50"
+        }, {
+          "name" : "searchBy",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+",
+            "x-regex-name" : "cleartextampersand"
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Search keyword to use for finding a particular user. The keyword must contain at least two characters."
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "pattern" : "-?((addedTime))"
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Key that sorts the list of user groups by a particular attribute: -(@addedTime@)"
+        }, {
+          "name" : "helpCenterId",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "ID of the help center from which the groups must be fetched"
+        }, {
+          "name" : "userId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -325,12 +736,50 @@
         } ],
         "x-audience" : [ "external-public" ]
       }
+    },
+    "/api/v1/portalUsers/{userId}/removeUser" : {
+      "post" : {
+        "tags" : [ "User" ],
+        "summary" : "Remove Portal User",
+        "description" : "Removes a portal user from the help center.",
+        "operationId" : "removePortalUser",
+        "parameters" : [ {
+          "name" : "userId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.DELETE", "Desk.basic.DELETE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
     }
   },
   "components" : {
     "schemas" : {
       "massActionErrorResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "errorCode" : {
@@ -346,7 +795,7 @@
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "httpCode" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           }
@@ -354,38 +803,38 @@
         "required" : [ "error", "errorCode", "httpCode" ]
       },
       "massActionJsonResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "success" : {
             "type" : [ "boolean", "null" ]
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "errors" : {
-            "$ref" : "./User.json#/components/schemas/massActionErrorResponse"
+            "$ref" : "#/components/schemas/massActionErrorResponse"
           }
         },
         "required" : [ "errors", "id", "success" ]
       },
       "massActionJsonArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./User.json#/components/schemas/massActionJsonResponse"
+          "$ref" : "#/components/schemas/massActionJsonResponse"
         }
       },
       "userDefaultJson" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "photoUrl" : {
             "type" : [ "string", "null" ],
             "maxLength" : 200,
             "minLength" : 0,
-            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&%\\$#_@]*)?$)"
           },
           "name" : {
             "type" : [ "string", "null" ],
@@ -393,7 +842,7 @@
             "minLength" : 0
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
@@ -403,6 +852,28 @@
       "userMetaJson" : {
         "additionalProperties" : false,
         "allOf" : [ {
+          "$ref" : "#/components/schemas/userDefaultJson"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "emailAddress" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0,
+              "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+            },
+            "userType" : {
+              "type" : [ "string", "null" ],
+              "enum" : [ "ENDUSER", "SUPPORTREP" ]
+            },
+            "status" : {
+              "type" : [ "string", "null" ],
+              "enum" : [ "ACTIVE", "DISABLED", "DELETED" ]
+            }
+          },
+          "required" : [ "emailAddress", "status", "userType" ],
+          "additionalProperties" : false
+        }, {
           "$ref" : "./User.json#/components/schemas/userDefaultJson"
         }, {
           "type" : [ "null", "object" ],
@@ -430,7 +901,7 @@
         } ]
       },
       "userEmailObj" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "emailAddress" : {
@@ -449,17 +920,17 @@
         "required" : [ "emailAddress", "isPrimary", "isVerified" ]
       },
       "userEmailObjArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./User.json#/components/schemas/userEmailObj"
+          "$ref" : "#/components/schemas/userEmailObj"
         }
       },
       "userGroupInputJsonObj" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
@@ -467,13 +938,13 @@
         "required" : [ "id" ]
       },
       "userGroupInputJsonArr" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./User.json#/components/schemas/userGroupInputJsonObj"
+          "$ref" : "#/components/schemas/userGroupInputJsonObj"
         }
       },
       "userLabelJsonObj" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
           "$ref" : "./Label.json#/components/schemas/userLabelMetaResponse"
         }
@@ -481,6 +952,37 @@
       "userDetailJson" : {
         "additionalProperties" : false,
         "allOf" : [ {
+          "$ref" : "#/components/schemas/userDefaultJson"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "lastAccessedTime" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0,
+              "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+            },
+            "emailAddress" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0,
+              "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+            },
+            "userType" : {
+              "type" : [ "string", "null" ],
+              "enum" : [ "ENDUSER", "SUPPORTREP" ]
+            },
+            "label" : {
+              "$ref" : "./Label.json#/components/schemas/labelMetaResponse"
+            },
+            "status" : {
+              "type" : [ "string", "null" ],
+              "enum" : [ "ACTIVE", "DISABLED", "DELETED" ]
+            }
+          },
+          "required" : [ "emailAddress", "label", "lastAccessedTime", "status", "userType" ],
+          "additionalProperties" : false
+        }, {
           "$ref" : "./User.json#/components/schemas/userDefaultJson"
         }, {
           "type" : [ "null", "object" ],
@@ -517,30 +1019,20 @@
         } ]
       },
       "data" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./User.json#/components/schemas/userDetailJson"
+          "$ref" : "#/components/schemas/userDetailJson"
         }
       },
-      "userListViewJson" : {
-        "type" : [ "null", "object" ],
-        "additionalProperties" : false,
-        "properties" : {
-          "data" : {
-            "$ref" : "./User.json#/components/schemas/data"
-          }
-        },
-        "required" : [ "data" ]
-      },
       "userLabelInputJsonObj" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "isPrimary" : {
             "type" : [ "boolean", "null" ]
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
@@ -548,13 +1040,13 @@
         "required" : [ "id", "isPrimary" ]
       },
       "userLabelInputJsonArr" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./User.json#/components/schemas/userLabelInputJsonObj"
+          "$ref" : "#/components/schemas/userLabelInputJsonObj"
         }
       },
       "userGroupJsonObj" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
           "$ref" : "./HelpcenterGroups.json#/components/schemas/groupMetaResponse"
         }
@@ -566,11 +1058,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "results" : {
-                  "$ref" : "./User.json#/components/schemas/massActionJsonArray"
+                  "$ref" : "#/components/schemas/massActionJsonArray"
                 }
               },
               "required" : [ "results" ]
@@ -608,6 +1100,39 @@
             "schema" : {
               "additionalProperties" : false,
               "allOf" : [ {
+                "$ref" : "#/components/schemas/userDefaultJson"
+              }, {
+                "type" : [ "object", "null" ],
+                "properties" : {
+                  "lastAccessedTime" : {
+                    "type" : [ "string", "null" ],
+                    "maxLength" : 100,
+                    "minLength" : 0,
+                    "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+                  },
+                  "contactId" : {
+                    "type" : [ "string", "integer", "null" ],
+                    "format" : "int64",
+                    "pattern" : "([0-9]+)"
+                  },
+                  "userType" : {
+                    "type" : [ "string", "null" ],
+                    "enum" : [ "ENDUSER", "SUPPORTREP" ]
+                  },
+                  "label" : {
+                    "$ref" : "./Label.json#/components/schemas/labelMetaResponse"
+                  },
+                  "email" : {
+                    "$ref" : "#/components/schemas/userEmailObjArray"
+                  },
+                  "status" : {
+                    "type" : [ "string", "null" ],
+                    "enum" : [ "ACTIVE", "DISABLED", "DELETED" ]
+                  }
+                },
+                "required" : [ "contactId", "email", "label", "lastAccessedTime", "status", "userType" ],
+                "additionalProperties" : false
+              }, {
                 "$ref" : "./User.json#/components/schemas/userDefaultJson"
               }, {
                 "type" : [ "null", "object" ],
@@ -649,7 +1174,7 @@
               "Valid responses Definitions" : {
                 "value" : {
                   "lastAccessedTime" : "2021-06-11T06:21:32.000Z",
-                  "photoURL" : "https://desk.zoho.com/portal/api/portalUser/17883000000094001/photo",
+                  "photoURL" : "https://desk.example.com/portal/api/portalUser/17883000000094001/photo",
                   "contactId" : "3313135931139",
                   "name" : "Developer",
                   "id" : "310975130121",
@@ -663,7 +1188,7 @@
                     "id" : "24073000002823026",
                     "logoUrl" : null
                   },
-                  "type" : "ENDUSER",
+                  "type" : [ "ENDUSER" ],
                   "email" : [ {
                     "emailAddress" : "zylcare@zylker.com",
                     "isVerified" : "false",
@@ -681,11 +1206,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./User.json#/components/schemas/userLabelJsonObj"
+                  "$ref" : "#/components/schemas/userLabelJsonObj"
                 }
               },
               "required" : [ "data" ]
@@ -742,15 +1267,15 @@
           "application/json" : {
             "schema" : {
               "allOf" : [ {
-                "type" : "object",
+                "type" : [ "object" ],
                 "properties" : {
                   "data" : {
-                    "type" : "array",
+                    "type" : [ "array" ],
                     "items" : {
-                      "type" : "object",
+                      "type" : [ "object" ],
                       "properties" : {
                         "count" : {
-                          "type" : [ "string", "null", "integer" ],
+                          "type" : [ "string", "integer", "null" ],
                           "format" : "int32",
                           "pattern" : "([0-9]+)"
                         }
@@ -759,30 +1284,29 @@
                   }
                 }
               }, {
-                "oneOf" : [ {
-                  "type" : [ "null", "object" ],
+                "anyOf" : [ {
+                  "type" : [ "object", "null" ],
                   "additionalProperties" : false,
                   "properties" : {
                     "data" : {
-                      "$ref" : "./User.json#/components/schemas/data"
+                      "$ref" : "#/components/schemas/data"
                     }
                   },
                   "required" : [ "data" ]
                 }, {
+                  "type" : [ "object", "null" ],
                   "additionalProperties" : false,
-                  "allOf" : [ {
-                    "$ref" : "./User.json#/components/schemas/userListViewJson"
-                  }, {
-                    "type" : [ "null", "object" ],
-                    "properties" : {
-                      "count" : {
-                        "type" : [ "string", "null", "integer" ],
-                        "format" : "int32",
-                        "pattern" : "([0-9]+)"
-                      }
+                  "properties" : {
+                    "data" : {
+                      "$ref" : "#/components/schemas/data"
                     },
-                    "required" : [ "count" ]
-                  } ]
+                    "count" : {
+                      "type" : [ "string", "integer", "null" ],
+                      "format" : "int32",
+                      "pattern" : "([0-9]+)"
+                    }
+                  },
+                  "required" : [ "data", "count" ]
                 } ]
               } ]
             },
@@ -791,7 +1315,25 @@
                 "value" : {
                   "data" : [ {
                     "lastAccessedTime" : "2021-06-11T06:21:32.000Z",
-                    "photoURL" : "https://desk.zoho.com/portal/api/portalUser/17883000000094001/photo",
+                    "photoURL" : "https://desk.example.com/portal/api/portalUser/17883000000094001/photo",
+                    "emailAddress" : "carol@zylker.com",
+                    "name" : "Developer",
+                    "id" : "310975130121",
+                    "label" : {
+                      "preferences" : {
+                        "shape" : "RECTANGLE",
+                        "bgColor" : "#39B54A",
+                        "textColor" : "#FFFFFF"
+                      },
+                      "name" : "Lock Label",
+                      "id" : "24073000002823026",
+                      "logoUrl" : null
+                    },
+                    "type" : [ "ENDUSER" ],
+                    "status" : "ACTIVE"
+                  }, {
+                    "lastAccessedTime" : "2021-06-11T06:21:32.000Z",
+                    "photoURL" : "https://desk.example.com/portal/api/portalUser/17883000000094001/photo",
                     "emailAddress" : "carol@zylker.com",
                     "name" : "Developer",
                     "id" : "310975130121",
@@ -820,11 +1362,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./User.json#/components/schemas/userGroupJsonObj"
+                  "$ref" : "#/components/schemas/userGroupJsonObj"
                 }
               },
               "required" : [ "data" ]
@@ -844,7 +1386,7 @@
                     "name" : "Zoho Desk Partners",
                     "id" : "24073000002957051",
                     "helpCenterId" : "24073000002733221",
-                    "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/24073000002959001?portalId=b363e6f8e029247a38a55e49806bf1f683801f9cd92870bf7cc50d48844902f0",
+                    "logoUrl" : "https://desk.example.com/portal/api/publicImages/24073000002959001?portalId=b363e6f8e029247a38a55e49806bf1f683801f9cd92870bf7cc50d48844902f0",
                     "status" : "ACTIVE"
                   }, {
                     "addedTime" : "2020-04-06T04:50:14.000Z",
@@ -861,30 +1403,16 @@
         }
       }
     },
-    "parameters" : {
-      "userId" : {
-        "name" : "userId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      }
-    },
     "requestBodies" : {
       "userGroupInputJson" : {
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "groups" : {
-                  "$ref" : "./User.json#/components/schemas/userGroupInputJsonArr"
+                  "$ref" : "#/components/schemas/userGroupInputJsonArr"
                 }
               },
               "required" : [ "groups" ]
@@ -911,13 +1439,14 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "anonymizedName" : {
                   "type" : [ "string", "null" ],
                   "description" : "Display name of the user in tickets and community topics after anonymization",
                   "maxLength" : 100,
+                  "pattern" : "[A-Za-z0-9~@$%_\\!\\^\\[\\]\\{\\},#*:`.'\"&\\+\\?\\-\\\\\\/\\|\\P{InBasicLatin}\\s]+",
                   "minLength" : 0
                 }
               }
@@ -936,11 +1465,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "labels" : {
-                  "$ref" : "./User.json#/components/schemas/userLabelInputJsonArr"
+                  "$ref" : "#/components/schemas/userLabelInputJsonArr"
                 }
               },
               "required" : [ "labels" ]
@@ -968,13 +1497,13 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "email" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array", "null" ],
                   "items" : {
-                    "type" : [ "null", "object" ],
+                    "type" : [ "object", "null" ],
                     "additionalProperties" : false,
                     "maxProperties" : 2,
                     "minProperties" : 2,
@@ -1020,6 +1549,15 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "jwt-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/jwt-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

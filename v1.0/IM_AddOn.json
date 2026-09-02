@@ -1,0 +1,491 @@
+{
+  "openapi" : "3.1.0",
+  "x-mcp-group" : [ "IM AddOns" ],
+  "info" : {
+    "title" : "IM_AddOn",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/im/subscription/addOns" : {
+      "get" : {
+        "tags" : [ "IM_AddOn" ],
+        "summary" : "Get AddOn Package Details",
+        "description" : "Retrieves add-on package details for the specified integration service.",
+        "operationId" : "getAddOnPackageDetails",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "integrationServiceId",
+          "in" : "query",
+          "description" : "Integration service type to filter add-on packages. Possible values: TELEGRAM, TWILIO, IM_TALK, LINE, WECHAT, WECOM, WHATSAPP, FACEBOOKMESSENGER, INSTAGRAM.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "Integration service type to filter add-on packages.",
+            "enum" : [ "TELEGRAM", "TWILIO", "IM_TALK", "LINE", "WECHAT", "WECOM", "WHATSAPP", "FACEBOOKMESSENGER", "INSTAGRAM" ],
+            "maxLength" : 100,
+            "minLength" : 1
+          }
+        }, {
+          "name" : "subscription",
+          "in" : "query",
+          "description" : "Includes subscription details for purchased add-on packages. Possible values: true to include subscription details such as available balance, reserved amount, and renewal settings; false to omit subscription details.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "boolean",
+            "description" : "Includes subscription details for purchased add-on packages. Possible values: true to include subscription details such as available balance, reserved amount, and renewal settings; false to omit subscription details."
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/getAddOnPackageDetails"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.InstantMessages.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/im/subscription/statement" : {
+      "get" : {
+        "tags" : [ "IM_AddOn" ],
+        "summary" : "Get IM Payment Statement",
+        "description" : "Retrieves IM credit statement entries for the org, with pagination support.",
+        "operationId" : "getIMPaymentStatement",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "transactionType",
+          "in" : "query",
+          "description" : "Filter statement entries by transaction type.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "Filter statement entries by transaction type.",
+            "enum" : [ "CREDIT", "DEBIT", "CREDIT_RENEWAL", "UNSUCCESSFUL_DEBIT" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "duration",
+          "in" : "query",
+          "description" : "Predefined time range for the statement. Use CUSTOM_IN_DATE or CUSTOM_IN_MILLIS with startDate and endDate. Possible values: LAST24HOURS, TODAY, YESTERDAY, LAST_7_DAYS, LAST_30_DAYS, THIS_WEEK, LAST_WEEK, THIS_MONTH, LAST_MONTH, CUSTOM_IN_DATE, CUSTOM_IN_MILLIS, LAST_1_HOUR.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "Predefined time range for the statement. Possible values: LAST24HOURS, TODAY, YESTERDAY, LAST_7_DAYS, LAST_30_DAYS, THIS_WEEK, LAST_WEEK, THIS_MONTH, LAST_MONTH, CUSTOM_IN_DATE, CUSTOM_IN_MILLIS, LAST_1_HOUR.",
+            "enum" : [ "LAST24HOURS", "TODAY", "YESTERDAY", "LAST_30_DAYS", "LAST_7_DAYS", "THIS_WEEK", "LAST_WEEK", "THIS_MONTH", "LAST_MONTH", "CUSTOM_IN_DATE", "CUSTOM_IN_MILLIS", "LAST_1_HOUR" ],
+            "pattern" : "(LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR)",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "endDate",
+          "in" : "query",
+          "description" : "End date for a custom date range. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the end time as a Unix timestamp in milliseconds.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "End date for a custom date range. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the end time as a Unix timestamp in milliseconds.",
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "[0-9\\-]+",
+            "x-regex-name" : "reportCustomTime"
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of statement entries to fetch. Defaults to 30 when omitted. Maximum value is 100.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int32",
+            "description" : "Number of statement entries to fetch. Defaults to 30 when omitted. Maximum value is 100.",
+            "pattern" : "([0-9]+)",
+            "default" : 30,
+            "maximum" : 100
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number, starting from which the statement entry must be fetched.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int32",
+            "description" : "Index number, starting from which the statement entry must be fetched.",
+            "pattern" : "([0-9]+)",
+            "default" : 0
+          }
+        }, {
+          "name" : "startDate",
+          "in" : "query",
+          "description" : "Start date for a custom date range. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the start time as a Unix timestamp in milliseconds.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "Start date for a custom date range. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the start time as a Unix timestamp in milliseconds.",
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "[0-9\\-]+",
+            "x-regex-name" : "reportCustomTime"
+          }
+        }, {
+          "name" : "channelId",
+          "in" : "query",
+          "description" : "Filter statement entries for a particular channel.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Filter statement entries for a particular channel.",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/StatementResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.InstantMessages.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "addOnSubscriptionInfo" : {
+        "type" : [ "null", "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "count" : {
+            "description" : "Number of add-on packages purchased.",
+            "type" : [ "string", "null", "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "available" : {
+            "description" : "Available balance for the subscription.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "reserved" : {
+            "description" : "Reserved amount for the subscription.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "renewalCount" : {
+            "description" : "Renewal package count configured for auto-renewal.",
+            "type" : [ "string", "null", "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "renewalThreshold" : {
+            "description" : "Threshold balance that triggers auto-renewal.",
+            "type" : [ "string", "null", "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "status" : {
+            "description" : "Subscription status of the add-on package.",
+            "type" : [ "string", "null" ],
+            "enum" : [ "PURCHASED", "PURCHASE_MODIFIED", "RENEWAL_SUCCESS", "RENEWAL_FAILURE", "LICENSE_CANCELLED" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "available", "count", "renewalCount", "renewalThreshold", "reserved", "status" ]
+      },
+      "addOnPackage" : {
+        "type" : [ "null", "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "cost" : {
+            "description" : "Cost of the add-on package.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "subscriptionInfo" : {
+            "description" : "Subscription details for the add-on package when subscription=true.",
+            "$ref" : "./IM_AddOn.json#/components/schemas/addOnSubscriptionInfo"
+          },
+          "kind" : {
+            "description" : "Type of the add-on item.",
+            "type" : [ "string", "null" ],
+            "enum" : [ "single.addOn", "list.addOn", "single.statement" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "module" : {
+            "description" : "Module the add-on applies to.",
+            "type" : [ "string", "null" ],
+            "enum" : [ "MESSAGE", "CHANNEL", "CONVERSATION" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "name" : {
+            "description" : "Name of the add-on package.",
+            "type" : [ "string", "null" ],
+            "enum" : [ "IM_CREDITS", "TWILIO_PHONENUMBER" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "type" : {
+            "description" : "Billing type of the add-on package.",
+            "type" : [ "string", "null" ],
+            "enum" : [ "CREDIT", "COUNT" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "cost", "kind", "module", "name", "subscriptionInfo", "type" ]
+      },
+      "addOnPackagesArray" : {
+        "type" : [ "null", "array" ],
+        "items" : {
+          "$ref" : "./IM_AddOn.json#/components/schemas/addOnPackage"
+        }
+      },
+      "DebitDetails" : {
+        "type" : [ "null", "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "deductionReason" : {
+            "description" : "Reason for the debit transaction.",
+            "type" : [ "string", "null" ],
+            "enum" : [ "PENDING_CLEARANCE", "WHATSAPP_BUSINESS_INITIATED_CONVERSATION", "WHATSAPP_USER_INITIATED_CONVERSATION", "WHATSAPP_REFERRAL_MESSAGE", "TWILIO_PHONENUMBER_PURCHASE", "TWILIO_TEMPLATE_MESSAGE", "TWILIO_SESSION_MESSAGE", "TWILIO_PHONENUMBER_RENEWAL", "WHATSAPP_MARKETING_CONVERSATION", "WHATSAPP_UTILITY_CONVERSATION", "WHATSAPP_AUTHENTICATION_CONVERSATION", "WHATSAPP_SERVICE_CONVERSATION", "WHATSAPP_AUTHENTICATION_INTERNATIONAL_CONVERSATION", "WECOM_LICENSE_PAYMENT", "WHATSAPP_BUSINESS_INITIATED_CALLS", "BROADCAST_RESERVATION", "BROADCAST_DEDUCTION" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "agentId" : {
+            "description" : "Unique ID of the agent associated with the debit.",
+            "type" : [ "string", "null", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "messageType" : {
+            "description" : "Type of the IM message associated with the debit.",
+            "type" : [ "string", "null" ],
+            "const" : "TEMPLATE",
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "contactId" : {
+            "description" : "Unique ID of the contact associated with the debit.",
+            "type" : [ "string", "null", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "conversationId" : {
+            "description" : "Unique ID of the IM conversation associated with the debit.",
+            "type" : [ "string", "null", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "messageId" : {
+            "description" : "Unique ID of the IM message associated with the debit.",
+            "type" : [ "string", "null", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "integrationService" : {
+            "description" : "Integration service through which the debit occurred.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "botId" : {
+            "type" : [ "string", "null", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "channelId" : {
+            "type" : [ "string", "null", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        },
+        "required" : [ "agentId", "botId", "channelId", "contactId", "conversationId", "deductionReason", "integrationService", "messageId", "messageType" ]
+      },
+      "StatementEntry" : {
+        "type" : [ "null", "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "transactionType" : {
+            "description" : "Type of the statement transaction.",
+            "type" : [ "string", "null" ],
+            "enum" : [ "CREDIT", "DEBIT", "CREDIT_RENEWAL", "UNSUCCESSFUL_DEBIT" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "debitDetails" : {
+            "description" : "Debit-specific details. Null for credit transactions.",
+            "$ref" : "./IM_AddOn.json#/components/schemas/DebitDetails"
+          },
+          "transactionAmount" : {
+            "description" : "Transaction amount with currency.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "featureType" : {
+            "description" : "Feature type for which the transaction was recorded.",
+            "type" : [ "string", "null" ],
+            "enum" : [ "IM_CREDITS", "TWILIO_PHONENUMBERS" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "zohoService" : {
+            "description" : "Zoho service that recorded the transaction.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "time" : {
+            "description" : "Date and time when the transaction occurred.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "balanceAmount" : {
+            "description" : "Remaining balance after the transaction, with currency.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "transactionId" : {
+            "description" : "Unique ID of the statement transaction.",
+            "type" : [ "string", "null", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        },
+        "required" : [ "balanceAmount", "debitDetails", "featureType", "time", "transactionAmount", "transactionId", "transactionType", "zohoService" ]
+      },
+      "StatementEntryArray" : {
+        "type" : [ "null", "array" ],
+        "items" : {
+          "$ref" : "./IM_AddOn.json#/components/schemas/StatementEntry"
+        }
+      }
+    },
+    "responses" : {
+      "getAddOnPackageDetails" : {
+        "description" : "List of IM add-on packages with pagination metadata.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "null", "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "./IM_AddOn.json#/components/schemas/addOnPackagesArray"
+                },
+                "kind" : {
+                  "description" : "Type of the response payload.",
+                  "type" : [ "string", "null" ],
+                  "enum" : [ "single.addOn", "list.addOn", "single.statement" ],
+                  "maxLength" : 100,
+                  "minLength" : 0
+                },
+                "hasMore" : {
+                  "description" : "Indicates whether more add-on packages are available beyond the current page.",
+                  "type" : [ "boolean", "null" ]
+                }
+              },
+              "required" : [ "data", "hasMore", "kind" ]
+            },
+            "examples" : {
+              "GetAddOnPackageDetails_200" : {
+                "$ref" : "./examples/IM_AddOn.json#/components/examples/GetAddOnPackageDetails_200"
+              },
+              "GetAddOnPackageDetails_200_subscription" : {
+                "$ref" : "./examples/IM_AddOn.json#/components/examples/GetAddOnPackageDetails_200_subscription"
+              }
+            }
+          }
+        }
+      },
+      "StatementResponse" : {
+        "description" : "List of IM payment statement entries with pagination metadata.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "null", "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "./IM_AddOn.json#/components/schemas/StatementEntryArray"
+                },
+                "kind" : {
+                  "description" : "Type of the response payload.",
+                  "type" : [ "string", "null" ],
+                  "enum" : [ "single.addOn", "list.addOn", "single.statement" ],
+                  "maxLength" : 100,
+                  "minLength" : 0
+                },
+                "hasMore" : {
+                  "description" : "Indicates whether more statement entries are available beyond the current page.",
+                  "type" : [ "boolean", "null" ]
+                }
+              },
+              "required" : [ "data", "hasMore", "kind" ]
+            },
+            "examples" : {
+              "GetIMPaymentStatement_200" : {
+                "$ref" : "./examples/IM_AddOn.json#/components/examples/GetIMPaymentStatement_200"
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "IM_AddOn"
+}

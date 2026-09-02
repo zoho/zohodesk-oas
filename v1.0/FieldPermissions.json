@@ -1,0 +1,244 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "FieldPermissions",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/organizationFields/{fieldId}/permissions" : {
+      "get" : {
+        "tags" : [ "FieldPermissions" ],
+        "summary" : "Get Field Permissions",
+        "description" : "Retrieves field permissions for all profiles",
+        "operationId" : "getFieldPermissions",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "fieldId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "description" : "Unique ID of the field",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/singleFieldPermissionResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/licenseErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/unprocessableEntityErrorResponse"
+          }
+        },
+        "x-audience" : [ "external-public" ],
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.fields.READ", "Desk.permissions.READ", "Desk.settings.READ" ]
+        } ]
+      },
+      "patch" : {
+        "tags" : [ "FieldPermissions" ],
+        "summary" : "Update Field Permissions",
+        "description" : "Updates field permissions for the specified profiles",
+        "operationId" : "updateFieldPermissions",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "fieldId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "description" : "Unique ID of the field",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/updateFieldPermissionRequest"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/singleFieldPermissionResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/licenseErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/unprocessableEntityErrorResponse"
+          }
+        },
+        "x-audience" : [ "external-public" ],
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.permissions.UPDATE", "Desk.settings.UPDATE" ]
+        } ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "fieldPermissionResponseArray" : {
+        "type" : [ "array", "null" ],
+        "description" : "List of permission entries for the field",
+        "items" : {
+          "$ref" : "#/components/schemas/fieldPermissionResponseObject"
+        }
+      },
+      "fieldPermissionResponseObject" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "profileName" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "minLength" : 0,
+            "description" : "Name of the profile"
+          },
+          "isReadOnly" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Editability flag, applied only when the field is visible. The effective access state comes from isWriteOnly and isReadOnly together: isWriteOnly=true with isReadOnly=false = read-write (editable); isWriteOnly=true with isReadOnly=true = read-only; isWriteOnly=false = hidden (isReadOnly is ignored). To make a field read-only, send isWriteOnly=true and isReadOnly=true."
+          },
+          "profileId" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the profile"
+          },
+          "isInVisibleAccess" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the field is allowed to be hidden (hide access). Possible values: true = field can be hidden, false = field cannot be hidden"
+          },
+          "isReadAccess" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether read access can be configured for the field. Possible values: true = read access configurable, false = not configurable"
+          },
+          "isInVisible" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Visibility flag for the field on the layout. Set true to show the field (required for both read-write and read-only fields) or false to hide it. The effective access state is derived from this flag together with isReadOnly (see isReadOnly)."
+          },
+          "isWriteOnly" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the field is editable (read-write) for the profile. Possible values: true = editable, false = not editable"
+          },
+          "isWriteAccess" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether write access can be configured for the field. Possible values: true = write access configurable, false = not configurable"
+          },
+          "isCustomProfile" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the profile is a custom profile. Possible values: true = custom profile, false = system profile"
+          }
+        },
+        "required" : [ "isCustomProfile", "isInVisible", "isInVisibleAccess", "isReadAccess", "isReadOnly", "isWriteAccess", "isWriteOnly", "profileId", "profileName" ]
+      },
+      "fieldPermissionProfileEntry" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "isReadOnly" : {
+            "type" : [ "boolean" ],
+            "description" : "Editability flag, applied only when the field is visible. The effective access state comes from isWriteOnly and isReadOnly together: isWriteOnly=true with isReadOnly=false = read-write (editable); isWriteOnly=true with isReadOnly=true = read-only; isWriteOnly=false = hidden (isReadOnly is ignored). To make a field read-only, send isWriteOnly=true and isReadOnly=true."
+          },
+          "profileId" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the profile"
+          },
+          "isWriteOnly" : {
+            "type" : [ "boolean" ],
+            "description" : "Visibility flag for the field on the layout. Set true to show the field (required for both read-write and read-only fields) or false to hide it. The effective access state is derived from this flag together with isReadOnly (see isReadOnly)."
+          }
+        },
+        "required" : [ "isReadOnly", "isWriteOnly", "profileId" ]
+      },
+      "updateFieldPermissionRequestSchema" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "profiles" : {
+            "type" : [ "array" ],
+            "description" : "List of profile permission entries to update for the field",
+            "items" : {
+              "$ref" : "#/components/schemas/fieldPermissionProfileEntry"
+            }
+          }
+        }
+      }
+    },
+    "requestBodies" : {
+      "updateFieldPermissionRequest" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/updateFieldPermissionRequestSchema"
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "profiles" : [ {
+                    "isReadOnly" : false,
+                    "profileId" : 4000000000123,
+                    "isWriteOnly" : true
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses" : {
+      "singleFieldPermissionResponse" : {
+        "description" : "fieldPermissionsResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "#/components/schemas/fieldPermissionResponseArray"
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "FieldPermissions"
+}

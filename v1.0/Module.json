@@ -2,6 +2,7 @@
   "openapi" : "3.1.0",
   "info" : {
     "title" : "Module",
+    "description" : "A module is a structured compartment used to store, organize, and manage specific types of data, allowing businesses to efficiently handle different entities such as tickets, contacts, products, price details, and more.",
     "version" : "1.0.0"
   },
   "paths" : {
@@ -9,10 +10,20 @@
       "get" : {
         "tags" : [ "Module" ],
         "summary" : "Get Module",
-        "description" : "This API fetches a single Module",
+        "description" : "Retrieves a specific module.",
         "operationId" : "getModule",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/moduleId"
+          "name" : "moduleId",
+          "in" : "path",
+          "required" : true,
+          "description" : "Unique ID of the module",
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -34,17 +45,28 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.modules.READ", "Desk.settings.READ" ]
         } ],
-        "x-audience" : [ "external-public" ]
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
       },
       "put" : {
         "tags" : [ "Module" ],
         "summary" : "Update Module",
-        "description" : "The API updates a Module.",
+        "description" : "Updates a custom module.",
         "operationId" : "updateModule",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/moduleId"
+          "name" : "moduleId",
+          "in" : "path",
+          "required" : true,
+          "description" : "Unique ID of the module",
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -69,9 +91,10 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.modules.UPDATE", "Desk.settings.UPDATE" ]
         } ],
-        "x-audience" : [ "external-public" ]
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
       }
     },
     "/api/v1/myAccessibleModules" : {
@@ -101,8 +124,6 @@
         "description" : "The API fetches all the modules available in Zoho Desk. <br></br> <b> This API is <code>deprecated</code>, use <i>api/v1/organizationModules</i> api for fetching modules.</b>",
         "operationId" : "getModulesDeprecated",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/featureFlags"
-        }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
@@ -123,11 +144,9 @@
       "get" : {
         "tags" : [ "Module" ],
         "summary" : "Get Modules",
-        "description" : "The API fetches all the modules.",
+        "description" : "Retrieves all modules.",
         "operationId" : "getModules",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/featureFlags"
-        }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
@@ -142,14 +161,15 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.modules.READ", "Desk.settings.READ" ]
         } ],
-        "x-audience" : [ "external-public" ]
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
       },
       "post" : {
         "tags" : [ "Module" ],
         "summary" : "Create Module",
-        "description" : "The API creates a Custom Module. <a href='https://help.zoho.com/portal/en/kb/desk/customization/modules/articles/creating-custom-modules' target='_blank'>Custom Module</a> allows users to organize, store, and manage specific types of data tailored to meet unique business requirements.",
+        "description" : "Creates a custom module. Custom modules allow you to organize, store, and manage specific types of data tailored to unique business requirements.",
         "operationId" : "createModule",
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -172,199 +192,168 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.CREATE" ]
+          "iam-oauth2-schema" : [ "Desk.modules.CREATE", "Desk.settings.CREATE" ]
         } ],
-        "x-audience" : [ "external-public" ]
-      }
-    },
-    "/api/v1/{customModuleApiName}/count" : {
-      "get" : {
-        "tags" : [ "Module" ],
-        "summary" : "Get Custom Module Record Count ",
-        "description" : "This API fetches the number of records.",
-        "operationId" : "getCustomModuleRecordsCount",
-        "parameters" : [ {
-          "name" : "viewId",
-          "in" : "query",
-          "description" : "ID of the view from which the record count needs to be fetched.",
-          "required" : true,
-          "style" : "form",
-          "explode" : true,
-          "schema" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
-            "description" : "ID of the view from which the record count needs to be fetched.",
-            "pattern" : "([0-9]+)"
-          }
-        }, {
-          "name" : "customModuleApiName",
-          "in" : "path",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "(cm_[a-zA-Z0-9_]+)"
-          }
-        }, {
-          "$ref" : "./Common.json#/components/parameters/orgId"
-        } ],
-        "responses" : {
-          "200" : {
-            "$ref" : "./Ticket.json#/components/responses/getRequestsCount"
-          },
-          "422" : {
-            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
-          },
-          "500" : {
-            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
-          },
-          "403" : {
-            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
-          }
-        },
-        "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.custommodule.READ" ]
-        } ],
-        "x-audience" : [ "external-public" ]
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
       }
     }
   },
   "components" : {
     "schemas" : {
       "modifierJson" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "photoURL" : {
-            "type" : [ "string", "null" ],
+            "type" : [ "string" ],
             "maxLength" : 200,
             "minLength" : 0,
-            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+            "description" : "Photo URL of the user who modified the module"
           },
           "firstName" : {
             "type" : [ "string", "null" ],
             "maxLength" : 50,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "First name of the user who modified the module"
           },
           "lastName" : {
-            "type" : [ "string", "null" ],
+            "type" : [ "string" ],
             "maxLength" : 50,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Last name of the user who modified the module"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the user who modified the module"
           },
           "email" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+            "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$",
+            "description" : "Email address of the user who modified the module"
           }
         },
         "required" : [ "email", "firstName", "id", "lastName", "photoURL" ]
       },
       "moduleJsonIncludingCustomModuleforList" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object" ],
         "additionalProperties" : false,
         "properties" : {
           "displayLabel" : {
-            "type" : [ "string", "null" ],
+            "type" : [ "string" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "Display label of the module"
           },
           "modifiedTime" : {
-            "type" : [ "string", "null" ],
+            "type" : [ "string" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+            "description" : "Time at which the module was last modified"
           },
           "apiName" : {
-            "type" : [ "string", "null" ],
+            "type" : [ "string" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Unique read-only name of the module"
           },
           "modifier" : {
-            "$ref" : "#/components/schemas/modifierJson"
+            "$ref" : "#/components/schemas/modifierJson",
+            "description" : "Details of the user who modified the module"
           },
           "description" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Description of the module"
           },
           "nameField" : {
-            "type" : [ "string", "null" ],
+            "type" : [ "string" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Name of the primary field of the module."
           },
           "pluralLabel" : {
-            "type" : [ "string", "null" ],
+            "type" : [ "string" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "Plural label of the module",
+            "x-unique" : true
           },
           "singularLabel" : {
-            "type" : [ "string", "null" ],
+            "type" : [ "string" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "Singular label of the module",
+            "x-unique" : true
           },
           "hasRecycleBin" : {
-            "type" : [ "boolean", "null" ]
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the module has a Recycle Bin feature to store deleted records and attachments. Possible values: true = deleted records are moved to the Recycle Bin and can be restored if needed false = deleted records are permanently deleted"
           },
           "createdBy" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the user who created the module"
           },
           "isCustomModule" : {
-            "type" : [ "boolean", "null" ]
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the module is a custom module. Possible values: true = custom module, false = system module"
           },
           "createdTime" : {
-            "type" : [ "string", "null" ],
+            "type" : [ "string" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+            "description" : "Time at which the module was created"
           },
           "isDeptSpecific" : {
-            "type" : [ "boolean", "null" ]
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the module is department-specific. Possible values: true = department-specific module, false = organization-level module"
           },
           "modifiedBy" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the user who modified the module"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the module"
           }
         },
         "required" : [ "apiName", "createdBy", "createdTime", "description", "displayLabel", "hasRecycleBin", "id", "isCustomModule", "isDeptSpecific", "modifiedBy", "modifiedTime", "modifier", "nameField", "pluralLabel", "singularLabel" ]
       },
       "moduleJson" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object" ],
         "additionalProperties" : false,
         "properties" : {
           "displayLabel" : {
-            "type" : [ "string", "null" ],
+            "type" : [ "string" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "apiKey" : {
-            "type" : [ "string", "null" ],
+            "type" : [ "string" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "isEnabled" : {
-            "type" : [ "boolean", "null" ]
+            "type" : [ "boolean" ]
           },
           "nameField" : {
             "type" : [ "string", "null" ],
@@ -372,18 +361,18 @@
             "minLength" : 0
           },
           "pluralLabel" : {
-            "type" : [ "string", "null" ],
+            "type" : [ "string" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "singularLabel" : {
-            "type" : [ "string", "null" ],
+            "type" : [ "string" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
@@ -392,29 +381,29 @@
         "required" : [ "apiKey", "displayLabel", "id", "isEnabled", "nameField", "pluralLabel", "singularLabel" ]
       },
       "listOfModules" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
           "$ref" : "#/components/schemas/moduleJson"
         }
       },
       "modulesWithNameFieldResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object" ],
         "additionalProperties" : false,
         "properties" : {
           "displayLabel" : {
-            "type" : [ "string", "null" ],
+            "type" : [ "string" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "apiKey" : {
-            "type" : [ "string", "null" ],
+            "type" : [ "string" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "isEnabled" : {
-            "type" : [ "boolean", "null" ]
+            "type" : [ "boolean" ]
           },
           "nameField" : {
             "type" : [ "string", "null" ],
@@ -422,16 +411,16 @@
             "minLength" : 0
           },
           "isMigratedModule" : {
-            "type" : [ "boolean", "null" ]
+            "type" : [ "boolean" ]
           },
           "pluralLabel" : {
-            "type" : [ "string", "null" ],
+            "type" : [ "string" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
@@ -445,7 +434,7 @@
         "required" : [ "apiKey", "displayLabel", "id", "isEnabled", "isMigratedModule", "nameField", "pluralLabel", "singularLabel" ]
       },
       "modulesWithNameField" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
           "$ref" : "#/components/schemas/modulesWithNameFieldResponse"
         }
@@ -455,7 +444,7 @@
         "allOf" : [ {
           "$ref" : "#/components/schemas/moduleJson"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "sanitizedName" : {
               "type" : [ "string", "null" ],
@@ -485,104 +474,20 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "i18NLabel", "isCustomModule", "isDeptSpecific", "isMigratedModule", "sanitizedName", "singularI18NLabel" ]
+          "required" : [ "i18NLabel", "isCustomModule", "isDeptSpecific", "isMigratedModule", "sanitizedName", "singularI18NLabel" ],
+          "additionalProperties" : false
         } ]
       },
       "listOfModulesWithCustomModuleData" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
           "$ref" : "#/components/schemas/modulesWithCustomModuleJson"
         }
       },
       "listOfModulesIncludingCustomModule" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
           "$ref" : "#/components/schemas/moduleJsonIncludingCustomModuleforList"
-        }
-      },
-      "custommoduleResponseWithNameField" : {
-        "type" : [ "null", "object" ],
-        "additionalProperties" : false,
-        "properties" : {
-          "displayLabel" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
-          },
-          "modifiedTime" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
-          },
-          "apiName" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0
-          },
-          "modifier" : {
-            "$ref" : "#/components/schemas/modifierJson"
-          },
-          "nameField" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0
-          },
-          "description" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0
-          },
-          "pluralLabel" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
-          },
-          "singularLabel" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
-          },
-          "hasRecycleBin" : {
-            "type" : [ "boolean", "null" ]
-          },
-          "createdBy" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
-          },
-          "isCustomModule" : {
-            "type" : [ "boolean", "null" ]
-          },
-          "createdTime" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
-          },
-          "isDeptSpecific" : {
-            "type" : [ "boolean", "null" ]
-          },
-          "modifiedBy" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
-          },
-          "id" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
-          }
-        },
-        "required" : [ "apiName", "createdBy", "createdTime", "description", "displayLabel", "hasRecycleBin", "id", "isCustomModule", "isDeptSpecific", "modifiedBy", "modifiedTime", "modifier", "nameField", "pluralLabel", "singularLabel" ]
-      },
-      "organizationModuleArrayOfResponses" : {
-        "type" : [ "null", "array" ],
-        "items" : {
-          "$ref" : "#/components/schemas/custommoduleResponseWithNameField"
         }
       }
     },
@@ -592,44 +497,48 @@
         "content" : {
           "application/json" : {
             "schema" : {
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "allOf" : [ {
                 "$ref" : "#/components/schemas/moduleJsonIncludingCustomModuleforList"
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object" ],
                 "properties" : {
                   "profileIds" : {
-                    "type" : [ "null", "array" ],
+                    "type" : [ "array", "null" ],
                     "items" : {
-                      "type" : [ "string", "null", "integer" ],
+                      "type" : [ "string", "integer" ],
                       "format" : "int64",
                       "pattern" : "([0-9]+)"
                     },
-                    "uniqueItems" : false
+                    "uniqueItems" : true,
+                    "description" : "ID(s) of the profiles associated with the module"
                   },
                   "departmentIds" : {
-                    "type" : [ "null", "array" ],
+                    "type" : [ "array", "null" ],
                     "items" : {
-                      "type" : [ "string", "null", "integer" ],
+                      "type" : [ "string", "integer" ],
                       "format" : "int64",
                       "pattern" : "([0-9]+)"
                     },
-                    "uniqueItems" : false
+                    "uniqueItems" : true,
+                    "description" : "ID(s) of the departments associated with the module"
                   }
                 },
-                "required" : [ "departmentIds", "profileIds" ]
+                "required" : [ "departmentIds", "profileIds" ],
+                "additionalProperties" : false
               } ]
             },
             "examples" : {
               "Valid responses Definitions" : {
                 "value" : {
                   "displayLabel" : "Doctors",
-                  "modifiedTime" : 1713519302000,
+                  "modifiedTime" : "2024-04-19T09:35:02.000Z",
                   "apiName" : "cm_doctors",
                   "modifier" : {
                     "firstName" : "",
                     "lastName" : "Kyle",
-                    "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000000329/photo?orgId=3981311",
+                    "photoURL" : "https://desk.example.com/api/v1/agents/4000000000329/photo?orgId=1234567890",
                     "id" : "4000000000329",
                     "email" : "kyle@zylker.com"
                   },
@@ -642,7 +551,7 @@
                   "hasRecycleBin" : true,
                   "createdBy" : "1000000000375",
                   "isCustomModule" : true,
-                  "createdTime" : 1713517457000,
+                  "createdTime" : "2024-04-19T09:04:17.000Z",
                   "modifiedBy" : "1000000000375",
                   "isDeptSpecific" : true,
                   "id" : "1000003000001"
@@ -657,7 +566,7 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "modules" : {
@@ -842,7 +751,7 @@
           "application/json" : {
             "schema" : {
               "oneOf" : [ {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "modules" : {
@@ -851,7 +760,7 @@
                 },
                 "required" : [ "modules" ]
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "data" : {
@@ -860,7 +769,7 @@
                 },
                 "required" : [ "data" ]
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "data" : {
@@ -1025,197 +934,246 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "anyOf" : [ {
-                "type" : [ "null", "object" ],
-                "additionalProperties" : false,
-                "properties" : {
-                  "data" : {
-                    "$ref" : "#/components/schemas/listOfModulesIncludingCustomModule"
-                  }
-                },
-                "required" : [ "data" ]
-              }, {
-                "type" : [ "null", "object" ],
-                "additionalProperties" : false,
-                "properties" : {
-                  "data" : {
-                    "$ref" : "#/components/schemas/organizationModuleArrayOfResponses"
-                  }
-                },
-                "required" : [ "data" ]
-              } ]
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "#/components/schemas/listOfModulesIncludingCustomModule"
+                }
+              },
+              "required" : [ "data" ]
             },
             "examples" : {
               "Valid responses Definitions" : {
                 "value" : {
                   "data" : [ {
                     "displayLabel" : "Accounts",
-                    "modifiedTime" : 946684800000,
+                    "modifiedTime" : "2000-01-01T00:00:00.000Z",
                     "apiName" : "accounts",
-                    "modifier" : null,
+                    "modifier" : {
+                      "firstName" : "",
+                      "lastName" : "Kyle",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000000329/photo?orgId=1234567890",
+                      "id" : "4000000000329",
+                      "email" : "kyle@zylker.com"
+                    },
                     "nameField" : "accountName",
                     "description" : null,
                     "pluralLabel" : "Accounts",
                     "singularLabel" : "Account",
                     "hasRecycleBin" : true,
-                    "createdBy" : null,
+                    "createdBy" : "1000000000375",
                     "isCustomModule" : false,
-                    "createdTime" : 946684800000,
-                    "modifiedBy" : null,
+                    "createdTime" : "2000-01-01T00:00:00.000Z",
+                    "modifiedBy" : "1000000000375",
                     "isDeptSpecific" : false,
                     "id" : "1000000000377"
                   }, {
                     "displayLabel" : "Contacts",
-                    "modifiedTime" : 946684800000,
+                    "modifiedTime" : "2000-01-01T00:00:00.000Z",
                     "apiName" : "contacts",
-                    "modifier" : null,
+                    "modifier" : {
+                      "firstName" : "",
+                      "lastName" : "Kyle",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000000329/photo?orgId=1234567890",
+                      "id" : "4000000000329",
+                      "email" : "kyle@zylker.com"
+                    },
                     "nameField" : "lastName",
                     "description" : null,
                     "pluralLabel" : "Contacts",
                     "singularLabel" : "Contact",
                     "hasRecycleBin" : true,
-                    "createdBy" : null,
+                    "createdBy" : "1000000000375",
                     "isCustomModule" : false,
-                    "createdTime" : 946684800000,
-                    "modifiedBy" : null,
+                    "createdTime" : "2000-01-01T00:00:00.000Z",
+                    "modifiedBy" : "1000000000375",
                     "isDeptSpecific" : false,
                     "id" : "1000000000379"
                   }, {
                     "displayLabel" : "Tasks",
-                    "modifiedTime" : 946684800000,
+                    "modifiedTime" : "2000-01-01T00:00:00.000Z",
                     "apiName" : "tasks",
-                    "modifier" : null,
+                    "modifier" : {
+                      "firstName" : "",
+                      "lastName" : "Kyle",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000000329/photo?orgId=1234567890",
+                      "id" : "4000000000329",
+                      "email" : "kyle@zylker.com"
+                    },
                     "nameField" : "subject",
                     "description" : null,
                     "pluralLabel" : "Tasks",
                     "singularLabel" : "Task",
                     "hasRecycleBin" : true,
-                    "createdBy" : null,
+                    "createdBy" : "1000000000375",
                     "isCustomModule" : false,
-                    "createdTime" : 946684800000,
-                    "modifiedBy" : null,
+                    "createdTime" : "2000-01-01T00:00:00.000Z",
+                    "modifiedBy" : "1000000000375",
                     "isDeptSpecific" : true,
                     "id" : "1000000000383"
                   }, {
                     "displayLabel" : "Tickets",
-                    "modifiedTime" : 946684800000,
+                    "modifiedTime" : "2000-01-01T00:00:00.000Z",
                     "apiName" : "tickets",
-                    "modifier" : null,
+                    "modifier" : {
+                      "firstName" : "",
+                      "lastName" : "Kyle",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000000329/photo?orgId=1234567890",
+                      "id" : "4000000000329",
+                      "email" : "kyle@zylker.com"
+                    },
                     "nameField" : "subject",
                     "description" : null,
                     "pluralLabel" : "Tickets",
                     "singularLabel" : "Ticket",
                     "hasRecycleBin" : true,
-                    "createdBy" : null,
+                    "createdBy" : "1000000000375",
                     "isCustomModule" : false,
-                    "createdTime" : 946684800000,
-                    "modifiedBy" : null,
+                    "createdTime" : "2000-01-01T00:00:00.000Z",
+                    "modifiedBy" : "1000000000375",
                     "isDeptSpecific" : true,
                     "id" : "1000000000423"
                   }, {
                     "displayLabel" : "Contracts",
-                    "modifiedTime" : 946684800000,
+                    "modifiedTime" : "2000-01-01T00:00:00.000Z",
                     "apiName" : "contracts",
-                    "modifier" : null,
+                    "modifier" : {
+                      "firstName" : "",
+                      "lastName" : "Kyle",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000000329/photo?orgId=1234567890",
+                      "id" : "4000000000329",
+                      "email" : "kyle@zylker.com"
+                    },
                     "nameField" : "contractName",
                     "description" : null,
                     "pluralLabel" : "Contracts",
                     "singularLabel" : "Contract",
                     "hasRecycleBin" : true,
-                    "createdBy" : null,
+                    "createdBy" : "1000000000375",
                     "isCustomModule" : false,
-                    "createdTime" : 946684800000,
-                    "modifiedBy" : null,
+                    "createdTime" : "2000-01-01T00:00:00.000Z",
+                    "modifiedBy" : "1000000000375",
                     "isDeptSpecific" : true,
                     "id" : "1000000000427"
                   }, {
                     "displayLabel" : "Products",
-                    "modifiedTime" : 946684800000,
+                    "modifiedTime" : "2000-01-01T00:00:00.000Z",
                     "apiName" : "products",
-                    "modifier" : null,
+                    "modifier" : {
+                      "firstName" : "",
+                      "lastName" : "Kyle",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000000329/photo?orgId=1234567890",
+                      "id" : "4000000000329",
+                      "email" : "kyle@zylker.com"
+                    },
                     "nameField" : "productName",
                     "description" : null,
                     "pluralLabel" : "Products",
                     "singularLabel" : "Product",
                     "hasRecycleBin" : true,
-                    "createdBy" : null,
+                    "createdBy" : "1000000000375",
                     "isCustomModule" : false,
-                    "createdTime" : 946684800000,
-                    "modifiedBy" : null,
+                    "createdTime" : "2000-01-01T00:00:00.000Z",
+                    "modifiedBy" : "1000000000375",
                     "isDeptSpecific" : false,
                     "id" : "1000000000429"
                   }, {
                     "displayLabel" : "Time Entry",
-                    "modifiedTime" : 946684800000,
+                    "modifiedTime" : "2000-01-01T00:00:00.000Z",
                     "apiName" : "timeEntry",
-                    "modifier" : null,
+                    "modifier" : {
+                      "firstName" : "",
+                      "lastName" : "Kyle",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000000329/photo?orgId=1234567890",
+                      "id" : "4000000000329",
+                      "email" : "kyle@zylker.com"
+                    },
                     "nameField" : "requestChargeType",
                     "description" : null,
                     "pluralLabel" : "Time Entry",
                     "singularLabel" : "Time Entry",
                     "hasRecycleBin" : true,
-                    "createdBy" : null,
+                    "createdBy" : "1000000000375",
                     "isCustomModule" : false,
-                    "createdTime" : 946684800000,
-                    "modifiedBy" : null,
+                    "createdTime" : "2000-01-01T00:00:00.000Z",
+                    "modifiedBy" : "1000000000375",
                     "isDeptSpecific" : true,
                     "id" : "1000000000431"
                   }, {
                     "displayLabel" : "Agents",
-                    "modifiedTime" : 946684800000,
+                    "modifiedTime" : "2000-01-01T00:00:00.000Z",
                     "apiName" : "agents",
-                    "modifier" : null,
+                    "modifier" : {
+                      "firstName" : "",
+                      "lastName" : "Kyle",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000000329/photo?orgId=1234567890",
+                      "id" : "4000000000329",
+                      "email" : "kyle@zylker.com"
+                    },
                     "nameField" : "lastName",
                     "description" : null,
                     "pluralLabel" : "Agents",
                     "singularLabel" : "Agent",
                     "hasRecycleBin" : false,
-                    "createdBy" : null,
+                    "createdBy" : "1000000000375",
                     "isCustomModule" : false,
-                    "createdTime" : 946684800000,
-                    "modifiedBy" : null,
+                    "createdTime" : "2000-01-01T00:00:00.000Z",
+                    "modifiedBy" : "1000000000375",
                     "isDeptSpecific" : false,
                     "id" : "1000000000435"
                   }, {
                     "displayLabel" : "Events",
-                    "modifiedTime" : 946684800000,
+                    "modifiedTime" : "2000-01-01T00:00:00.000Z",
                     "apiName" : "events",
-                    "modifier" : null,
+                    "modifier" : {
+                      "firstName" : "",
+                      "lastName" : "Kyle",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000000329/photo?orgId=1234567890",
+                      "id" : "4000000000329",
+                      "email" : "kyle@zylker.com"
+                    },
                     "nameField" : "subject",
                     "description" : null,
                     "pluralLabel" : "Events",
                     "singularLabel" : "Event",
                     "hasRecycleBin" : true,
-                    "createdBy" : null,
+                    "createdBy" : "1000000000375",
                     "isCustomModule" : false,
-                    "createdTime" : 946684800000,
-                    "modifiedBy" : null,
+                    "createdTime" : "2000-01-01T00:00:00.000Z",
+                    "modifiedBy" : "1000000000375",
                     "isDeptSpecific" : true,
                     "id" : "1000000000445"
                   }, {
                     "displayLabel" : "Calls",
-                    "modifiedTime" : 946684800000,
+                    "modifiedTime" : "2000-01-01T00:00:00.000Z",
                     "apiName" : "calls",
-                    "modifier" : null,
+                    "modifier" : {
+                      "firstName" : "",
+                      "lastName" : "Kyle",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000000329/photo?orgId=1234567890",
+                      "id" : "4000000000329",
+                      "email" : "kyle@zylker.com"
+                    },
                     "nameField" : "subject",
                     "description" : null,
                     "pluralLabel" : "Calls",
                     "singularLabel" : "Call",
                     "hasRecycleBin" : true,
-                    "createdBy" : null,
+                    "createdBy" : "1000000000375",
                     "isCustomModule" : false,
-                    "createdTime" : 946684800000,
-                    "modifiedBy" : null,
+                    "createdTime" : "2000-01-01T00:00:00.000Z",
+                    "modifiedBy" : "1000000000375",
                     "isDeptSpecific" : true,
                     "id" : "1000000000447"
                   }, {
                     "displayLabel" : "Doctors",
-                    "modifiedTime" : 1713519302000,
+                    "modifiedTime" : "2024-04-19T09:35:02.000Z",
                     "apiName" : "cm_doctors",
                     "modifier" : {
                       "firstName" : "",
                       "lastName" : "Kyle",
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000000329/photo?orgId=3981311",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000000329/photo?orgId=1234567890",
                       "id" : "4000000000329",
                       "email" : "kyle@zylker.com"
                     },
@@ -1226,7 +1184,7 @@
                     "hasRecycleBin" : true,
                     "createdBy" : "1000000000375",
                     "isCustomModule" : true,
-                    "createdTime" : 1713517457000,
+                    "createdTime" : "2024-04-19T09:04:17.000Z",
                     "modifiedBy" : "1000000000375",
                     "isDeptSpecific" : true,
                     "id" : "1000003000001"
@@ -1238,75 +1196,51 @@
         }
       }
     },
-    "parameters" : {
-      "moduleId" : {
-        "name" : "moduleId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "featureFlags" : {
-        "name" : "featureFlags",
-        "in" : "header",
-        "required" : false,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null" ],
-          "enum" : [ "customModule" ],
-          "maxLength" : 100,
-          "minLength" : 0
-        }
-      }
-    },
     "requestBodies" : {
       "editRequestJson" : {
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "description" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "type" : [ "string" ],
+                  "maxLength" : 200,
+                  "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+",
+                  "description" : "Description of the module"
                 },
                 "profileIds" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
+                  "description" : "ID(s) of the profiles associated with the module",
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
-                  "uniqueItems" : false
+                  "uniqueItems" : true
                 },
                 "pluralLabel" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0,
-                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                  "type" : [ "string" ],
+                  "maxLength" : 50,
+                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+                  "description" : "Plural label of the module"
                 },
                 "departmentIds" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
-                  "uniqueItems" : false
+                  "uniqueItems" : true,
+                  "description" : "ID(s) of the departments associated with the module"
                 },
                 "singularLabel" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0,
-                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                  "type" : [ "string" ],
+                  "maxLength" : 50,
+                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+                  "description" : "Singular label of the module"
                 }
               },
               "required" : [ "departmentIds", "pluralLabel", "profileIds", "singularLabel" ]
@@ -1323,55 +1257,62 @@
               }
             }
           }
-        }
+        },
+        "required" : true
       },
       "requestJson" : {
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "description" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "type" : [ "string" ],
+                  "maxLength" : 200,
+                  "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+",
+                  "description" : "Description of the module"
                 },
                 "profileIds" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
-                  "uniqueItems" : false
+                  "uniqueItems" : false,
+                  "description" : "Unique ID(s) of the profiles associated with the module"
                 },
                 "isDeptSpecific" : {
-                  "type" : [ "boolean", "null" ]
+                  "type" : [ "boolean" ],
+                  "description" : "Indicates whether the module is department-specific. Possible values: true = creates a department-specific module, false = creates an organization-level module. Note: If this key is not provided, an organization-level module is created"
                 },
                 "pluralLabel" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0,
-                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                  "type" : [ "string" ],
+                  "maxLength" : 50,
+                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+                  "description" : "Plural label of the module",
+                  "x-unique" : true
                 },
                 "departmentIds" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
-                  "uniqueItems" : false
+                  "uniqueItems" : false,
+                  "description" : "Unique ID(s) of the departments associated with the module"
                 },
                 "singularLabel" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0,
-                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                  "type" : [ "string" ],
+                  "maxLength" : 50,
+                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+                  "description" : "Singular label of the module",
+                  "x-unique" : true
                 }
               },
-              "required" : [ "departmentIds", "isDeptSpecific", "pluralLabel", "profileIds", "singularLabel" ]
+              "required" : [ "pluralLabel", "singularLabel" ]
             },
             "examples" : {
               "Valid requestBody Definitions" : {
@@ -1386,10 +1327,17 @@
               }
             }
           }
-        }
+        },
+        "required" : true
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

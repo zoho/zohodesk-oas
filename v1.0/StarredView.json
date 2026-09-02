@@ -1,0 +1,369 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "StarredView",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/views/{cvId}/star" : {
+      "post" : {
+        "tags" : [ "StarredView" ],
+        "summary" : "Add Star View",
+        "description" : "This API stars a view, enabling quick access to the view.",
+        "operationId" : "addStarredView",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "Unique ID of the department in which the view is configured",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]*|null|undefined)"
+          }
+        }, {
+          "name" : "cvId",
+          "in" : "path",
+          "description" : "Unique ID of the view",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.basic.UPDATE", "Desk.settings.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/starredViews/{cvId}/unstar" : {
+      "post" : {
+        "tags" : [ "StarredView" ],
+        "summary" : "Remove Star View",
+        "description" : "This API unstars a view, disabling quick access to the view.",
+        "operationId" : "removeStarredView",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "Unique ID of the department in which the view is configured",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]*|null|undefined)"
+          }
+        }, {
+          "name" : "cvId",
+          "in" : "path",
+          "description" : "Unique ID of the view",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.basic.UPDATE", "Desk.settings.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/starredViews/order" : {
+      "put" : {
+        "tags" : [ "StarredView" ],
+        "summary" : "Reorder Starred Views",
+        "description" : "This API helps reorder the starred views in a module.",
+        "operationId" : "updateStarredViewOrder",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "module",
+          "in" : "query",
+          "description" : "Module associated with the view. Possible values: tickets, tasks, contacts, accounts, calls, events, activities, contracts",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "tickets", "tasks", "contacts", "accounts", "calls", "events", "activities", "contracts" ],
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+          }
+        }, {
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "Unique ID of the department in which the view is configured",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]*|null|undefined)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/starredViewJsonOrder"
+        },
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.basic.UPDATE", "Desk.settings.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/starredViews" : {
+      "get" : {
+        "tags" : [ "StarredView" ],
+        "summary" : "Get Starred Views",
+        "description" : "This API lists the starred views in a module. Number of resources in the starred view is displayed only for the Tickets module.",
+        "operationId" : "getStarredViews",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "module",
+          "in" : "query",
+          "description" : "Module associated with the view. Possible values: tickets, tasks, contacts, accounts, calls, events, activities, contracts",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "tickets", "tasks", "contacts", "accounts", "calls", "events", "activities", "contracts" ],
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+          }
+        }, {
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "Unique ID of the department in which the view is configured",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]*|null|undefined)"
+          }
+        }, {
+          "name" : "featureFlags",
+          "in" : "header",
+          "required" : false,
+          "description" : "Optional flags to include extra details in the response. Possible values: createdBy. Use a comma-separated list to pass more than one.",
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "createdBy" ]
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/getStarredViewsResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.settings.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "starredView_array" : {
+        "type" : [ "array" ],
+        "items" : {
+          "type" : [ "string", "integer" ],
+          "format" : "int64",
+          "pattern" : "([0-9]+)"
+        }
+      },
+      "starredViewResponseArray" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/starredViewsJson"
+        }
+      },
+      "starredViewsJson" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "id" : {
+            "description" : "Unique ID of the view",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "name" : {
+            "description" : "Name of the view",
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "minLength" : 0,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@%\\?\\,\\:\\'\\P{InBasicLatin}\\s&amp;&lt;&gt;\\+=]+"
+          },
+          "viewName" : {
+            "description" : "Name of the view",
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "minLength" : 0
+          },
+          "isCustomView" : {
+            "description" : "Indicates whether the view is a custom view. Possible values: true = custom view, false = system view",
+            "type" : [ "boolean", "null" ]
+          },
+          "isLocked" : {
+            "description" : "Indicates whether the custom view is locked. Possible values: true = locked, false = not locked",
+            "type" : [ "boolean", "null" ]
+          },
+          "deprecatedViewId" : {
+            "description" : "Deprecated ID of the view",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "count" : {
+            "description" : "Number of resources in the starred view",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "createdBy" : {
+            "description" : "ID of the user who created the view",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        },
+        "required" : [ "id", "name", "viewName", "isCustomView", "isLocked", "deprecatedViewId" ]
+      }
+    },
+    "responses" : {
+      "getStarredViewsResponse" : {
+        "description" : "getStarredViewsResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "starredViews" : {
+                  "description" : "List of starred view entries",
+                  "$ref" : "#/components/schemas/starredViewResponseArray"
+                },
+                "module" : {
+                  "description" : "Module associated with the starred views",
+                  "type" : [ "string", "null" ],
+                  "enum" : [ "tickets", "tasks", "contracts", "accounts", "contacts", "calls", "events", "activities" ]
+                }
+              },
+              "required" : [ "module", "starredViews" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "starredViews" : [ {
+                    "id" : "1000000044498",
+                    "name" : "All Cases",
+                    "viewName" : "All Cases",
+                    "isCustomView" : false,
+                    "isLocked" : false,
+                    "deprecatedViewId" : "1000000033028"
+                  } ],
+                  "module" : "tickets"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "requestBodies" : {
+      "starredViewJsonOrder" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "starredViewIds" : {
+                  "description" : "IDs of the starred views",
+                  "$ref" : "#/components/schemas/starredView_array"
+                }
+              },
+              "required" : [ "starredViewIds" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "starredViewIds" : [ "4000000007808", "4000000007810", "4000000007818", "4000000007820", "4000000007828", "4000000007830", "4000000007848", "4000000007850" ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "StarredView"
+}

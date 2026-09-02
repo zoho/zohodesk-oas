@@ -16,16 +16,13 @@
           "in" : "query",
           "description" : "Secondary information related to the comments. Value allowed is @mentions@, which returns the details of users mentioned in the comments.",
           "required" : false,
-          "style" : "simple",
+          "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "null", "array" ],
-            "description" : "Secondary information related to the comments. Value allowed is @mentions@, which returns the details of users mentioned in the comments.",
+            "type" : [ "array" ],
             "items" : {
-              "type" : [ "string", "null" ],
-              "enum" : [ "mentions" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "type" : [ "string" ],
+              "enum" : [ "mentions" ]
             },
             "uniqueItems" : true
           }
@@ -37,12 +34,12 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "integer" ],
             "format" : "int32",
-            "description" : "No. of comments to fetch",
             "maximum" : 100,
             "minimum" : 1,
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "default" : 50
           }
         }, {
           "name" : "from",
@@ -52,10 +49,11 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "integer" ],
             "format" : "int32",
-            "description" : "Index number starting from which the comments must be fetched",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "minimum" : 0,
+            "default" : 0
           }
         }, {
           "name" : "sortBy",
@@ -65,14 +63,21 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "sortby can be @commentedTime@. default order : commentedTime in descending order , prefix @-@ denotes desc",
+            "type" : [ "string" ],
             "enum" : [ "commentedTime" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "pattern" : "-?(commentedTime)"
           }
         }, {
-          "$ref" : "#/components/parameters/contactId"
+          "name" : "contactId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -92,7 +97,16 @@
         "description" : "This API adds a comment to a contact.",
         "operationId" : "createContactComment",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/contactId"
+          "name" : "contactId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -124,23 +138,38 @@
           "in" : "query",
           "description" : "Secondary information related to the comments. Value allowed is @mentions@, which returns the details of users mentioned in the comments.",
           "required" : false,
-          "style" : "simple",
+          "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "null", "array" ],
-            "description" : "Secondary information related to the comments. Value allowed is @mentions@, which returns the details of users mentioned in the comments.",
+            "type" : [ "array" ],
             "items" : {
-              "type" : [ "string", "null" ],
-              "enum" : [ "mentions" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "type" : [ "string" ],
+              "enum" : [ "mentions" ]
             },
             "uniqueItems" : true
           }
         }, {
-          "$ref" : "#/components/parameters/contactId"
+          "name" : "contactId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/commentId"
+          "name" : "commentId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -160,9 +189,27 @@
         "description" : "This API updates an existing contact comment.",
         "operationId" : "updateContactComment",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/contactId"
+          "name" : "contactId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/commentId"
+          "name" : "commentId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -185,9 +232,27 @@
         "description" : "This API deletes an existing contact comment.",
         "operationId" : "deleteContactComment",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/contactId"
+          "name" : "contactId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/commentId"
+          "name" : "commentId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -206,9 +271,9 @@
   "components" : {
     "schemas" : {
       "mentions" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "additionalProperties" : false,
           "maxProperties" : 9,
           "minProperties" : 9,
@@ -230,25 +295,23 @@
               "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
             },
             "offset" : {
-              "type" : [ "string", "null", "integer" ],
+              "type" : [ "string", "integer", "null" ],
               "format" : "int32",
               "pattern" : "([0-9]+)"
             },
             "length" : {
-              "type" : [ "string", "null", "integer" ],
+              "type" : [ "string", "integer", "null" ],
               "format" : "int32",
               "pattern" : "([0-9]+)"
             },
             "id" : {
-              "type" : [ "string", "null", "integer" ],
+              "type" : [ "string", "integer", "null" ],
               "format" : "int64",
               "pattern" : "([0-9]+)"
             },
             "type" : {
               "type" : [ "string", "null" ],
-              "enum" : [ "AGENT", "TEAM" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "enum" : [ "AGENT", "TEAM" ]
             },
             "email" : {
               "type" : [ "string", "null" ],
@@ -257,7 +320,7 @@
               "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
             },
             "zuid" : {
-              "type" : [ "string", "null", "integer" ],
+              "type" : [ "string", "integer", "null" ],
               "format" : "int32",
               "pattern" : "([0-9]+)"
             }
@@ -267,7 +330,7 @@
         "uniqueItems" : false
       },
       "commenter" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "photoURL" : {
@@ -297,15 +360,13 @@
             "minLength" : 0
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "type" : {
             "type" : [ "string", "null" ],
-            "enum" : [ "END_USER", "AGENT", "TEAM", "TICKET", "ACTIVITY" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "END_USER", "AGENT", "TEAM", "TICKET", "ACTIVITY" ]
           },
           "email" : {
             "type" : [ "string", "null" ],
@@ -317,7 +378,7 @@
         "required" : [ "email", "firstName", "id", "lastName", "name", "photoURL", "roleName", "type" ]
       },
       "contactCommentCommonResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "modifiedTime" : {
@@ -338,18 +399,16 @@
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "contentType" : {
             "type" : [ "string", "null" ],
-            "enum" : [ "plainText", "html" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "plainText", "html" ]
           },
           "commenterId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
@@ -359,7 +418,7 @@
             "minLength" : 0
           },
           "commenter" : {
-            "$ref" : "./ContactComments.json#/components/schemas/commenter"
+            "$ref" : "#/components/schemas/commenter"
           },
           "impersonatedUser" : {
             "$ref" : "./TicketComment.json#/components/schemas/impersonatedUser"
@@ -368,9 +427,9 @@
         "required" : [ "commentedTime", "commenter", "commenterId", "content", "contentType", "encodedContent", "id", "impersonatedUser", "modifiedTime" ]
       },
       "dataArr" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./ContactComments.json#/components/schemas/contactCommentCommonResponse"
+          "$ref" : "#/components/schemas/contactCommentCommonResponse"
         }
       }
     },
@@ -383,12 +442,13 @@
               "allOf" : [ {
                 "$ref" : "#/components/schemas/contactCommentCommonResponse"
               }, {
-                "type" : "object",
+                "type" : [ "object" ],
                 "properties" : {
                   "mention" : {
                     "$ref" : "#/components/schemas/mentions"
                   }
-                }
+                },
+                "additionalProperties" : false
               } ]
             },
             "examples" : {
@@ -403,10 +463,10 @@
                   "commenter" : {
                     "firstName" : "Jade",
                     "lastName" : "Tywin",
-                    "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000008692/photo?orgId=292828",
+                    "photoURL" : "https://desk.example.com/api/v1/agents/4000000008692/photo?orgId=1234567890",
                     "name" : "Jade Tywin",
                     "roleName" : "LightAgent",
-                    "type" : "AGENT",
+                    "type" : [ "AGENT" ],
                     "email" : "jade12tywin@zylker.com"
                   }
                 }
@@ -434,10 +494,10 @@
                   "commenter" : {
                     "firstName" : "Jade",
                     "lastName" : "Tywin",
-                    "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000008692/photo?orgId=292828",
+                    "photoURL" : "https://desk.example.com/api/v1/agents/4000000008692/photo?orgId=1234567890",
                     "name" : "Jade Tywin",
                     "roleName" : "LightAgent",
-                    "type" : "AGENT",
+                    "type" : [ "AGENT" ],
                     "email" : "jade12tywin@zylker.com"
                   }
                 }
@@ -452,26 +512,28 @@
           "application/json" : {
             "schema" : {
               "allOf" : [ {
-                "type" : "object",
+                "type" : [ "object" ],
                 "properties" : {
                   "data" : {
-                    "type" : "array",
+                    "type" : [ "array" ],
                     "items" : {
-                      "type" : "object",
+                      "type" : [ "object" ],
                       "properties" : {
                         "mention" : {
                           "$ref" : "#/components/schemas/mentions"
                         }
-                      }
+                      },
+                      "additionalProperties" : false
                     }
                   }
-                }
+                },
+                "additionalProperties" : false
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "data" : {
-                    "$ref" : "./ContactComments.json#/components/schemas/dataArr"
+                    "$ref" : "#/components/schemas/dataArr"
                   }
                 },
                 "required" : [ "data" ]
@@ -491,10 +553,10 @@
                     "commenter" : {
                       "firstName" : "Jade",
                       "lastName" : "Tywin",
-                      "photoURL" : "https://desk.zoho.com/api/v1/portalUser/4000000008692/photo?orgId=292828",
+                      "photoURL" : "https://desk.example.com/api/v1/portalUser/4000000008692/photo?orgId=1234567890",
                       "name" : "Jade Tywin",
                       "roleName" : "PortalUser",
-                      "type" : "END_USER",
+                      "type" : [ "END_USER" ],
                       "email" : "jade12tywin@zylker.com"
                     }
                   }, {
@@ -508,10 +570,10 @@
                     "commenter" : {
                       "firstName" : "Jade",
                       "lastName" : "Tywin",
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000008692/photo?orgId=292828",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000008692/photo?orgId=1234567890",
                       "name" : "Jade Tywin",
                       "roleName" : "CEO",
-                      "type" : "AGENT",
+                      "type" : [ "AGENT" ],
                       "email" : "jade12tywin@zylker.com"
                     }
                   } ]
@@ -522,50 +584,22 @@
         }
       }
     },
-    "parameters" : {
-      "contactId" : {
-        "name" : "contactId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "commentId" : {
-        "name" : "commentId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      }
-    },
     "requestBodies" : {
       "addContactCommentRequestBody" : {
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "contentType" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "enum" : [ "plainText", "html" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "default" : "html"
                 },
                 "content" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 32000,
-                  "minLength" : 0
+                  "type" : [ "string" ],
+                  "maxLength" : 32000
                 }
               },
               "required" : [ "content" ]
@@ -585,13 +619,17 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "content" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "maxLength" : 32000,
                   "minLength" : 0
+                },
+                "contentType" : {
+                  "type" : [ "string" ],
+                  "enum" : [ "html", "plainText" ]
                 }
               }
             },
@@ -607,6 +645,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

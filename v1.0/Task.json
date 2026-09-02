@@ -11,6 +11,7 @@
         "summary" : "Update many tasks",
         "description" : "This API updates multiple tasks at once.",
         "operationId" : "bulkUpdateTasks",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -37,6 +38,7 @@
         "summary" : "Delete spam tasks",
         "description" : "This API deletes the given spam tasks",
         "operationId" : "deleteSpamTasks",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -63,26 +65,34 @@
         "summary" : "Get task",
         "description" : "This API fetches a task from your help desk portal.",
         "operationId" : "getTask",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
-          "description" : "Additional information related to the task. Values allowed are: @contacts@, @assignee@,@tickets@,@teams@,@creator@.",
+          "description" : "Additional information related to the task. Values allowed are: contacts, assignee, tickets, teams, projects, creator.",
           "required" : false,
-          "style" : "simple",
+          "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "null", "array" ],
-            "description" : "Additional information related to the task. Values allowed are: @contacts@, @assignee@,@tickets@,@teams@,@creator@.",
+            "type" : [ "array" ],
             "items" : {
-              "type" : [ "string", "null" ],
-              "enum" : [ "contacts", "tickets", "assignee", "teams" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "type" : [ "string" ],
+              "enum" : [ "contacts", "tickets", "assignee", "teams", "projects", "creator" ]
             },
             "uniqueItems" : true
           }
         }, {
-          "$ref" : "#/components/parameters/taskId"
+          "name" : "taskId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the task"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -99,10 +109,21 @@
       "patch" : {
         "tags" : [ "Task" ],
         "operationId" : "updateTask",
+        "x-mcp-ready" : true,
         "summary" : "Update a task",
         "description" : "This API helps update the details of a task.",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/taskId"
+          "name" : "taskId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the task"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -129,6 +150,7 @@
         "summary" : "Empty spam tasks",
         "description" : "This API deletes all spam tasks.",
         "operationId" : "deleteAllSpamTasks",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -155,6 +177,7 @@
         "summary" : "Delete tasks",
         "description" : "This API moves task entries to the Recycle Bin of your help desk portal.",
         "operationId" : "deleteTask",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -181,28 +204,129 @@
         "summary" : "List tasks",
         "description" : "This API fetches a particular number of tasks, based on the limit specified.",
         "operationId" : "getTasks",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
           "required" : false,
-          "style" : "simple",
+          "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "null", "array" ],
+            "type" : [ "array" ],
             "items" : {
-              "type" : [ "string", "null" ],
-              "enum" : [ "contacts", "tickets", "assignee", "teams" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "type" : [ "string" ],
+              "enum" : [ "contacts", "tickets", "assignee", "teams", "projects" ]
             },
             "uniqueItems" : true
+          },
+          "description" : "Additional information to include in the response"
+        }, {
+          "name" : "departmentIds",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string", "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "maxItems" : 20
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Departments from which the tasks need to be queried"
+        }, {
+          "name" : "viewId",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "ID of the view to apply while fetching the resources"
+        }, {
+          "name" : "assignee",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string", "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "maxItems" : 20
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Key that filters tickets by assignee. Values allowed are any valid assignee ID or multiple assignee IDs separated by commas."
+        }, {
+          "name" : "dueDate",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "enum" : [ "Overdue", "Today", "Tomorrow", "CurrentWeek", "CurrentMonth" ]
+            },
+            "maxItems" : 10
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Due date for completing the task. Values allowed are Overdue, Tomorrow, CurrentWeek, CurrentMonth and Today. You can pass multiple values by separating them with commas."
+        }, {
+          "name" : "isCompleted",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "boolean" ]
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Key that denotes whether the task is completed or not"
+        }, {
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "ID of the department from which the task count must be fetched",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
           }
         }, {
-          "$ref" : "#/components/parameters/departmentId"
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of tasks to list",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 100,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/limit"
-        }, {
-          "$ref" : "#/components/parameters/from"
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number, starting from which the tasks must be listed",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "name" : "sortBy",
           "in" : "query",
@@ -210,13 +334,44 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
+            "type" : [ "string" ],
             "enum" : [ "category", "subject", "dueDate", "status", "createdTime", "modifiedTime", "priority" ],
-            "maxLength" : 100,
-            "minLength" : 0
-          }
+            "pattern" : "-?(category|subject|dueDate|status||createdTime|modifiedTime|priority)"
+          },
+          "description" : "Sorts tasks by the specified attribute"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
+        }, {
+          "name" : "fields",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ]
+            }
+          },
+          "description" : "Key that returns the values of mentioned fields (both pre-defined and custom) in your portal. All field types except multi-text are supported. Standard, non-editable fields are supported too. These fields include: photoURL, webUrl. Maximum of 30 fields is supported as comma separated values.",
+          "style" : "form",
+          "explode" : false
+        }, {
+          "name" : "filters",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "$ref" : "./Ticket.json#/components/schemas/filter_json"
+          },
+          "description" : "To fetch the tasks based on the filters specified in the criteria JSON, which includes the field and its conditions."
+        }, {
+          "name" : "filterId",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "integer", "string" ],
+            "pattern" : "([0-9]+)",
+            "format" : "int64"
+          },
+          "description" : "ID of the SavedFilter to filter the records"
         } ],
         "responses" : {
           "204" : {
@@ -236,6 +391,7 @@
         "summary" : "Create task",
         "description" : "This API creates a task in your help desk portal.",
         "operationId" : "createTask",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -262,46 +418,80 @@
         "summary" : "List tasks by ticket",
         "description" : "This API lists all tasks associated with a particular ticket.",
         "operationId" : "getTasksByTicket",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
-          "description" : "Additional information related to the task. Values allowed are: @contacts@, @assignee@,@tickets@,@teams@,@projects@.",
-          "required" : false,
-          "style" : "simple",
-          "explode" : true,
-          "schema" : {
-            "type" : [ "null", "array" ],
-            "description" : "Additional information related to the task. Values allowed are: @contacts@, @assignee@,@tickets@,@teams@,@projects@.",
-            "items" : {
-              "type" : [ "string", "null" ],
-              "enum" : [ "contacts", "tickets", "assignee", "teams" ],
-              "maxLength" : 100,
-              "minLength" : 0
-            },
-            "uniqueItems" : true
-          }
-        }, {
-          "$ref" : "#/components/parameters/limit"
-        }, {
-          "$ref" : "#/components/parameters/from"
-        }, {
-          "name" : "sortBy",
-          "in" : "query",
-          "description" : "Key that sorts the tasks by a specific attribute: @dueDate@ or @createdTime@.The default sorting order is ascending. A @-@ prefix denotes a descending order of sorting. ",
+          "description" : "Additional information related to the task. Values allowed are: contacts, assignee, tickets, teams, projects.",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Key that sorts the tasks by a specific attribute: @dueDate@ or @createdTime@.The default sorting order is ascending. A @-@ prefix denotes a descending order of sorting. ",
-            "enum" : [ "dueDate", "createdTime" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "enum" : [ "contacts", "tickets", "assignee", "teams", "projects" ]
+            },
+            "uniqueItems" : true
           }
         }, {
-          "$ref" : "#/components/parameters/isSpam"
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of tasks to list",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 100,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/isCompleted"
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number, starting from which the tasks must be listed",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "description" : "Key that sorts the tasks by a specific attribute: dueDate or createdTime. The default sorting order is ascending. A - prefix denotes a descending order of sorting.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "category", "subject", "dueDate", "status", "createdTime", "modifiedTime", "priority" ],
+            "pattern" : "-?(category|subject|dueDate|status|createdTime|modifiedTime|priority)"
+          }
+        }, {
+          "name" : "isSpam",
+          "in" : "query",
+          "description" : "Key that denotes whether to fetch spam tasks or not",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "boolean" ]
+          }
+        }, {
+          "name" : "isCompleted",
+          "in" : "query",
+          "description" : "Key that denotes if the task was completed or not",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "boolean" ]
+          }
         }, {
           "name" : "ticketId",
           "in" : "path",
@@ -309,10 +499,11 @@
           "style" : "simple",
           "explode" : false,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
-          }
+          },
+          "description" : "Unique ID of the ticket"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -336,6 +527,7 @@
         "summary" : "List all tasks count",
         "description" : "This API returns the number of tasks in your help desk.",
         "operationId" : "getTasksCount",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "viewId",
           "in" : "query",
@@ -344,28 +536,34 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
-            "description" : "ID of the view to apply while fetching the resources",
             "pattern" : "([0-9]+)"
           }
         }, {
-          "$ref" : "#/components/parameters/departmentId"
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "ID of the department from which the task count must be fetched",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "allDepartment|[0-9]+"
+          }
         }, {
           "name" : "dueDate",
           "in" : "query",
-          "description" : "Filter by task duedate. Values allowed are @Overdue@, @Tomorrow@, @CurrentWeek@, @CurrentMonth@ and @Today@. You can include both values by separating them with a comma",
+          "description" : "Filter by task duedate. Values allowed are Overdue, Tomorrow, CurrentWeek, CurrentMonth and Today. You can include both values by separating them with a comma",
           "required" : false,
-          "style" : "simple",
+          "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "null", "array" ],
-            "description" : "Filter by task duedate. Values allowed are @Overdue@, @Tomorrow@, @CurrentWeek@, @CurrentMonth@ and @Today@. You can include both values by separating them with a comma",
+            "type" : [ "array" ],
             "items" : {
-              "type" : [ "string", "null" ],
-              "enum" : [ "Overdue", "Today", "Tomorrow", "CurrentWeek", "CurrentMonth" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "type" : [ "string" ],
+              "enum" : [ "Overdue", "Today", "Tomorrow", "CurrentWeek", "CurrentMonth" ]
             },
             "uniqueItems" : true
           }
@@ -374,13 +572,12 @@
           "in" : "query",
           "description" : " Key that filters tasks by assignee. A valid assigneeId must be passed for this parameter. Multiple assigneeIds can be passed as comma-separated values.",
           "required" : false,
-          "style" : "simple",
+          "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "null", "array" ],
-            "description" : " Key that filters tasks by assignee. A valid assigneeId must be passed for this parameter. Multiple assigneeIds can be passed as comma-separated values.",
+            "type" : [ "array" ],
             "items" : {
-              "type" : [ "string", "null", "integer" ],
+              "type" : [ "string", "integer" ],
               "format" : "int64",
               "pattern" : "([0-9]+)"
             },
@@ -388,6 +585,16 @@
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
+        }, {
+          "name" : "filterId",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "integer", "string" ],
+            "pattern" : "([0-9]+)",
+            "format" : "int64"
+          },
+          "description" : "Id of the SavedFilter to filter the records"
         } ],
         "responses" : {
           "422" : {
@@ -407,106 +614,109 @@
   "components" : {
     "schemas" : {
       "long_array" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array" ],
         "items" : {
-          "type" : [ "string", "null", "integer" ],
+          "type" : [ "string", "integer" ],
           "format" : "int64",
           "pattern" : "([0-9]+)"
         }
       },
       "assignee" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "photoURL" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "URL of the profile photo"
           },
           "firstName" : {
             "type" : [ "string", "null" ],
             "maxLength" : 50,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "First name of the user"
           },
           "lastName" : {
             "type" : [ "string", "null" ],
             "maxLength" : 50,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Last name of the user"
           },
           "emailId" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+            "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$",
+            "description" : "Email address of the user"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the user"
           }
         },
         "required" : [ "emailId", "firstName", "id", "lastName", "photoURL" ]
       },
       "relativeReminder" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "relativeReminderInMin" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int32",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Time offset in minutes before the task starts"
           },
           "alertType" : {
-            "type" : [ "null", "array" ],
+            "type" : [ "array", "null" ],
             "items" : {
               "type" : [ "string", "null" ],
-              "enum" : [ "EMAIL", "POPUP", "SMS" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "enum" : [ "EMAIL", "POPUP", "SMS" ]
             },
-            "uniqueItems" : true
+            "uniqueItems" : true,
+            "description" : "Type of alert(s) related to the reminder. Accepted values: EMAIL, POPUP, SMS"
           },
           "reminderType" : {
             "type" : [ "string", "null" ],
             "enum" : [ "RELATIVE" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "description" : "Type of the reminder. Value: RELATIVE"
           }
         },
         "required" : [ "alertType", "relativeReminderInMin", "reminderType" ]
       },
       "absoluteReminder" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "alertType" : {
-            "type" : [ "null", "array" ],
+            "type" : [ "array", "null" ],
             "items" : {
               "type" : [ "string", "null" ],
-              "enum" : [ "EMAIL", "POPUP", "SMS" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "enum" : [ "EMAIL", "POPUP", "SMS" ]
             },
-            "uniqueItems" : true
+            "uniqueItems" : true,
+            "description" : "Type of alert(s) related to the reminder. Accepted values: EMAIL, POPUP, SMS"
           },
           "reminderType" : {
             "type" : [ "string", "null" ],
             "enum" : [ "ABSOLUTE" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "description" : "Type of the reminder. Value: ABSOLUTE"
           },
           "reminderTime" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+            "description" : "Time when the reminder is triggered"
           }
         },
         "required" : [ "alertType", "reminderTime", "reminderType" ]
       },
       "reminderArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
           "oneOf" : [ {
             "$ref" : "#/components/schemas/relativeReminder"
@@ -515,12 +725,398 @@
           } ]
         }
       },
-      "commonJson" : {
-        "type" : [ "null", "object" ],
+      "taskListByContactOrAccountJson" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/commonJsonResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "callId" : {
+              "type" : [ "string", "integer", "null" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)",
+              "description" : "Unique ID of the call associated with the task"
+            },
+            "modifiedTime" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0,
+              "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+              "description" : "Time when the task was last modified"
+            },
+            "statusType" : {
+              "type" : [ "string", "null" ],
+              "enum" : [ "Open", "Closed" ],
+              "description" : "Type of the task status. Accepted values: Open, Closed"
+            },
+            "completedTime" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0,
+              "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+              "description" : "Time when the task was completed"
+            },
+            "creatorId" : {
+              "type" : [ "string", "integer", "null" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)",
+              "description" : "Unique ID of the user who created the task"
+            },
+            "activityTime" : {
+              "type" : [ "string", "integer", "null" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)",
+              "description" : "Activity time of the task"
+            },
+            "layoutId" : {
+              "type" : [ "string", "integer", "null" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)",
+              "description" : "Unique ID of the layout associated with the task"
+            },
+            "isTrashed" : {
+              "type" : [ "boolean", "null" ],
+              "description" : "Indicates whether the task is in the Recycle Bin"
+            },
+            "isCommented" : {
+              "type" : [ "boolean", "null" ],
+              "description" : "Indicates whether the task contains comments"
+            },
+            "webUrl" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 500,
+              "minLength" : 0,
+              "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+              "description" : "URL to access the task"
+            },
+            "createdTime" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0,
+              "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+              "description" : "Time when the task was created"
+            },
+            "modifiedBy" : {
+              "$ref" : "#/components/schemas/assignee"
+            },
+            "startTime" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0,
+              "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+              "description" : "Start time of the task"
+            },
+            "id" : {
+              "type" : [ "string", "integer", "null" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)",
+              "description" : "Unique ID of the task"
+            },
+            "isSpam" : {
+              "type" : [ "boolean", "null" ],
+              "description" : "Indicates whether the task is marked as spam"
+            },
+            "category" : {
+              "type" : [ "string", "null" ],
+              "x-dynamic-enum" : true,
+              "description" : "Category of the task"
+            },
+            "direction" : {
+              "type" : [ "string", "null" ],
+              "enum" : [ "inbound", "outbound" ],
+              "description" : "Direction of the activity"
+            }
+          },
+          "required" : [ "activityTime", "callId", "category", "completedTime", "createdTime", "creatorId", "direction", "id", "isCommented", "isSpam", "isTrashed", "layoutId", "modifiedBy", "modifiedTime", "startTime", "statusType", "webUrl" ],
+          "additionalProperties" : false
+        } ],
+        "required" : [ "departmentId", "subject" ]
+      },
+      "taskListViewJson" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/commonJsonResponse"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "modifiedTime" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0,
+              "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+              "description" : "Time when the task was last modified"
+            },
+            "statusType" : {
+              "type" : [ "string", "null" ],
+              "enum" : [ "Open", "Closed" ],
+              "description" : "Type of the task status. Accepted values: Open, Closed"
+            },
+            "completedTime" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0,
+              "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+              "description" : "Time when the task was completed"
+            },
+            "creatorId" : {
+              "type" : [ "string", "integer", "null" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)",
+              "description" : "Unique ID of the user who created the task"
+            },
+            "activityTime" : {
+              "type" : [ "string", "integer", "null" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)",
+              "description" : "Activity time of the task"
+            },
+            "layoutId" : {
+              "type" : [ "string", "integer", "null" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)",
+              "description" : "Unique ID of the layout associated with the task"
+            },
+            "isTrashed" : {
+              "type" : [ "boolean", "null" ],
+              "description" : "Indicates whether the task is in the Recycle Bin"
+            },
+            "isCommented" : {
+              "type" : [ "boolean", "null" ],
+              "description" : "Indicates whether the task contains comments"
+            },
+            "webUrl" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 500,
+              "minLength" : 0,
+              "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+              "description" : "URL to access the task"
+            },
+            "createdTime" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0,
+              "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+              "description" : "Time when the task was created"
+            },
+            "modifiedBy" : {
+              "$ref" : "#/components/schemas/assignee"
+            },
+            "id" : {
+              "type" : [ "string", "integer", "null" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)",
+              "description" : "Unique ID of the task"
+            },
+            "isSpam" : {
+              "type" : [ "boolean", "null" ],
+              "description" : "Indicates whether the task is marked as spam"
+            },
+            "category" : {
+              "type" : [ "string", "null" ],
+              "x-dynamic-enum" : true,
+              "description" : "Category of the task"
+            }
+          },
+          "required" : [ "activityTime", "category", "completedTime", "createdTime", "creatorId", "id", "isCommented", "isSpam", "isTrashed", "layoutId", "modifiedBy", "modifiedTime", "statusType", "webUrl" ],
+          "additionalProperties" : false
+        } ],
+        "required" : [ "contactId", "departmentId", "dueDate", "ownerId", "priority", "status", "subject", "ticketId" ]
+      },
+      "data" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/taskListViewJson"
+        }
+      },
+      "taskTableViewJson" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "subject" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 300,
+            "minLength" : 0,
+            "description" : "Subject of the task"
+          },
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the task"
+          }
+        },
+        "required" : [ "id", "subject" ]
+      },
+      "tableViewData" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/taskTableViewJson"
+        }
+      },
+      "taskTableViewIncludeJson" : {
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "contactId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the contact associated with the task"
+          },
+          "subject" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 300,
+            "minLength" : 0,
+            "description" : "Subject of the task"
+          },
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the task"
+          },
+          "ticketId" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the ticket associated with the task"
+          }
+        },
+        "required" : [ "contactId", "id", "subject", "ticketId" ]
+      },
+      "tableViewIncludeData" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/taskTableViewIncludeJson"
+        }
+      },
+      "taskTableViewTicketIdJson" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "subject" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 300,
+            "minLength" : 0,
+            "description" : "Subject of the task"
+          },
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the task"
+          },
+          "ticketId" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the ticket associated with the task"
+          }
+        },
+        "required" : [ "id", "subject", "ticketId" ]
+      },
+      "tableViewTicketIdData" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/taskTableViewTicketIdJson"
+        }
+      },
+      "taskTableViewContactIdJson" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "contactId" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the contact associated with the task"
+          },
+          "subject" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 300,
+            "minLength" : 0,
+            "description" : "Subject of the task"
+          },
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the task"
+          }
+        },
+        "required" : [ "contactId", "id", "subject" ]
+      },
+      "tableViewContactIdData" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/taskTableViewContactIdJson"
+        }
+      },
+      "contactJson" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "firstName" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 40,
+            "minLength" : 0,
+            "description" : "First name of the contact"
+          },
+          "lastName" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "description" : "Last name of the contact"
+          },
+          "accountId" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the account associated with the contact"
+          },
+          "phone" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "minLength" : 0,
+            "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\(\\)\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+",
+            "description" : "Phone number of the contact"
+          },
+          "mobile" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "minLength" : 0,
+            "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\(\\)\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+",
+            "description" : "Mobile number of the contact"
+          },
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the contact"
+          },
+          "isSpam" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the contact is marked as spam"
+          },
+          "email" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 255,
+            "minLength" : 0,
+            "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'\\&\\~]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$",
+            "description" : "Email address of the contact"
+          }
+        },
+        "required" : [ "accountId", "email", "firstName", "id", "isSpam", "lastName", "mobile", "phone" ]
+      },
+      "commonJsonResponse" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "contactId" : {
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "description" : "ID of the contact associated with the task",
             "pattern" : "([0-9]+)"
@@ -532,7 +1128,7 @@
             "minLength" : 0
           },
           "departmentId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "description" : "ID of the department in which the task must be created",
             "pattern" : "([0-9]+)"
@@ -545,7 +1141,7 @@
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "ownerId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "description" : "ID of the user to whom the task is assigned",
             "pattern" : "([0-9]+)"
@@ -556,7 +1152,7 @@
             "x-dynamic-enum" : true
           },
           "ticketId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "description" : "ID of the ticket with which the task must be associated",
             "pattern" : "([0-9]+)"
@@ -566,345 +1162,60 @@
             "description" : "Status of task completion",
             "x-dynamic-enum" : true
           }
-        },
-        "required" : [ "contactId", "departmentId", "dueDate", "ownerId", "priority", "status", "subject", "ticketId" ]
-      },
-      "taskListByContactOrAccountJson" : {
-        "additionalProperties" : false,
-        "allOf" : [ {
-          "$ref" : "#/components/schemas/commonJson"
-        }, {
-          "type" : [ "null", "object" ],
-          "properties" : {
-            "callId" : {
-              "type" : [ "string", "null", "integer" ],
-              "format" : "int64",
-              "pattern" : "([0-9]+)"
-            },
-            "modifiedTime" : {
-              "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0,
-              "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
-            },
-            "statusType" : {
-              "type" : [ "string", "null" ],
-              "enum" : [ "Open", "Closed" ],
-              "maxLength" : 100,
-              "minLength" : 0
-            },
-            "completedTime" : {
-              "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0,
-              "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
-            },
-            "creatorId" : {
-              "type" : [ "string", "null", "integer" ],
-              "format" : "int64",
-              "pattern" : "([0-9]+)"
-            },
-            "activityTime" : {
-              "type" : [ "string", "null", "integer" ],
-              "format" : "int64",
-              "pattern" : "([0-9]+)"
-            },
-            "layoutId" : {
-              "type" : [ "string", "null", "integer" ],
-              "format" : "int64",
-              "pattern" : "([0-9]+)"
-            },
-            "isTrashed" : {
-              "type" : [ "boolean", "null" ]
-            },
-            "isCommented" : {
-              "type" : [ "boolean", "null" ]
-            },
-            "webUrl" : {
-              "type" : [ "string", "null" ],
-              "maxLength" : 500,
-              "minLength" : 0,
-              "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
-            },
-            "createdTime" : {
-              "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0,
-              "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
-            },
-            "modifiedBy" : {
-              "$ref" : "#/components/schemas/assignee"
-            },
-            "startTime" : {
-              "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0,
-              "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
-            },
-            "id" : {
-              "type" : [ "string", "null", "integer" ],
-              "format" : "int64",
-              "pattern" : "([0-9]+)"
-            },
-            "isSpam" : {
-              "type" : [ "boolean", "null" ]
-            },
-            "category" : {
-              "type" : [ "string", "null" ],
-              "x-dynamic-enum" : true
-            },
-            "direction" : {
-              "type" : [ "string", "null" ],
-              "enum" : [ "inbound", "outbound" ],
-              "maxLength" : 100,
-              "minLength" : 0
-            }
-          },
-          "required" : [ "activityTime", "callId", "category", "completedTime", "createdTime", "creatorId", "direction", "id", "isCommented", "isSpam", "isTrashed", "layoutId", "modifiedBy", "modifiedTime", "startTime", "statusType", "webUrl" ]
-        } ]
-      },
-      "taskListViewJson" : {
-        "additionalProperties" : false,
-        "allOf" : [ {
-          "$ref" : "#/components/schemas/commonJson"
-        }, {
-          "type" : [ "null", "object" ],
-          "properties" : {
-            "modifiedTime" : {
-              "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0,
-              "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
-            },
-            "statusType" : {
-              "type" : [ "string", "null" ],
-              "enum" : [ "Open", "Closed" ],
-              "maxLength" : 100,
-              "minLength" : 0
-            },
-            "completedTime" : {
-              "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0,
-              "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
-            },
-            "creatorId" : {
-              "type" : [ "string", "null", "integer" ],
-              "format" : "int64",
-              "pattern" : "([0-9]+)"
-            },
-            "activityTime" : {
-              "type" : [ "string", "null", "integer" ],
-              "format" : "int64",
-              "pattern" : "([0-9]+)"
-            },
-            "layoutId" : {
-              "type" : [ "string", "null", "integer" ],
-              "format" : "int64",
-              "pattern" : "([0-9]+)"
-            },
-            "isTrashed" : {
-              "type" : [ "boolean", "null" ]
-            },
-            "isCommented" : {
-              "type" : [ "boolean", "null" ]
-            },
-            "webUrl" : {
-              "type" : [ "string", "null" ],
-              "maxLength" : 500,
-              "minLength" : 0,
-              "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
-            },
-            "createdTime" : {
-              "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0,
-              "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
-            },
-            "modifiedBy" : {
-              "$ref" : "#/components/schemas/assignee"
-            },
-            "id" : {
-              "type" : [ "string", "null", "integer" ],
-              "format" : "int64",
-              "pattern" : "([0-9]+)"
-            },
-            "isSpam" : {
-              "type" : [ "boolean", "null" ]
-            },
-            "category" : {
-              "type" : [ "string", "null" ],
-              "x-dynamic-enum" : true
-            }
-          },
-          "required" : [ "activityTime", "category", "completedTime", "createdTime", "creatorId", "id", "isCommented", "isSpam", "isTrashed", "isTrashed", "layoutId", "modifiedBy", "modifiedTime", "statusType", "webUrl" ]
-        } ]
-      },
-      "data" : {
-        "type" : [ "null", "array" ],
-        "items" : {
-          "$ref" : "#/components/schemas/taskListViewJson"
         }
       },
-      "taskTableViewJson" : {
-        "type" : [ "null", "object" ],
-        "additionalProperties" : false,
-        "properties" : {
-          "subject" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 300,
-            "minLength" : 0
-          },
-          "id" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
-          }
-        },
-        "required" : [ "id", "subject" ]
-      },
-      "tableViewData" : {
-        "type" : [ "null", "array" ],
-        "items" : {
-          "$ref" : "#/components/schemas/taskTableViewJson"
-        }
-      },
-      "taskTableViewIncludeJson" : {
-        "type" : [ "null", "object" ],
+      "commonJsonRequest" : {
+        "type" : [ "object" ],
         "additionalProperties" : false,
         "properties" : {
           "contactId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "description" : "ID of the contact associated with the task",
+            "pattern" : "([0-9]*|null|undefined)"
           },
           "subject" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 300,
-            "minLength" : 0
+            "type" : [ "string" ],
+            "description" : "Subject of the task",
+            "maxLength" : 300
           },
-          "id" : {
-            "type" : [ "string", "null", "integer" ],
+          "departmentId" : {
+            "type" : [ "string", "integer" ],
             "format" : "int64",
+            "description" : "ID of the department in which the task must be created",
             "pattern" : "([0-9]+)"
+          },
+          "dueDate" : {
+            "type" : [ "string" ],
+            "description" : "Due date for completing the task",
+            "maxLength" : 100,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null"
+          },
+          "ownerId" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "ID of the user to whom the task is assigned",
+            "pattern" : "([0-9]*|null|undefined)"
+          },
+          "priority" : {
+            "type" : [ "string" ],
+            "description" : "Priority of the task",
+            "x-dynamic-enum" : true,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
           },
           "ticketId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
+            "description" : "ID of the ticket with which the task must be associated",
             "pattern" : "([0-9]+)"
+          },
+          "status" : {
+            "type" : [ "string" ],
+            "description" : "Status of task completion",
+            "x-dynamic-enum" : true,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
           }
-        },
-        "required" : [ "contactId", "id", "subject", "ticketId" ]
-      },
-      "tableViewIncludeData" : {
-        "type" : [ "null", "array" ],
-        "items" : {
-          "$ref" : "#/components/schemas/taskTableViewIncludeJson"
         }
-      },
-      "taskTableViewTicketIdJson" : {
-        "type" : [ "null", "object" ],
-        "additionalProperties" : false,
-        "properties" : {
-          "subject" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 300,
-            "minLength" : 0
-          },
-          "id" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
-          },
-          "ticketId" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
-          }
-        },
-        "required" : [ "id", "subject", "ticketId" ]
-      },
-      "tableViewTicketIdData" : {
-        "type" : [ "null", "array" ],
-        "items" : {
-          "$ref" : "#/components/schemas/taskTableViewTicketIdJson"
-        }
-      },
-      "taskTableViewContactIdJson" : {
-        "type" : [ "null", "object" ],
-        "additionalProperties" : false,
-        "properties" : {
-          "contactId" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
-          },
-          "subject" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 300,
-            "minLength" : 0
-          },
-          "id" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
-          }
-        },
-        "required" : [ "contactId", "id", "subject" ]
-      },
-      "tableViewContactIdData" : {
-        "type" : [ "null", "array" ],
-        "items" : {
-          "$ref" : "#/components/schemas/taskTableViewContactIdJson"
-        }
-      },
-      "contactJson" : {
-        "type" : [ "null", "object" ],
-        "additionalProperties" : false,
-        "properties" : {
-          "firstName" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 40,
-            "minLength" : 0
-          },
-          "lastName" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 200,
-            "minLength" : 0
-          },
-          "accountId" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
-          },
-          "phone" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 50,
-            "minLength" : 0,
-            "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\(\\)\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
-          },
-          "mobile" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 50,
-            "minLength" : 0,
-            "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\(\\)\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
-          },
-          "id" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
-          },
-          "isSpam" : {
-            "type" : [ "boolean", "null" ]
-          },
-          "email" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 255,
-            "minLength" : 0,
-            "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'\\&\\~]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
-          }
-        },
-        "required" : [ "accountId", "email", "firstName", "id", "isSpam", "lastName", "mobile", "phone" ]
       }
     },
     "responses" : {
@@ -913,20 +1224,22 @@
         "content" : {
           "application/json" : {
             "schema" : {
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "allOf" : [ {
-                "$ref" : "#/components/schemas/commonJson"
+                "$ref" : "#/components/schemas/commonJsonResponse"
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "properties" : {
                   "modifiedTime" : {
                     "type" : [ "string", "null" ],
                     "maxLength" : 100,
                     "minLength" : 0,
-                    "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+                    "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+                    "description" : "Time when the task was last modified"
                   },
                   "cf" : {
-                    "type" : [ "null", "object" ],
+                    "type" : [ "object", "null" ],
                     "additionalProperties" : false,
                     "patternProperties" : {
                       "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
@@ -935,7 +1248,8 @@
                         "minLength" : 0,
                         "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                       }
-                    }
+                    },
+                    "description" : "User-defined fields related to the task"
                   },
                   "reminder" : {
                     "$ref" : "#/components/schemas/reminderArray"
@@ -943,16 +1257,16 @@
                   "statusType" : {
                     "type" : [ "string", "null" ],
                     "enum" : [ "Open", "Closed" ],
-                    "maxLength" : 100,
-                    "minLength" : 0
+                    "description" : "Type of the task status. Accepted values: Open, Closed"
                   },
                   "contactId" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
-                    "pattern" : "([0-9]+)"
+                    "pattern" : "([0-9]+)",
+                    "description" : "Unique ID of the contact associated with the task"
                   },
                   "customFields" : {
-                    "type" : [ "null", "object" ],
+                    "type" : [ "object", "null" ],
                     "additionalProperties" : false,
                     "patternProperties" : {
                       "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
@@ -961,67 +1275,81 @@
                         "minLength" : 0,
                         "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                       }
-                    }
+                    },
+                    "description" : "User-defined fields related to the task. Deprecated: use cf instead"
                   },
                   "completedTime" : {
                     "type" : [ "string", "null" ],
                     "maxLength" : 100,
                     "minLength" : 0,
-                    "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+                    "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+                    "description" : "Time when the task was completed"
                   },
                   "creatorId" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
-                    "pattern" : "([0-9]+)"
+                    "pattern" : "([0-9]+)",
+                    "description" : "Unique ID of the user who created the task"
                   },
                   "description" : {
                     "type" : [ "string", "null" ],
                     "maxLength" : 65535,
-                    "minLength" : 0
+                    "minLength" : 0,
+                    "description" : "Description of the task"
                   },
                   "activityTime" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
-                    "pattern" : "([0-9]+)"
+                    "pattern" : "([0-9]+)",
+                    "description" : "Activity time of the task"
                   },
                   "layoutId" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
-                    "pattern" : "([0-9]+)"
+                    "pattern" : "([0-9]+)",
+                    "description" : "Unique ID of the layout associated with the task"
                   },
                   "isTrashed" : {
-                    "type" : [ "boolean", "null" ]
+                    "type" : [ "boolean", "null" ],
+                    "description" : "Indicates whether the task is in the Recycle Bin"
                   },
                   "webUrl" : {
                     "type" : [ "string", "null" ],
                     "maxLength" : 500,
                     "minLength" : 0,
-                    "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+                    "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+                    "description" : "URL to access the task"
                   },
                   "createdTime" : {
                     "type" : [ "string", "null" ],
                     "maxLength" : 100,
                     "minLength" : 0,
-                    "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+                    "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+                    "description" : "Time when the task was created"
                   },
                   "modifiedBy" : {
                     "$ref" : "#/components/schemas/assignee"
                   },
                   "id" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
-                    "pattern" : "([0-9]+)"
+                    "pattern" : "([0-9]+)",
+                    "description" : "Unique ID of the task"
                   },
                   "isSpam" : {
-                    "type" : [ "boolean", "null" ]
+                    "type" : [ "boolean", "null" ],
+                    "description" : "Indicates whether the task is marked as spam"
                   },
                   "category" : {
                     "type" : [ "string", "null" ],
-                    "x-dynamic-enum" : true
+                    "x-dynamic-enum" : true,
+                    "description" : "Category of the task"
                   }
                 },
-                "required" : [ "activityTime", "category", "cf", "completedTime", "contactId", "createdTime", "creatorId", "customFields", "description", "id", "isSpam", "isTrashed", "layoutId", "modifiedBy", "modifiedTime", "reminder", "statusType", "webUrl" ]
-              } ]
+                "required" : [ "activityTime", "category", "cf", "completedTime", "contactId", "createdTime", "creatorId", "customFields", "description", "id", "isSpam", "isTrashed", "layoutId", "modifiedBy", "modifiedTime", "reminder", "statusType", "webUrl" ],
+                "additionalProperties" : false
+              } ],
+              "required" : [ "contactId", "departmentId", "dueDate", "ownerId", "priority", "status", "subject", "ticketId" ]
             },
             "examples" : {
               "Valid responses Definitions" : {
@@ -1035,7 +1363,7 @@
                   "description" : null,
                   "ownerId" : null,
                   "priority" : "High",
-                  "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Tasks/dv/51123033fe97b2f886f750280ded9c40",
+                  "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Tasks/dv/51123033fe97b2f886f750280ded9c40",
                   "createdTime" : 1468484846000,
                   "modifiedBy" : {
                     "firstName" : "George",
@@ -1059,206 +1387,243 @@
         "content" : {
           "application/json" : {
             "schema" : {
+              "type" : [ "object" ],
               "allOf" : [ {
-                "type" : "object",
+                "type" : [ "object" ],
                 "properties" : {
                   "data" : {
-                    "type" : "array",
+                    "type" : [ "array" ],
                     "items" : {
-                      "type" : "object",
+                      "type" : [ "object" ],
                       "properties" : {
                         "ticket" : {
-                          "type" : [ "null", "object" ],
+                          "type" : [ "object", "null" ],
                           "additionalProperties" : false,
                           "properties" : {
                             "contact" : {
                               "$ref" : "#/components/schemas/contactJson"
                             },
                             "team" : {
-                              "type" : [ "null", "object" ],
+                              "type" : [ "object", "null" ],
                               "additionalProperties" : false,
                               "properties" : {
                                 "name" : {
                                   "type" : [ "string", "null" ],
                                   "maxLength" : 50,
                                   "minLength" : 1,
-                                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+                                  "description" : "Name of the team"
                                 },
                                 "id" : {
-                                  "type" : [ "string", "null", "integer" ],
+                                  "type" : [ "string", "integer", "null" ],
                                   "format" : "int64",
-                                  "pattern" : "([0-9]+)"
+                                  "pattern" : "([0-9]+)",
+                                  "description" : "Unique ID of the team"
                                 },
                                 "logoUrl" : {
                                   "type" : [ "string", "null" ],
                                   "maxLength" : 200,
                                   "minLength" : 0,
-                                  "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+                                  "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+                                  "description" : "URL of the team logo"
                                 }
                               },
-                              "required" : [ "id", "logoUrl", "name" ]
+                              "required" : [ "id", "logoUrl", "name" ],
+                              "description" : "Details of the team associated with the ticket"
                             },
                             "ticketNumber" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int32",
-                              "pattern" : "([0-9]+)"
+                              "pattern" : "([0-9]+)",
+                              "description" : "Index or serial number of the ticket"
                             },
                             "subject" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 1000,
-                              "minLength" : 0
+                              "minLength" : 0,
+                              "description" : "Subject of the ticket"
                             },
                             "isArchived" : {
-                              "type" : [ "boolean", "null" ]
+                              "type" : [ "boolean", "null" ],
+                              "description" : "Indicates whether the ticket is archived"
                             },
                             "dueDate" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 100,
                               "minLength" : 0,
-                              "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+                              "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+                              "description" : "Due date of the ticket"
                             },
                             "channel" : {
                               "type" : [ "string", "null" ],
-                              "x-dynamic-enum" : true
+                              "x-dynamic-enum" : true,
+                              "description" : "Channel of the ticket"
                             },
                             "closedTime" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 100,
                               "minLength" : 0,
-                              "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+                              "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+                              "description" : "Time when the ticket was closed"
                             },
                             "phone" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 120,
                               "minLength" : 0,
-                              "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\(\\)\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+                              "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\(\\)\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+",
+                              "description" : "Phone number associated with the ticket"
                             },
                             "teamId" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
-                              "pattern" : "([0-9]+)"
+                              "pattern" : "([0-9]+)",
+                              "description" : "Unique ID of the team associated with the ticket"
                             },
                             "createdTime" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 100,
                               "minLength" : 0,
-                              "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+                              "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+                              "description" : "Time when the ticket was created"
                             },
                             "id" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
-                              "pattern" : "([0-9]+)"
+                              "pattern" : "([0-9]+)",
+                              "description" : "Unique ID of the ticket"
                             },
                             "assignee" : {
-                              "type" : [ "null", "object" ],
+                              "type" : [ "object", "null" ],
                               "additionalProperties" : false,
                               "properties" : {
                                 "firstName" : {
                                   "type" : [ "string", "null" ],
                                   "maxLength" : 50,
-                                  "minLength" : 0
+                                  "minLength" : 0,
+                                  "description" : "First name of the ticket assignee"
                                 },
                                 "lastName" : {
                                   "type" : [ "string", "null" ],
                                   "maxLength" : 50,
-                                  "minLength" : 0
+                                  "minLength" : 0,
+                                  "description" : "Last name of the ticket assignee"
                                 },
                                 "photoURL" : {
                                   "type" : [ "string", "null" ],
                                   "maxLength" : 100,
                                   "minLength" : 0,
-                                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+                                  "description" : "URL of the profile photo of the ticket assignee"
                                 },
                                 "id" : {
-                                  "type" : [ "string", "null", "integer" ],
+                                  "type" : [ "string", "integer", "null" ],
                                   "format" : "int64",
-                                  "pattern" : "([0-9]+)"
+                                  "pattern" : "([0-9]+)",
+                                  "description" : "Unique ID of the ticket assignee"
                                 }
                               },
-                              "required" : [ "firstName", "id", "lastName", "photoURL" ]
+                              "required" : [ "firstName", "id", "lastName", "photoURL" ],
+                              "description" : "Details of the agent assigned to the ticket"
                             },
                             "isSpam" : {
-                              "type" : [ "boolean", "null" ]
+                              "type" : [ "boolean", "null" ],
+                              "description" : "Indicates whether the ticket is marked as spam"
                             },
                             "status" : {
                               "type" : [ "string", "null" ],
-                              "x-dynamic-enum" : true
+                              "x-dynamic-enum" : true,
+                              "description" : "Status of the ticket"
                             }
                           },
-                          "required" : [ "assignee", "channel", "closedTime", "createdTime", "dueDate", "id", "isArchived", "isSpam", "phone", "status", "subject", "teamId", "ticketNumber" ]
+                          "required" : [ "assignee", "channel", "closedTime", "createdTime", "dueDate", "id", "isArchived", "isSpam", "phone", "status", "subject", "teamId", "ticketNumber" ],
+                          "description" : "Details of the ticket associated with the task"
                         },
                         "contact" : {
                           "$ref" : "#/components/schemas/contactJson"
                         },
                         "assignee" : {
-                          "type" : [ "null", "object" ],
+                          "type" : [ "object", "null" ],
                           "additionalProperties" : false,
                           "properties" : {
                             "firstName" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 50,
-                              "minLength" : 0
+                              "minLength" : 0,
+                              "description" : "First name of the task assignee"
                             },
                             "lastName" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 50,
-                              "minLength" : 0
+                              "minLength" : 0,
+                              "description" : "Last name of the task assignee"
                             },
                             "photoURL" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 100,
                               "minLength" : 0,
-                              "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                              "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+                              "description" : "URL of the profile photo of the task assignee"
                             },
                             "emailId" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 100,
                               "minLength" : 0,
-                              "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+                              "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$",
+                              "description" : "Email address of the task assignee"
                             },
                             "id" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
-                              "pattern" : "([0-9]+)"
+                              "pattern" : "([0-9]+)",
+                              "description" : "Unique ID of the task assignee"
                             }
                           },
-                          "required" : [ "emailId", "firstName", "id", "lastName", "photoURL" ]
+                          "required" : [ "emailId", "firstName", "id", "lastName", "photoURL" ],
+                          "description" : "Details of the agent assigned to the task"
                         },
                         "team" : {
-                          "type" : [ "null", "object" ],
+                          "type" : [ "object", "null" ],
                           "additionalProperties" : false,
                           "properties" : {
                             "name" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 50,
                               "minLength" : 1,
-                              "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                              "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+                              "description" : "Name of the team"
                             },
                             "id" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
-                              "pattern" : "([0-9]+)"
+                              "pattern" : "([0-9]+)",
+                              "description" : "Unique ID of the team"
                             },
                             "logoUrl" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 200,
                               "minLength" : 0,
-                              "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+                              "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+                              "description" : "URL of the team logo"
                             }
                           },
-                          "required" : [ "id", "logoUrl", "name" ]
+                          "required" : [ "id", "logoUrl", "name" ],
+                          "description" : "Details of the team associated with the task"
                         }
-                      }
-                    }
+                      },
+                      "additionalProperties" : false
+                    },
+                    "description" : "List of task entries"
                   }
-                }
+                },
+                "additionalProperties" : false
               }, {
-                "type" : "object",
+                "type" : [ "object" ],
                 "properties" : {
                   "data" : {
                     "$ref" : "#/components/schemas/data"
                   }
-                }
+                },
+                "additionalProperties" : false
               } ]
             },
             "examples" : {
@@ -1276,7 +1641,7 @@
                     "ownerId" : "5000000067003",
                     "priority" : "Normal",
                     "isCommented" : false,
-                    "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Tasks/dv/d4c0a5dce55dcf20279262cd8594cd0d",
+                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Tasks/dv/d4c0a5dce55dcf20279262cd8594cd0d",
                     "contact" : null,
                     "createdTime" : 1556634110000,
                     "startTime" : 0,
@@ -1296,7 +1661,7 @@
                   }, {
                     "ticket" : {
                       "ticketNumber" : "101",
-                      "phone" : "1 888 900 9646",
+                      "phone" : "1 555 010 0000",
                       "subject" : "Here's your first ticket.",
                       "dueDate" : 1553853086000,
                       "teamId" : null,
@@ -1319,12 +1684,12 @@
                     "team" : {
                       "name" : "Desk Team",
                       "id" : "3691000006805021",
-                      "logoUrl" : "https://desk.zoho.com/api/v1/teams/3691000006805021/logo?orgId=11278831"
+                      "logoUrl" : "https://desk.example.com/api/v1/teams/3691000006805021/logo?orgId=1234567890"
                     },
                     "ownerId" : "5000000015911",
                     "priority" : "High",
                     "isCommented" : false,
-                    "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Tasks/dv/9d4883f2d94d59e46474bbeb6432292e",
+                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Tasks/dv/9d4883f2d94d59e46474bbeb6432292e",
                     "teamId" : "3691000006805021",
                     "contact" : null,
                     "createdTime" : 1554784646000,
@@ -1354,219 +1719,260 @@
         "content" : {
           "application/json" : {
             "schema" : {
+              "type" : [ "object" ],
               "allOf" : [ {
-                "type" : "object",
+                "type" : [ "object" ],
                 "properties" : {
                   "data" : {
-                    "type" : "array",
+                    "type" : [ "array" ],
                     "items" : {
-                      "type" : "object",
+                      "type" : [ "object" ],
                       "properties" : {
                         "ticket" : {
-                          "type" : [ "null", "object" ],
+                          "type" : [ "object", "null" ],
                           "additionalProperties" : false,
                           "properties" : {
                             "ticketNumber" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int32",
-                              "pattern" : "([0-9]+)"
+                              "pattern" : "([0-9]+)",
+                              "description" : "Index or serial number of the ticket"
                             },
                             "subject" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 1000,
-                              "minLength" : 0
+                              "minLength" : 0,
+                              "description" : "Subject of the ticket"
                             },
                             "isArchived" : {
-                              "type" : [ "boolean", "null" ]
+                              "type" : [ "boolean", "null" ],
+                              "description" : "Indicates whether the ticket is archived"
                             },
                             "dueDate" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 100,
                               "minLength" : 0,
-                              "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+                              "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+                              "description" : "Due date of the ticket"
                             },
                             "channel" : {
                               "type" : [ "string", "null" ],
-                              "x-dynamic-enum" : true
+                              "x-dynamic-enum" : true,
+                              "description" : "Channel of the ticket"
                             },
                             "closedTime" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 100,
                               "minLength" : 0,
-                              "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+                              "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+                              "description" : "Time when the ticket was closed"
                             },
                             "phone" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 120,
                               "minLength" : 0,
-                              "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\(\\)\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+                              "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\(\\)\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+",
+                              "description" : "Phone number associated with the ticket"
                             },
                             "teamId" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
-                              "pattern" : "([0-9]+)"
+                              "pattern" : "([0-9]+)",
+                              "description" : "Unique ID of the team associated with the ticket"
                             },
                             "createdTime" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 100,
                               "minLength" : 0,
-                              "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+                              "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+                              "description" : "Time when the ticket was created"
                             },
                             "id" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
-                              "pattern" : "([0-9]+)"
+                              "pattern" : "([0-9]+)",
+                              "description" : "Unique ID of the ticket"
                             },
                             "assignee" : {
-                              "type" : [ "null", "object" ],
+                              "type" : [ "object", "null" ],
                               "additionalProperties" : false,
                               "properties" : {
                                 "firstName" : {
                                   "type" : [ "string", "null" ],
                                   "maxLength" : 50,
-                                  "minLength" : 0
+                                  "minLength" : 0,
+                                  "description" : "First name of the ticket assignee"
                                 },
                                 "lastName" : {
                                   "type" : [ "string", "null" ],
                                   "maxLength" : 50,
-                                  "minLength" : 0
+                                  "minLength" : 0,
+                                  "description" : "Last name of the ticket assignee"
                                 },
                                 "photoURL" : {
                                   "type" : [ "string", "null" ],
                                   "maxLength" : 100,
                                   "minLength" : 0,
-                                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+                                  "description" : "URL of the profile photo of the ticket assignee"
                                 },
                                 "id" : {
-                                  "type" : [ "string", "null", "integer" ],
+                                  "type" : [ "string", "integer", "null" ],
                                   "format" : "int64",
-                                  "pattern" : "([0-9]+)"
+                                  "pattern" : "([0-9]+)",
+                                  "description" : "Unique ID of the ticket assignee"
                                 }
                               },
-                              "required" : [ "firstName", "id", "lastName", "photoURL" ]
+                              "required" : [ "firstName", "id", "lastName", "photoURL" ],
+                              "description" : "Details of the agent assigned to the ticket"
                             },
                             "isSpam" : {
-                              "type" : [ "boolean", "null" ]
+                              "type" : [ "boolean", "null" ],
+                              "description" : "Indicates whether the ticket is marked as spam"
                             },
                             "status" : {
                               "type" : [ "string", "null" ],
-                              "x-dynamic-enum" : true
+                              "x-dynamic-enum" : true,
+                              "description" : "Status of the ticket"
                             }
                           },
-                          "required" : [ "assignee", "channel", "closedTime", "createdTime", "dueDate", "id", "isArchived", "isSpam", "phone", "status", "subject", "teamId", "ticketNumber" ]
+                          "required" : [ "assignee", "channel", "closedTime", "createdTime", "dueDate", "id", "isArchived", "isSpam", "phone", "status", "subject", "teamId", "ticketNumber" ],
+                          "description" : "Details of the ticket associated with the task"
                         },
                         "contact" : {
-                          "type" : [ "null", "object" ],
+                          "type" : [ "object", "null" ],
                           "additionalProperties" : false,
                           "properties" : {
                             "firstName" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 40,
-                              "minLength" : 0
+                              "minLength" : 0,
+                              "description" : "First name of the contact"
                             },
                             "lastName" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 200,
-                              "minLength" : 0
+                              "minLength" : 0,
+                              "description" : "Last name of the contact"
                             },
                             "accountId" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
-                              "pattern" : "([0-9]+)"
+                              "pattern" : "([0-9]+)",
+                              "description" : "Unique ID of the account associated with the contact"
                             },
                             "phone" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 50,
                               "minLength" : 0,
-                              "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\(\\)\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+                              "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\(\\)\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+",
+                              "description" : "Phone number of the contact"
                             },
                             "mobile" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 50,
                               "minLength" : 0,
-                              "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\(\\)\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+                              "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\(\\)\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+",
+                              "description" : "Mobile number of the contact"
                             },
                             "id" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
-                              "pattern" : "([0-9]+)"
+                              "pattern" : "([0-9]+)",
+                              "description" : "Unique ID of the contact"
                             },
                             "isSpam" : {
-                              "type" : [ "boolean", "null" ]
+                              "type" : [ "boolean", "null" ],
+                              "description" : "Indicates whether the contact is marked as spam"
                             },
                             "email" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 255,
                               "minLength" : 0,
-                              "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'\\&\\~]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+                              "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'\\&\\~]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$",
+                              "description" : "Email address of the contact"
                             }
                           },
-                          "required" : [ "accountId", "email", "firstName", "id", "isSpam", "lastName", "mobile", "phone" ]
+                          "required" : [ "accountId", "email", "firstName", "id", "isSpam", "lastName", "mobile", "phone" ],
+                          "description" : "Details of the contact associated with the task"
                         },
                         "assignee" : {
-                          "type" : [ "null", "object" ],
+                          "type" : [ "object", "null" ],
                           "additionalProperties" : false,
                           "properties" : {
                             "firstName" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 50,
-                              "minLength" : 0
+                              "minLength" : 0,
+                              "description" : "First name of the task assignee"
                             },
                             "lastName" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 50,
-                              "minLength" : 0
+                              "minLength" : 0,
+                              "description" : "Last name of the task assignee"
                             },
                             "photoURL" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 100,
                               "minLength" : 0,
-                              "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                              "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+                              "description" : "URL of the profile photo of the task assignee"
                             },
                             "emailId" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 100,
                               "minLength" : 0,
-                              "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+                              "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$",
+                              "description" : "Email address of the task assignee"
                             },
                             "id" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
-                              "pattern" : "([0-9]+)"
+                              "pattern" : "([0-9]+)",
+                              "description" : "Unique ID of the task assignee"
                             }
                           },
-                          "required" : [ "emailId", "firstName", "id", "lastName", "photoURL" ]
+                          "required" : [ "emailId", "firstName", "id", "lastName", "photoURL" ],
+                          "description" : "Details of the agent assigned to the task"
                         },
                         "team" : {
-                          "type" : [ "null", "object" ],
+                          "type" : [ "object", "null" ],
                           "additionalProperties" : false,
                           "properties" : {
                             "name" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 50,
                               "minLength" : 1,
-                              "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                              "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+                              "description" : "Name of the team"
                             },
                             "id" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
-                              "pattern" : "([0-9]+)"
+                              "pattern" : "([0-9]+)",
+                              "description" : "Unique ID of the team"
                             },
                             "logoUrl" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 200,
                               "minLength" : 0,
-                              "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+                              "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+                              "description" : "URL of the team logo"
                             }
                           },
-                          "required" : [ "id", "logoUrl", "name" ]
+                          "required" : [ "id", "logoUrl", "name" ],
+                          "description" : "Details of the team associated with the task"
                         }
-                      }
-                    }
+                      },
+                      "additionalProperties" : false
+                    },
+                    "description" : "List of task entries"
                   }
-                }
+                },
+                "additionalProperties" : false
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "data" : {
@@ -1591,7 +1997,7 @@
                     "contact" : {
                       "firstName" : null,
                       "lastName" : "Lawrence",
-                      "phone" : "1 888 900 9646",
+                      "phone" : "1 555 010 0000",
                       "mobile" : null,
                       "id" : "5000000016252",
                       "isSpam" : false,
@@ -1603,7 +2009,7 @@
                     "direction" : "inbound",
                     "ticket" : {
                       "ticketNumber" : "101",
-                      "phone" : "1 888 900 9646",
+                      "phone" : "1 555 010 0000",
                       "subject" : "Here's your first ticket.",
                       "dueDate" : 1553853086000,
                       "teamId" : null,
@@ -1622,11 +2028,11 @@
                     "team" : {
                       "name" : "Desk Team",
                       "id" : "3691000006805021",
-                      "logoUrl" : "https://desk.zoho.com/api/v1/teams/3691000006805021/logo?orgId=11278831"
+                      "logoUrl" : "https://desk.example.com/api/v1/teams/3691000006805021/logo?orgId=1234567890"
                     },
                     "priority" : "High",
                     "layoutId" : "5000000013466",
-                    "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Tasks/dv/9d4883f2d94d59e4d4dad33a9adf3649",
+                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Tasks/dv/9d4883f2d94d59e4d4dad33a9adf3649",
                     "teamId" : "3691000006805021",
                     "assignee" : {
                       "firstName" : "George",
@@ -1655,7 +2061,7 @@
                     "direction" : "inbound",
                     "ticket" : {
                       "ticketNumber" : "101",
-                      "phone" : "1 888 900 9646",
+                      "phone" : "1 555 010 0000",
                       "subject" : "Here's your first ticket.",
                       "dueDate" : 1553853086000,
                       "teamId" : null,
@@ -1674,7 +2080,7 @@
                     "team" : null,
                     "priority" : "High",
                     "layoutId" : "5000000013466",
-                    "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Tasks/dv/9d4883f2d94d59e46474bbeb6432292e",
+                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Tasks/dv/9d4883f2d94d59e46474bbeb6432292e",
                     "teamId" : null,
                     "assignee" : {
                       "firstName" : "George",
@@ -1699,13 +2105,14 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "count" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
-                  "pattern" : "([0-9]+)"
+                  "pattern" : "([0-9]+)",
+                  "description" : "Number of tasks matching the specified criteria"
                 }
               },
               "required" : [ "count" ]
@@ -1721,111 +2128,30 @@
         }
       }
     },
-    "parameters" : {
-      "departmentId" : {
-        "name" : "departmentId",
-        "in" : "query",
-        "description" : "ID of the department from which the task count must be fetched",
-        "required" : true,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "description" : "ID of the department from which the task count must be fetched",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "limit" : {
-        "name" : "limit",
-        "in" : "query",
-        "description" : "Number of tasks to list",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int32",
-          "description" : "Number of tasks to list",
-          "maximum" : 99,
-          "minimum" : 1,
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "from" : {
-        "name" : "from",
-        "in" : "query",
-        "description" : "Index number, starting from which the tasks must be listed",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int32",
-          "description" : "Index number, starting from which the tasks must be listed",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "isSpam" : {
-        "name" : "isSpam",
-        "in" : "query",
-        "description" : "Key that denotes whether to fetch spam tasks or not",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "boolean", "null" ],
-          "description" : "Key that denotes whether to fetch spam tasks or not"
-        }
-      },
-      "taskId" : {
-        "name" : "taskId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "isCompleted" : {
-        "name" : "isCompleted",
-        "in" : "query",
-        "description" : "Key that denotes if the task was completed or not",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "boolean", "null" ],
-          "description" : "Key that denotes if the task was completed or not"
-        }
-      }
-    },
     "requestBodies" : {
       "task_massupdate" : {
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "isCustomField" : {
-                  "type" : [ "boolean", "null" ]
+                  "type" : [ "boolean" ],
+                  "description" : "Indicates whether the specified field is a custom field"
                 },
                 "fieldName" : {
-                  "type" : [ "string", "null" ],
-                  "x-dynamic-enum" : true
+                  "type" : [ "string" ],
+                  "x-dynamic-enum" : true,
+                  "description" : "Name of the field to update"
                 },
                 "ids" : {
                   "$ref" : "#/components/schemas/long_array"
                 },
                 "fieldValue" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0,
-                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                  "type" : [ "string" ],
+                  "maxLength" : 320,
+                  "description" : "Value to set in the field"
                 }
               },
               "required" : [ "fieldName", "ids" ]
@@ -1847,17 +2173,18 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "taskIds" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
-                  "uniqueItems" : false
+                  "uniqueItems" : false,
+                  "description" : "ID(s) of the spam task(s) to delete"
                 }
               },
               "required" : [ "taskIds" ]
@@ -1876,49 +2203,115 @@
         "content" : {
           "application/json" : {
             "schema" : {
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "allOf" : [ {
-                "$ref" : "#/components/schemas/commonJson"
+                "$ref" : "#/components/schemas/commonJsonRequest"
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object" ],
                 "properties" : {
                   "alertType" : {
-                    "type" : [ "null", "array" ],
+                    "type" : [ "array" ],
                     "items" : {
-                      "type" : [ "string", "null" ],
-                      "enum" : [ "EMAIL", "POPUP", "SMS" ],
-                      "maxLength" : 100,
-                      "minLength" : 0
+                      "type" : [ "string" ],
+                      "enum" : [ "EMAIL", "POPUP", "SMS" ]
                     },
-                    "uniqueItems" : true
+                    "uniqueItems" : true,
+                    "description" : "Type of alert to use for the reminder. Accepted values: EMAIL, POPUP, SMS"
                   },
                   "cf" : {
-                    "type" : [ "null", "object" ],
+                    "type" : [ "object" ],
                     "additionalProperties" : false,
                     "patternProperties" : {
                       "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
-                        "type" : [ "string", "null" ],
+                        "type" : [ "string" ],
                         "maxLength" : 100,
                         "minLength" : 0,
                         "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                       }
-                    }
+                    },
+                    "description" : "User-defined fields related to the task"
                   },
                   "customFields" : {
-                    "type" : [ "null", "object" ],
+                    "type" : [ "object" ],
                     "additionalProperties" : false,
                     "patternProperties" : {
                       "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
-                        "type" : [ "string", "null" ],
+                        "type" : [ "string" ],
                         "maxLength" : 100,
                         "minLength" : 0,
                         "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                       }
-                    }
+                    },
+                    "description" : "User-defined fields related to the task. Deprecated: use cf instead"
+                  }
+                },
+                "additionalProperties" : false
+              }, {
+                "type" : [ "object" ],
+                "properties" : {
+                  "category" : {
+                    "type" : [ "string" ],
+                    "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+",
+                    "x-regex-name" : "picklistValue",
+                    "maxLength" : 120,
+                    "description" : "Category of the task"
+                  },
+                  "description" : {
+                    "type" : [ "string" ],
+                    "maxLength" : 65535,
+                    "description" : "Description of the task"
+                  },
+                  "teamId" : {
+                    "type" : [ "string", "integer" ],
+                    "format" : "int64",
+                    "pattern" : "([0-9]*|null|undefined)",
+                    "x-regex-name" : "long_null",
+                    "description" : "Unique ID of the team to which the task is assigned"
+                  },
+                  "reminder" : {
+                    "type" : [ "array" ],
+                    "items" : {
+                      "type" : [ "object" ],
+                      "properties" : {
+                        "reminderTime" : {
+                          "type" : [ "string" ],
+                          "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null",
+                          "x-regex-name" : "APIDateTime",
+                          "description" : "Time when the reminder must be triggered"
+                        },
+                        "reminderType" : {
+                          "type" : [ "string" ],
+                          "enum" : [ "ABSOLUTE", "RELATIVE" ],
+                          "x-regex-name" : "reminderType",
+                          "description" : "Type of the reminder. Accepted values: ABSOLUTE, RELATIVE"
+                        },
+                        "relativeReminderInMin" : {
+                          "type" : [ "integer" ],
+                          "format" : "int32",
+                          "description" : "Time offset in minutes before the task starts"
+                        },
+                        "alertType" : {
+                          "type" : [ "array" ],
+                          "items" : {
+                            "type" : [ "string" ],
+                            "enum" : [ "EMAIL", "POPUP", "SMS" ]
+                          },
+                          "x-template" : "alert_template",
+                          "description" : "Type of alert(s) related to the reminder. Accepted values: EMAIL, POPUP, SMS"
+                        }
+                      }
+                    },
+                    "maxLength" : 10000,
+                    "description" : "Details of the reminder set for the task"
+                  },
+                  "layoutId" : {
+                    "type" : [ "string", "integer" ],
+                    "format" : "int64",
+                    "pattern" : "([0-9]+)",
+                    "description" : "Unique ID of the layout associated with the task"
                   }
                 }
-              }, {
-                "type" : "object"
               } ]
             },
             "examples" : {
@@ -1933,11 +2326,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "departmentId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer" ],
                   "format" : "int64",
                   "description" : "ID of the department to which the activities belong",
                   "pattern" : "([0-9]+)"
@@ -1959,17 +2352,18 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "entityIds" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
-                  "uniqueItems" : false
+                  "uniqueItems" : false,
+                  "description" : "ID(s) of the task(s) to move to the Recycle Bin"
                 }
               },
               "required" : [ "entityIds" ]
@@ -1988,50 +2382,115 @@
         "content" : {
           "application/json" : {
             "schema" : {
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "allOf" : [ {
-                "$ref" : "#/components/schemas/commonJson"
+                "$ref" : "#/components/schemas/commonJsonRequest"
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object" ],
                 "properties" : {
                   "alertType" : {
-                    "type" : [ "null", "array" ],
+                    "type" : [ "array" ],
                     "items" : {
-                      "type" : [ "string", "null" ],
-                      "enum" : [ "EMAIL", "POPUP", "SMS" ],
-                      "maxLength" : 100,
-                      "minLength" : 0
+                      "type" : [ "string" ],
+                      "enum" : [ "EMAIL", "POPUP", "SMS" ]
                     },
-                    "uniqueItems" : true
+                    "uniqueItems" : true,
+                    "description" : "Type of alert to use for the reminder. Accepted values: EMAIL, POPUP, SMS"
                   },
                   "cf" : {
-                    "type" : [ "null", "object" ],
+                    "type" : [ "object" ],
                     "additionalProperties" : false,
                     "patternProperties" : {
                       "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
-                        "type" : [ "string", "null" ],
+                        "type" : [ "string" ],
                         "maxLength" : 100,
                         "minLength" : 0,
                         "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                       }
-                    }
+                    },
+                    "description" : "User-defined fields related to the task"
                   },
                   "customFields" : {
-                    "type" : [ "null", "object" ],
+                    "type" : [ "object" ],
                     "additionalProperties" : false,
                     "patternProperties" : {
                       "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
-                        "type" : [ "string", "null" ],
+                        "type" : [ "string" ],
                         "maxLength" : 100,
                         "minLength" : 0,
                         "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                       }
-                    }
+                    },
+                    "description" : "User-defined fields related to the task. Deprecated: use cf instead"
+                  }
+                },
+                "additionalProperties" : false
+              }, {
+                "type" : [ "object" ],
+                "properties" : {
+                  "category" : {
+                    "type" : [ "string" ],
+                    "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+",
+                    "x-regex-name" : "picklistValue",
+                    "maxLength" : 120,
+                    "description" : "Category of the task"
+                  },
+                  "description" : {
+                    "type" : [ "string" ],
+                    "maxLength" : 65535,
+                    "description" : "Description of the task"
+                  },
+                  "teamId" : {
+                    "type" : [ "string", "integer" ],
+                    "format" : "int64",
+                    "pattern" : "([0-9]*|null|undefined)",
+                    "x-regex-name" : "long_null",
+                    "description" : "Unique ID of the team to which the task is assigned"
+                  },
+                  "reminder" : {
+                    "type" : [ "array" ],
+                    "items" : {
+                      "type" : [ "object" ],
+                      "properties" : {
+                        "reminderTime" : {
+                          "type" : [ "string" ],
+                          "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null",
+                          "x-regex-name" : "APIDateTime",
+                          "description" : "Time when the reminder must be triggered"
+                        },
+                        "reminderType" : {
+                          "type" : [ "string" ],
+                          "enum" : [ "ABSOLUTE", "RELATIVE" ],
+                          "x-regex-name" : "reminderType",
+                          "description" : "Type of the reminder. Accepted values: ABSOLUTE, RELATIVE"
+                        },
+                        "relativeReminderInMin" : {
+                          "type" : [ "integer" ],
+                          "format" : "int32",
+                          "description" : "Time offset in minutes before the task starts"
+                        },
+                        "alertType" : {
+                          "type" : [ "array" ],
+                          "items" : {
+                            "type" : [ "string" ],
+                            "enum" : [ "EMAIL", "POPUP", "SMS" ]
+                          },
+                          "x-template" : "alert_template",
+                          "description" : "Type of alert(s) related to the reminder. Accepted values: EMAIL, POPUP, SMS"
+                        }
+                      }
+                    },
+                    "maxLength" : 10000,
+                    "description" : "Details of the reminder set for the task"
+                  },
+                  "layoutId" : {
+                    "type" : [ "string", "integer" ],
+                    "format" : "int64",
+                    "pattern" : "([0-9]+)",
+                    "description" : "Unique ID of the layout associated with the task"
                   }
                 }
-              }, {
-                "type" : "object",
-                "required" : [ "departmentId", "subject" ]
               } ]
             },
             "examples" : {
@@ -2051,6 +2510,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

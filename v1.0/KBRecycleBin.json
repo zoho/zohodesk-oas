@@ -4,45 +4,1554 @@
     "title" : "KBRecycleBin",
     "version" : "1.0.0"
   },
-  "paths" : { },
+  "paths" : {
+    "/api/v1/kbComments/trashedComments" : {
+      "get" : {
+        "tags" : [ "KBRecycleBin" ],
+        "summary" : "Get Trashed KB Comments",
+        "description" : "Retrieves a list of KB article translation comments that are in the Recycle Bin, with pagination support.",
+        "operationId" : "getTrashedArticleTranslationComments",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "deletedTimeRange",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)),(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null",
+            "x-regex-name" : "APIDateTimeRange"
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Filter trashed kb comments by deleted time. Enter the dates in the ISO date format of 'yyyy-MM-ddThh:mm:ss.SSSZ,yyyy-MM-ddThh:mm:ss.SSSZ'"
+        }, {
+          "name" : "deletedBy",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Filters trashed comments to those deleted by the specified user"
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "description" : "Number of trashed comments to fetch",
+          "schema" : {
+            "$ref" : "./Common.json#/components/schemas/limit50QueryParamSchema"
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "description" : "Index number from which trashed article translations comments must be fetched",
+          "schema" : {
+            "$ref" : "./Common.json#/components/schemas/fromQueryParamSchema"
+          }
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "description" : "Sorts trashed comments by the specified attribute. Default sorting order is descending. Prefix the value with a hyphen (-) to sort in descending order. Possible values:deletedTime ",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "deletedTime" ],
+            "pattern" : "-?(deletedTime)",
+            "default" : "-deletedTime"
+          }
+        }, {
+          "name" : "locale",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "description" : "Filters trashed comments by the specified language locale",
+          "schema" : {
+            "$ref" : "#/components/schemas/localeSchema"
+          }
+        }, {
+          "name" : "categoryId",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "description" : "Filters trashed comments to those under the specified category",
+          "schema" : {
+            "$ref" : "#/components/schemas/categoryIdSchema"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/listOfComments"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/articleTranslations/trashedTranslations/restore" : {
+      "post" : {
+        "tags" : [ "KBRecycleBin" ],
+        "summary" : "Restore Trashed Article Translations",
+        "description" : "Restores the specified article translations from the Recycle Bin to the help desk portal, including all associated parent entities.",
+        "operationId" : "restoreTrashedArticleTranslations",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/restoreJson"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "./MassActionResponse.json#/components/responses/massActionListResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/articleTranslations/trashedTranslations/count" : {
+      "get" : {
+        "tags" : [ "KBRecycleBin" ],
+        "summary" : "Get Trashed Article Translations Count",
+        "description" : "Retrieves the total count of article translations in the Recycle Bin.",
+        "operationId" : "getTrashedArticleTranslationsCount",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "locale",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "description" : "Filters the count by the specified language locale",
+          "schema" : {
+            "$ref" : "#/components/schemas/localeSchema"
+          }
+        }, {
+          "name" : "categoryId",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "description" : "Filters the count to translations under the specified topic",
+          "schema" : {
+            "$ref" : "#/components/schemas/categoryIdSchema"
+          }
+        }, {
+          "name" : "deletedTimeRange",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "description" : "Filters the count by deleted time. Enter dates in ISO format: yyyy-MM-ddThh:mm:ss.SSSZ,yyyy-MM-ddThh:mm:ss.SSSZ",
+          "schema" : {
+            "$ref" : "#/components/schemas/deletedRangeSchema"
+          }
+        }, {
+          "name" : "deletedBy",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "description" : "Filters the count to translations deleted by the specified user",
+          "schema" : {
+            "$ref" : "#/components/schemas/deletedBySchema"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        }, {
+          "name" : "isTemplate",
+          "in" : "query",
+          "description" : "Filters to count article template translations. Possible values: • true = count template translations  • false = do not filter by template",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "boolean" ],
+            "default" : false,
+            "description" : "Filters to count article template translations. Possible values: • true = count template translations  • false = do not filter by template"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/countJson"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/kbCategory/trashedCategories/count" : {
+      "get" : {
+        "tags" : [ "KBRecycleBin" ],
+        "summary" : "Get Trashed KB Categories Count",
+        "description" : "Retrieves the total count of KB categories in the Recycle Bin.",
+        "operationId" : "getTrashedKBCategoriesCount",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "categoryId",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "description" : "Filters the count to categories under the specified parent topic",
+          "schema" : {
+            "$ref" : "#/components/schemas/categoryIdSchema"
+          }
+        }, {
+          "name" : "deletedTimeRange",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "description" : "Filters the count by deleted time. Enter dates in ISO format: yyyy-MM-ddThh:mm:ss.SSSZ,yyyy-MM-ddThh:mm:ss.SSSZ",
+          "schema" : {
+            "$ref" : "#/components/schemas/deletedRangeSchema"
+          }
+        }, {
+          "name" : "deletedBy",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "description" : "Filters the count to categories deleted by the specified user",
+          "schema" : {
+            "$ref" : "#/components/schemas/deletedBySchema"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Total number of KB categories in the Recycle Bin matching the specified filters",
+            "$ref" : "#/components/responses/countJson"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/articleTranslations/trashedTranslations/delete" : {
+      "post" : {
+        "tags" : [ "KBRecycleBin" ],
+        "summary" : "Delete Trashed Article Translations",
+        "description" : "Permanently deletes the specified article translations from the Recycle Bin, including all associated child entities.",
+        "operationId" : "deleteTrashedArticleTranslations",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "description" : "ID(s) of the article translation entity(s) to permanently delete from the Recycle Bin",
+          "$ref" : "#/components/requestBodies/deleteTrashedTranslations_restoreJson"
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "200" : {
+            "$ref" : "./MassActionResponse.json#/components/responses/massActionListResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/kbComments/trashedComments/count" : {
+      "get" : {
+        "tags" : [ "KBRecycleBin" ],
+        "summary" : "Get Trashed KB Comments Count",
+        "description" : "Retrieves the total count of KB article translation comments in the Recycle Bin.",
+        "operationId" : "getTrashedArticleTranslationCommentsCount",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "deletedTimeRange",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)),(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null",
+            "x-regex-name" : "APIDateTimeRange"
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Filters the count by deleted time. Enter dates in ISO format: yyyy-MM-ddThh:mm:ss.SSSZ,yyyy-MM-ddThh:mm:ss.SSSZ"
+        }, {
+          "name" : "deletedBy",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Filters the count to comments deleted by the specified user"
+        }, {
+          "name" : "locale",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "pattern" : "[a-zA-Z]{2,4}([-_][a-zA-Z]{2})?",
+            "x-regex-name" : "articleLocale"
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Filters the count by the specified language locale"
+        }, {
+          "name" : "categoryId",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "description" : "Filters the count to comments under the specified category",
+          "schema" : {
+            "$ref" : "#/components/schemas/categoryIdSchema"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "200" : {
+            "description" : "Total number of KB comments in the Recycle Bin matching the specified filters",
+            "$ref" : "#/components/responses/countJson"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/articleTranslations/trashedTranslations" : {
+      "get" : {
+        "tags" : [ "KBRecycleBin" ],
+        "summary" : "Get Trashed Article Translations",
+        "description" : "Retrieves a list of article translations that are in the Recycle Bin, with pagination support.",
+        "operationId" : "getTrashedArticleTranslations",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "limit",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "description" : "Number of trashed Article Translations to fetch",
+          "schema" : {
+            "$ref" : "./Common.json#/components/schemas/limit50QueryParamSchema"
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "description" : "Index number from which trashed article translations must be fetched",
+          "schema" : {
+            "$ref" : "./Common.json#/components/schemas/fromQueryParamSchema"
+          }
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "description" : "Sorts trashed translations by the specified attribute. Default sorting order is descending. Prefix the value with a hyphen (-) to sort in descending order. Possible values:deletedTime",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "deletedTime" ],
+            "pattern" : "-?(deletedTime)",
+            "default" : "-deletedTime"
+          }
+        }, {
+          "name" : "locale",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "description" : "Filters trashed translations by the specified language locale",
+          "schema" : {
+            "$ref" : "#/components/schemas/localeSchema"
+          }
+        }, {
+          "name" : "deletedBy",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "description" : "Filters trashed translations to those deleted by the specified user",
+          "schema" : {
+            "$ref" : "#/components/schemas/deletedBySchema"
+          }
+        }, {
+          "name" : "deletedTimeRange",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "description" : "Filters trashed translations by deleted time. Enter dates in ISO format: yyyy-MM-ddThh:mm:ss.SSSZ,yyyy-MM-ddThh:mm:ss.SSSZ",
+          "schema" : {
+            "$ref" : "#/components/schemas/deletedRangeSchema"
+          }
+        }, {
+          "name" : "categoryId",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "description" : "Filters trashed translations to those under the specified topic",
+          "schema" : {
+            "$ref" : "#/components/schemas/categoryIdSchema"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        }, {
+          "name" : "isTemplate",
+          "in" : "query",
+          "description" : "Filters to return article template translations. Possible values: • true = return template translations  • false = do not filter by template",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "boolean" ],
+            "default" : false,
+            "description" : "To search the article template"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/getTrashedTranslationResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/kbComments/trashedComments/delete" : {
+      "post" : {
+        "tags" : [ "KBRecycleBin" ],
+        "summary" : "Delete Trashed KB Comments",
+        "description" : "Permanently deletes the specified KB article translation comments from the Recycle Bin, including all associated child entities.",
+        "operationId" : "deleteTrashedArticleTranslationComments",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "description" : "ID(s) of the article translation comment(s) to permanently delete from the Recycle Bin",
+          "$ref" : "#/components/requestBodies/restoreCommentJson"
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "200" : {
+            "$ref" : "./MassActionResponse.json#/components/responses/massActionListResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/kbComments/trashedComments/restore" : {
+      "post" : {
+        "tags" : [ "KBRecycleBin" ],
+        "summary" : "Restore Trashed KB Comments",
+        "description" : "Restores the specified KB article translation comments from the Recycle Bin to the help desk portal, including all associated parent entities.",
+        "operationId" : "restoreTrashedArticleTranslationComments",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/restoreTrashedComments_restoreCommentJson"
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "200" : {
+            "$ref" : "./MassActionResponse.json#/components/responses/massActionListResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/kbCategory/trashedCategories" : {
+      "get" : {
+        "tags" : [ "KBRecycleBin" ],
+        "summary" : "Get Trashed KB Categories",
+        "description" : "Retrieves a list of KB categories that are in the Recycle Bin, with pagination support.",
+        "operationId" : "getTrashedKBCategories",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "limit",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "description" : "Number of trashed categories to fetch",
+          "schema" : {
+            "$ref" : "./Common.json#/components/schemas/limit50QueryParamSchema"
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "description" : "Index number from which trashed categories must be fetched",
+          "schema" : {
+            "$ref" : "./Common.json#/components/schemas/fromQueryParamSchema"
+          }
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "description" : "Sorts trashed categories by the specified attribute. Default sorting order is descending. Prefix the value with a hyphen (-) to sort in descending order. Possible values:deletedTime",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "deletedTime" ],
+            "pattern" : "-?(deletedTime)",
+            "default" : "-deletedTime"
+          }
+        }, {
+          "name" : "locale",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "description" : "Filters trashed categories by the specified language locale",
+          "schema" : {
+            "$ref" : "#/components/schemas/localeSchema"
+          }
+        }, {
+          "name" : "deletedBy",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "description" : "Filters trashed categories to those deleted by the specified user",
+          "schema" : {
+            "$ref" : "#/components/schemas/deletedBySchema"
+          }
+        }, {
+          "name" : "deletedTimeRange",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "description" : "Filters trashed categories by deleted time. Enter dates in ISO format: yyyy-MM-ddThh:mm:ss.SSSZ,yyyy-MM-ddThh:mm:ss.SSSZ",
+          "schema" : {
+            "$ref" : "#/components/schemas/deletedRangeSchema"
+          }
+        }, {
+          "name" : "categoryId",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "description" : "Filters trashed categories to those under the specified parent topic",
+          "schema" : {
+            "$ref" : "#/components/schemas/categoryIdSchema"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/getTrashedCategoriesResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    }
+  },
   "components" : {
     "schemas" : {
+      "articleTranslation" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "translationId" : {
+            "description" : "Unique ID of the article translation record",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "id" : {
+            "description" : "Unique ID of the article",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "title" : {
+            "description" : "Title of the article",
+            "type" : [ "string", "null" ],
+            "maxLength" : 500,
+            "minLength" : 0
+          },
+          "locale" : {
+            "description" : "Language locale of the article translation",
+            "type" : [ "string", "null" ],
+            "enum" : [ "en", "ja", "zh", "es", "de", "fr", "tr", "ru", "pt", "it", "nl", "da", "sv", "pl", "ar", "he", "af", "cs", "fr-ca", "bg", "fi", "el", "hu", "id", "nb", "ro", "th", "uk", "vi", "ur", "hi", "te", "kn", "ta", "mr", "ko", "fa", "bn", "gu", "ms", "ml", "en-gb", "sk", "hr", "sl", "zh_TW", "zh-tw", "ca", "ka", "kk", "my", "km", "pt-br" ],
+            "pattern" : "([a-zA-Z]{2,4}([-_][a-zA-Z]{2})?)"
+          },
+          "articleNumber" : {
+            "$ref" : "./ArticleTranslation.json#/components/schemas/articleNumber"
+          }
+        },
+        "required" : [ "id", "locale", "title", "translationId", "articleNumber" ]
+      },
+      "category" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "name" : {
+            "description" : "Name of the category",
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "minLength" : 0
+          },
+          "id" : {
+            "description" : "Unique ID of the category",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "locale" : {
+            "description" : "Language locale of the category",
+            "type" : [ "string", "null" ],
+            "enum" : [ "en", "ja", "zh", "es", "de", "fr", "tr", "ru", "pt", "it", "nl", "da", "sv", "pl", "ar", "he", "af", "cs", "fr-ca", "bg", "fi", "el", "hu", "id", "nb", "ro", "th", "uk", "vi", "ur", "hi", "te", "kn", "ta", "mr", "ko", "fa", "bn", "gu", "ms", "ml", "en-gb", "sk", "hr", "sl", "zh_TW", "zh-tw", "ca", "ka", "kk", "my", "km", "pt-br" ],
+            "pattern" : "([a-zA-Z]{2,4}([-_][a-zA-Z]{2})?)"
+          }
+        },
+        "required" : [ "id", "locale", "name" ]
+      },
+      "commentListResponse" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "modifiedTime" : {
+            "description" : "Time when the comment was last modified",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+          },
+          "articleTranslation" : {
+            "description" : "Details of the article translation on which the comment was added",
+            "$ref" : "#/components/schemas/articleTranslation"
+          },
+          "hashtags" : {
+            "$ref" : "./ArticleComment.json#/components/schemas/hashtags"
+          },
+          "commentedTime" : {
+            "description" : "Time when the comment was added",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+          },
+          "content" : {
+            "description" : "Text content of the comment",
+            "type" : [ "string", "null" ],
+            "maxLength" : 32000,
+            "minLength" : 0
+          },
+          "commenterId" : {
+            "description" : "Unique ID of the user who added the comment",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "deletedBy" : {
+            "description" : "Details of the user who deleted the comment",
+            "$ref" : "./ArticleComment.json#/components/schemas/commenter"
+          },
+          "commenter" : {
+            "description" : "Details of the user who added the comment",
+            "$ref" : "./ArticleComment.json#/components/schemas/commenter"
+          },
+          "rootCategoryId" : {
+            "description" : "Unique ID of the root category associated with the article",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "mentions" : {
+            "description" : "User and group mentions in the comment",
+            "$ref" : "./ArticleComment.json#/components/schemas/mentionObjResponse"
+          },
+          "isPublic" : {
+            "description" : "Indicates whether the comment is a public comment. Possible values:• true = public comment  • false = private comment",
+            "type" : [ "boolean", "null" ]
+          },
+          "id" : {
+            "description" : "Unique ID of the comment",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "deleterId" : {
+            "description" : "Unique ID of the user who deleted the comment",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "deletedTime" : {
+            "description" : "Time when the comment was moved to the Recycle Bin",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+          },
+          "category" : {
+            "description" : "Details of the category associated with the article",
+            "$ref" : "#/components/schemas/category"
+          },
+          "contentType" : {
+            "description" : "Format of the comment content. \n\nPossible values:html, plainText",
+            "type" : [ "string", "null" ],
+            "enum" : [ "plainText", "html" ]
+          },
+          "categoryId" : {
+            "description" : "Unique ID of the category associated with the article",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "articleTranslationId" : {
+            "description" : "Unique ID of the article translation",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        },
+        "required" : [ "articleTranslation", "articleTranslationId", "category", "categoryId", "commentedTime", "commenter", "commenterId", "content", "contentType", "deletedBy", "deletedTime", "deleterId", "hashtags", "id", "isPublic", "mentions", "modifiedTime", "rootCategoryId" ]
+      },
+      "commentData" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/commentListResponse"
+        }
+      },
       "deletedBy" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "photoURL" : {
+            "description" : "URL of the user's profile phot",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "name" : {
+            "description" : "Full name of the user",
             "type" : [ "string", "null" ],
             "maxLength" : 50,
             "minLength" : 0
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the user",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "status" : {
+            "description" : "Status of the user's account",
             "type" : [ "string", "null" ],
-            "enum" : [ "ACTIVE", "DISABLED", "LICENSE_DOWNGRADED", "DELETED", "ANONYMIZED", "CLOSED" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "ACTIVE", "DISABLED", "LICENSE_DOWNGRADED", "DELETED", "ANONYMIZED", "CLOSED" ]
           },
           "zuid" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Zoho UserId of the user",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           }
         },
         "required" : [ "id", "name", "photoURL", "status", "zuid" ]
+      },
+      "availableLocaleTranslationsObject" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "latestVersionStatus" : {
+            "description" : "Status of the latest version for the locale translation",
+            "type" : [ "string", "null" ],
+            "enum" : [ "Published", "Draft", "Review", "Expired", "Unpublished", "Auto-translate Pending" ]
+          },
+          "isTrashed" : {
+            "description" : "Indicates whether the locale translation is in the Recycle Bin. Possible values: • true = in the Recycle Bin  • false = not in the Recycle Bin",
+            "type" : [ "boolean", "null" ]
+          },
+          "translationId" : {
+            "description" : "Unique ID of the locale translation record",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "recycleBinEntityId" : {
+            "description" : "Unique ID of the locale translation entity in the Recycle Bin",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "latestVersion" : {
+            "description" : "Version number of the latest version for the locale translation",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "isLocked" : {
+            "description" : "Indicates whether the locale translation is locked for editing. Possible values: • true = locked  • false = not locked",
+            "type" : [ "boolean", "null" ]
+          },
+          "latestPublishedVersion" : {
+            "description" : "Version number of the latest published version for the locale translation",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "href" : {
+            "description" : "URL to access the locale translation",
+            "type" : [ "string", "null" ],
+            "maxLength" : 500,
+            "minLength" : 0,
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+          },
+          "locale" : {
+            "description" : "Language locale of the translation",
+            "type" : [ "string", "null" ],
+            "enum" : [ "en", "ja", "zh", "es", "de", "fr", "tr", "ru", "pt", "it", "nl", "da", "sv", "pl", "ar", "he", "af", "cs", "fr-ca", "bg", "fi", "el", "hu", "id", "nb", "ro", "th", "uk", "vi", "ur", "hi", "te", "kn", "ta", "mr", "ko", "fa", "bn", "gu", "ms", "ml", "en-gb", "sk", "hr", "sl", "zh_TW", "zh-tw", "ca", "ka", "kk", "my", "km", "pt-br" ],
+            "pattern" : "([a-zA-Z]{2,4}([-_][a-zA-Z]{2})?)"
+          },
+          "authorId" : {
+            "description" : "Unique ID of the locale translation author",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "translationState" : {
+            "description" : "Translation state of the locale translation",
+            "type" : [ "string", "null" ],
+            "enum" : [ "OUTDATED", "UP-TO-DATE", "AUTO-TRANSLATE INPROGRESS", "AUTO-TRANSLATE FAILED" ]
+          },
+          "status" : {
+            "description" : "Publication status of the locale translation",
+            "type" : [ "string", "null" ],
+            "enum" : [ "Published", "Draft", "Review", "Expired", "Unpublished", "Auto-translate Pending" ]
+          }
+        },
+        "required" : [ "authorId", "href", "isLocked", "isTrashed", "latestPublishedVersion", "latestVersion", "latestVersionStatus", "locale", "recycleBinEntityId", "status", "translationId", "translationState" ]
+      },
+      "availableLocaleTranslations" : {
+        "type" : [ "array", "null" ],
+        "description" : "Available translations of the article in other locales",
+        "items" : {
+          "$ref" : "#/components/schemas/availableLocaleTranslationsObject"
+        }
+      },
+      "translationResponse" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "./ArticleTranslation.json#/components/schemas/articleTranslationListViewObject"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "recycleBinEntityId" : {
+              "description" : "Unique ID of the entity in the Recycle Bin",
+              "type" : [ "string", "integer", "null" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "availableLocaleTranslations" : {
+              "$ref" : "#/components/schemas/availableLocaleTranslations"
+            },
+            "deletedTime" : {
+              "description" : "Time when the article translation was moved to the Recycle Bin",
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0,
+              "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+            },
+            "deletedBy" : {
+              "$ref" : "#/components/schemas/deletedBy"
+            }
+          },
+          "required" : [ "availableLocaleTranslations", "deletedBy", "deletedTime", "recycleBinEntityId" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "trashedTranslationData" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/translationResponse"
+        }
+      },
+      "categoryResponse" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "modifiedTime" : {
+            "description" : "Time when the category was last modified",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+          },
+          "visibility" : {
+            "description" : "Visibility setting of the category",
+            "type" : [ "string", "null" ],
+            "enum" : [ "ALL_USERS", "AGENTS", "GROUP_USERS", "PRIVATE_IP", "NONE" ]
+          },
+          "description" : {
+            "description" : "Description of the category",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]*"
+          },
+          "groups" : {
+            "description" : "Groups associated with the category",
+            "$ref" : "./KbCategory.json#/components/schemas/groupJsonArr"
+          },
+          "logoUrl" : {
+            "description" : "URL of the category's logo image",
+            "type" : [ "string", "null" ],
+            "maxLength" : 255,
+            "minLength" : 0,
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+          },
+          "deletedBy" : {
+            "description" : "Details of the user who deleted the category",
+            "$ref" : "#/components/schemas/deletedBy"
+          },
+          "associatedDepartmentIds" : {
+            "description" : "ID(s) of the department(s) associated with the category",
+            "type" : [ "array", "null" ],
+            "items" : {
+              "type" : [ "string", "integer", "null" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "uniqueItems" : false
+          },
+          "rootCategoryId" : {
+            "description" : "Unique ID of the root category",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "createdBy" : {
+            "description" : "Details of the user who created the category",
+            "$ref" : "./ArticleTranslation.json#/components/schemas/modifiedBy"
+          },
+          "recycleBinEntityId" : {
+            "description" : "Unique ID of the entity in the Recycle Bin",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "translations" : {
+            "description" : "Translations associated with the category",
+            "$ref" : "./KBRootCategory.json#/components/schemas/rootTranslationResponseJsonArr"
+          },
+          "name" : {
+            "description" : "Name of the category",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "createdTime" : {
+            "description" : "Time when the category was created",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+          },
+          "modifiedBy" : {
+            "description" : "Details of the user who last modified the category",
+            "$ref" : "./ArticleTranslation.json#/components/schemas/modifiedBy"
+          },
+          "parentCategoryId" : {
+            "description" : "Unique ID of the parent category",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "ipAddresses" : {
+            "description" : "IP addresses associated with the category",
+            "type" : [ "array", "null" ],
+            "items" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0,
+              "pattern" : "^((?:(?:(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|\\*)\\.){3}(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|\\*)(/(?:[012]?[0-9]|3[012]))?)|\\*)$"
+            },
+            "uniqueItems" : false
+          },
+          "id" : {
+            "description" : "Unique ID of the category",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "deletedTime" : {
+            "description" : "Time when the category was moved to the Recycle Bin",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+          },
+          "order" : {
+            "description" : "Display order of the category",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "status" : {
+            "description" : "Visibility status of the category",
+            "type" : [ "string", "null" ],
+            "enum" : [ "SHOW_IN_HELPCENTER", "HIDE_IN_HELPCENTER" ]
+          }
+        },
+        "required" : [ "associatedDepartmentIds", "createdBy", "createdTime", "deletedBy", "deletedTime", "description", "groups", "id", "ipAddresses", "logoUrl", "modifiedBy", "modifiedTime", "name", "order", "parentCategoryId", "recycleBinEntityId", "rootCategoryId", "status", "translations", "visibility" ]
+      },
+      "trashedCategoryData" : {
+        "description" : "List of trashed KB category entries",
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/categoryResponse"
+        }
+      },
+      "categoryIdSchema" : {
+        "type" : [ "string", "integer" ],
+        "format" : "int64",
+        "pattern" : "([0-9]+)"
+      },
+      "localeSchema" : {
+        "type" : [ "string" ],
+        "enum" : [ "en", "ja", "zh", "es", "de", "fr", "tr", "ru", "pt", "it", "nl", "da", "sv", "pl", "ar", "he", "af", "cs", "fr-ca", "bg", "fi", "el", "hu", "id", "nb", "ro", "th", "uk", "vi", "ur", "hi", "te", "kn", "ta", "mr", "ko", "fa", "bn", "gu", "ms", "ml", "en-gb", "sk", "hr", "sl", "zh_TW", "zh-tw", "ca", "ka", "kk", "my", "km", "pt-br" ],
+        "pattern" : "[a-zA-Z]{2,4}([-_][a-zA-Z]{2})?"
+      },
+      "deletedBySchema" : {
+        "type" : [ "string", "integer" ],
+        "format" : "int64",
+        "pattern" : "([0-9]+)"
+      },
+      "deletedRangeSchema" : {
+        "type" : [ "string" ],
+        "maxLength" : 100,
+        "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)),(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null"
+      }
+    },
+    "responses" : {
+      "listOfComments" : {
+        "description" : "listOfComments template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "#/components/schemas/commentData"
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "Valid responses Example" : {
+                "value" : {
+                  "data" : [ {
+                    "modifiedTime" : 1726054566000,
+                    "articleTranslation" : {
+                      "translationId" : "2000000129020",
+                      "id" : "2000000129018",
+                      "articleNumber" : "101",
+                      "title" : "johny article",
+                      "locale" : "en"
+                    },
+                    "hashtags" : [ ],
+                    "commentedTime" : 1726054566000,
+                    "commenterId" : "2000000000521",
+                    "deletedBy" : {
+                      "firstName" : "Emily",
+                      "lastName" : "Roberts",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/2000000000521/photo?orgId=1234567890",
+                      "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Solutions/dv/2000000000521/en",
+                      "roleName" : "CEO",
+                      "name" : "Emily Roberts",
+                      "id" : "2000000000521",
+                      "label" : null,
+                      "type" : [ "AGENT" ],
+                      "email" : "emily@zylker.com",
+                      "kbRole" : null
+                    },
+                    "content" : "<div>Zoho Desk KB Comment</div>",
+                    "rootCategoryId" : "2000000129001",
+                    "commenter" : {
+                      "firstName" : "Emily",
+                      "lastName" : "Roberts",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/2000000000521/photo?orgId=1234567890",
+                      "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Solutions/dv/2000000000521/en",
+                      "roleName" : "CEO",
+                      "name" : "Emily Roberts",
+                      "id" : "2000000000521",
+                      "label" : null,
+                      "type" : [ "AGENT" ],
+                      "email" : "emily@zylker.com",
+                      "kbRole" : null
+                    },
+                    "mentions" : {
+                      "groups" : [ ],
+                      "users" : [ ]
+                    },
+                    "isPublic" : false,
+                    "id" : "2000000131002",
+                    "deletedTime" : 1726054635000,
+                    "deleterId" : "2000000000521",
+                    "category" : {
+                      "name" : "Desk category",
+                      "id" : "2000000129001",
+                      "locale" : "en"
+                    },
+                    "contentType" : "html",
+                    "categoryId" : "2000000129001",
+                    "articleTranslationId" : "2000000129020"
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "countJson" : {
+        "description" : "countJson template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "count" : {
+                  "description" : "Total number of entities in the Recycle Bin matching the specified filters",
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int32",
+                  "pattern" : "([0-9]+)"
+                }
+              },
+              "required" : [ "count" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "count" : "5"
+                }
+              }
+            }
+          }
+        }
+      },
+      "getTrashedTranslationResponse" : {
+        "description" : "The response returns a data array. Each entry contains the following attributes:",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "description" : "List of trashed article translation entries",
+                  "$ref" : "#/components/schemas/trashedTranslationData"
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "data" : [ {
+                    "modifiedTime" : 1576136119000,
+                    "departmentId" : "1000000147842",
+                    "creatorId" : "1000000015894",
+                    "dislikeCount" : "0",
+                    "modifierId" : "1000000015894",
+                    "likeCount" : "0",
+                    "title" : "django basic commands",
+                    "ownerId" : "1000000015894",
+                    "locale" : "zh-CN",
+                    "deletedBy" : {
+                      "photoURL" : "https://desk.example.com/api/v1/agents/1000000015894/photo?orgId=1234567890",
+                      "name" : "Emily",
+                      "id" : "1000000015894",
+                      "status" : "ACTIVE"
+                    },
+                    "translationState" : "UP-TO-DATE",
+                    "isTrashed" : true,
+                    "createdTime" : 1576136022000,
+                    "modifiedBy" : {
+                      "photoURL" : "https://desk.example.com/api/v1/agents/1000000015894/photo?orgId=1234567890",
+                      "name" : "Emily",
+                      "id" : "1000000015894",
+                      "status" : "ACTIVE"
+                    },
+                    "id" : "1000000247006",
+                    "viewCount" : "0",
+                    "deletedTime" : 1576136119000,
+                    "summary" : "django basic commands",
+                    "owner" : {
+                      "photoURL" : "https://desk.example.com/api/v1/agents/1000000015894/photo?orgId=1234567890",
+                      "name" : "Emily",
+                      "id" : "1000000015894",
+                      "status" : "ACTIVE"
+                    },
+                    "latestVersionStatus" : "Published",
+                    "myVote" : null,
+                    "author" : {
+                      "photoURL" : "https://desk.example.com/api/v1/agents/1000000015894/photo?orgId=1234567890",
+                      "name" : "Emily",
+                      "id" : "1000000015894",
+                      "status" : "ACTIVE"
+                    },
+                    "permission" : "ALL",
+                    "authorId" : "1000000015894",
+                    "usageCount" : "0",
+                    "isTemplate" : false,
+                    "templateUsageCount" : "2",
+                    "templateUsedUsersCount" : "2",
+                    "templateLastUpdatedTime" : "2019-12-31T09:45:52.000Z",
+                    "commentCount" : "0",
+                    "sourceLocale" : "ja-JP",
+                    "translationId" : "1000000247096",
+                    "createdBy" : {
+                      "photoURL" : "https://desk.example.com/api/v1/agents/1000000015894/photo?orgId=1234567890",
+                      "name" : "Emily",
+                      "id" : "1000000015894",
+                      "status" : "ACTIVE"
+                    },
+                    "latestVersion" : "1.0",
+                    "recycleBinEntityId" : "1000000247096",
+                    "webUrl" : "https://desk.example.com//support/zylker/ShowHomePage.do#Solutions/dv/1000000247006/locale/zh-CN",
+                    "portalUrl" : null,
+                    "feedbackCount" : "0",
+                    "attachmentCount" : "0",
+                    "latestPublishedVersion" : "1.0",
+                    "availableLocaleTranslations" : [ {
+                      "latestVersionStatus" : "Published",
+                      "translationId" : "1000000247008",
+                      "isTrashed" : true,
+                      "recycleBinEntityId" : "1000000247008",
+                      "href" : "https://desk.example.com//api/v1/articles/1000000247006/translations/en-us?orgId=1234567890",
+                      "authorId" : "1000000015894",
+                      "locale" : "en-US",
+                      "translationState" : "UP-TO-DATE",
+                      "status" : "Published"
+                    }, {
+                      "latestVersionStatus" : "Published",
+                      "translationId" : "1000000247044",
+                      "isTrashed" : false,
+                      "recycleBinEntityId" : "1000000247006",
+                      "href" : "https://desk.example.com//api/v1/articles/1000000247006/translations/ja-jp?orgId=1234567890",
+                      "authorId" : "1000000015894",
+                      "locale" : "ja-JP",
+                      "translationState" : "UP-TO-DATE",
+                      "status" : "Published"
+                    }, {
+                      "latestVersionStatus" : "Published",
+                      "translationId" : "1000000247071",
+                      "isTrashed" : true,
+                      "recycleBinEntityId" : "1000000247071",
+                      "href" : "https://desk.example.com//api/v1/articles/1000000247006/translations/de-de?orgId=1234567890",
+                      "authorId" : "1000000015894",
+                      "locale" : "de-DE",
+                      "translationState" : "UP-TO-DATE",
+                      "status" : "Published"
+                    }, {
+                      "latestVersionStatus" : "Published",
+                      "translationId" : "1000000247096",
+                      "isTrashed" : true,
+                      "recycleBinEntityId" : "1000000247096",
+                      "href" : "https://desk.example.com//api/v1/articles/1000000247006/translations/zh-cn?orgId=1234567890",
+                      "authorId" : "1000000015894",
+                      "locale" : "zh-CN",
+                      "translationState" : "UP-TO-DATE",
+                      "status" : "Published"
+                    } ],
+                    "category" : {
+                      "name" : "django",
+                      "id" : "1000000221006"
+                    },
+                    "permalink" : "django-basic-commands",
+                    "categoryId" : "1000000221006",
+                    "status" : "Published"
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "getTrashedCategoriesResponse" : {
+        "description" : "getTrashedCategoriesResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "#/components/schemas/trashedCategoryData"
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "data" : [ {
+                    "modifiedTime" : 1595493475000,
+                    "visibility" : "NONE",
+                    "groups" : [ ],
+                    "description" : "Analytics samples",
+                    "deletedBy" : {
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000015894/photo?orgId=1234567890",
+                      "name" : "Emily",
+                      "id" : "4000000015894",
+                      "status" : "ACTIVE",
+                      "zuid" : "1234567890"
+                    },
+                    "logoUrl" : "https://desk.example.com/portal/api/departments/4000000007245/logo?orgId=1234567890",
+                    "rootCategoryId" : "4000002881348",
+                    "associatedDepartmentIds" : [ "4000002879058" ],
+                    "recycleBinEntityId" : "4000002881365",
+                    "createdBy" : {
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000015894/photo?orgId=1234567890",
+                      "name" : "Emily",
+                      "id" : "4000000015894",
+                      "status" : "ACTIVE",
+                      "zuid" : "1234567890"
+                    },
+                    "translations" : [ {
+                      "modifiedTime" : 1595493475000,
+                      "createdBy" : {
+                        "photoURL" : "https://desk.example.com/api/v1/agents/4000000015894/photo?orgId=1234567890",
+                        "name" : "Emily",
+                        "id" : "4000000015894",
+                        "status" : "ACTIVE"
+                      },
+                      "name" : "General Analytics",
+                      "description" : "Analytics samples",
+                      "createdTime" : 1595493475000,
+                      "modifiedBy" : {
+                        "photoURL" : "https://desk.example.com/api/v1/agents/4000000015894/photo?orgId=1234567890",
+                        "name" : "Emily",
+                        "id" : "4000000015894",
+                        "status" : "ACTIVE"
+                      },
+                      "id" : "4000002881367",
+                      "permalink" : "general-analytics",
+                      "locale" : "en",
+                      "categoryId" : "4000002881365"
+                    } ],
+                    "name" : "General Analytics",
+                    "createdTime" : 1595493475000,
+                    "modifiedBy" : {
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000015894/photo?orgId=1234567890",
+                      "name" : "Emily",
+                      "id" : "4000000015894",
+                      "status" : "ACTIVE",
+                      "zuid" : "1234567890"
+                    },
+                    "parentCategoryId" : "4000002881348",
+                    "ipAddresses" : [ ],
+                    "id" : "4000002881365",
+                    "deletedTime" : 1596250760000,
+                    "status" : "SHOW_IN_HELPCENTER",
+                    "order" : "1"
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "requestBodies" : {
+      "restoreJson" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "ids" : {
+                  "description" : "ID(s) of the article translation entity(s) to restore from the Recycle Bin",
+                  "type" : [ "array" ],
+                  "items" : {
+                    "type" : [ "string", "integer" ],
+                    "format" : "int64",
+                    "pattern" : "([0-9]+)"
+                  },
+                  "uniqueItems" : false
+                }
+              },
+              "required" : [ "ids" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "ids" : [ 1000000182001, 1000000207102, 234567890 ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "deleteTrashedTranslations_restoreJson" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "ids" : {
+                  "type" : [ "array" ],
+                  "items" : {
+                    "type" : [ "string", "integer" ],
+                    "format" : "int64",
+                    "pattern" : "([0-9]+)"
+                  },
+                  "uniqueItems" : false
+                }
+              },
+              "required" : [ "ids" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "ids" : [ 1000000182001, 1000000207102, 234567890 ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "restoreCommentJson" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "ids" : {
+                  "type" : [ "array" ],
+                  "items" : {
+                    "type" : [ "string", "integer" ],
+                    "format" : "int64",
+                    "pattern" : "([0-9]+)"
+                  },
+                  "uniqueItems" : false
+                }
+              },
+              "required" : [ "ids" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "ids" : [ "2000000108022", "2000000108012" ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "restoreTrashedComments_restoreCommentJson" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "ids" : {
+                  "description" : "ID(s) of the article translation comment(s) to restore from the Recycle Bin",
+                  "type" : [ "array" ],
+                  "items" : {
+                    "type" : [ "string", "integer" ],
+                    "format" : "int64",
+                    "pattern" : "([0-9]+)"
+                  },
+                  "uniqueItems" : false
+                }
+              },
+              "required" : [ "ids" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "ids" : [ "2000000117009", "2000000116060" ]
+                }
+              }
+            }
+          }
+        }
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

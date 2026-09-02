@@ -8,17 +8,19 @@
   "components" : {
     "schemas" : {
       "canvasPositionObject" : {
-        "type" : [ "null", "object" ],
+        "type" : "object",
         "additionalProperties" : false,
         "properties" : {
           "top" : {
-            "type" : [ "string", "null" ],
+            "description" : "Top position coordinate on the canvas",
+            "type" : [ "string", "integer" ],
             "maxLength" : 500,
             "minLength" : 0,
             "pattern" : "[0-9\\.\\-]+"
           },
           "left" : {
-            "type" : [ "string", "null" ],
+            "description" : "Left position coordinate on the canvas",
+            "type" : [ "string", "integer" ],
             "maxLength" : 500,
             "minLength" : 0,
             "pattern" : "[0-9\\.\\-]+"
@@ -27,43 +29,217 @@
         "required" : [ "left", "top" ]
       },
       "connectionDetailsObject" : {
-        "type" : [ "null", "object" ],
+        "type" : "object",
         "additionalProperties" : false,
         "properties" : {
           "toUuid" : {
-            "type" : [ "string", "null" ],
+            "description" : "Canvas anchor UUID for the incoming endpoint of the destination state on the designer. Type: string. Required. This is not the state ID; it is a visual port identifier used only by chartData.connectionDetails. Pattern: state name followed by a unique numeric suffix (for example, \"On Hold1\", \"Closed1\"). Each connection endpoint must use its own anchor UUID. Do not reuse the same UUID as both the incoming anchor (toUuid) and outgoing anchor (fromUuid) on the same state. Example: for Open -> On Hold -> Closed, use toUuid \"On Hold1\" on the first connection and fromUuid \"On Hold2\" (not \"On Hold1\") on the second connection.",
+            "type" : "string",
             "maxLength" : 121,
             "minLength" : 1,
             "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
           },
           "transName" : {
-            "type" : [ "string", "null" ],
+            "description" : "Name of the transition for the connection",
+            "type" : "string",
             "maxLength" : 30,
             "minLength" : 1,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "isCommTrans" : {
-            "type" : [ "boolean", "null" ]
+            "description" : "Indicates whether the connection is a common transition. Possible values: @true@ - connection is a common transition, @false@ - connection is a specific transition",
+            "type" : "boolean"
           },
           "fromUuid" : {
-            "type" : [ "string", "null" ],
+            "description" : "Canvas anchor UUID for the outgoing endpoint of the source state on the designer. Type: string. Required. This is not the state ID; it is a visual port identifier used only by chartData.connectionDetails. Pattern: state name followed by a unique numeric suffix (for example, \"Open0\", \"On Hold2\"). Each connection endpoint must use its own anchor UUID. When a state has both incoming and outgoing connections, assign different suffixes for each port (for example, incoming toUuid \"On Hold1\" and outgoing fromUuid \"On Hold2\"). Reusing one anchor for both directions prevents the designer from rendering the second connection.",
+            "type" : "string",
             "maxLength" : 121,
             "minLength" : 1,
             "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
           },
           "usedStates" : {
+            "description" : "States that share the common transition",
             "$ref" : "./blueprintTransitions.json#/components/schemas/commonStatesArray"
           },
           "isAuto" : {
-            "type" : [ "boolean", "null" ]
+            "description" : "Indicates whether the transition is automatic. Possible values: @true@ - transition is automatic, @false@ - transition is manual",
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "fromUuid", "isAuto", "isCommTrans", "toUuid", "transName" ]
+      },
+      "connectionDetailsArray" : {
+        "type" : "array",
+        "items" : {
+          "$ref" : "#/components/schemas/connectionDetailsObject"
+        }
+      },
+      "stateDetailsObjectForResponse" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "slaTime" : {
+            "description" : "SLA time configured for the state",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]*|^$"
+          },
+          "lastModifiedStateName" : {
+            "description" : "Name of the last modified state",
+            "type" : [ "string", "null" ],
+            "maxLength" : 120,
+            "minLength" : 0,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
+          },
+          "stateName" : {
+            "description" : "Name of the state",
+            "type" : [ "string", "null" ],
+            "maxLength" : 120,
+            "minLength" : 1,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
+          },
+          "displayName" : {
+            "description" : "Display name of the state",
+            "type" : [ "string", "null" ],
+            "maxLength" : 120,
+            "minLength" : 0,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
+          },
+          "stateId" : {
+            "description" : "Unique ID of the state",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "position" : {
+            "description" : "Position coordinates of the state in the chart",
+            "$ref" : "#/components/schemas/canvasPositionObject"
+          }
+        },
+        "required" : [ "displayName", "lastModifiedStateName", "position", "stateId", "stateName" ]
+      },
+      "stateDetailsArrayForResponse" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/stateDetailsObjectForResponse"
+        }
+      },
+      "chartDataObjectForResponse" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "canvasPosition" : {
+            "description" : "Position coordinates of the canvas in the blueprint chart",
+            "$ref" : "#/components/schemas/canvasPositionObject"
+          },
+          "connectionDetails" : {
+            "description" : "Visual connection wiring returned for the blueprint designer canvas. Each item maps a transition line using fromUuid and toUuid canvas anchor UUIDs. Anchors are not state IDs; a state with both incoming and outgoing lines uses different anchor suffixes per port.",
+            "$ref" : "#/components/schemas/connectionDetailsArray"
+          },
+          "stateDetails" : {
+            "description" : "State position details in the chart",
+            "$ref" : "#/components/schemas/stateDetailsArrayForResponse"
+          }
+        },
+        "required" : [ "canvasPosition", "connectionDetails", "stateDetails" ]
+      },
+      "stateDetailsObject" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "properties" : {
+          "slaTime" : {
+            "description" : "SLA time configured for the state",
+            "type" : "string",
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]*|^$"
+          },
+          "stateName" : {
+            "description" : "Name of the state",
+            "type" : "string",
+            "maxLength" : 120,
+            "minLength" : 1,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
+          },
+          "position" : {
+            "description" : "Position coordinates of the state in the chart",
+            "$ref" : "#/components/schemas/canvasPositionObject"
+          }
+        },
+        "required" : [ "position", "slaTime", "stateName" ]
+      },
+      "stateDetailsArray" : {
+        "type" : "array",
+        "items" : {
+          "$ref" : "#/components/schemas/stateDetailsObject"
+        }
+      },
+      "chartDataObject" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "properties" : {
+          "canvasPosition" : {
+            "description" : "Position coordinates of the canvas in the blueprint chart",
+            "$ref" : "#/components/schemas/canvasPositionObject"
+          },
+          "connectionDetails" : {
+            "description" : "Visual connection wiring for the blueprint designer canvas. Required for rendering transition lines. Use unique fromUuid and toUuid canvas anchor UUIDs per connection endpoint; do not reuse the same anchor as both incoming and outgoing on one state.",
+            "$ref" : "#/components/schemas/connectionDetailsArray"
+          },
+          "stateDetails" : {
+            "description" : "State position details in the chart",
+            "$ref" : "#/components/schemas/stateDetailsArray"
+          }
+        },
+        "required" : [ "canvasPosition", "connectionDetails", "stateDetails" ]
+      },
+      "draftConnectionDetailsObject" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "properties" : {
+          "toUuid" : {
+            "description" : "Canvas anchor UUID for the incoming endpoint of the destination state on the designer. Type: string. Required. This is not the state ID; it is a visual port identifier used only by chartData.connectionDetails. Pattern: state name followed by a unique numeric suffix (for example, \"On Hold1\", \"Closed1\"). Each connection endpoint must use its own anchor UUID. Do not reuse the same UUID as both the incoming anchor (toUuid) and outgoing anchor (fromUuid) on the same state. Example: for Open -> On Hold -> Closed, use toUuid \"On Hold1\" on the first connection and fromUuid \"On Hold2\" (not \"On Hold1\") on the second connection.",
+            "type" : "string",
+            "maxLength" : 121,
+            "minLength" : 1,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
+          },
+          "transName" : {
+            "description" : "Name of the transition for the connection",
+            "type" : "string",
+            "maxLength" : 30,
+            "minLength" : 1,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "isCommTrans" : {
+            "description" : "Indicates whether the connection is a common transition. Possible values: @true@ - connection is a common transition, @false@ - connection is a specific transition",
+            "type" : "boolean"
+          },
+          "fromUuid" : {
+            "description" : "Canvas anchor UUID for the outgoing endpoint of the source state on the designer. Type: string. Required. This is not the state ID; it is a visual port identifier used only by chartData.connectionDetails. Pattern: state name followed by a unique numeric suffix (for example, \"Open0\", \"On Hold2\"). Each connection endpoint must use its own anchor UUID. When a state has both incoming and outgoing connections, assign different suffixes for each port (for example, incoming toUuid \"On Hold1\" and outgoing fromUuid \"On Hold2\"). Reusing one anchor for both directions prevents the designer from rendering the second connection.",
+            "type" : "string",
+            "maxLength" : 121,
+            "minLength" : 1,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
+          },
+          "usedStates" : {
+            "description" : "States that share the common transition",
+            "$ref" : "./blueprintTransitions.json#/components/schemas/commonStatesArray"
+          },
+          "isAuto" : {
+            "description" : "Indicates whether the transition is automatic. Possible values: @true@ - transition is automatic, @false@ - transition is manual",
+            "type" : "boolean"
           },
           "fromState" : {
+            "description" : "Logical source state name for this visual connection. Type: string. Required for blueprint draft create/update requests. Must exactly match a states[].name value and align with fromUuid (for example, fromState \"On Hold\" with fromUuid \"On Hold2\").",
             "type" : [ "string", "null" ],
             "maxLength" : 120,
             "minLength" : 0,
             "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
           },
           "toState" : {
+            "description" : "Logical destination state name for this visual connection. Type: string. Required for blueprint draft create/update requests. Must exactly match a states[].name value and align with toUuid (for example, toState \"Closed\" with toUuid \"Closed1\").",
             "type" : [ "string", "null" ],
             "maxLength" : 120,
             "minLength" : 0,
@@ -72,119 +248,58 @@
         },
         "required" : [ "fromUuid", "isAuto", "isCommTrans", "toUuid", "transName" ]
       },
-      "connectionDetailsArray" : {
+      "draftConnectionDetailsArray" : {
         "type" : [ "null", "array" ],
         "items" : {
-          "$ref" : "./blueprintChartData.json#/components/schemas/connectionDetailsObject"
+          "$ref" : "#/components/schemas/draftConnectionDetailsObject"
         }
       },
-      "stateDetailsObjectForResponse" : {
-        "type" : [ "null", "object" ],
-        "additionalProperties" : false,
-        "properties" : {
-          "slaTime" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
-          },
-          "lastModifiedStateName" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 120,
-            "minLength" : 0,
-            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
-          },
-          "stateName" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 120,
-            "minLength" : 1,
-            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
-          },
-          "displayName" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 120,
-            "minLength" : 0,
-            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
-          },
-          "stateId" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
-          },
-          "position" : {
-            "$ref" : "./blueprintChartData.json#/components/schemas/canvasPositionObject"
-          }
-        },
-        "required" : [ "displayName", "lastModifiedStateName", "position", "stateId", "stateName" ]
-      },
-      "stateDetailsArrayForResponse" : {
-        "type" : [ "null", "array" ],
-        "items" : {
-          "$ref" : "./blueprintChartData.json#/components/schemas/stateDetailsObjectForResponse"
-        }
-      },
-      "chartDataObjectForResponse" : {
+      "draftChartDataObject" : {
         "type" : [ "null", "object" ],
         "additionalProperties" : false,
         "properties" : {
           "canvasPosition" : {
-            "$ref" : "./blueprintChartData.json#/components/schemas/canvasPositionObject"
+            "description" : "Position coordinates of the canvas in the blueprint chart",
+            "$ref" : "#/components/schemas/canvasPositionObject"
           },
           "connectionDetails" : {
-            "$ref" : "./blueprintChartData.json#/components/schemas/connectionDetailsArray"
+            "description" : "Visual connection wiring for the blueprint draft designer canvas. Type: array of connection objects. Required. Works together with connections and transitions to render lines in the UI. MCP rule: fromUuid and toUuid are per-port canvas anchors, not state IDs; assign unique anchors per endpoint. For a chain such as Open -> On Hold -> Closed, example anchors are fromUuid \"Open0\", toUuid \"On Hold1\", then fromUuid \"On Hold2\", toUuid \"Closed1\".",
+            "$ref" : "#/components/schemas/draftConnectionDetailsArray"
           },
           "stateDetails" : {
-            "$ref" : "./blueprintChartData.json#/components/schemas/stateDetailsArrayForResponse"
+            "description" : "State position details in the chart",
+            "$ref" : "#/components/schemas/stateDetailsArray"
           }
         },
         "required" : [ "canvasPosition", "connectionDetails", "stateDetails" ]
       },
-      "stateDetailsObject" : {
-        "type" : [ "null", "object" ],
-        "additionalProperties" : false,
-        "properties" : {
-          "slaTime" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
-          },
-          "stateName" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 120,
-            "minLength" : 1,
-            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
-          },
-          "position" : {
-            "$ref" : "./blueprintChartData.json#/components/schemas/canvasPositionObject"
-          }
-        },
-        "required" : [ "position", "slaTime", "stateName" ]
-      },
-      "stateDetailsArray" : {
-        "type" : [ "null", "array" ],
-        "items" : {
-          "$ref" : "./blueprintChartData.json#/components/schemas/stateDetailsObject"
-        }
-      },
-      "chartDataObject" : {
-        "type" : [ "null", "object" ],
+      "draftChartDataObjectForResponse" : {
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "canvasPosition" : {
-            "$ref" : "./blueprintChartData.json#/components/schemas/canvasPositionObject"
+            "description" : "Position coordinates of the canvas in the blueprint chart",
+            "$ref" : "#/components/schemas/canvasPositionObject"
           },
           "connectionDetails" : {
-            "$ref" : "./blueprintChartData.json#/components/schemas/connectionDetailsArray"
+            "description" : "Visual connection wiring returned for the draft designer canvas. Each item includes fromUuid, toUuid, fromState, and toState. Anchor UUIDs are per-port identifiers; when a state both receives and sends connections, the incoming toUuid and outgoing fromUuid must differ (for example, \"On Hold1\" vs \"On Hold2\").",
+            "$ref" : "#/components/schemas/draftConnectionDetailsArray"
           },
           "stateDetails" : {
-            "$ref" : "./blueprintChartData.json#/components/schemas/stateDetailsArray"
+            "description" : "State position details in the chart",
+            "$ref" : "#/components/schemas/stateDetailsArrayForResponse"
           }
         },
         "required" : [ "canvasPosition", "connectionDetails", "stateDetails" ]
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

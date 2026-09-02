@@ -16,16 +16,14 @@
           "in" : "query",
           "description" : "SSecondary information related to the comments The allowed values are mentions and plainText. In the API request, you can pass mention, plainText, or both by using commas to separate them.",
           "required" : false,
-          "style" : "simple",
+          "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "null", "array" ],
+            "type" : [ "array" ],
             "description" : "Secondary information related to the comments The allowed values are mentions and plainText. In the API request, you can pass mention, plainText, or both by using commas to separate them.",
             "items" : {
-              "type" : [ "string", "null" ],
-              "enum" : [ "creator" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "type" : [ "string" ],
+              "enum" : [ "creator" ]
             },
             "uniqueItems" : true
           }
@@ -37,15 +35,21 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "integer" ],
             "format" : "int32",
-            "description" : "Number of comments to fetch",
             "maximum" : 100,
             "minimum" : 1,
             "pattern" : "([0-9]+)"
           }
         }, {
-          "$ref" : "#/components/parameters/isPublic"
+          "name" : "isPublic",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "boolean" ]
+          }
         }, {
           "name" : "from",
           "in" : "query",
@@ -54,11 +58,10 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "integer" ],
             "format" : "int32",
-            "description" : "Index number starting from which the comments must be fetched",
-            "minimum" : 0,
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "default" : 0
           }
         }, {
           "name" : "sortBy",
@@ -68,14 +71,21 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Sort by the commentedTime attribute. The default sorting order is ascending. A - prefix denotes descending order of sorting",
+            "type" : [ "string" ],
             "enum" : [ "createdTime" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "pattern" : "-?(createdTime)"
           }
         }, {
-          "$ref" : "#/components/parameters/ticketId"
+          "name" : "ticketId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -98,9 +108,25 @@
         "description" : "This API attaches a file to a ticket.",
         "operationId" : "createTicketAttachment",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/isPublic"
+          "name" : "isPublic",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "boolean" ]
+          }
         }, {
-          "$ref" : "#/components/parameters/ticketId"
+          "name" : "ticketId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -108,15 +134,16 @@
           "content" : {
             "multipart/form-data" : {
               "schema" : {
-                "type" : "object",
+                "type" : [ "object" ],
                 "properties" : {
                   "file" : {
-                    "type" : "string",
+                    "type" : [ "string" ],
                     "format" : "binary",
                     "description" : "File to be attached"
                   }
                 },
-                "required" : [ "file" ]
+                "required" : [ "file" ],
+                "additionalProperties" : false
               }
             }
           }
@@ -142,9 +169,27 @@
         "description" : "This API deletes an attachment from a ticket.",
         "operationId" : "deleteTicketAttachment",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/attachmentId"
+          "name" : "attachmentId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/ticketId"
+          "name" : "ticketId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -167,9 +212,27 @@
         "description" : "This API updates an existing attachment.",
         "operationId" : "updateTicketAttachment",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/attachmentId"
+          "name" : "attachmentId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/ticketId"
+          "name" : "ticketId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -194,54 +257,46 @@
   "components" : {
     "schemas" : {
       "attachmentResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "previewurl" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "maxLength" : 16000000,
             "minLength" : 0,
             "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
           },
           "size" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "description" : "",
             "pattern" : "([0-9]+)"
           },
           "creatorId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "description" : "",
             "pattern" : "([0-9]+)"
           },
           "name" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "maxLength" : 100,
             "minLength" : 0
           },
           "createdTime" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "isPublic" : {
-            "type" : [ "boolean", "null" ],
-            "description" : ""
+            "type" : [ "boolean", "null" ]
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "description" : "",
             "pattern" : "([0-9]+)"
           },
           "href" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "maxLength" : 16000000,
             "minLength" : 0,
             "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
@@ -250,9 +305,9 @@
         "required" : [ "createdTime", "creatorId", "href", "id", "isPublic", "name", "previewurl", "size" ]
       },
       "data" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./TicketAttachment.json#/components/schemas/attachmentResponse"
+          "$ref" : "#/components/schemas/attachmentResponse"
         }
       }
     },
@@ -263,48 +318,42 @@
           "application/json" : {
             "schema" : {
               "allOf" : [ {
-                "type" : "object",
+                "type" : [ "object" ],
                 "properties" : {
                   "data" : {
-                    "type" : "array",
+                    "type" : [ "array" ],
                     "items" : {
-                      "type" : "object",
+                      "type" : [ "object" ],
                       "properties" : {
                         "creator" : {
-                          "type" : [ "null", "object" ],
+                          "type" : [ "object", "null" ],
                           "additionalProperties" : false,
-                          "description" : "",
                           "maxProperties" : 5,
                           "minProperties" : 5,
                           "properties" : {
                             "firstName" : {
                               "type" : [ "string", "null" ],
-                              "description" : "",
                               "maxLength" : 40,
                               "minLength" : 0
                             },
                             "lastName" : {
                               "type" : [ "string", "null" ],
-                              "description" : "",
                               "maxLength" : 200,
                               "minLength" : 0
                             },
                             "photoURL" : {
                               "type" : [ "string", "null" ],
-                              "description" : "",
                               "maxLength" : 100,
                               "minLength" : 0,
                               "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
                             },
                             "id" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
-                              "description" : "",
                               "pattern" : "([0-9]+)"
                             },
                             "email" : {
                               "type" : [ "string", "null" ],
-                              "description" : "",
                               "maxLength" : 255,
                               "minLength" : 0,
                               "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'\\&\\~]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
@@ -312,16 +361,18 @@
                           },
                           "required" : [ "email", "firstName", "id", "lastName", "photoURL" ]
                         }
-                      }
+                      },
+                      "additionalProperties" : false
                     }
                   }
-                }
+                },
+                "additionalProperties" : false
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "data" : {
-                    "$ref" : "./TicketAttachment.json#/components/schemas/data"
+                    "$ref" : "#/components/schemas/data"
                   }
                 },
                 "required" : [ "data" ]
@@ -340,54 +391,46 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "previewurl" : {
                   "type" : [ "string", "null" ],
-                  "description" : "",
                   "maxLength" : 16000000,
                   "minLength" : 0,
                   "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
                 },
                 "size" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
-                  "description" : "",
                   "pattern" : "([0-9]+)"
                 },
                 "creatorId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
-                  "description" : "",
                   "pattern" : "([0-9]+)"
                 },
                 "name" : {
                   "type" : [ "string", "null" ],
-                  "description" : "",
                   "maxLength" : 100,
                   "minLength" : 0
                 },
                 "createdTime" : {
                   "type" : [ "string", "null" ],
-                  "description" : "",
                   "maxLength" : 100,
                   "minLength" : 0,
                   "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
                 },
                 "isPublic" : {
-                  "type" : [ "boolean", "null" ],
-                  "description" : ""
+                  "type" : [ "boolean", "null" ]
                 },
                 "id" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
-                  "description" : "",
                   "pattern" : "([0-9]+)"
                 },
                 "href" : {
                   "type" : [ "string", "null" ],
-                  "description" : "",
                   "maxLength" : 16000000,
                   "minLength" : 0,
                   "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
@@ -404,59 +447,16 @@
         }
       }
     },
-    "parameters" : {
-      "isPublic" : {
-        "name" : "isPublic",
-        "in" : "query",
-        "description" : "",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "boolean", "null" ],
-          "description" : ""
-        }
-      },
-      "attachmentId" : {
-        "name" : "attachmentId",
-        "in" : "path",
-        "description" : "",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "description" : "",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "ticketId" : {
-        "name" : "ticketId",
-        "in" : "path",
-        "description" : "",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "description" : "",
-          "pattern" : "([0-9]+)"
-        }
-      }
-    },
     "requestBodies" : {
       "attachmentJson" : {
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "isPublic" : {
-                  "type" : [ "boolean", "null" ],
-                  "description" : ""
+                  "type" : [ "boolean" ]
                 }
               }
             },
@@ -470,6 +470,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

@@ -8,11 +8,22 @@
     "/api/v1/agents/{agentId}/signatures" : {
       "get" : {
         "tags" : [ "AgentSignatures" ],
-        "summary" : "Get signatures of agent",
-        "description" : "This API fetches the different signatures configured by an agent.",
+        "summary" : "Get Agent Signatures",
+        "description" : "Retrieves the signature details of all agents.",
         "operationId" : "getSignatures",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/agentId"
+          "name" : "agentId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the agent"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -22,17 +33,28 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.agents.READ", "Desk.settings.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
       },
       "patch" : {
         "tags" : [ "AgentSignatures" ],
-        "summary" : "Update signatures of agent",
-        "description" : "This API updates the existing signatures of an agent.",
+        "summary" : "Update Agent Signature",
+        "description" : "Updates the signature of the specified agent. <p><b>Pre-requisites:</b> Agents require the Update Agent permission to update the signatures of other agents.<p> <p><b>Note:</b> Agents do not require any special permissions to update their own signatures.</p>",
         "operationId" : "updateSignatures",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/agentId"
+          "name" : "agentId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the agent"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -48,7 +70,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.agents.UPDATE", "Desk.settings.UPDATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -59,8 +81,19 @@
         "summary" : "Update customized signatures of agent",
         "description" : "This API updates the customized signatures of an agent.",
         "operationId" : "updateCustomSignature",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/agentId"
+          "name" : "agentId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the agent"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -76,7 +109,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.agents.UPDATE", "Desk.settings.UPDATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -85,26 +118,28 @@
   "components" : {
     "schemas" : {
       "customSignatureJson" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object" ],
         "additionalProperties" : false,
         "properties" : {
           "signature" : {
-            "type" : [ "string", "null" ],
+            "type" : [ "string" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Signature configured for the department"
           },
           "departmentId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the department"
           }
         },
         "required" : [ "departmentId", "signature" ]
       },
       "customSignatureList" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./AgentSignatures.json#/components/schemas/customSignatureJson"
+          "$ref" : "#/components/schemas/customSignatureJson"
         }
       }
     },
@@ -114,13 +149,14 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "customizedSignatures" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array", "null" ],
+                  "description" : "Department-specific customized signatures of the agent",
                   "items" : {
-                    "type" : [ "null", "object" ],
+                    "type" : [ "object", "null" ],
                     "additionalProperties" : false,
                     "maxProperties" : 2,
                     "minProperties" : 2,
@@ -128,11 +164,13 @@
                       "signature" : {
                         "type" : [ "string", "null" ],
                         "maxLength" : 100,
-                        "minLength" : 0
+                        "minLength" : 0,
+                        "description" : "Signature configured for the department"
                       },
                       "departmentId" : {
-                        "type" : [ "string", "null", "integer" ],
+                        "type" : [ "string", "integer", "null" ],
                         "format" : "int64",
+                        "description" : "Unique ID of the department",
                         "pattern" : "([0-9]+)"
                       }
                     },
@@ -141,21 +179,25 @@
                   "uniqueItems" : false
                 },
                 "agentId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
+                  "description" : "Unique ID of the agent",
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "defaultSignature" : {
                   "type" : [ "string", "null" ],
+                  "description" : "Default signature of the agent",
                   "maxLength" : 65000,
                   "minLength" : 0
                 },
                 "id" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
+                  "description" : "Unique ID of the agent",
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "isActive" : {
+                  "description" : "Indicates whether the agent's signature is included in ticket replies.<p><b>Possible values:</b> • true = The signature is included in ticket replies • false = The signature is not included in ticket replies</p>",
                   "type" : [ "boolean", "null" ]
                 }
               },
@@ -179,38 +221,26 @@
         }
       }
     },
-    "parameters" : {
-      "agentId" : {
-        "name" : "agentId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      }
-    },
     "requestBodies" : {
       "agentSignatureJson" : {
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "customizedSignatures" : {
-                  "$ref" : "./AgentSignatures.json#/components/schemas/customSignatureList"
+                  "$ref" : "#/components/schemas/customSignatureList",
+                  "description" : "Department-specific customized signatures of the agent"
                 },
                 "defaultSignature" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "maxLength" : 65000,
-                  "minLength" : 0
+                  "description" : "Default signature of the agent"
                 },
                 "isActive" : {
-                  "type" : [ "boolean", "null" ]
+                  "type" : [ "boolean" ],
+                  "description" : "Determines whether the agent's signature is included in ticket replies.<p><b>   Possible values:</b>  • true = Include the signature in ticket replies   • false = Exclude the signature from ticket replies</p>"
                 }
               }
             },
@@ -232,16 +262,17 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "signature" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "type" : [ "string" ],
+                  "maxLength" : 65000,
+                  "description" : "Signature configured for the department"
                 },
                 "departmentId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer" ],
+                  "description" : "Unique ID of the department",
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 }
@@ -261,6 +292,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

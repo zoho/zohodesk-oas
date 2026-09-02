@@ -1,16 +1,191 @@
 {
   "openapi" : "3.1.0",
+  "x-mcp-group" : [ "IM Sessions" ],
   "info" : {
     "title" : "IM_Session",
     "version" : "1.0.0"
   },
   "paths" : {
+    "/api/v1/im/sessions/metrics" : {
+      "get" : {
+        "tags" : [ "IM_Session" ],
+        "summary" : "Get Session Metrics",
+        "description" : "Returns session counts grouped by assignee filter and session status. Use optional query parameters to narrow results by department, channel, or integration service.",
+        "operationId" : "getSessionMetrics",
+        "x-mcp-group" : [ "IM Metrics" ],
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "Filter conversations of all channels in given department",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Filter conversations of all channels in given department",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "integrationServiceId",
+          "in" : "query",
+          "description" : "Integration service ID to filter session metrics. Possible values: TELEGRAM, TWILIO, IM_TALK, LINE, WECHAT, WECOM, WHATSAPP, FACEBOOKMESSENGER, INSTAGRAM.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "Integration service ID to filter session metrics. Possible values: TELEGRAM, TWILIO, IM_TALK, LINE, WECHAT, WECOM, WHATSAPP, FACEBOOKMESSENGER, INSTAGRAM.",
+            "enum" : [ "TELEGRAM", "TWILIO", "IM_TALK", "LINE", "WECHAT", "WECOM", "WHATSAPP", "FACEBOOKMESSENGER", "INSTAGRAM" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "channelId",
+          "in" : "query",
+          "description" : "Filter conversations of a channel",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "Filter conversations of a channel",
+            "pattern" : "^([0-9]+)(,([0-9]+)){0,49}$",
+            "maxLength" : 1000,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "excludeSyncingChannels",
+          "in" : "query",
+          "description" : "Exclude session of channels which are in syncing status",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "boolean",
+            "description" : "Exclude session of channels which are in syncing status"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/getSessionMetrics"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.InstantMessages.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/im/sessions/{id}/tickets" : {
+      "get" : {
+        "tags" : [ "IM_Session" ],
+        "summary" : "Get Session Tickets",
+        "description" : "Retrieves tickets associated with the specified IM session, with pagination support.",
+        "operationId" : "getIMSessionTickets",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "Unique ID of the session.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Unique ID of the session.",
+            "maxLength" : 100,
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number, starting from which the tickets must be fetched.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 0,
+            "minimum" : 0
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of tickets to fetch. Defaults to 50 when omitted or zero. Maximum value is 50.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 50,
+            "minimum" : 0,
+            "maximum" : 50
+          }
+        }, {
+          "name" : "include",
+          "in" : "query",
+          "description" : "Additional information to include in the response. This is a list-based parameter; pass one or more comma-separated values. Possible values: contacts, products, isRead, departments, team, assignee, source, ability.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "^(contacts|products|isRead|departments|team|assignee|source|ability)(,(contacts|products|isRead|departments|team|assignee|source|ability))*$",
+            "example" : "assignee,team",
+            "maxLength" : 200,
+            "minLength" : 0
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/getIMSessionTickets"
+          },
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.InstantMessages.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
     "/api/v1/im/sessions" : {
       "get" : {
         "tags" : [ "IM_Session" ],
         "summary" : "List Sessions",
         "description" : "This API lists all sessions",
         "operationId" : "getSessions",
+        "x-mcp-group" : [ "Initiate Session", "IM Messages" ],
+        "x-mcp-ready" : true,
+        "x-system-description" : "If assigneeFilter is not set, MINE is applied by default and returns sessions assigned to the current agent; use agentId to filter by a specific agent. Set assigneeFilter to NONE to fetch all sessions, UNASSIGNED for sessions with no agent assigned, or BOT for bot-assigned sessions. When both channelId and contactExtId are provided, assignment filtering is ignored and all matching sessions are returned.",
         "parameters" : [ {
           "name" : "modifiedAfter",
           "in" : "query",
@@ -19,7 +194,7 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "description" : "After which modified date conversations should be included. Enter a date in the ISO date format of yyyy-MM-ddThh:mm:ss.SSSZ.",
             "maxLength" : 100,
             "minLength" : 0,
@@ -33,7 +208,7 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
             "description" : "Filter conversations assigned to an agent",
             "pattern" : "([0-9]+)"
@@ -46,7 +221,7 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
             "description" : "Filter conversations of a contact",
             "pattern" : "([0-9]+)"
@@ -59,28 +234,62 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
             "description" : "Filter conversations of a profile",
             "pattern" : "([0-9]+)"
           }
         }, {
-          "$ref" : "#/components/parameters/departmentId"
-        }, {
-          "$ref" : "#/components/parameters/limit"
-        }, {
-          "$ref" : "#/components/parameters/from"
-        }, {
-          "name" : "assigneeFilter",
+          "name" : "departmentId",
           "in" : "query",
-          "description" : "Assignment status filter for the conversations. Allowed values are @MINE@, @UNASSIGNED@ ,@NONE@ ,@BOT@",
+          "description" : "Filter conversations of all channels in given department",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Assignment status filter for the conversations. Allowed values are @MINE@, @UNASSIGNED@ ,@NONE@ ,@BOT@",
-            "enum" : [ "MINE", "UNASSIGNED", "NONE" ],
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Filter conversations of all channels in given department",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of tickets to fetch",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int32",
+            "description" : "Number of tickets to fetch",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number, starting from which the tickets must be fetched",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int32",
+            "description" : "Index number, starting from which the tickets must be fetched",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "assigneeFilter",
+          "in" : "query",
+          "description" : "Assignment status filter for the conversations. Allowed values: MINE, UNASSIGNED, NONE, BOT",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "Assignment status filter for the conversations. Allowed values: MINE, UNASSIGNED, NONE, BOT",
+            "enum" : [ "MINE", "UNASSIGNED", "NONE", "BOT" ],
+            "pattern" : "(MINE|UNASSIGNED|NONE|BOT)",
             "maxLength" : 100,
             "minLength" : 0
           }
@@ -92,7 +301,7 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "description" : "Before which date conversations should be included. Enter a date in the ISO date format of yyyy-MM-ddThh:mm:ss.SSSZ.",
             "maxLength" : 100,
             "minLength" : 0,
@@ -106,25 +315,65 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "description" : "After which date conversations should be included. Enter a date in the ISO date format of yyyy-MM-ddThh:mm:ss.SSSZ.",
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           }
         }, {
-          "$ref" : "#/components/parameters/channelId"
-        }, {
-          "name" : "status",
+          "name" : "channelId",
           "in" : "query",
-          "description" : "Status filter for the conversations. Allowed values are @OPEN@, @ON_PROGRESS@ ,@ON_HOLD@ ,@BLOCKED@",
+          "description" : "Filter conversations of a channel",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "null", "object" ],
-            "additionalProperties" : false,
-            "description" : "Status filter for the conversations. Allowed values are @OPEN@, @ON_PROGRESS@ ,@ON_HOLD@ ,@BLOCKED@"
+            "type" : "string",
+            "description" : "Filter conversations of a channel",
+            "pattern" : "^([0-9]+)(,([0-9]+)){0,49}$",
+            "maxLength" : 1000,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "botIds",
+          "in" : "query",
+          "description" : "IM bot IDs of bots whose sessions should be returned.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "IM bot IDs of bots whose sessions should be returned.",
+            "pattern" : "^([0-9]+)(,([0-9]+)){0,49}$",
+            "maxLength" : 1000,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "status",
+          "in" : "query",
+          "description" : "Status filter for the conversations. Allowed values: OPEN, ENDED, ON_PROGRESS, ON_HOLD, BLOCKED",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "Status filter for the conversations. Allowed values: OPEN, ENDED, ON_PROGRESS, ON_HOLD, BLOCKED",
+            "pattern" : "^(OPEN|ENDED|ON_PROGRESS|ON_HOLD|BLOCKED)(,(OPEN|ENDED|ON_PROGRESS|ON_HOLD|BLOCKED)){0,4}$",
+            "example" : "OPEN,ENDED,ON_PROGRESS,ON_HOLD,BLOCKED",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "excludeSyncingChannels",
+          "in" : "query",
+          "description" : "Exclude session of channels which are in syncing status",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "boolean",
+            "description" : "Exclude session of channels which are in syncing status"
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -135,6 +384,12 @@
           },
           "200" : {
             "$ref" : "#/components/responses/getSessions"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
           }
         },
         "security" : [ {
@@ -149,8 +404,22 @@
         "summary" : "Get a session",
         "description" : "This API fetches details of an session.",
         "operationId" : "getSession",
+        "x-mcp-group" : [ "Initiate Session", "IM Messages" ],
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/id"
+          "name" : "id",
+          "in" : "path",
+          "description" : "Unique ID of the session.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Unique ID of the session.",
+            "maxLength" : 100,
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -172,173 +441,367 @@
           "iam-oauth2-schema" : [ "Desk.InstantMessages.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
+      },
+      "patch" : {
+        "tags" : [ "IM_Session" ],
+        "summary" : "Update a session",
+        "description" : "This API updates details of a session, including its status and assignee. Use it to assign the session to yourself or another agent by passing agentId with an appropriate status value. To assign a bot, pass botId with deskBotId from List IM Bots. Status changes must follow allowed transitions from the current session status. From any status, you can transition to BLOCKED or ENDED. Additional transitions are allowed based on the current status: from BLOCKED to OPEN; from OPEN to ON_HOLD; from ON_PROGRESS to ENDED; from ENDED to ON_HOLD. An invalid status transition returns a validation error.",
+        "operationId" : "updateSession",
+        "x-mcp-group" : [ "IM Messages" ],
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "Unique ID of the session.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Unique ID of the session.",
+            "maxLength" : 100,
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/updateSession"
+        },
+        "responses" : {
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/getSession"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.InstantMessages.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
       }
     }
   },
   "components" : {
     "schemas" : {
+      "singleMetric" : {
+        "type" : [ "null", "object" ],
+        "description" : "Session count grouped by session status.",
+        "additionalProperties" : false,
+        "properties" : {
+          "CREATED" : {
+            "type" : [ "string", "null", "integer" ],
+            "description" : "Count of sessions in CREATED status.",
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "BLOCKED" : {
+            "type" : [ "string", "null", "integer" ],
+            "description" : "Count of sessions in BLOCKED status.",
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "ENDED" : {
+            "type" : [ "string", "null", "integer" ],
+            "description" : "Count of sessions in ENDED status.",
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "MISSED" : {
+            "type" : [ "string", "null", "integer" ],
+            "description" : "Count of sessions in MISSED status.",
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "ON_HOLD" : {
+            "type" : [ "string", "null", "integer" ],
+            "description" : "Count of sessions in ON_HOLD status.",
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "ON_PROGRESS" : {
+            "type" : [ "string", "null", "integer" ],
+            "description" : "Count of sessions in ON_PROGRESS status.",
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "OPEN" : {
+            "type" : [ "string", "null", "integer" ],
+            "description" : "Count of sessions in OPEN status.",
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        },
+        "required" : [ "BLOCKED", "CREATED", "ENDED", "MISSED", "ON_HOLD", "ON_PROGRESS", "OPEN" ]
+      },
+      "assigneeMetrics" : {
+        "type" : [ "null", "object" ],
+        "description" : "Session metrics grouped by assignee filter.",
+        "additionalProperties" : false,
+        "properties" : {
+          "MINE" : {
+            "description" : "Session counts for conversations assigned to the current agent.",
+            "$ref" : "./IM_Session.json#/components/schemas/singleMetric"
+          },
+          "NONE" : {
+            "description" : "Session counts for all conversations regardless of assignment.",
+            "$ref" : "./IM_Session.json#/components/schemas/singleMetric"
+          },
+          "UNASSIGNED" : {
+            "description" : "Session counts for unassigned conversations.",
+            "$ref" : "./IM_Session.json#/components/schemas/singleMetric"
+          }
+        },
+        "required" : [ "MINE", "NONE", "UNASSIGNED" ]
+      },
+      "listofTickets" : {
+        "type" : [ "null", "array" ],
+        "items" : {
+          "$ref" : "./Ticket.json#/components/schemas/listviewJson"
+        }
+      },
       "sessionActor" : {
+        "description" : "Details of the message or session actor.",
         "type" : [ "null", "object" ],
         "additionalProperties" : false,
         "properties" : {
           "photoURL" : {
+            "description" : "Photo URL of the author.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "contactId" : {
+            "description" : "Unique ID of the associated contact, when applicable.",
             "type" : [ "string", "null", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "contactName" : {
+            "description" : "Name of the associated end-user contact.",
             "type" : [ "string", "null" ],
             "maxLength" : 200,
             "minLength" : 0
           },
           "botType" : {
+            "description" : "Type of bot when the actor is a bot. Possible values: GC, ZIA.",
             "type" : [ "string", "null" ],
             "enum" : [ "GC", "ZIA" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "name" : {
+            "description" : "Full name of the author.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "externalId" : {
+            "description" : "External system ID of the author.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "id" : {
+            "description" : "Unique ID of the author.",
             "type" : [ "string", "null", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "type" : {
+            "description" : "Type of the author. Possible values: AGENT, END_USER, ENDUSER, BOT.",
             "type" : [ "string", "null" ],
-            "enum" : [ "END_USER", "AGENT", "BOT" ],
+            "enum" : [ "END_USER", "ENDUSER", "AGENT", "BOT" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "email" : {
+            "description" : "Email address of the author.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+          },
+          "zohoService" : {
+            "description" : "Zoho service that owns the author record. Example: ZOHO_DESK.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
           }
         },
-        "required" : [ "botType", "contactId", "contactName", "email", "externalId", "id", "name", "photoURL", "type" ]
+        "required" : [ "contactName", "email", "externalId", "id", "name", "photoURL", "type" ]
       },
       "meta" : {
+        "description" : "Metadata key-value pairs associated with a session or message.",
         "type" : [ "null", "object" ],
         "additionalProperties" : false,
         "properties" : {
           "DESK_TICKET_ID" : {
+            "description" : "Unique ID of the Desk ticket linked to the session or message.",
             "type" : [ "string", "null", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "DESK_TICKET_NUMBER" : {
+            "description" : "Ticket number of the linked Desk ticket.",
             "type" : [ "string", "null", "integer" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
+          },
+          "DESK_CX_HAPPINESS_SURVEY_STATE" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "UNKNOWN" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "SKIP_SESSION_STATUS_UPDATE" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "FINANCE_TRACKING_ID" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
           }
         },
         "required" : [ "DESK_TICKET_ID", "DESK_TICKET_NUMBER" ]
       },
       "getSession" : {
-        "type" : [ "null", "object" ],
+        "description" : "Details of an instant messaging session.",
+        "type" : [ "object" ],
         "additionalProperties" : false,
         "properties" : {
           "agentId" : {
+            "description" : "Unique ID of the agent associated with the session.",
             "type" : [ "string", "null", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "lastActiveTime" : {
+            "description" : "Last active time in the session.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "contactId" : {
+            "description" : "Unique ID of the end user's Desk contact.",
+            "type" : [ "string", "null", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "botId" : {
+            "description" : "Unique ID of the bot associated with the session.",
             "type" : [ "string", "null", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "subject" : {
+            "description" : "Subject of the session.",
             "type" : [ "string", "null" ],
             "maxLength" : 50000,
             "minLength" : 0
           },
           "unreadMessagesCount" : {
+            "description" : "Total unread message count in the session.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "channel" : {
+            "description" : "Channel code.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "integrationService" : {
+            "description" : "Integration service of the channel. Possible values: TELEGRAM, TWILIO, IM_TALK, LINE, WECHAT, WECOM, WHATSAPP, FACEBOOKMESSENGER, INSTAGRAM.",
             "type" : [ "string", "null" ],
-            "enum" : [ "TELEGRAM", "TWILIO", "IM_TALK", "LINE", "WECHAT", "WHATSAPP", "FACEBOOKMESSENGER" ],
+            "enum" : [ "TELEGRAM", "TWILIO", "IM_TALK", "LINE", "WECHAT", "WECOM", "WHATSAPP", "FACEBOOKMESSENGER", "INSTAGRAM" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "deskAssignee" : {
+            "description" : "Details of the session assignee.",
             "$ref" : "./IM_Session.json#/components/schemas/sessionActor"
           },
           "contactLastActiveTime" : {
+            "description" : "Last active time of the end user.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "actor" : {
+            "description" : "Details of the session actor.",
             "$ref" : "./IM_Session.json#/components/schemas/sessionActor"
           },
           "meta" : {
+            "description" : "Metadata associated with the session.",
             "$ref" : "./IM_Session.json#/components/schemas/meta"
           },
           "createdTime" : {
+            "description" : "Time when the session was created.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "replyStatus" : {
+            "description" : "Reply status of the session. Possible values: ACCEPTED, CHANNEL_INACTIVE, CHANNEL_REVOKED, SESSION_ENDED, SESSION_BLOCKED, SESSION_EXPIRED, UNASSIGNED, NOT_AN_ASSIGNEE, CREDIT_EXHAUSTED, ACCESSTOKEN_EXPIRED, PERMISSION_REVOKED, UNEXPECTED_ERROR, PAGE_REMOVED, SANDBOX_LIMIT_REACHED, CHANNEL_DELETED, ENDUSER_OFFLINE.",
             "type" : [ "string", "null" ],
-            "enum" : [ "ACCEPTED", "CHANNEL_INACTIVE", "SESSION_ENDED", "SESSION_BLOCKED", "SESSION_EXPIRED", "UNASSIGNED", "NOT_AN_ASSIGNEE" ],
+            "enum" : [ "ACCEPTED", "CHANNEL_INACTIVE", "CHANNEL_REVOKED", "SESSION_ENDED", "SESSION_BLOCKED", "SESSION_EXPIRED", "UNASSIGNED", "NOT_AN_ASSIGNEE", "CREDIT_EXHAUSTED", "ACCESSTOKEN_EXPIRED", "PERMISSION_REVOKED", "UNEXPECTED_ERROR", "PAGE_REMOVED", "SANDBOX_LIMIT_REACHED", "CHANNEL_DELETED", "ENDUSER_OFFLINE" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "messagesCount" : {
+            "description" : "Total message count in the session.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "id" : {
+            "description" : "Unique ID of the session.",
+            "type" : [ "string", "null", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "channelId" : {
+            "description" : "Unique ID of the channel for which the session is created.",
             "type" : [ "string", "null", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "agentLastActiveTime" : {
+            "description" : "Last active time of the agent.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "status" : {
+            "description" : "Status of the session. Possible values: CREATED, OPEN, ON_PROGRESS, ON_HOLD, ENDED, BLOCKED, MISSED.",
             "type" : [ "string", "null" ],
             "enum" : [ "CREATED", "OPEN", "ON_PROGRESS", "ON_HOLD", "ENDED", "BLOCKED", "MISSED" ],
             "maxLength" : 100,
             "minLength" : 0
           }
         },
-        "required" : [ "actor", "agentId", "agentLastActiveTime", "channel", "contactId", "contactLastActiveTime", "createdTime", "deskAssignee", "id", "integrationService", "lastActiveTime", "messagesCount", "meta", "replyStatus", "status", "subject", "unreadMessagesCount" ]
+        "required" : [ "actor", "agentId", "agentLastActiveTime", "botId", "channel", "channelId", "contactId", "contactLastActiveTime", "createdTime", "deskAssignee", "id", "integrationService", "lastActiveTime", "messagesCount", "meta", "replyStatus", "status", "subject", "unreadMessagesCount" ]
       },
       "listofSessions" : {
         "type" : [ "null", "array" ],
@@ -348,6 +811,62 @@
       }
     },
     "responses" : {
+      "getSessionMetrics" : {
+        "description" : "Session metrics grouped by assignee filter and session status.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "properties" : {
+                "kind" : {
+                  "type" : [ "string", "null" ],
+                  "description" : "Response discriminator. Always single.session.metrics.",
+                  "enum" : [ "single.session.metrics" ],
+                  "maxLength" : 100,
+                  "minLength" : 0
+                },
+                "assignee" : {
+                  "description" : "Session counts grouped by assignee filter.",
+                  "$ref" : "./IM_Session.json#/components/schemas/assigneeMetrics"
+                }
+              },
+              "required" : [ "assignee", "kind" ]
+            },
+            "examples" : {
+              "GetSessionMetrics_200" : {
+                "$ref" : "./examples/IM_Session.json#/components/examples/GetSessionMetrics_200"
+              }
+            }
+          }
+        }
+      },
+      "getIMSessionTickets" : {
+        "description" : "List of tickets linked to the IM session.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "null", "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "description" : "Tickets associated with the session.",
+                  "$ref" : "./IM_Session.json#/components/schemas/listofTickets"
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "GetIMSessionTickets_200_withInclude" : {
+                "$ref" : "./examples/IM_Session.json#/components/examples/GetIMSessionTickets_200_withInclude"
+              },
+              "GetIMSessionTickets_200" : {
+                "$ref" : "./examples/IM_Session.json#/components/examples/GetIMSessionTickets_200"
+              }
+            }
+          }
+        }
+      },
       "getSessions" : {
         "description" : "getSessions template definitions",
         "content" : {
@@ -357,143 +876,19 @@
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
+                  "description" : "List of instant messaging sessions matching the filter criteria.",
                   "$ref" : "./IM_Session.json#/components/schemas/listofSessions"
                 },
                 "hasMore" : {
-                  "type" : [ "boolean", "null" ]
+                  "type" : [ "boolean", "null" ],
+                  "description" : "Indicates whether more sessions are available beyond the current page."
                 }
               },
               "required" : [ "data", "hasMore" ]
             },
             "examples" : {
-              "Valid responses Definitions" : {
-                "value" : {
-                  "data" : [ {
-                    "agentId" : "78412824",
-                    "lastActiveTime" : 1711094233000,
-                    "contactId" : "1892000001128052",
-                    "subject" : "This is test 2   Abhishek Aich",
-                    "unreadMessagesCount" : "0",
-                    "channel" : "TEST_WA_CHANNEL_4",
-                    "integrationService" : "WHATSAPP",
-                    "deskAssignee" : {
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/1000000000059/photo?orgId=111111",
-                      "botType" : null,
-                      "contactName" : null,
-                      "name" : "Alex John",
-                      "externalId" : null,
-                      "id" : "1000000000059",
-                      "type" : "AGENT",
-                      "email" : "zykler.sales@zylker.com"
-                    },
-                    "contactLastActiveTime" : 1711086669000,
-                    "actor" : {
-                      "photoURL" : null,
-                      "botType" : null,
-                      "contactName" : "Abhishek Aich",
-                      "name" : "Abhishek Aich",
-                      "externalId" : "109000000002003",
-                      "id" : "1000000000059",
-                      "type" : "ENDUSER",
-                      "email" : null
-                    },
-                    "meta" : {
-                      "DESK_TICKET_ID" : "1892000000143237",
-                      "DESK_TICKET_NUMBER" : "480"
-                    },
-                    "createdTime" : 1711085659000,
-                    "replyStatus" : "SESSION_EXPIRED",
-                    "botId" : null,
-                    "messagesCount" : "10",
-                    "id" : "3942000001423083",
-                    "channelId" : "3942000001423029",
-                    "agentLastActiveTime" : 1711094233000,
-                    "status" : "ON_PROGRESS"
-                  }, {
-                    "agentId" : "78412824",
-                    "lastActiveTime" : 1711094223000,
-                    "contactId" : "186543000000451259",
-                    "subject" : "This is test 2   Abhishek Aich",
-                    "unreadMessagesCount" : "0",
-                    "channel" : "SANDBOX",
-                    "integrationService" : "WHATSAPP",
-                    "deskAssignee" : {
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/1000000000059/photo?orgId=111111",
-                      "botType" : null,
-                      "contactName" : null,
-                      "name" : "Alex John",
-                      "externalId" : null,
-                      "id" : "1000000000059",
-                      "type" : "AGENT",
-                      "email" : "@zylker.com"
-                    },
-                    "contactLastActiveTime" : 1711012260000,
-                    "actor" : {
-                      "photoURL" : null,
-                      "botType" : null,
-                      "contactName" : "Abhishek Aich",
-                      "name" : "Abhishek Aich",
-                      "externalId" : "109000000002003",
-                      "id" : "1000000000059",
-                      "type" : "ENDUSER",
-                      "email" : null
-                    },
-                    "meta" : {
-                      "DESK_TICKET_ID" : "186543000001653193",
-                      "DESK_TICKET_NUMBER" : "477"
-                    },
-                    "createdTime" : 1693819815000,
-                    "replyStatus" : "SESSION_EXPIRED",
-                    "botId" : null,
-                    "messagesCount" : "65",
-                    "id" : "3942000000042104",
-                    "channelId" : "3942000000045001",
-                    "agentLastActiveTime" : 1711094223000,
-                    "status" : "ON_PROGRESS"
-                  }, {
-                    "agentId" : "78412824",
-                    "lastActiveTime" : 1711085558000,
-                    "contactId" : "186543000000451259",
-                    "subject" : "Hi good morning",
-                    "unreadMessagesCount" : "0",
-                    "channel" : "WA_CHANNEL",
-                    "integrationService" : "WHATSAPP",
-                    "deskAssignee" : {
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/1000000000059/photo?orgId=111111",
-                      "botType" : null,
-                      "contactName" : null,
-                      "name" : "Alex John",
-                      "externalId" : null,
-                      "id" : "1000000000059",
-                      "type" : "AGENT",
-                      "email" : "zykler.sales@zylker.com"
-                    },
-                    "contactLastActiveTime" : 1711083846000,
-                    "actor" : {
-                      "photoURL" : null,
-                      "botType" : null,
-                      "contactName" : "Abhishek Aich",
-                      "name" : "Abhishek Aich",
-                      "externalId" : "109000000002003",
-                      "id" : "1000000000059",
-                      "type" : "ENDUSER",
-                      "email" : null
-                    },
-                    "meta" : {
-                      "DESK_TICKET_ID" : "186543000001662009",
-                      "DESK_TICKET_NUMBER" : "479"
-                    },
-                    "createdTime" : 1711083846000,
-                    "replyStatus" : "CHANNEL_DELETED",
-                    "botId" : null,
-                    "messagesCount" : "5",
-                    "id" : "3942000001422171",
-                    "channelId" : "3942000001422011",
-                    "agentLastActiveTime" : 1711085558000,
-                    "status" : "ON_PROGRESS"
-                  } ],
-                  "hasMore" : false
-                }
+              "GetIMSessions_200" : {
+                "$ref" : "./examples/IM_Session.json#/components/examples/GetIMSessions_200"
               }
             }
           }
@@ -504,215 +899,65 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
-              "additionalProperties" : false,
-              "properties" : {
-                "agentId" : {
-                  "type" : [ "string", "null", "integer" ],
-                  "format" : "int64",
-                  "pattern" : "([0-9]+)"
-                },
-                "lastActiveTime" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                },
-                "contactId" : {
-                  "type" : [ "string", "null", "integer" ],
-                  "format" : "int64",
-                  "pattern" : "([0-9]+)"
-                },
-                "subject" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 50000,
-                  "minLength" : 0
-                },
-                "unreadMessagesCount" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                },
-                "channel" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0,
-                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
-                },
-                "integrationService" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "TELEGRAM", "TWILIO", "IM_TALK", "LINE", "WECHAT", "WHATSAPP", "FACEBOOKMESSENGER" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                },
-                "deskAssignee" : {
-                  "$ref" : "./IM_Session.json#/components/schemas/sessionActor"
-                },
-                "contactLastActiveTime" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                },
-                "actor" : {
-                  "$ref" : "./IM_Session.json#/components/schemas/sessionActor"
-                },
-                "meta" : {
-                  "$ref" : "./IM_Session.json#/components/schemas/meta"
-                },
-                "createdTime" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                },
-                "replyStatus" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "ACCEPTED", "CHANNEL_INACTIVE", "SESSION_ENDED", "SESSION_BLOCKED", "SESSION_EXPIRED", "UNASSIGNED", "NOT_AN_ASSIGNEE" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                },
-                "messagesCount" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                },
-                "id" : {
-                  "type" : [ "string", "null", "integer" ],
-                  "format" : "int64",
-                  "pattern" : "([0-9]+)"
-                },
-                "agentLastActiveTime" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                },
-                "status" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "CREATED", "OPEN", "ON_PROGRESS", "ON_HOLD", "ENDED", "BLOCKED", "MISSED" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                }
-              },
-              "required" : [ "actor", "agentId", "agentLastActiveTime", "channel", "contactId", "contactLastActiveTime", "createdTime", "deskAssignee", "id", "integrationService", "lastActiveTime", "messagesCount", "meta", "replyStatus", "status", "subject", "unreadMessagesCount" ]
+              "$ref" : "./IM_Session.json#/components/schemas/getSession"
             },
             "examples" : {
-              "Valid responses Definitions" : {
-                "value" : {
-                  "agentId" : "78412824",
-                  "lastActiveTime" : 1711094233000,
-                  "contactId" : "186543000000451259",
-                  "subject" : "This is test 2   Abhishek Aich",
-                  "unreadMessagesCount" : "0",
-                  "channel" : "TEST_WA_CHANNEL_4",
-                  "integrationService" : "WHATSAPP",
-                  "deskAssignee" : {
-                    "photoURL" : "https://desk.zoho.com/api/v1/agents/186543000000190001/photo?orgId=78412359",
-                    "botType" : null,
-                    "contactName" : null,
-                    "name" : "Abhishek Aich",
-                    "externalId" : null,
-                    "id" : "186543000000190001",
-                    "type" : "AGENT",
-                    "email" : "zykler.sales@zylker.com"
-                  },
-                  "contactLastActiveTime" : 1711086669000,
-                  "actor" : {
-                    "photoURL" : null,
-                    "botType" : null,
-                    "contactName" : "Abhishek Aich",
-                    "name" : "Abhishek Aich",
-                    "externalId" : "109000000002003",
-                    "id" : "186543000000451285",
-                    "type" : "ENDUSER",
-                    "email" : null
-                  },
-                  "meta" : {
-                    "DESK_TICKET_ID" : "186543000001662116",
-                    "DESK_TICKET_NUMBER" : "480"
-                  },
-                  "createdTime" : 1711085659000,
-                  "botId" : null,
-                  "messagesCount" : "10",
-                  "id" : "3942000001423083",
-                  "channelId" : "3942000001423029",
-                  "agentLastActiveTime" : 1711094233000,
-                  "status" : "ON_PROGRESS"
-                }
+              "GetIMSession_200" : {
+                "$ref" : "./examples/IM_Session.json#/components/examples/GetIMSession_200"
               }
             }
           }
         }
       }
     },
-    "parameters" : {
-      "departmentId" : {
-        "name" : "departmentId",
-        "in" : "query",
-        "description" : "Filter conversations of all channels in given department",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "description" : "Filter conversations of all channels in given department",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "limit" : {
-        "name" : "limit",
-        "in" : "query",
-        "description" : "Number of tickets to fetch",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int32",
-          "description" : "Number of tickets to fetch",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "from" : {
-        "name" : "from",
-        "in" : "query",
-        "description" : "Index number, starting from which the tickets must be fetched",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int32",
-          "description" : "Index number, starting from which the tickets must be fetched",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "id" : {
-        "name" : "id",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "channelId" : {
-        "name" : "channelId",
-        "in" : "query",
-        "description" : "Filter conversations of a channel",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "description" : "Filter conversations of a channel",
-          "pattern" : "([0-9]+)"
+    "requestBodies" : {
+      "updateSession" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "properties" : {
+                "agentId" : {
+                  "type" : [ "string", "integer" ],
+                  "format" : "int64",
+                  "description" : "Zoho Desk user ID of the agent to assign as the current session assignee.",
+                  "pattern" : "([0-9]+)"
+                },
+                "botId" : {
+                  "type" : [ "string", "integer" ],
+                  "format" : "int64",
+                  "description" : "Desk bot ID of the bot to assign as the current session assignee.",
+                  "pattern" : "([0-9]+)"
+                },
+                "status" : {
+                  "type" : "string",
+                  "description" : "Current status of the session to be set. Possible values: OPEN, ENDED, ON_HOLD, BLOCKED",
+                  "enum" : [ "OPEN", "ON_HOLD", "ENDED", "BLOCKED" ],
+                  "maxLength" : 100,
+                  "minLength" : 0
+                }
+              }
+            },
+            "examples" : {
+              "UpdateIMSession_request" : {
+                "$ref" : "./examples/IM_Session.json#/components/examples/UpdateIMSession_request"
+              },
+              "UpdateIMSession_assignBot_request" : {
+                "$ref" : "./examples/IM_Session.json#/components/examples/UpdateIMSession_assignBot_request"
+              }
+            }
+          }
         }
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

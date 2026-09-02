@@ -19,11 +19,8 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Category for getting the field criteria for primary or secondary fields",
-            "enum" : [ "primary", "secondary" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "type" : [ "string" ],
+            "enum" : [ "primary", "secondary" ]
           }
         }, {
           "name" : "layoutId",
@@ -32,7 +29,7 @@
           "style" : "simple",
           "explode" : false,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
@@ -48,7 +45,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.READ", "Desk.settings.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -57,7 +54,7 @@
   "components" : {
     "schemas" : {
       "availableConditionJson" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "condition" : {
@@ -71,39 +68,25 @@
             "minLength" : 0
           },
           "value" : {
-            "type" : [ "null", "array" ],
-            "items" : {
-              "oneOf" : [ {
-                "type" : [ "string", "null" ],
-                "maxLength" : 100,
-                "minLength" : 0
-              }, {
-                "type" : [ "null", "array" ],
-                "items" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                },
-                "uniqueItems" : false
-              } ]
-            },
+            "type" : [ "array", "null" ],
+            "items" : { },
             "uniqueItems" : false
           }
         },
         "required" : [ "condition", "i18NCondition", "value" ]
       },
       "availableConditionArr" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./LayoutRuleCriteria.json#/components/schemas/availableConditionJson"
+          "$ref" : "#/components/schemas/availableConditionJson"
         }
       },
       "criteriaJson" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "availableConditions" : {
-            "$ref" : "./LayoutRuleCriteria.json#/components/schemas/availableConditionArr"
+            "$ref" : "#/components/schemas/availableConditionArr"
           },
           "fieldName" : {
             "type" : [ "string", "null" ],
@@ -124,45 +107,39 @@
           },
           "type" : {
             "type" : [ "string", "null" ],
-            "enum" : [ "ischeck", "emptycheck", "text", "date", "integer", "dateTime", "user", "team", "boolean", "lookup", "picklist", "currency" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "ischeck", "emptycheck", "text", "date", "integer", "dateTime", "user", "team", "boolean", "lookup", "picklist", "currency" ]
           }
         },
         "required" : [ "availableConditions", "fieldLabel", "fieldName", "i18NLabel", "type" ]
       },
       "criteriaArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./LayoutRuleCriteria.json#/components/schemas/criteriaJson"
+          "$ref" : "#/components/schemas/criteriaJson"
         }
       },
       "fieldJson" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "displayLabel" : {
             "type" : [ "string", "null" ],
-            "enum" : [ "Tickets", "Contacts", "Accounts", "Tasks", "Solutions", "Products", "Contracts", "Calls - Call Information", "Events - Event Information", "Activities", "TimeEntry", "Cases", "Calls", "Events" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "Tickets", "Contacts", "Accounts", "Tasks", "Solutions", "Products", "Contracts", "Calls - Call Information", "Events - Event Information", "Activities", "TimeEntry", "Cases", "Calls", "Events" ]
           },
           "name" : {
             "type" : [ "string", "null" ],
-            "enum" : [ "tickets", "contacts", "products", "accounts", "tasks", "social", "articles", "community", "timeEntry", "contracts", "topics", "departments", "agents", "category", "attachments", "solutions", "reports", "kbCategory", "dashboards", "chat", "calls", "events", "activities" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "tickets", "contacts", "products", "accounts", "tasks", "social", "articles", "community", "timeEntry", "contracts", "topics", "departments", "agents", "category", "attachments", "solutions", "reports", "kbCategory", "dashboards", "chat", "calls", "events", "activities" ]
           },
           "fieldDetails" : {
-            "$ref" : "./LayoutRuleCriteria.json#/components/schemas/criteriaArray"
+            "$ref" : "#/components/schemas/criteriaArray"
           }
         },
         "required" : [ "displayLabel", "fieldDetails", "name" ]
       },
       "fieldDetailList" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./LayoutRuleCriteria.json#/components/schemas/fieldJson"
+          "$ref" : "#/components/schemas/fieldJson"
         }
       }
     },
@@ -172,11 +149,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "criteriaFields" : {
-                  "$ref" : "./LayoutRuleCriteria.json#/components/schemas/fieldDetailList"
+                  "$ref" : "#/components/schemas/fieldDetailList"
                 }
               },
               "required" : [ "criteriaFields" ]
@@ -204,7 +181,7 @@
                       "fieldName" : "accountId",
                       "fieldLabel" : "Account Name",
                       "i18NLabel" : "Account Name",
-                      "type" : "lookup"
+                      "type" : [ "lookup" ]
                     }, {
                       "availableConditions" : [ {
                         "condition" : "is",
@@ -222,7 +199,7 @@
                       "fieldName" : "contactId",
                       "fieldLabel" : "Contact Name",
                       "i18NLabel" : "Contact Name",
-                      "type" : "lookup"
+                      "type" : [ "lookup" ]
                     }, {
                       "availableConditions" : [ {
                         "condition" : "is",
@@ -252,7 +229,7 @@
                       "fieldName" : "phone",
                       "fieldLabel" : "Phone",
                       "i18NLabel" : "Phone",
-                      "type" : "text"
+                      "type" : [ "text" ]
                     }, {
                       "availableConditions" : [ {
                         "condition" : "is OPEN",
@@ -288,7 +265,7 @@
                       "fieldName" : "status",
                       "fieldLabel" : "Status",
                       "i18NLabel" : "Status",
-                      "type" : "text"
+                      "type" : [ "text" ]
                     }, {
                       "availableConditions" : [ {
                         "condition" : "is",
@@ -306,7 +283,7 @@
                       "fieldName" : "productId",
                       "fieldLabel" : "Product Name",
                       "i18NLabel" : "Product Name",
-                      "type" : "lookup"
+                      "type" : [ "lookup" ]
                     }, {
                       "availableConditions" : [ {
                         "condition" : "is",
@@ -336,7 +313,7 @@
                       "fieldName" : "dueDate",
                       "fieldLabel" : "Due Date",
                       "i18NLabel" : "Due Date",
-                      "type" : "dateTime"
+                      "type" : [ "dateTime" ]
                     }, {
                       "availableConditions" : [ {
                         "condition" : "is",
@@ -366,7 +343,7 @@
                       "fieldName" : "priority",
                       "fieldLabel" : "Priority",
                       "i18NLabel" : "Priority",
-                      "type" : "text"
+                      "type" : [ "text" ]
                     }, {
                       "availableConditions" : [ {
                         "condition" : "is",
@@ -396,7 +373,7 @@
                       "fieldName" : "channel",
                       "fieldLabel" : "Mode",
                       "i18NLabel" : "Mode",
-                      "type" : "text"
+                      "type" : [ "text" ]
                     }, {
                       "availableConditions" : [ {
                         "condition" : "is",
@@ -426,7 +403,7 @@
                       "fieldName" : "classification",
                       "fieldLabel" : "Classification",
                       "i18NLabel" : "Classification",
-                      "type" : "text"
+                      "type" : [ "text" ]
                     } ]
                   } ]
                 }
@@ -437,6 +414,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

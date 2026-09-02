@@ -1,0 +1,54 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "ArticleExternalImageUrlResponse",
+    "version" : "1.0.0"
+  },
+  "paths" : { },
+  "components" : {
+    "schemas" : {
+      "externalUrlResponseObject" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "responseMessage" : {
+            "description" : "Result message",
+            "type" : [ "string", "null" ],
+            "enum" : [ "Success", "Bad Request", "Inaccessible", "Unauthorised Access", "Not Found", "Size Exceeded" ]
+          },
+          "url" : {
+            "description" : "Original external image URL",
+            "type" : [ "string", "null" ],
+            "maxLength" : 500,
+            "minLength" : 0,
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+          },
+          "responseCode" : {
+            "description" : "HTTP response code for the upload operation",
+            "type" : [ "string", "null" ],
+            "enum" : [ "200", "400", "401", "403", "404", "422" ]
+          }
+        },
+        "required" : [ "responseCode", "responseMessage", "url" ]
+      },
+      "resultJsonArray" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/externalUrlResponseObject"
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "ArticleExternalImageUrlResponse"
+}

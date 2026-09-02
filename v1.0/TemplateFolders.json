@@ -2,54 +2,76 @@
   "openapi" : "3.1.0",
   "info" : {
     "title" : "TemplateFolders",
+    "description" : "A template folder is a pack of email templates. Template folders help organize and group email templates for easy access and management within the help desk portal.",
     "version" : "1.0.0"
   },
   "paths" : {
     "/api/v1/templateFolders" : {
       "get" : {
         "tags" : [ "TemplateFolders" ],
-        "summary" : "Listing Template Folders",
-        "description" : "List all Template Folders in alphabetical order",
+        "summary" : "Get Template Folders",
+        "description" : "Retrieves a list of template folders for the specified department, with pagination support.",
         "operationId" : "getTemplateFolders",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "departmentId",
           "in" : "query",
-          "description" : "the corresponding department to be fetched",
+          "description" : "Unique ID of the department for which template folders must be fetched.",
           "required" : true,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : "string",
             "format" : "int64",
-            "description" : "the corresponding department to be fetched",
             "pattern" : "([0-9]+)"
           }
         }, {
           "name" : "limit",
           "in" : "query",
-          "description" : "number of folders to be retrieved Range 1-50, @DEFAULT 50@",
+          "description" : "Number of template folders to retrieve.",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "integer" ],
             "format" : "int32",
-            "description" : "number of folders to be retrieved Range 1-50, @DEFAULT 50@",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "maximum" : 1000,
+            "default" : 1000
           }
         }, {
           "name" : "from",
           "in" : "query",
-          "description" : "from index, @DEFAULT 1@",
+          "description" : "Index number from which template folders must be fetched.",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "integer" ],
             "format" : "int32",
-            "description" : "from index, @DEFAULT 1@",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "maximum" : 1000,
+            "default" : 1
           }
+        }, {
+          "name" : "include",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "description" : "Possible values: smsTemplatesCount, emailTemplatesCount.",
+              "maxLength" : 100,
+              "enum" : [ "smsTemplatesCount", "emailTemplatesCount" ]
+            },
+            "maxItems" : 2
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Additional meta information to include in the response. Possible values: smsTemplatesCount, emailTemplatesCount. Multiple values can be provided by separating them with commas."
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -62,15 +84,16 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.templates.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
       },
       "post" : {
         "tags" : [ "TemplateFolders" ],
-        "summary" : "Adding a Template Folder",
-        "description" : "Adding a Template Folder",
+        "summary" : "Create Template Folder",
+        "description" : "Creates a new template folder.",
         "operationId" : "addTemplateFolder",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -86,7 +109,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.CREATE" ]
+          "iam-oauth2-schema" : [ "Desk.settings.CREATE", "Desk.templates.CREATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -94,11 +117,23 @@
     "/api/v1/templateFolders/{folderId}" : {
       "get" : {
         "tags" : [ "TemplateFolders" ],
-        "summary" : "Getting a single Template Folder",
-        "description" : "Listing  a particular Template Folder",
+        "summary" : "Get Template Folder",
+        "description" : "Retrieves details of a specific template folder.",
         "operationId" : "getTemplateFolder",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/folderId"
+          "name" : "folderId",
+          "in" : "path",
+          "description" : "Unique ID of the template folder.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "maxLength" : 100
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -108,17 +143,29 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.templates.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
       },
       "put" : {
         "tags" : [ "TemplateFolders" ],
-        "summary" : "Updating a Template Folder",
-        "description" : "Updating a Template Folder",
+        "summary" : "Update Template Folder",
+        "description" : "Updates an existing template folder.",
         "operationId" : "updateTemplateFolder",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/folderId"
+          "name" : "folderId",
+          "in" : "path",
+          "description" : "Unique ID of the template folder.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "maxLength" : 100
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -134,7 +181,45 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.settings.UPDATE", "Desk.templates.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      },
+      "patch" : {
+        "tags" : [ "TemplateFolders" ],
+        "summary" : "Update Template Folder",
+        "description" : "Updates an existing template folder.",
+        "operationId" : "patchTemplateFolder",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "folderId",
+          "in" : "path",
+          "description" : "Unique ID of the template folder.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "maxLength" : 100
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/templateFolderjson"
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/templateFolderResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.UPDATE", "Desk.templates.UPDATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       },
@@ -144,7 +229,18 @@
         "description" : "Delete a Template Folder",
         "operationId" : "deleteTemplateFolder",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/folderId"
+          "name" : "folderId",
+          "in" : "path",
+          "description" : "Unique ID of the template folder.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "maxLength" : 100
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -154,7 +250,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.DELETE" ]
+          "iam-oauth2-schema" : [ "Desk.settings.DELETE", "Desk.templates.DELETE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -162,45 +258,109 @@
   },
   "components" : {
     "schemas" : {
+      "templatesCount" : {
+        "type" : [ "array" ],
+        "items" : {
+          "type" : [ "object" ],
+          "properties" : {
+            "templateType" : {
+              "type" : [ "string" ],
+              "description" : "Type of template.",
+              "enum" : [ "Email", "SMS" ]
+            },
+            "count" : {
+              "type" : [ "object" ],
+              "description" : "Module-wise count of templates in the folder.",
+              "properties" : {
+                "tickets" : {
+                  "description" : "Count of templates for the Tickets module.",
+                  "$ref" : "#/components/schemas/count"
+                },
+                "calls" : {
+                  "description" : "Count of templates for the Calls module.",
+                  "$ref" : "#/components/schemas/count"
+                },
+                "solutions" : {
+                  "description" : "Count of templates for the Solutions (Knowledge Base) module.",
+                  "$ref" : "#/components/schemas/count"
+                },
+                "accounts" : {
+                  "description" : "Count of templates for the Accounts module.",
+                  "$ref" : "#/components/schemas/count"
+                },
+                "tasks" : {
+                  "description" : "Count of templates for the Tasks module.",
+                  "$ref" : "#/components/schemas/count"
+                },
+                "contacts" : {
+                  "description" : "Count of templates for the Contacts module.",
+                  "$ref" : "#/components/schemas/count"
+                },
+                "events" : {
+                  "description" : "Count of templates for the Events module.",
+                  "$ref" : "#/components/schemas/count"
+                },
+                "products" : {
+                  "description" : "Count of templates for the Products module.",
+                  "$ref" : "#/components/schemas/count"
+                }
+              },
+              "required" : [ "events", "products", "contacts", "tasks", "accounts", "solutions", "calls", "tickets" ]
+            }
+          },
+          "required" : [ "templateType", "count" ]
+        }
+      },
+      "count" : {
+        "type" : "string",
+        "pattern" : "([0-9]+)",
+        "format" : "int32"
+      },
       "templateFolderResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "folderDesc" : {
             "type" : [ "string", "null" ],
+            "description" : "Description of the template folder.",
             "maxLength" : 32000,
             "minLength" : 0
           },
           "modifiedOn" : {
             "type" : [ "string", "null" ],
+            "description" : "Time at which the template folder was last modified.",
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "createdBy" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "null" ],
+            "description" : "Unique ID of the user who created the template folder.",
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "folderAccessDetails" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
+            "description" : "Access configuration of the template folder.",
             "additionalProperties" : false,
             "maxProperties" : 5,
             "minProperties" : 5,
             "properties" : {
               "teams" : {
-                "type" : [ "null", "array" ],
+                "type" : [ "array", "null" ],
+                "description" : "Teams with access to the folder.",
                 "items" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "uniqueItems" : false
               },
               "roles" : {
-                "type" : [ "null", "array" ],
+                "type" : [ "array", "null" ],
+                "description" : "Roles with access to the folder.",
                 "items" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
@@ -208,23 +368,24 @@
               },
               "type" : {
                 "type" : [ "string", "null" ],
-                "enum" : [ "onlyMe", "allAgents", "restrictedAccess" ],
-                "maxLength" : 100,
-                "minLength" : 0
+                "description" : "Accessibility type of the template folder.",
+                "enum" : [ "onlyMe", "allAgents", "restrictedAccess" ]
               },
               "rolesAndSubordinates" : {
-                "type" : [ "null", "array" ],
+                "type" : [ "array", "null" ],
+                "description" : "Roles and subordinates with access to the folder.",
                 "items" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "uniqueItems" : false
               },
               "agents" : {
-                "type" : [ "null", "array" ],
+                "type" : [ "array", "null" ],
+                "description" : "Agents with access to the folder.",
                 "items" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
@@ -234,37 +395,45 @@
             "required" : [ "agents", "roles", "rolesAndSubordinates", "teams", "type" ]
           },
           "departmentId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "null" ],
+            "description" : "Unique ID of the department associated with the folder.",
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "modifiedBy" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "null" ],
+            "description" : "Unique ID of the user who last modified the template folder.",
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "folderName" : {
             "type" : [ "string", "null" ],
+            "description" : "Name of the template folder.",
             "maxLength" : 250,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "category" : {
             "type" : [ "string", "null" ],
-            "enum" : [ "CUSTOM_FOLDER", "DEFAULT_FOLDER" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "description" : "Category of the template folder.",
+            "enum" : [ "CUSTOM_FOLDER", "DEFAULT_FOLDER" ]
           },
           "createdOn" : {
             "type" : [ "string", "null" ],
+            "description" : "Time at which the template folder was created.",
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "folderId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "null" ],
+            "description" : "Unique ID of the template folder.",
             "format" : "int64",
             "pattern" : "([0-9]+)"
+          },
+          "templatesCount" : {
+            "description" : "Template count details grouped by template type.",
+            "$ref" : "#/components/schemas/templatesCount"
           }
         },
         "required" : [ "category", "createdBy", "createdOn", "departmentId", "folderAccessDetails", "folderDesc", "folderId", "folderName", "modifiedBy", "modifiedOn" ]
@@ -276,9 +445,9 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "array" ],
+              "type" : [ "array", "null" ],
               "items" : {
-                "$ref" : "./TemplateFolders.json#/components/schemas/templateFolderResponse"
+                "$ref" : "#/components/schemas/templateFolderResponse"
               }
             },
             "examples" : {
@@ -290,7 +459,7 @@
                   "folderAccessDetails" : {
                     "teams" : null,
                     "roles" : null,
-                    "type" : "restrictedAccess",
+                    "type" : [ "restrictedAccess" ],
                     "rolesAndSubordinates" : null,
                     "agents" : [ "11000000038001", "11000000058011" ]
                   },
@@ -320,7 +489,7 @@
                   "folderAccessDetails" : {
                     "teams" : null,
                     "roles" : null,
-                    "type" : "restrictedAccess",
+                    "type" : [ "restrictedAccess" ],
                     "rolesAndSubordinates" : null,
                     "agents" : [ "11000000016526", "11000000038001" ]
                   },
@@ -350,7 +519,7 @@
                   "folderAccessDetails" : {
                     "teams" : null,
                     "roles" : null,
-                    "type" : "allAgents",
+                    "type" : [ "allAgents" ],
                     "rolesAndSubordinates" : null,
                     "agents" : null
                   },
@@ -381,7 +550,7 @@
                   "folderAccessDetails" : {
                     "teams" : null,
                     "roles" : null,
-                    "type" : "allAgents",
+                    "type" : [ "allAgents" ],
                     "rolesAndSubordinates" : null,
                     "agents" : null
                   },
@@ -411,7 +580,7 @@
                   "folderAccessDetails" : {
                     "teams" : null,
                     "roles" : null,
-                    "type" : "allAgents",
+                    "type" : [ "allAgents" ],
                     "rolesAndSubordinates" : null,
                     "agents" : null
                   },
@@ -441,7 +610,7 @@
                   "folderAccessDetails" : {
                     "teams" : null,
                     "roles" : null,
-                    "type" : "allAgents",
+                    "type" : [ "allAgents" ],
                     "rolesAndSubordinates" : null,
                     "agents" : null
                   },
@@ -471,7 +640,7 @@
                   "folderAccessDetails" : {
                     "teams" : null,
                     "roles" : null,
-                    "type" : "allAgents",
+                    "type" : [ "allAgents" ],
                     "rolesAndSubordinates" : null,
                     "agents" : null
                   },
@@ -501,7 +670,7 @@
                   "folderAccessDetails" : {
                     "teams" : null,
                     "roles" : null,
-                    "type" : "restrictedAccess",
+                    "type" : [ "restrictedAccess" ],
                     "rolesAndSubordinates" : null,
                     "agents" : [ "11000000016526", "11000000038001" ]
                   },
@@ -535,44 +704,50 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "folderDesc" : {
                   "type" : [ "string", "null" ],
+                  "description" : "Description of the template folder.",
                   "maxLength" : 32000,
                   "minLength" : 0
                 },
                 "modifiedOn" : {
                   "type" : [ "string", "null" ],
+                  "description" : "Time at which the template folder was last modified.",
                   "maxLength" : 100,
                   "minLength" : 0,
                   "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
                 },
                 "createdBy" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "null" ],
+                  "description" : "Unique ID of the user who created the template folder.",
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "folderAccessDetails" : {
-                  "type" : [ "null", "object" ],
+                  "type" : [ "object", "null" ],
+                  "description" : "Access configuration of the template folder.",
                   "additionalProperties" : false,
                   "maxProperties" : 5,
                   "minProperties" : 5,
                   "properties" : {
                     "teams" : {
-                      "type" : [ "null", "array" ],
+                      "type" : [ "array", "null" ],
+                      "description" : "Teams with access to the folder.",
                       "items" : {
-                        "type" : [ "string", "null", "integer" ],
+                        "type" : [ "string", "null" ],
                         "format" : "int64",
                         "pattern" : "([0-9]+)"
                       },
                       "uniqueItems" : false
                     },
                     "roles" : {
-                      "type" : [ "null", "array" ],
+                      "type" : [ "array", "null" ],
+                      "description" : "Roles with access to the folder.",
                       "items" : {
-                        "type" : [ "string", "null", "integer" ],
+                        "type" : [ "string", "null" ],
                         "format" : "int64",
                         "pattern" : "([0-9]+)"
                       },
@@ -580,23 +755,24 @@
                     },
                     "type" : {
                       "type" : [ "string", "null" ],
-                      "enum" : [ "onlyMe", "allAgents", "restrictedAccess" ],
-                      "maxLength" : 100,
-                      "minLength" : 0
+                      "description" : "Accessibility type of the template folder.",
+                      "enum" : [ "onlyMe", "allAgents", "restrictedAccess" ]
                     },
                     "rolesAndSubordinates" : {
-                      "type" : [ "null", "array" ],
+                      "type" : [ "array", "null" ],
+                      "description" : "Roles and subordinates with access to the folder.",
                       "items" : {
-                        "type" : [ "string", "null", "integer" ],
+                        "type" : [ "string", "null" ],
                         "format" : "int64",
                         "pattern" : "([0-9]+)"
                       },
                       "uniqueItems" : false
                     },
                     "agents" : {
-                      "type" : [ "null", "array" ],
+                      "type" : [ "array", "null" ],
+                      "description" : "Agents with access to the folder.",
                       "items" : {
-                        "type" : [ "string", "null", "integer" ],
+                        "type" : [ "string", "null" ],
                         "format" : "int64",
                         "pattern" : "([0-9]+)"
                       },
@@ -606,35 +782,39 @@
                   "required" : [ "agents", "roles", "rolesAndSubordinates", "teams", "type" ]
                 },
                 "departmentId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "null" ],
+                  "description" : "Unique ID of the department associated with the folder.",
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "modifiedBy" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "null" ],
+                  "description" : "Unique ID of the user who last modified the template folder.",
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "folderName" : {
                   "type" : [ "string", "null" ],
+                  "description" : "Name of the template folder.",
                   "maxLength" : 250,
                   "minLength" : 0,
                   "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                 },
                 "category" : {
                   "type" : [ "string", "null" ],
-                  "enum" : [ "CUSTOM_FOLDER", "DEFAULT_FOLDER" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "description" : "Category of the template folder.",
+                  "enum" : [ "CUSTOM_FOLDER", "DEFAULT_FOLDER" ]
                 },
                 "createdOn" : {
                   "type" : [ "string", "null" ],
+                  "description" : "Time at which the template folder was created.",
                   "maxLength" : 100,
                   "minLength" : 0,
                   "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
                 },
                 "folderId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "null" ],
+                  "description" : "Unique ID of the template folder.",
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 }
@@ -648,7 +828,7 @@
                   "modifiedOn" : null,
                   "createdBy" : null,
                   "folderAccessDetails" : {
-                    "type" : "allAgents"
+                    "type" : [ "allAgents" ]
                   },
                   "departmentId" : "1892000000082069",
                   "modifiedBy" : null,
@@ -663,76 +843,67 @@
         }
       }
     },
-    "parameters" : {
-      "folderId" : {
-        "name" : "folderId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      }
-    },
     "requestBodies" : {
       "templateFolderjson" : {
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "folderDesc" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "maxLength" : 32000,
-                  "minLength" : 0
+                  "minLength" : 0,
+                  "description" : "Description of the folder."
                 },
                 "folderAccessDetails" : {
-                  "type" : [ "null", "object" ],
+                  "type" : [ "object" ],
                   "additionalProperties" : false,
                   "maxProperties" : 5,
                   "minProperties" : 5,
+                  "description" : "Access configuration of the folder.",
                   "properties" : {
                     "teams" : {
-                      "type" : [ "null", "array" ],
+                      "type" : [ "array" ],
+                      "description" : "Teams with access to the folder.",
                       "items" : {
-                        "type" : [ "string", "null", "integer" ],
+                        "type" : "string",
                         "format" : "int64",
                         "pattern" : "([0-9]+)"
                       },
                       "uniqueItems" : false
                     },
                     "roles" : {
-                      "type" : [ "null", "array" ],
+                      "type" : [ "array" ],
+                      "description" : "Roles with access to the folder.",
                       "items" : {
-                        "type" : [ "string", "null", "integer" ],
+                        "type" : "string",
                         "format" : "int64",
                         "pattern" : "([0-9]+)"
                       },
                       "uniqueItems" : false
                     },
                     "type" : {
-                      "type" : [ "string", "null" ],
+                      "type" : [ "string" ],
                       "enum" : [ "onlyMe", "allAgents", "restrictedAccess" ],
-                      "maxLength" : 100,
-                      "minLength" : 0
+                      "description" : "Accessibility type of the template folder. Possible values: allAgents, onlyMe, restrictedAccess. Note: ID is necessary for onlyMe and restrictedAccess."
                     },
                     "rolesAndSubordinates" : {
-                      "type" : [ "null", "array" ],
+                      "type" : [ "array" ],
+                      "description" : "Roles and subordinates with access to the folder.",
                       "items" : {
-                        "type" : [ "string", "null", "integer" ],
+                        "type" : "string",
                         "format" : "int64",
                         "pattern" : "([0-9]+)"
                       },
                       "uniqueItems" : false
                     },
                     "agents" : {
-                      "type" : [ "null", "array" ],
+                      "type" : [ "array" ],
+                      "description" : "Agents with access to the folder.",
                       "items" : {
-                        "type" : [ "string", "null", "integer" ],
+                        "type" : "string",
                         "format" : "int64",
                         "pattern" : "([0-9]+)"
                       },
@@ -742,15 +913,17 @@
                   "required" : [ "agents", "roles", "rolesAndSubordinates", "teams", "type" ]
                 },
                 "departmentId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string" ],
                   "format" : "int64",
-                  "pattern" : "([0-9]+)"
+                  "pattern" : "([0-9]+)",
+                  "description" : "Unique ID of the department to associate with the folder."
                 },
                 "folderName" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "maxLength" : 250,
                   "minLength" : 0,
-                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+                  "description" : "Name of the template folder."
                 }
               }
             },
@@ -768,57 +941,61 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "folderDesc" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 32000,
-                  "minLength" : 0
+                  "type" : [ "string" ],
+                  "description" : "Description of the template folder.",
+                  "maxLength" : 32000
                 },
                 "folderAccessDetails" : {
-                  "type" : [ "null", "object" ],
+                  "type" : [ "object" ],
                   "additionalProperties" : false,
                   "maxProperties" : 5,
                   "minProperties" : 5,
+                  "description" : "Access configuration of the folder.",
                   "properties" : {
                     "teams" : {
-                      "type" : [ "null", "array" ],
+                      "type" : [ "array" ],
+                      "description" : "Teams with access to the folder.",
                       "items" : {
-                        "type" : [ "string", "null", "integer" ],
+                        "type" : "string",
                         "format" : "int64",
                         "pattern" : "([0-9]+)"
                       },
                       "uniqueItems" : false
                     },
                     "roles" : {
-                      "type" : [ "null", "array" ],
+                      "type" : [ "array" ],
+                      "description" : "Roles with access to the folder.",
                       "items" : {
-                        "type" : [ "string", "null", "integer" ],
+                        "type" : "string",
                         "format" : "int64",
                         "pattern" : "([0-9]+)"
                       },
                       "uniqueItems" : false
                     },
                     "type" : {
-                      "type" : [ "string", "null" ],
+                      "type" : [ "string" ],
                       "enum" : [ "onlyMe", "allAgents", "restrictedAccess" ],
-                      "maxLength" : 100,
-                      "minLength" : 0
+                      "description" : "Accessibility type of the template folder. Possible values: allAgents, onlyMe, restrictedAccess. Note: ID is necessary for onlyMe and restrictedAccess."
                     },
                     "rolesAndSubordinates" : {
-                      "type" : [ "null", "array" ],
+                      "type" : [ "array" ],
+                      "description" : "Roles and subordinates with access to the folder.",
                       "items" : {
-                        "type" : [ "string", "null", "integer" ],
+                        "type" : "string",
                         "format" : "int64",
                         "pattern" : "([0-9]+)"
                       },
                       "uniqueItems" : false
                     },
                     "agents" : {
-                      "type" : [ "null", "array" ],
+                      "type" : [ "array" ],
+                      "description" : "Agents with access to the folder.",
                       "items" : {
-                        "type" : [ "string", "null", "integer" ],
+                        "type" : "string",
                         "format" : "int64",
                         "pattern" : "([0-9]+)"
                       },
@@ -828,15 +1005,16 @@
                   "required" : [ "agents", "roles", "rolesAndSubordinates", "teams", "type" ]
                 },
                 "departmentId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string" ],
                   "format" : "int64",
-                  "pattern" : "([0-9]+)"
+                  "pattern" : "([0-9]+)",
+                  "description" : "Unique ID of the department to associate with the folder."
                 },
                 "folderName" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "maxLength" : 250,
-                  "minLength" : 0,
-                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+                  "description" : "Name of the template folder."
                 }
               },
               "required" : [ "departmentId", "folderAccessDetails", "folderName" ]
@@ -846,7 +1024,7 @@
                 "value" : {
                   "folderDesc" : "contains details",
                   "folderAccessDetails" : {
-                    "type" : "allAgents"
+                    "type" : [ "allAgents" ]
                   },
                   "departmentId" : "4000000007039",
                   "folderName" : "New my Folder"
@@ -858,6 +1036,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

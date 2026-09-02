@@ -1,37 +1,48 @@
 {
   "openapi" : "3.1.0",
+  "x-mcp-group" : [ "IM Channels" ],
   "info" : {
     "title" : "IM_Channel",
-    "version" : "1.0.0"
+    "version" : "1.0.0",
+    "description" : "An IM channel refers to the platform or medium through which a message is sent or received. In IM, a channel is created using configuration parameters, which are settings that can be adjusted to customize the behavior of the channel."
   },
   "paths" : {
     "/api/v1/im/channels/{id}" : {
       "get" : {
         "tags" : [ "IM_Channel" ],
-        "summary" : "Get a Channel",
-        "description" : "This API fetches details of an channel.",
+        "summary" : "Get Channel",
+        "description" : "Retrieves details of a specific IM channel.",
         "operationId" : "getIMChannel",
+        "x-mcp-group" : [ "Initiate Session" ],
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
-          "description" : "Additional information related to the channel. Allowed values are @preference@, @creator@",
+          "description" : "Additional information related to the channel. Possible values: preference, creator.",
           "required" : false,
-          "style" : "simple",
+          "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "null", "array" ],
-            "description" : "Additional information related to the channel. Allowed values are @preference@, @creator@",
-            "items" : {
-              "type" : [ "string", "null" ],
-              "enum" : [ "preference", "creator" ],
-              "maxLength" : 100,
-              "minLength" : 0
-            },
-            "maxItems" : 2,
-            "uniqueItems" : true
+            "type" : "string",
+            "description" : "Additional information related to the channel. Possible values: preference, creator.",
+            "pattern" : "^(preference|creator)(,(preference|creator))?$",
+            "example" : "creator",
+            "maxLength" : 100,
+            "minLength" : 0
           }
         }, {
-          "$ref" : "#/components/parameters/id"
+          "name" : "id",
+          "in" : "path",
+          "description" : "Unique ID of the channel.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "maxLength" : 100,
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -61,43 +72,139 @@
     "/api/v1/im/channels" : {
       "get" : {
         "tags" : [ "IM_Channel" ],
-        "summary" : "List Channels",
-        "description" : "This API lists all channels",
+        "summary" : "Get Channels",
+        "description" : "Retrieves a list of channels, with pagination support.",
         "operationId" : "getIMChannelsList",
+        "x-mcp-group" : [ "Initiate Session" ],
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
-          "description" : "Additional information related to the channels.If passed in the param, then these values will be appended in the channel response. Allowed values are @preference@,@creator@,@meta@,@configParams@",
-          "required" : false,
-          "style" : "simple",
-          "explode" : true,
-          "schema" : {
-            "type" : [ "null", "array" ],
-            "description" : "Additional information related to the channels.If passed in the param, then these values will be appended in the channel response. Allowed values are @preference@,@creator@,@meta@,@configParams@",
-            "items" : {
-              "type" : [ "string", "null" ],
-              "enum" : [ "preference", "creator" ],
-              "maxLength" : 100,
-              "minLength" : 0
-            },
-            "maxItems" : 2,
-            "uniqueItems" : true
-          }
-        }, {
-          "name" : "departmentId",
-          "in" : "query",
-          "description" : "Department Id for which channels to be fetched",
+          "description" : "Additional information to include in the channel response. Possible values: preference, creator, meta, configParams.",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : "string",
+            "description" : "Additional information to include in the channel response. Possible values: preference, creator, meta, configParams.",
+            "pattern" : "^(creator|preference|meta|configParams)(,(creator|preference|meta|configParams)){0,3}$",
+            "example" : "creator,configParams,meta",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "Unique ID of the department from which channels must be fetched.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
             "format" : "int64",
-            "description" : "Department Id for which channels to be fetched",
+            "description" : "Unique ID of the department from which channels must be fetched.",
             "pattern" : "([0-9]+)"
           }
         }, {
-          "$ref" : "#/components/parameters/integrationServiceId"
+          "name" : "integrationServiceId",
+          "in" : "query",
+          "description" : "Integration service ID to filter channels. Possible values: TELEGRAM, TWILIO, IM_TALK, LINE, WECHAT, WECOM, WHATSAPP, FACEBOOKMESSENGER, INSTAGRAM.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "Integration service ID to filter channels. Possible values: TELEGRAM, TWILIO, IM_TALK, LINE, WECHAT, WECOM, WHATSAPP, FACEBOOKMESSENGER, INSTAGRAM.",
+            "enum" : [ "TELEGRAM", "TWILIO", "IM_TALK", "LINE", "WECHAT", "WECOM", "WHATSAPP", "FACEBOOKMESSENGER", "INSTAGRAM" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "[a-zA-Z0-9_]*$"
+          }
+        }, {
+          "name" : "isSandBox",
+          "in" : "query",
+          "description" : "Filters sandbox channels. Possible values: true, false.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "boolean",
+            "description" : "Filters sandbox channels. Possible values: true, false."
+          }
+        }, {
+          "name" : "isActive",
+          "in" : "query",
+          "description" : "Filters active channels. Possible values: true, false.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "boolean",
+            "description" : "Filters active channels. Possible values: true, false."
+          }
+        }, {
+          "name" : "includeDeleted",
+          "in" : "query",
+          "description" : "Includes deleted channels in the response. Possible values: true, false.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "boolean",
+            "description" : "Includes deleted channels in the response. Possible values: true, false."
+          }
+        }, {
+          "name" : "configName",
+          "in" : "query",
+          "description" : "Filters channels by the given config parameter name.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "Filters channels by the given config parameter name.",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "configValue",
+          "in" : "query",
+          "description" : "Filters channels by the given config parameter value.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "Filters channels by the given config parameter value.",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "excludeConfigName",
+          "in" : "query",
+          "description" : "Filters channels that do not have the given config parameter name.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "Filters channels that do not have the given config parameter name.",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "excludeConfigValue",
+          "in" : "query",
+          "description" : "Filters channels that do not have the given config parameter value.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "Filters channels that do not have the given config parameter value.",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -107,10 +214,55 @@
           },
           "200" : {
             "$ref" : "#/components/responses/getIMChannelsList"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
           }
         },
         "security" : [ {
           "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.InstantMessages.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      },
+      "post" : {
+        "tags" : [ "IM_Channel" ],
+        "summary" : "Create an IM channel",
+        "description" : "Creates a new IM channel for the org. Required fields are name and integrationServiceId. Optional fields include configParams (integration-specific credentials), meta, defaultBotId, isSandBox. If isSandBox is omitted, it defaults to false.\n\nFor WhatsApp production channels, obtain the PHONE_NUMBER value for configParams by calling GET /api/v1/im/integrationServices/WHATSAPP/details to list WABA accounts, then GET /api/v1/im/integrationServices/WHATSAPP/phonenumbers with query parameter wabaId to list phone numbers for the chosen WABA. If these APIs return no data, complete Facebook embedded signup from the Desk UI before retrying channel creation.\n\nAfter creation, associate the channel with a Desk department using PATCH /api/v1/im/channels/id/department.",
+        "operationId" : "createIMChannel",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/createIMChannel"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/getIMChannel"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.basic.CREATE", "Desk.qaautomation.CREATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -118,6 +270,81 @@
   },
   "components" : {
     "schemas" : {
+      "updater" : {
+        "type" : [ "null", "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "lastName" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "minLength" : 0
+          },
+          "agent" : {
+            "type" : [ "boolean", "null" ]
+          },
+          "displayName" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "externalId" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "emailId" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+          },
+          "type" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "END_USER", "AGENT", "TEAM", "TICKET", "ACTIVITY" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "zuid" : {
+            "type" : [ "string", "null", "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "photoURL" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+          },
+          "firstName" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "minLength" : 0
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "roleName" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "id" : {
+            "type" : [ "string", "null", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "email" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+          }
+        },
+        "required" : [ "agent", "displayName", "email", "emailId", "externalId", "firstName", "id", "lastName", "name", "photoURL", "roleName", "type", "zuid" ]
+      },
       "getComputedOption" : {
         "type" : [ "null", "object" ],
         "additionalProperties" : false,
@@ -145,30 +372,37 @@
       "getConfigParam" : {
         "type" : [ "null", "object" ],
         "additionalProperties" : false,
+        "description" : "Configuration property with which the channel is created. Config params are specific to the integration.",
         "properties" : {
           "isRequired" : {
-            "type" : [ "boolean", "null" ]
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the configuration parameter is required. Possible values: true = required, false = not required."
           },
           "modifiedTime" : {
             "type" : [ "string", "null" ],
+            "description" : "Time at which the configuration parameter was last modified.",
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "isDeprecated" : {
-            "type" : [ "boolean", "null" ]
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the configuration parameter is deprecated. Possible values: true = deprecated, false = not deprecated."
           },
           "isSecured" : {
-            "type" : [ "boolean", "null" ]
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the configuration parameter is secured. Possible values: true = secured, false = not secured."
           },
           "defaultValue" : {
             "type" : [ "string", "null" ],
+            "description" : "Default value of the configuration parameter.",
             "maxLength" : 500,
             "minLength" : 0,
             "pattern" : "(null|^$|NULL|[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+)"
           },
           "parentParams" : {
             "type" : [ "null", "array" ],
+            "description" : "Parent parameter(s) of the configuration parameter.",
             "items" : {
               "type" : [ "string", "null" ],
               "maxLength" : 100,
@@ -179,45 +413,54 @@
           },
           "label" : {
             "type" : [ "string", "null" ],
+            "description" : "Label of the configuration parameter.",
             "maxLength" : 500,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "type" : {
             "type" : [ "string", "null" ],
+            "description" : "Type of the configuration parameter.",
             "enum" : [ "STRING", "NUMBER", "URL", "EMAIL", "PHONE", "OPTIONS", "PASSWORD", "DATE", "TIME", "DATETIME", "SYSTEM_DEFINED", "OPTIONS_COMPUTED", "BOOLEAN" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "uuid" : {
             "type" : [ "string", "null" ],
+            "description" : "UUID of the configuration parameter.",
             "maxLength" : 100,
             "minLength" : 0
           },
           "isInternal" : {
-            "type" : [ "boolean", "null" ]
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the configuration parameter is internal. Possible values: true = internal, false = not internal."
           },
           "name" : {
             "type" : [ "string", "null" ],
+            "description" : "Name of the configuration parameter.",
             "maxLength" : 500,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "options" : {
+            "description" : "Available option(s) for the configuration parameter.",
             "$ref" : "./IM_Channel.json#/components/schemas/listOfConfigParamsComputedOptions"
           },
           "id" : {
             "type" : [ "string", "null", "integer" ],
             "format" : "int64",
+            "description" : "Unique ID of the configuration parameter.",
             "pattern" : "([0-9]+)"
           },
           "value" : {
             "type" : [ "string", "null" ],
+            "description" : "Value of the configuration parameter.",
             "maxLength" : 100,
             "minLength" : 0
           },
           "maxLen" : {
             "type" : [ "string", "null" ],
+            "description" : "Maximum length allowed for the configuration parameter value.",
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "[0-9]+"
@@ -227,6 +470,7 @@
       },
       "listOfConfigParams" : {
         "type" : [ "null", "array" ],
+        "description" : "Configuration properties with which the channel is created. Config params are specific to the integration.",
         "items" : {
           "$ref" : "./IM_Channel.json#/components/schemas/getConfigParam"
         }
@@ -234,31 +478,37 @@
       "agent" : {
         "type" : [ "null", "object" ],
         "additionalProperties" : false,
+        "description" : "Desk agent assigned to handle the IM channel.",
         "properties" : {
           "photoURL" : {
             "type" : [ "string", "null" ],
+            "description" : "URL of the agent profile photo.",
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "name" : {
             "type" : [ "string", "null" ],
+            "description" : "Display name of the agent.",
             "maxLength" : 100,
             "minLength" : 0
           },
           "id" : {
             "type" : [ "string", "null", "integer" ],
             "format" : "int64",
+            "description" : "Unique Desk agent ID.",
             "pattern" : "([0-9]+)"
           },
           "type" : {
             "type" : [ "string", "null" ],
+            "description" : "Actor type. Allowed values: END_USER, AGENT, BOT.",
             "enum" : [ "END_USER", "AGENT", "BOT" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "email" : {
             "type" : [ "string", "null" ],
+            "description" : "Email address of the agent.",
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
@@ -266,62 +516,103 @@
           "zuid" : {
             "type" : [ "string", "null", "integer" ],
             "format" : "int32",
+            "description" : "Zoho user ID of the agent.",
             "pattern" : "([0-9]+)"
           }
         },
         "required" : [ "email", "id", "name", "photoURL", "type", "zuid" ]
       },
       "IMChannelMeta" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object" ],
         "additionalProperties" : false,
+        "description" : "Channel metadata name-value pair.",
         "properties" : {
           "name" : {
-            "type" : [ "string", "null" ],
+            "type" : [ "string" ],
+            "description" : "Metadata key name",
+            "enum" : [ "WHATSAPP_SETTINGS_BACKUP", "ADMIN_TOKEN_MAIN", "ADMIN_TOKEN_MAIN_EXPIRY", "NEW_PASSWORD", "ADMIN_TOKEN_DR", "ADMIN_TOKEN_DR_EXPIRY", "ONBOARDING_DATA", "LINE_BASIC_ID", "WECHAT_UNIVERSAL_LINK", "TWO_STEP_VERIFICATION", "WHATSAPP_OBA_REQUEST", "FACEBOOK_PAGE_NETWORKID", "CHANNEL_CUSTOMISATION", "INSTAGRAM_PAGE_NETWORKID", "WECOM_MESSSAGE_CURSOR", "WECOM_UNIVERSAL_LINK", "CO_EXISTENCE" ],
             "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "minLength" : 0
           },
           "value" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 100,
+            "type" : [ "string" ],
+            "description" : "Metadata value for the given name.",
+            "maxLength" : 65535,
             "minLength" : 0
           }
         },
         "required" : [ "name", "value" ]
       },
       "listOfChannelMeta" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array" ],
+        "description" : "Metadata entries associated with the channel.",
         "items" : {
           "$ref" : "./IM_Channel.json#/components/schemas/IMChannelMeta"
         }
       },
-      "metaVariableJSON" : {
-        "type" : [ "null", "object" ],
+      "configParam_input_add" : {
+        "type" : "object",
         "additionalProperties" : false,
+        "description" : "Configuration parameter name and value for channel create or update.",
         "properties" : {
           "name" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
+            "description" : "Configuration parameter name (e.g. BOT_AUTH_TOKEN, WABA_ID, PHONE_NUMBER).",
+            "enum" : [ "PHONE_NUMBER", "WABA_ID", "SKIP_EMBEDDED_SIGNUP", "CHANNEL_ID", "CHANNEL_SECRET", "FACEBOOK_USER", "FACEBOOK_PAGE", "INSTAGRAM_USER", "INSTAGRAM_BUSINESS_ACCOUNT", "ORIGINAL_ID", "APP_ID", "APP_SECRET", "TOKEN", "AES_KEY", "WECHAT_OPEN_KFID", "WECOM_CORP_ID", "BOT_AUTH_TOKEN" ],
             "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
-          },
-          "id" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "minLength" : 1,
+            "pattern" : "([a-zA-Z0-9_]+)"
           },
           "value" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "type" : "string",
+            "description" : "Value for the configuration parameter.",
+            "maxLength" : 5000,
+            "minLength" : 1
           }
         },
-        "required" : [ "id", "name", "value" ]
+        "required" : [ "name", "value" ]
       },
-      "listOfIMChanneMeta" : {
+      "getConfigParamsComputedOptions_input_list" : {
         "type" : [ "null", "array" ],
+        "description" : "",
         "items" : {
-          "$ref" : "./IM_Channel.json#/components/schemas/metaVariableJSON"
+          "$ref" : "./IM_Channel.json#/components/schemas/configParam_input_add"
+        }
+      },
+      "listofConfigParams_input_add" : {
+        "type" : "array",
+        "description" : "List of configuration parameters to create or update on the channel.",
+        "items" : {
+          "$ref" : "./IM_Channel.json#/components/schemas/configParam_input_add"
+        }
+      },
+      "channelMeta_input_add" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "description" : "Channel metadata entry (name and value pair).",
+        "properties" : {
+          "name" : {
+            "type" : "string",
+            "description" : "Metadata key. Allowed values include WHATSAPP_SETTINGS_BACKUP, CHANNEL_CUSTOMISATION, LINE_BASIC_ID, WECHAT_UNIVERSAL_LINK, and related integration-specific keys.",
+            "enum" : [ "WHATSAPP_SETTINGS_BACKUP", "ADMIN_TOKEN_MAIN", "ADMIN_TOKEN_MAIN_EXPIRY", "NEW_PASSWORD", "ADMIN_TOKEN_DR", "ADMIN_TOKEN_DR_EXPIRY", "ONBOARDING_DATA", "LINE_BASIC_ID", "WECHAT_UNIVERSAL_LINK", "TWO_STEP_VERIFICATION", "WHATSAPP_OBA_REQUEST", "FACEBOOK_PAGE_NETWORKID", "CHANNEL_CUSTOMISATION", "INSTAGRAM_PAGE_NETWORKID", "WECOM_MESSSAGE_CURSOR", "WECOM_UNIVERSAL_LINK", "CO_EXISTENCE" ],
+            "maxLength" : 100,
+            "minLength" : 1,
+            "pattern" : "([a-zA-Z0-9_]+)"
+          },
+          "value" : {
+            "type" : "string",
+            "description" : "Metadata value (often JSON-encoded configuration).",
+            "maxLength" : 100,
+            "minLength" : 1
+          }
+        },
+        "required" : [ "name", "value" ]
+      },
+      "listOfChannelMeta_input_add" : {
+        "type" : "array",
+        "description" : "List of channel metadata entries for create.",
+        "items" : {
+          "$ref" : "./IM_Channel.json#/components/schemas/channelMeta_input_add"
         }
       },
       "getIMChannel_list" : {
@@ -329,107 +620,221 @@
         "additionalProperties" : false,
         "properties" : {
           "defaultBotId" : {
+            "description" : "Unique ID of the default bot associated with the channel.",
             "type" : [ "string", "null", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "code" : {
+            "description" : "Code name of the channel.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "accountName" : {
+            "description" : "Account name of the channel.",
             "type" : [ "string", "null" ],
             "maxLength" : 500,
             "minLength" : 0,
             "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
           },
           "integrationServiceType" : {
+            "description" : "Integration service of the channel. Possible values: TELEGRAM, TWILIO, IM_TALK, LINE, WECHAT, WECOM, WHATSAPP, FACEBOOKMESSENGER, INSTAGRAM.",
             "type" : [ "string", "null" ],
-            "enum" : [ "TELEGRAM", "TWILIO", "IM_TALK", "LINE", "WECHAT", "WHATSAPP", "FACEBOOKMESSENGER" ],
+            "enum" : [ "TELEGRAM", "TWILIO", "IM_TALK", "LINE", "WECHAT", "WECOM", "WHATSAPP", "FACEBOOKMESSENGER", "INSTAGRAM" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "appName" : {
+            "description" : "App name of the channel.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "departmentId" : {
+            "description" : "Unique ID of the department associated with the channel.",
             "type" : [ "string", "null", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "universalLink" : {
+            "description" : "Universal link of the channel.",
             "type" : [ "string", "null" ],
             "maxLength" : 65535,
             "minLength" : 0,
             "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
           },
+          "callsUniversalLink" : {
+            "description" : "Universal link for voice or video calls on the channel, when supported.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 65535,
+            "minLength" : 0
+          },
           "isActive" : {
+            "description" : "Indicates whether the channel is active. Possible values: true = active, false = inactive.",
             "type" : [ "boolean", "null" ]
           },
           "isAuthorizationPending" : {
+            "description" : "Indicates whether authorization is pending for the channel. Possible values: true = authorization pending, false = authorization complete.",
             "type" : [ "boolean", "null" ]
           },
           "photoURL" : {
+            "description" : "URL of the channel photo.",
             "type" : [ "string", "null" ],
             "maxLength" : 65535,
             "minLength" : 0,
             "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
           },
           "isSubscribed" : {
+            "description" : "Indicates whether the channel is subscribed. Possible values: true = subscribed, false = not subscribed.",
             "type" : [ "boolean", "null" ]
           },
           "isDeleted" : {
+            "description" : "Indicates whether the channel is deleted. Possible values: true = deleted, false = not deleted.",
             "type" : [ "boolean", "null" ]
           },
           "createdBy" : {
+            "description" : "Unique ID of the agent who created the channel.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "[0-9]+"
           },
           "isOwner" : {
+            "description" : "Indicates whether the agent is the owner of the channel. Possible values: true = owner, false = not owner.",
             "type" : [ "boolean", "null" ]
           },
           "isStorageEnabled" : {
+            "description" : "Indicates whether storage is enabled for the channel. Possible values: true = storage enabled, false = storage disabled.",
             "type" : [ "boolean", "null" ]
           },
           "name" : {
+            "description" : "Name of the channel.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "createdTime" : {
+            "description" : "Time at which the channel was created.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "authenticationURL" : {
+            "description" : "Authentication URL of the channel.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
           },
           "id" : {
+            "description" : "Unique ID of the channel.",
             "type" : [ "string", "null", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "isSandBox" : {
+            "description" : "Indicates whether the channel is a sandbox channel. Possible values: true = sandbox channel, false = production channel.",
             "type" : [ "boolean", "null" ]
+          },
+          "creator" : {
+            "description" : "Agent who created the channel (returned when include=creator).",
+            "$ref" : "./IM_Channel.json#/components/schemas/updater"
+          },
+          "meta" : {
+            "description" : "Metadata entries associated with the channel.",
+            "$ref" : "./IM_Channel.json#/components/schemas/listOfChannelMeta"
+          },
+          "configParams" : {
+            "description" : "Configuration properties with which the channel is created. Config params are specific to the integration.",
+            "$ref" : "./IM_Channel.json#/components/schemas/listOfConfigParams"
+          },
+          "preference" : {
+            "description" : "Channel preferences (returned when include=preference).",
+            "$ref" : "./IM_Channel.json#/components/schemas/channelPreference"
           }
         },
-        "required" : [ "accountName", "appName", "authenticationURL", "code", "createdBy", "createdTime", "defaultBotId", "departmentId", "id", "integrationServiceType", "isActive", "isAuthorizationPending", "isDeleted", "isOwner", "isSandBox", "isStorageEnabled", "isSubscribed", "name", "photoURL", "universalLink" ]
+        "required" : [ "accountName", "appName", "authenticationURL", "callsUniversalLink", "code", "createdBy", "createdTime", "defaultBotId", "departmentId", "id", "integrationServiceType", "isActive", "isAuthorizationPending", "isDeleted", "isOwner", "isSandBox", "isStorageEnabled", "isSubscribed", "name", "photoURL", "universalLink" ]
       },
       "listOfIMChannels" : {
         "type" : [ "null", "array" ],
         "items" : {
           "$ref" : "./IM_Channel.json#/components/schemas/getIMChannel_list"
         }
+      },
+      "channelPreference" : {
+        "type" : [ "object" ],
+        "description" : "Admin preferences for an IM channel including routing, business hours, and ticket conversion settings.",
+        "additionalProperties" : false,
+        "properties" : {
+          "updatedBy" : {
+            "type" : [ "string", "null", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Desk agent ID of the user who last updated these preferences."
+          },
+          "businessHourEnabled" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Whether business hours are enabled for this channel. When true, use businessHourId to select the configured schedule."
+          },
+          "businessHourId" : {
+            "type" : [ "string", "null", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Business hour configuration ID when businessHourEnabled is true. Null when business hours are disabled."
+          },
+          "allHandlingAgents" : {
+            "type" : [ "null", "array" ],
+            "description" : "Desk agent IDs assigned as handling agents for chat routing on this channel.",
+            "items" : {
+              "type" : [ "string", "null", "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)",
+              "description" : "Handling agent ID."
+            },
+            "uniqueItems" : false
+          },
+          "autoTicketConvertInterval" : {
+            "type" : [ "string", "null" ],
+            "description" : "Timer duration in minutes for converting chats into new tickets. When a customer responds to an existing conversation after this idle period, a new ticket is created automatically. Allowed range: 10 to 5760 minutes. Any interval in minutes within this range is accepted. Example intervals: NONE (set autoTicketConvert to false), 10min (10), 20min (20), 30min (30), 40min (40), 50min (50), 60min (60), 2hour (120), 3hour (180), 6hour (360), 9hour (540), 12hour (720), 18h (1080), 24h (1440), 2days (2880), 3days (4320), 4days (5760), always (-1 or \"-1\" for a single ticket without a timed interval).",
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "^-1$|^[0-9]{2,4}$"
+          },
+          "autoTicketConvert" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Enables the timer for converting chats into new tickets. When true, a new ticket is automatically created if the customer responds to an existing conversation after the duration set in autoTicketConvertInterval (minutes). Set to false to disable (NONE)."
+          },
+          "assignmentRuleEnabled" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Whether chat routing is enabled. When true, incoming chats are assigned sequentially to handling agents in allHandlingAgents."
+          },
+          "updater" : {
+            "$ref" : "./IM_Channel.json#/components/schemas/updater"
+          },
+          "callsVisibility" : {
+            "type" : [ "string", "null" ],
+            "description" : "Call visibility setting for the channel when supported by the integration.",
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "callsEnabled" : {
+            "type" : [ "string", "null" ],
+            "description" : "Whether calls are enabled for the channel when supported by the integration.",
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "sessionAutocloseExpiry" : {
+            "type" : [ "string", "null" ],
+            "description" : "Session auto-close expiry in seconds for inactive conversations. Configure per actor (AGENT or BOT) via the channel preferences API. Auto-closes inactive conversations after the specified period to improve team efficiency.",
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "[0-9]+"
+          }
+        },
+        "required" : [ "allHandlingAgents", "assignmentRuleEnabled", "autoTicketConvert", "autoTicketConvertInterval", "businessHourEnabled", "businessHourId", "updatedBy", "updater" ]
       }
     },
     "responses" : {
@@ -442,451 +847,337 @@
               "additionalProperties" : false,
               "properties" : {
                 "defaultBotId" : {
+                  "description" : "Unique ID of the default bot associated with the channel.",
                   "type" : [ "string", "null", "integer" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "code" : {
+                  "description" : "Code name of the channel.",
                   "type" : [ "string", "null" ],
                   "maxLength" : 100,
                   "minLength" : 0
                 },
                 "accountName" : {
+                  "description" : "Account name of the channel.",
                   "type" : [ "string", "null" ],
                   "maxLength" : 500,
                   "minLength" : 0,
                   "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
                 },
                 "integrationServiceType" : {
+                  "description" : "Integration service of the channel. Possible values: TELEGRAM, TWILIO, IM_TALK, LINE, WECHAT, WECOM, WHATSAPP, FACEBOOKMESSENGER, INSTAGRAM.",
                   "type" : [ "string", "null" ],
-                  "enum" : [ "TELEGRAM", "TWILIO", "IM_TALK", "LINE", "WECHAT", "WHATSAPP", "FACEBOOKMESSENGER" ],
+                  "enum" : [ "TELEGRAM", "TWILIO", "IM_TALK", "LINE", "WECHAT", "WECOM", "WHATSAPP", "FACEBOOKMESSENGER", "INSTAGRAM" ],
                   "maxLength" : 100,
                   "minLength" : 0
                 },
                 "appName" : {
+                  "description" : "App name of the channel.",
                   "type" : [ "string", "null" ],
                   "maxLength" : 100,
                   "minLength" : 0
                 },
                 "departmentId" : {
+                  "description" : "Unique ID of the department associated with the channel.",
                   "type" : [ "string", "null", "integer" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "universalLink" : {
+                  "description" : "Universal link of the channel.",
                   "type" : [ "string", "null" ],
                   "maxLength" : 65535,
                   "minLength" : 0,
                   "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
                 },
+                "callsUniversalLink" : {
+                  "description" : "Universal link for voice or video calls on the channel, when supported.",
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 65535,
+                  "minLength" : 0
+                },
                 "isActive" : {
+                  "description" : "Indicates whether the channel is active. Possible values: true = active, false = inactive.",
                   "type" : [ "boolean", "null" ]
                 },
                 "isAuthorizationPending" : {
+                  "description" : "Indicates whether authorization is pending for the channel. Possible values: true = authorization pending, false = authorization complete.",
                   "type" : [ "boolean", "null" ]
                 },
                 "photoURL" : {
+                  "description" : "URL of the channel photo.",
                   "type" : [ "string", "null" ],
                   "maxLength" : 65535,
                   "minLength" : 0,
                   "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
                 },
                 "isSubscribed" : {
+                  "description" : "Indicates whether the channel is subscribed. Possible values: true = subscribed, false = not subscribed.",
                   "type" : [ "boolean", "null" ]
                 },
                 "configParams" : {
+                  "description" : "Configuration properties with which the channel is created. Config params are specific to the integration.",
                   "$ref" : "./IM_Channel.json#/components/schemas/listOfConfigParams"
                 },
                 "isDeleted" : {
+                  "description" : "Indicates whether the channel is deleted. Possible values: true = deleted, false = not deleted.",
                   "type" : [ "boolean", "null" ]
                 },
                 "createdBy" : {
+                  "description" : "Unique ID of the agent who created the channel.",
                   "type" : [ "string", "null" ],
                   "maxLength" : 100,
                   "minLength" : 0,
                   "pattern" : "[0-9]+"
                 },
                 "isOwner" : {
+                  "description" : "Indicates whether the agent is the owner of the channel. Possible values: true = owner, false = not owner.",
                   "type" : [ "boolean", "null" ]
                 },
                 "isStorageEnabled" : {
+                  "description" : "Indicates whether storage is enabled for the channel. Possible values: true = storage enabled, false = storage disabled.",
                   "type" : [ "boolean", "null" ]
                 },
                 "conversationCount" : {
+                  "description" : "Total conversation count of the channel.",
                   "type" : [ "string", "null" ],
                   "maxLength" : 100,
                   "minLength" : 0,
                   "pattern" : "[0-9]+"
                 },
                 "meta" : {
+                  "description" : "Metadata entries associated with the channel.",
                   "$ref" : "./IM_Channel.json#/components/schemas/listOfChannelMeta"
                 },
                 "name" : {
+                  "description" : "Name of the channel.",
                   "type" : [ "string", "null" ],
                   "maxLength" : 100,
                   "minLength" : 0,
                   "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                 },
                 "createdTime" : {
+                  "description" : "Time at which the channel was created.",
                   "type" : [ "string", "null" ],
                   "maxLength" : 100,
                   "minLength" : 0,
                   "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
                 },
                 "authenticationURL" : {
+                  "description" : "Authentication URL of the channel.",
                   "type" : [ "string", "null" ],
                   "maxLength" : 100,
                   "minLength" : 0,
                   "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
                 },
                 "id" : {
+                  "description" : "Unique ID of the channel.",
                   "type" : [ "string", "null", "integer" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "isSandBox" : {
+                  "description" : "Indicates whether the channel is a sandbox channel. Possible values: true = sandbox channel, false = production channel.",
                   "type" : [ "boolean", "null" ]
+                },
+                "preference" : {
+                  "description" : "Channel preferences (returned when include=preference).",
+                  "$ref" : "./IM_Channel.json#/components/schemas/channelPreference"
+                },
+                "creator" : {
+                  "description" : "Agent who created the channel (returned when include=creator).",
+                  "$ref" : "./IM_Channel.json#/components/schemas/updater"
                 }
               },
-              "required" : [ "accountName", "appName", "authenticationURL", "code", "configParams", "conversationCount", "createdBy", "createdTime", "defaultBotId", "departmentId", "id", "integrationServiceType", "isActive", "isAuthorizationPending", "isDeleted", "isOwner", "isSandBox", "isStorageEnabled", "isSubscribed", "meta", "name", "photoURL", "universalLink" ]
+              "required" : [ "accountName", "appName", "authenticationURL", "callsUniversalLink", "code", "createdBy", "createdTime", "defaultBotId", "departmentId", "id", "integrationServiceType", "isActive", "isAuthorizationPending", "isDeleted", "isOwner", "isSandBox", "isStorageEnabled", "isSubscribed", "name", "photoURL", "universalLink" ]
+            },
+            "examples" : {
+              "GetIMChannel_200_TELEGRAM" : {
+                "$ref" : "./examples/IM_Channel.json#/components/examples/GetIMChannel_200_TELEGRAM"
+              },
+              "GetIMChannel_200_WHATSAPP" : {
+                "$ref" : "./examples/IM_Channel.json#/components/examples/GetIMChannel_200_WHATSAPP"
+              },
+              "GetIMChannel_200_IM_TALK" : {
+                "$ref" : "./examples/IM_Channel.json#/components/examples/GetIMChannel_200_IM_TALK"
+              },
+              "GetIMChannel_200_FACEBOOKMESSENGER" : {
+                "$ref" : "./examples/IM_Channel.json#/components/examples/GetIMChannel_200_FACEBOOKMESSENGER"
+              },
+              "GetIMChannel_200_INSTAGRAM" : {
+                "$ref" : "./examples/IM_Channel.json#/components/examples/GetIMChannel_200_INSTAGRAM"
+              },
+              "GetIMChannel_200_WECHAT" : {
+                "$ref" : "./examples/IM_Channel.json#/components/examples/GetIMChannel_200_WECHAT"
+              },
+              "GetIMChannel_200_LINE" : {
+                "$ref" : "./examples/IM_Channel.json#/components/examples/GetIMChannel_200_LINE"
+              },
+              "GetIMChannel_200_TELEGRAM_withCreator" : {
+                "$ref" : "./examples/IM_Channel.json#/components/examples/GetIMChannel_200_TELEGRAM_withCreator"
+              },
+              "GetIMChannel_200_TELEGRAM_withPreference" : {
+                "$ref" : "./examples/IM_Channel.json#/components/examples/GetIMChannel_200_TELEGRAM_withPreference"
+              }
+            }
+          }
+        }
+      },
+      "getConfigParamsComputedOptions" : {
+        "description" : "getConfigParamsComputedOptions template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "null", "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "./IM_Channel.json#/components/schemas/listOfConfigParamsComputedOptions"
+                },
+                "kind" : {
+                  "type" : [ "string", "null" ],
+                  "description" : "",
+                  "enum" : [ "single.license", "single.efc", "list.addOn", "single.addOn", "single.json" ],
+                  "maxLength" : 100,
+                  "minLength" : 0
+                },
+                "hasMore" : {
+                  "type" : [ "boolean", "null" ],
+                  "description" : ""
+                }
+              },
+              "required" : [ "data", "hasMore", "kind" ]
             },
             "examples" : {
               "Valid responses Definitions" : {
-                "value" : null
+                "value" : { }
               }
             }
           }
         }
       },
       "getIMChannelsList" : {
-        "description" : "getIMChannelsList template definitions",
+        "description" : "List of channel entries returned by Get Channels. Use the include query parameter to embed preference, creator, meta, or configParams per channel.",
         "content" : {
           "application/json" : {
             "schema" : {
-              "allOf" : [ {
-                "type" : "object",
-                "properties" : {
-                  "data" : {
-                    "type" : "array",
-                    "items" : {
-                      "type" : "object",
-                      "properties" : {
-                        "creator" : {
-                          "type" : [ "null", "object" ],
-                          "additionalProperties" : false,
-                          "maxProperties" : 13,
-                          "minProperties" : 13,
-                          "properties" : {
-                            "lastName" : {
-                              "type" : [ "string", "null" ],
-                              "maxLength" : 50,
-                              "minLength" : 0
-                            },
-                            "agent" : {
-                              "type" : [ "boolean", "null" ]
-                            },
-                            "displayName" : {
-                              "type" : [ "string", "null" ],
-                              "maxLength" : 200,
-                              "minLength" : 0,
-                              "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
-                            },
-                            "externalId" : {
-                              "type" : [ "string", "null" ],
-                              "maxLength" : 100,
-                              "minLength" : 0
-                            },
-                            "emailId" : {
-                              "type" : [ "string", "null" ],
-                              "maxLength" : 100,
-                              "minLength" : 0,
-                              "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
-                            },
-                            "type" : {
-                              "type" : [ "string", "null" ],
-                              "enum" : [ "END_USER", "AGENT", "TEAM", "TICKET", "ACTIVITY" ],
-                              "maxLength" : 100,
-                              "minLength" : 0
-                            },
-                            "zuid" : {
-                              "type" : [ "string", "null", "integer" ],
-                              "format" : "int32",
-                              "pattern" : "([0-9]+)"
-                            },
-                            "photoURL" : {
-                              "type" : [ "string", "null" ],
-                              "maxLength" : 200,
-                              "minLength" : 0,
-                              "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
-                            },
-                            "firstName" : {
-                              "type" : [ "string", "null" ],
-                              "maxLength" : 50,
-                              "minLength" : 0
-                            },
-                            "name" : {
-                              "type" : [ "string", "null" ],
-                              "maxLength" : 100,
-                              "minLength" : 0
-                            },
-                            "roleName" : {
-                              "type" : [ "string", "null" ],
-                              "maxLength" : 100,
-                              "minLength" : 0
-                            },
-                            "id" : {
-                              "type" : [ "string", "null", "integer" ],
-                              "format" : "int64",
-                              "pattern" : "([0-9]+)"
-                            },
-                            "email" : {
-                              "type" : [ "string", "null" ],
-                              "maxLength" : 100,
-                              "minLength" : 0,
-                              "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
-                            }
-                          },
-                          "required" : [ "agent", "displayName", "email", "emailId", "externalId", "firstName", "id", "lastName", "name", "photoURL", "roleName", "type", "zuid" ]
-                        },
-                        "preference" : {
-                          "type" : [ "null", "object" ],
-                          "additionalProperties" : false,
-                          "maxProperties" : 8,
-                          "minProperties" : 8,
-                          "properties" : {
-                            "updatedBy" : {
-                              "type" : [ "string", "null", "integer" ],
-                              "format" : "int64",
-                              "pattern" : "([0-9]+)"
-                            },
-                            "businessHourEnabled" : {
-                              "type" : [ "boolean", "null" ]
-                            },
-                            "businessHourId" : {
-                              "type" : [ "string", "null", "integer" ],
-                              "format" : "int64",
-                              "pattern" : "([0-9]+)"
-                            },
-                            "allHandlingAgents" : {
-                              "type" : [ "null", "array" ],
-                              "items" : {
-                                "type" : [ "string", "null", "integer" ],
-                                "format" : "int64",
-                                "pattern" : "([0-9]+)"
-                              },
-                              "uniqueItems" : false
-                            },
-                            "autoTicketConvertInterval" : {
-                              "type" : [ "string", "null" ],
-                              "maxLength" : 100,
-                              "minLength" : 0,
-                              "pattern" : "[0-9]+"
-                            },
-                            "autoTicketConvert" : {
-                              "type" : [ "boolean", "null" ]
-                            },
-                            "assignmentRuleEnabled" : {
-                              "type" : [ "boolean", "null" ]
-                            },
-                            "updater" : {
-                              "type" : [ "null", "object" ],
-                              "additionalProperties" : false,
-                              "maxProperties" : 13,
-                              "minProperties" : 13,
-                              "properties" : {
-                                "lastName" : {
-                                  "type" : [ "string", "null" ],
-                                  "maxLength" : 50,
-                                  "minLength" : 0
-                                },
-                                "agent" : {
-                                  "type" : [ "boolean", "null" ]
-                                },
-                                "displayName" : {
-                                  "type" : [ "string", "null" ],
-                                  "maxLength" : 200,
-                                  "minLength" : 0,
-                                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
-                                },
-                                "externalId" : {
-                                  "type" : [ "string", "null" ],
-                                  "maxLength" : 100,
-                                  "minLength" : 0
-                                },
-                                "emailId" : {
-                                  "type" : [ "string", "null" ],
-                                  "maxLength" : 100,
-                                  "minLength" : 0,
-                                  "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
-                                },
-                                "type" : {
-                                  "type" : [ "string", "null" ],
-                                  "enum" : [ "END_USER", "AGENT", "TEAM", "TICKET", "ACTIVITY" ],
-                                  "maxLength" : 100,
-                                  "minLength" : 0
-                                },
-                                "zuid" : {
-                                  "type" : [ "string", "null", "integer" ],
-                                  "format" : "int32",
-                                  "pattern" : "([0-9]+)"
-                                },
-                                "photoURL" : {
-                                  "type" : [ "string", "null" ],
-                                  "maxLength" : 200,
-                                  "minLength" : 0,
-                                  "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
-                                },
-                                "firstName" : {
-                                  "type" : [ "string", "null" ],
-                                  "maxLength" : 50,
-                                  "minLength" : 0
-                                },
-                                "name" : {
-                                  "type" : [ "string", "null" ],
-                                  "maxLength" : 100,
-                                  "minLength" : 0
-                                },
-                                "roleName" : {
-                                  "type" : [ "string", "null" ],
-                                  "maxLength" : 100,
-                                  "minLength" : 0
-                                },
-                                "id" : {
-                                  "type" : [ "string", "null", "integer" ],
-                                  "format" : "int64",
-                                  "pattern" : "([0-9]+)"
-                                },
-                                "email" : {
-                                  "type" : [ "string", "null" ],
-                                  "maxLength" : 100,
-                                  "minLength" : 0,
-                                  "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
-                                }
-                              },
-                              "required" : [ "agent", "displayName", "email", "emailId", "externalId", "firstName", "id", "lastName", "name", "photoURL", "roleName", "type", "zuid" ]
-                            }
-                          },
-                          "required" : [ "allHandlingAgents", "assignmentRuleEnabled", "autoTicketConvert", "autoTicketConvertInterval", "businessHourEnabled", "businessHourId", "updatedBy", "updater" ]
-                        }
-                      }
-                    }
-                  }
+              "type" : "object",
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "description" : "List of channel entries.",
+                  "$ref" : "./IM_Channel.json#/components/schemas/listOfIMChannels"
                 }
-              }, {
-                "type" : [ "null", "object" ],
-                "additionalProperties" : false,
-                "properties" : {
-                  "data" : {
-                    "$ref" : "./IM_Channel.json#/components/schemas/listOfIMChannels"
-                  }
-                },
-                "required" : [ "data" ]
-              } ]
+              },
+              "required" : [ "data" ]
             },
             "examples" : {
-              "Valid responses Definitions" : {
-                "value" : {
-                  "data" : [ {
-                    "defaultBotId" : "-1",
-                    "code" : "SANDBOX",
-                    "accountName" : "+13312040199",
-                    "integrationServiceType" : "WHATSAPP",
-                    "appName" : "Sandbox",
-                    "departmentId" : "186543000000006907",
-                    "universalLink" : "https://wa.me/13312040199",
-                    "isActive" : true,
-                    "isAuthorizationPending" : false,
-                    "photoURL" : "https://desk.zoho.com/api/v1/channels/sandbox/photo?orgId=78412359",
-                    "isSubscribed" : true,
-                    "isDeleted" : false,
-                    "isStorageEnabled" : false,
-                    "createdBy" : "78412824",
-                    "isOwner" : true,
-                    "name" : "Sandbox",
-                    "createdTime" : 1693818836000,
-                    "id" : "3942000000045001",
-                    "authenticationURL" : null,
-                    "isSandBox" : true
-                  }, {
-                    "defaultBotId" : "-1",
-                    "code" : "TEST_SOFTWARE_4_3",
-                    "accountName" : "Test Software 4",
-                    "integrationServiceType" : "FACEBOOKMESSENGER",
-                    "appName" : "Test Software 4",
-                    "departmentId" : "186543000000393040",
-                    "universalLink" : "https://m.me/168123406390163",
-                    "isActive" : true,
-                    "isAuthorizationPending" : false,
-                    "photoURL" : "https://desk.zoho.com/api/v1/channels/test_software_4_3/photo?orgId=78412359",
-                    "isSubscribed" : true,
-                    "isDeleted" : false,
-                    "isStorageEnabled" : false,
-                    "createdBy" : "78412824",
-                    "isOwner" : true,
-                    "name" : "Test Software 4",
-                    "createdTime" : 1707287312000,
-                    "id" : "3942000000943035",
-                    "authenticationURL" : null,
-                    "isSandBox" : false
-                  }, {
-                    "defaultBotId" : "-1",
-                    "code" : "TEST_DEP",
-                    "accountName" : "ZImAbhiTestBot",
-                    "integrationServiceType" : "TELEGRAM",
-                    "appName" : "Test DEP",
-                    "departmentId" : "186543000000393040",
-                    "universalLink" : "https://t.me/ZImAbhiTestBot",
-                    "isActive" : true,
-                    "isAuthorizationPending" : false,
-                    "photoURL" : "https://desk.zoho.com/api/v1/channels/test_dep/photo?orgId=78412359",
-                    "isSubscribed" : true,
-                    "isDeleted" : false,
-                    "isStorageEnabled" : false,
-                    "createdBy" : "76837521",
-                    "isOwner" : true,
-                    "name" : "Test DEP",
-                    "createdTime" : 1705378636000,
-                    "id" : "3942000000735961",
-                    "authenticationURL" : null,
-                    "isSandBox" : false
-                  } ]
-                }
+              "GetIMChannelsList_200" : {
+                "$ref" : "./examples/IM_Channel.json#/components/examples/GetIMChannelsList_200"
+              },
+              "GetIMChannelsList_200_withInclude" : {
+                "$ref" : "./examples/IM_Channel.json#/components/examples/GetIMChannelsList_200_withInclude"
               }
             }
           }
         }
       }
     },
-    "parameters" : {
-      "id" : {
-        "name" : "id",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
+    "requestBodies" : {
+      "createIMChannel" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "description" : "Payload for creating a new IM channel.",
+              "properties" : {
+                "name" : {
+                  "type" : "string",
+                  "description" : "Display name for the channel.",
+                  "maxLength" : 200,
+                  "minLength" : 1,
+                  "pattern" : "[a-zA-Z0-9_\\-\\+\\?\\!\\.\\:\\,@\\;\\P{InBasicLatin}\\(\\)\\s]+"
+                },
+                "integrationServiceId" : {
+                  "type" : "string",
+                  "description" : "Integration service type. Allowed values: TELEGRAM, TWILIO, IM_TALK, LINE, WECHAT, WECOM, WHATSAPP, FACEBOOKMESSENGER, INSTAGRAM.",
+                  "enum" : [ "TELEGRAM", "TWILIO", "IM_TALK", "LINE", "WECHAT", "WECOM", "WHATSAPP", "FACEBOOKMESSENGER", "INSTAGRAM" ],
+                  "maxLength" : 100,
+                  "minLength" : 1
+                },
+                "configParams" : {
+                  "$ref" : "./IM_Channel.json#/components/schemas/listofConfigParams_input_add"
+                },
+                "defaultBotId" : {
+                  "type" : [ "string", "integer" ],
+                  "format" : "int64",
+                  "description" : "Default bot ID for the channel.",
+                  "maxLength" : 100,
+                  "pattern" : "([0-9]+)"
+                },
+                "isSandBox" : {
+                  "type" : "boolean",
+                  "description" : "Set to true to create a sandbox channel (supported for WHATSAPP). Defaults to false when omitted."
+                },
+                "meta" : {
+                  "$ref" : "./IM_Channel.json#/components/schemas/listOfChannelMeta_input_add"
+                }
+              },
+              "required" : [ "integrationServiceId", "name" ]
+            },
+            "examples" : {
+              "CreateIMChannel_telegram" : {
+                "$ref" : "./examples/IM_Channel.json#/components/examples/CreateIMChannel_telegram"
+              },
+              "CreateIMChannel_whatsappSandbox" : {
+                "$ref" : "./examples/IM_Channel.json#/components/examples/CreateIMChannel_whatsappSandbox"
+              },
+              "CreateIMChannel_wechat" : {
+                "$ref" : "./examples/IM_Channel.json#/components/examples/CreateIMChannel_wechat"
+              },
+              "CreateIMChannel_line" : {
+                "$ref" : "./examples/IM_Channel.json#/components/examples/CreateIMChannel_line"
+              },
+              "CreateIMChannel_imTalk" : {
+                "$ref" : "./examples/IM_Channel.json#/components/examples/CreateIMChannel_imTalk"
+              },
+              "CreateIMChannel_whatsapp" : {
+                "$ref" : "./examples/IM_Channel.json#/components/examples/CreateIMChannel_whatsapp"
+              }
+            }
+          }
         }
       },
-      "integrationServiceId" : {
-        "name" : "integrationServiceId",
-        "in" : "query",
-        "description" : "Channel ID to filter",
-        "required" : true,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null" ],
-          "description" : "Channel ID to filter",
-          "enum" : [ "TELEGRAM", "TWILIO", "IM_TALK", "LINE", "WECHAT", "WHATSAPP", "FACEBOOKMESSENGER" ],
-          "maxLength" : 100,
-          "minLength" : 0
+      "getIntegrationConfigParamsComputedOptions_getConfigParamsComputedOptions_input" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "null", "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "configParams" : {
+                  "$ref" : "./IM_Channel.json#/components/schemas/getConfigParamsComputedOptions_input_list"
+                }
+              }
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : { }
+              }
+            }
+          }
         }
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

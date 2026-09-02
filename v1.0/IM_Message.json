@@ -1,25 +1,83 @@
 {
   "openapi" : "3.1.0",
+  "x-mcp-group" : [ "IM Messages" ],
   "info" : {
     "title" : "IM_Message",
     "version" : "1.0.0"
   },
   "paths" : {
-    "/api/v1/im/channels/{channelId}/initiateSession" : {
-      "post" : {
+    "/api/v1/im/sessions/{sid}/messages/{msg_id}" : {
+      "get" : {
         "tags" : [ "IM_Message" ],
-        "summary" : "Initiate Session",
-        "description" : "This API initiates a session with a template message",
-        "operationId" : "initiateSessionUsingTemplate",
+        "summary" : "Get Session Message",
+        "description" : "Retrieves details of a single message in the specified IM session.",
+        "operationId" : "getMessage",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "name" : "channelId",
+          "name" : "msg_id",
           "in" : "path",
+          "description" : "Unique ID of the message.",
           "required" : true,
           "style" : "simple",
           "explode" : false,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
+            "description" : "Unique ID of the message.",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "sid",
+          "in" : "path",
+          "description" : "Unique ID of the session.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Unique ID of the session.",
+            "maxLength" : 100,
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/getMessage_listView"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.InstantMessages.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/im/channels/{channelId}/initiateSession" : {
+      "post" : {
+        "tags" : [ "IM_Message" ],
+        "summary" : "Initiate Session",
+        "description" : "Initiates a session with a template message. This API is used only for WhatsApp Integration.",
+        "operationId" : "initiateSessionUsingTemplate",
+        "x-mcp-group" : [ "Initiate Session" ],
+        "x-mcp-ready" : true,
+        "x-system-description" : "If the canned message contains placeholders, resolve them before calling this API. Use the Apply Canned Message API to replace placeholders with the correct values; a contactId and either a ticketId or sessionId is required for that step. If the user does not provide a sessionId, ask the user for the replacement values needed for the placeholders before proceeding.",
+        "parameters" : [ {
+          "name" : "channelId",
+          "in" : "path",
+          "description" : "Unique ID of the channel.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Unique ID of the channel.",
+            "maxLength" : 100,
             "pattern" : "([0-9]+)"
           }
         }, {
@@ -27,6 +85,263 @@
         } ],
         "requestBody" : {
           "$ref" : "#/components/requestBodies/initiateSessionUsingTemplate"
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/getMessage_listView"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.InstantMessages.CREATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/im/channels/{channelId}/sessions" : {
+      "post" : {
+        "tags" : [ "IM_Message" ],
+        "summary" : "Start Facebook Messenger Session",
+        "description" : "Starts a Facebook Messenger session outside the standard messaging window using the Facebook comment ID and Facebook user ID from a post where the user interacted. Prerequisites: In facebookMessengerPayload, facebookUserId and facebookCommentId must be provided. If they are not passed in the payload, the API throws an error. Note: A single message can be sent with a given comment ID. Send the request as application/json for text-only sessions, or as multipart/form-data with a file attachment and the session JSON in the payload query parameter.",
+        "operationId" : "startSessionIM",
+        "x-mcp-group" : [ "Initiate Session" ],
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "channelId",
+          "in" : "path",
+          "description" : "Unique ID of the channel.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Unique ID of the channel.",
+            "maxLength" : 100,
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "payload",
+          "in" : "query",
+          "description" : "Session payload for Facebook Messenger as a JSON string. Required when using multipart/form-data with a file attachment. Use the same structure as the application/json request body. Omit message in facebookMessengerPayload when a file is attached because Facebook does not allow both attachment and message together.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "JSON string matching the application/json request body schema (integrationServiceId, facebookMessengerPayload, meta).",
+            "maxLength" : 7000,
+            "minLength" : 1
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/startSession"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/getMessage_listView"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.InstantMessages.CREATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/im/sessions/{sid}/messages/{msg_id}/fullContent" : {
+      "get" : {
+        "tags" : [ "IM_Message" ],
+        "summary" : "Get Message Full Content",
+        "description" : "Retrieves the full content of a message in the specified IM session.",
+        "operationId" : "getMessageFullContent",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "sid",
+          "in" : "path",
+          "description" : "Unique ID of the session.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Unique ID of the session.",
+            "maxLength" : 100,
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "msg_id",
+          "in" : "path",
+          "description" : "Unique ID of the message.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Unique ID of the message.",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/getMessageFullContent"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.InstantMessages.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/im/sessions/{sid}/messages" : {
+      "get" : {
+        "tags" : [ "IM_Message" ],
+        "summary" : "Get Session Messages",
+        "description" : "Retrieves messages in the specified IM session, with pagination support.",
+        "operationId" : "getSessionConversation",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "sid",
+          "in" : "path",
+          "description" : "Unique ID of the session.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Unique ID of the session.",
+            "maxLength" : 100,
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "ticketId",
+          "in" : "query",
+          "description" : "Filter messages present in a ticket.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Filter messages present in a ticket.",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number from which the messages must be fetched.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int32",
+            "description" : "Index number from which the messages must be fetched.",
+            "pattern" : "([0-9]+)",
+            "default" : 0
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of messages to fetch. Defaults to 50 when omitted or zero. Maximum value is 50.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int32",
+            "description" : "Number of messages to fetch. Defaults to 50 when omitted or zero. Maximum value is 50.",
+            "pattern" : "([0-9]+)",
+            "default" : 0,
+            "maximum" : 50
+          }
+        }, {
+          "name" : "modifiedAfter",
+          "in" : "query",
+          "description" : "After which date messages should be included. Enter a date in the ISO date format of yyyy-MM-ddThh:mm:ss.SSSZ.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "After which date messages should be included. Enter a date in the ISO date format of yyyy-MM-ddThh:mm:ss.SSSZ.",
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/getSessionConversation"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.InstantMessages.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      },
+      "post" : {
+        "tags" : [ "IM_Message" ],
+        "summary" : "Add Outgoing Message",
+        "description" : "Adds an outgoing message to an IM session. This API can be called only when the session is assigned to the current agent. If the session is unassigned or assigned to another agent, use the Update Session API to pick up the session first, then send the message.",
+        "operationId" : "addOutgoingMessage",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "sid",
+          "in" : "path",
+          "description" : "Unique ID of the session.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Unique ID of the session.",
+            "maxLength" : 100,
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/addOutgoingMessage"
         },
         "responses" : {
           "422" : {
@@ -45,56 +360,246 @@
         "x-audience" : [ "external-public" ]
       }
     },
-    "/api/v1/channels/{channel_id}/photo" : {
-      "post" : {
+    "/api/v1/im/sessions/{sid}/attachments" : {
+      "get" : {
         "tags" : [ "IM_Message" ],
-        "summary" : "Update Channel logo",
-        "description" : "This API updates the logo for the given channel. Logo of SYSTEM channels cannot be updated.",
-        "operationId" : "uploadChannelPhoto",
+        "summary" : "Get Session Attachments",
+        "description" : "Retrieves attachments in the specified IM session, with pagination support.",
+        "operationId" : "getSessionAttachments",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "name" : "channel_id",
+          "name" : "sid",
           "in" : "path",
-          "description" : "",
+          "description" : "Unique ID of the session.",
           "required" : true,
           "style" : "simple",
           "explode" : false,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "",
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Unique ID of the session.",
+            "maxLength" : 100,
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number from which the attachments must be fetched.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int32",
+            "description" : "Index number from which the attachments must be fetched.",
+            "pattern" : "([0-9]+)",
+            "default" : 0
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of attachments to fetch. Defaults to 50 when omitted or zero. Maximum value is 50.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int32",
+            "description" : "Number of attachments to fetch. Defaults to 50 when omitted or zero. Maximum value is 50.",
+            "pattern" : "([0-9]+)",
+            "default" : 0,
+            "maximum" : 50
+          }
+        }, {
+          "name" : "modifiedAfter",
+          "in" : "query",
+          "description" : "After which date attachments should be included. Enter a date in the ISO date format of yyyy-MM-ddThh:mm:ss.SSSZ.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "After which date attachments should be included. Enter a date in the ISO date format of yyyy-MM-ddThh:mm:ss.SSSZ.",
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "([a-zA-Z0-9_\\-]+)"
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
-        "requestBody" : {
-          "content" : {
-            "multipart/form-data" : {
-              "schema" : {
-                "type" : "object",
-                "properties" : {
-                  "photo" : {
-                    "type" : "string",
-                    "format" : "binary",
-                    "description" : ""
-                  }
-                },
-                "required" : [ "photo" ]
-              }
-            }
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/getSessionAttachments"
           }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.InstantMessages.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      },
+      "post" : {
+        "tags" : [ "IM_Message" ],
+        "summary" : "Send Attachment Message",
+        "description" : "Sends a file attachment to the specified IM session.",
+        "operationId" : "addAttachmentMessage",
+        "x-mcp-ready" : false,
+        "parameters" : [ {
+          "name" : "sid",
+          "in" : "path",
+          "description" : "Unique ID of the session.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Unique ID of the session.",
+            "maxLength" : 100,
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        }, {
+          "name" : "replyToMessageId",
+          "in" : "query",
+          "description" : "Parent message ID when sending the attachment as a reply.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Parent message ID when sending the attachment as a reply.",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "message",
+          "in" : "query",
+          "description" : "Caption for the attachment.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "Caption for the attachment.",
+            "maxLength" : 2000,
+            "minLength" : 0
+          }
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/addAttachmentMessage"
         },
         "responses" : {
           "422" : {
             "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
           },
           "200" : {
-            "$ref" : "./Common.json#/components/responses/emptyResponse"
+            "$ref" : "#/components/responses/getMessage_listView"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.basic.CREATE" ]
+          "iam-oauth2-schema" : [ "Desk.InstantMessages.CREATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/im/sessions/lastMessages" : {
+      "post" : {
+        "tags" : [ "IM_Message" ],
+        "summary" : "Get Session Last Messages",
+        "description" : "Retrieves the last message for each specified IM session.",
+        "operationId" : "getSessionsLastMessages",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/getSessionsLastMessages"
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/getSessionConversation"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.InstantMessages.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/im/sessions/{sid}/attachments/{attachment_id}" : {
+      "get" : {
+        "tags" : [ "IM_Message" ],
+        "summary" : "Get Attachment Content",
+        "description" : "Downloads the content of an attachment in the specified IM session.",
+        "operationId" : "getMessageAttachmentContent",
+        "x-mcp-ready" : false,
+        "parameters" : [ {
+          "name" : "sid",
+          "in" : "path",
+          "description" : "Unique ID of the session.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Unique ID of the session.",
+            "maxLength" : 100,
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "attachment_id",
+          "in" : "path",
+          "description" : "Unique ID of the attachment.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Unique ID of the attachment.",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "inline",
+          "in" : "query",
+          "description" : "Display content inline in the browser instead of as a download.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "boolean",
+            "description" : "Display content inline in the browser instead of as a download."
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "200" : {
+            "$ref" : "./Common.json#/components/responses/fileResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.InstantMessages.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -103,6 +608,7 @@
   "components" : {
     "schemas" : {
       "meta" : {
+        "description" : "Metadata key-value pairs associated with an instant message.",
         "additionalProperties" : false,
         "allOf" : [ {
           "$ref" : "./IM_Session.json#/components/schemas/meta"
@@ -148,37 +654,189 @@
               "type" : [ "string", "null" ],
               "maxLength" : 100,
               "minLength" : 0
+            },
+            "UNKNOWN" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "GC_FETCH" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "SYSTEM_MESSAGE_TYPE" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "BROADCAST_ID" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "FAILED_REASON" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "CANNED_MESSAGE_ID" : {
+              "description" : "Unique ID of the canned or template message used to create this message.",
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "BROADCAST_TRACKING_ID" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "CATALOG_ID" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "PRODUCT_ID" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "CTWA_CLID" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "SKIP_PAYMENT" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "FB_COMMENT_ID" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "IM_CALLS_ID" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "MESSAGE_SOURCE" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "DESK_PARENT_TICKET_ID" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "GC_PAYMENT_STATUS" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "EXTERNAL_SYSTEM_MESSAGE_TYPE" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "IM_CALLS_DURATION" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "CRM_RULE_ID" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "CRM_RULE_NAME" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "BIGIN_INTERNAL_MESSAGE" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "CRM_RULE_TYPE" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "CRM_MODULE_ID" : {
+              "type" : [ "string", "null", "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "CRM_MODULE_NAME" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "MODULE_NAME" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "MODULE_ID" : {
+              "type" : [ "string", "null", "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "PEOPLE_TRACKING_ID" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "SIGN_TRACKING_ID" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "FINANCE_TRACKING_ID" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0
             }
           },
-          "required" : [ "BOT_REPLY_STATUS", "COST", "DESK_KB_ARTICLE_TRANSLATION_ID", "GC_SELECTED", "GC_SKIPPED", "GC_TRANSFERRED", "RATING_STAR", "REACTION" ]
+          "required" : [ "BIGIN_INTERNAL_MESSAGE", "BOT_REPLY_STATUS", "BROADCAST_ID", "BROADCAST_TRACKING_ID", "CANNED_MESSAGE_ID", "CATALOG_ID", "COST", "CRM_MODULE_ID", "CRM_MODULE_NAME", "CRM_RULE_ID", "CRM_RULE_NAME", "CRM_RULE_TYPE", "CTWA_CLID", "DESK_KB_ARTICLE_TRANSLATION_ID", "DESK_PARENT_TICKET_ID", "EXTERNAL_SYSTEM_MESSAGE_TYPE", "FAILED_REASON", "FB_COMMENT_ID", "FINANCE_TRACKING_ID", "GC_FETCH", "GC_PAYMENT_STATUS", "GC_SELECTED", "GC_SKIPPED", "GC_TRANSFERRED", "IM_CALLS_DURATION", "IM_CALLS_ID", "MESSAGE_SOURCE", "MODULE_ID", "MODULE_NAME", "PEOPLE_TRACKING_ID", "PRODUCT_ID", "RATING_STAR", "REACTION", "SIGN_TRACKING_ID", "SKIP_PAYMENT", "SYSTEM_MESSAGE_TYPE", "UNKNOWN" ]
         } ]
       },
       "attachment" : {
+        "description" : "File attachment associated with the message when type is ATTACHMENT.",
         "type" : [ "null", "object" ],
         "additionalProperties" : false,
         "properties" : {
           "size" : {
+            "description" : "Size of the attachment in bytes.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "[0-9]+"
           },
           "name" : {
+            "description" : "Name of the attachment file.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "id" : {
+            "description" : "Unique ID of the attachment.",
             "type" : [ "string", "null", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "type" : {
+            "description" : "MIME type of the attachment.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "url" : {
+            "description" : "URL to download the attachment.",
             "type" : [ "string", "null" ],
             "maxLength" : 200,
             "minLength" : 0,
@@ -210,41 +868,69 @@
         }
       },
       "info" : {
+        "description" : "Informational details when the message type is INFO.",
         "type" : [ "null", "object" ],
         "additionalProperties" : false,
         "properties" : {
           "actor" : {
+            "description" : "Details of the actor associated with the info message.",
             "$ref" : "./IM_Session.json#/components/schemas/sessionActor"
           },
           "sessionStatus" : {
+            "description" : "Status of the session at the time of the info message. Possible values: CREATED, OPEN, ON_PROGRESS, ON_HOLD, ENDED, BLOCKED, MISSED.",
             "type" : [ "string", "null" ],
             "enum" : [ "CREATED", "OPEN", "ON_PROGRESS", "ON_HOLD", "ENDED", "BLOCKED", "MISSED" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "action" : {
+            "description" : "Action that triggered the info message. Possible values: UN_IDENTIFIED, END_SESSION, BLOCK_SESSION, UNBLOCK_SESSION, CHAT_ACCEPT, CHAT_REOPEN, CHAT_TRANSFER, ADD_PARTICIPANT, REMOVE_PARTICIPANT.",
             "type" : [ "string", "null" ],
             "enum" : [ "UN_IDENTIFIED", "END_SESSION", "BLOCK_SESSION", "UNBLOCK_SESSION", "CHAT_ACCEPT", "CHAT_REOPEN", "CHAT_TRANSFER", "ADD_PARTICIPANT", "REMOVE_PARTICIPANT" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "targets" : {
+            "description" : "List of targets affected by the info message action.",
             "$ref" : "./IM_Message.json#/components/schemas/infoMessageTargets"
           }
         },
         "required" : [ "action", "actor", "sessionStatus", "targets" ]
       },
       "location" : {
+        "description" : "Location details associated with the message when type is LOCATION.",
         "type" : [ "null", "object" ],
         "additionalProperties" : false,
         "properties" : {
           "latitude" : {
+            "description" : "Latitude coordinate of the location.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "longitude" : {
+            "description" : "Longitude coordinate of the location.",
             "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "latitude", "longitude" ]
+      },
+      "location_input" : {
+        "type" : "object",
+        "description" : "Location details to send as a location message. Includes latitude and longitude coordinates.",
+        "additionalProperties" : false,
+        "properties" : {
+          "latitude" : {
+            "type" : "string",
+            "description" : "Latitude coordinate of the location.",
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "longitude" : {
+            "type" : "string",
+            "description" : "Longitude coordinate of the location.",
             "maxLength" : 100,
             "minLength" : 0
           }
@@ -294,103 +980,286 @@
         "required" : [ "createdTime", "id", "owner", "summary", "title", "translationId", "webUrl" ]
       },
       "getMessage_listview_main" : {
+        "description" : "Instant message details returned in list and single-message views.",
         "type" : [ "null", "object" ],
         "additionalProperties" : false,
         "properties" : {
           "kbArticle" : {
+            "description" : "Knowledge base article linked to the message, when applicable.",
             "$ref" : "./IM_Message.json#/components/schemas/article"
           },
           "fullContentURL" : {
+            "description" : "URL to retrieve the full content of the message. Null when content is inline or unavailable.",
+            "x-system-description" : "If fullContentURL is present, use the getMessageFullContent operation to fetch the full message content.",
             "type" : [ "string", "null" ],
             "maxLength" : 200,
             "minLength" : 0,
             "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
           },
           "isRead" : {
+            "description" : "Indicates whether the message has been read. true = read, false = not read.",
             "type" : [ "boolean", "null" ]
           },
           "index" : {
+            "description" : "Position index of the message in the session conversation.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "[0-9]+"
           },
           "sessionId" : {
+            "description" : "Unique ID of the session associated with the message.",
             "type" : [ "string", "null", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "type" : {
+            "description" : "Type of the message. Possible values: TEXT, ATTACHMENT, LAYOUT, INFO, LOCATION, TEMPLATE, CAROUSEL, ACTION, EXTERNAL_INFO.",
             "type" : [ "string", "null" ],
-            "enum" : [ "TEXT", "INFO", "ATTACHMENT", "LOCATION", "TEMPLATE", "CAROUSEL", "LAYOUT" ],
+            "enum" : [ "TEXT", "INFO", "ATTACHMENT", "LOCATION", "TEMPLATE", "CAROUSEL", "LAYOUT", "ACTION", "EXTERNAL_INFO" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "ticketWebUrl" : {
+            "description" : "Web URL of the Desk ticket associated with the message.",
             "type" : [ "string", "null" ],
             "maxLength" : 500,
             "minLength" : 0,
             "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
           },
           "actor" : {
+            "description" : "Details of the message author.",
             "$ref" : "./IM_Session.json#/components/schemas/sessionActor"
           },
           "displayMessage" : {
+            "description" : "Summary or preview text of the message content.",
             "type" : [ "string", "null" ],
             "maxLength" : 300,
             "minLength" : 0
           },
           "attachment" : {
+            "description" : "File attachment associated with the message when type is ATTACHMENT.",
             "$ref" : "./IM_Message.json#/components/schemas/attachment"
           },
           "meta" : {
+            "description" : "Metadata associated with the message, such as ticket ID, canned message ID, and system flags.",
             "$ref" : "./IM_Message.json#/components/schemas/meta"
           },
           "createdTime" : {
+            "description" : "Time when the message was created.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "statusUpdatedTime" : {
+            "description" : "Time when the message delivery status was last updated.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "location" : {
+            "description" : "Location details associated with the message when type is LOCATION.",
             "$ref" : "./IM_Message.json#/components/schemas/location"
           },
           "id" : {
+            "description" : "Unique ID of the message.",
             "type" : [ "string", "null", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "contentType" : {
+            "description" : "MIME type of the message content. Possible values: text/html, text/plain, application/json.",
             "type" : [ "string", "null" ],
             "enum" : [ "text/html", "text/plain", "application/json" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "direction" : {
+            "description" : "Direction of the message. Possible values: IN, OUT.",
             "type" : [ "string", "null" ],
             "enum" : [ "IN", "OUT" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "status" : {
+            "description" : "Delivery status of the message. Possible values: SAVED, QUEUED, SENT, DELIVERED, READ, FAILED, DELETED, MISSED.",
             "type" : [ "string", "null" ],
             "enum" : [ "SAVED", "QUEUED", "SENT", "DELIVERED", "READ", "FAILED", "DELETED", "MISSED" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "info" : {
+            "description" : "Informational details when the message type is INFO.",
             "$ref" : "./IM_Message.json#/components/schemas/info"
+          },
+          "template" : {
+            "description" : "Structured template layout of the message when type is TEMPLATE or CAROUSEL.",
+            "type" : [ "null", "object" ],
+            "additionalProperties" : true,
+            "properties" : {
+              "rows" : {
+                "description" : "List of template rows that make up the message layout.",
+                "type" : [ "null", "array" ],
+                "items" : {
+                  "type" : [ "null", "object" ],
+                  "additionalProperties" : false,
+                  "properties" : {
+                    "arrangement" : {
+                      "description" : "Layout arrangement of the row. Possible values: list.",
+                      "type" : [ "string", "null" ],
+                      "maxLength" : 100,
+                      "minLength" : 0
+                    },
+                    "columns" : {
+                      "description" : "List of columns in the template row.",
+                      "type" : [ "null", "array" ],
+                      "items" : {
+                        "type" : [ "null", "object" ],
+                        "additionalProperties" : false,
+                        "properties" : {
+                          "type" : {
+                            "description" : "Type of the template column. Possible values: TEXT, BUTTON, DOCUMENT, URL_BUTTON, IMAGE, VIDEO.",
+                            "type" : [ "string", "null" ],
+                            "enum" : [ "TEXT", "BUTTON", "DOCUMENT", "URL_BUTTON", "IMAGE", "VIDEO" ],
+                            "maxLength" : 100,
+                            "minLength" : 0
+                          },
+                          "id" : {
+                            "description" : "Unique ID of the template column or attachment.",
+                            "type" : [ "string", "null" ],
+                            "maxLength" : 100,
+                            "minLength" : 0
+                          },
+                          "text" : {
+                            "description" : "Text content block in the template column.",
+                            "type" : [ "null", "object" ],
+                            "additionalProperties" : false,
+                            "properties" : {
+                              "style" : {
+                                "description" : "Text style in the template. Possible values: TITLE, SUB_TITLE, DESCRIPTION.",
+                                "type" : [ "string", "null" ],
+                                "enum" : [ "TITLE", "SUB_TITLE", "DESCRIPTION" ],
+                                "maxLength" : 100,
+                                "minLength" : 0
+                              },
+                              "text" : {
+                                "description" : "Text content for the template block.",
+                                "type" : [ "string", "null" ],
+                                "maxLength" : 50000,
+                                "minLength" : 0
+                              }
+                            },
+                            "required" : [ "style", "text" ]
+                          },
+                          "button" : {
+                            "description" : "Button element in the template column.",
+                            "type" : [ "null", "object" ],
+                            "additionalProperties" : false,
+                            "properties" : {
+                              "action" : {
+                                "description" : "Action triggered by the button. Possible values: REPLY, PHONE_NUMBER.",
+                                "type" : [ "string", "null" ],
+                                "enum" : [ "REPLY", "PHONE_NUMBER" ],
+                                "maxLength" : 100,
+                                "minLength" : 0
+                              },
+                              "text" : {
+                                "description" : "Display label of the button.",
+                                "type" : [ "string", "null" ],
+                                "maxLength" : 500,
+                                "minLength" : 0
+                              },
+                              "value" : {
+                                "description" : "Value associated with the button action, such as a phone number or payload.",
+                                "type" : [ "string", "null" ],
+                                "maxLength" : 500,
+                                "minLength" : 0
+                              }
+                            },
+                            "required" : [ "action", "text", "value" ]
+                          },
+                          "document" : {
+                            "description" : "Document media element in the template column.",
+                            "type" : [ "null", "object" ],
+                            "additionalProperties" : false,
+                            "properties" : {
+                              "source" : {
+                                "description" : "URL or source reference of the document.",
+                                "type" : [ "string", "null" ],
+                                "maxLength" : 500,
+                                "minLength" : 0
+                              },
+                              "text" : {
+                                "description" : "Display name or caption of the document.",
+                                "type" : [ "string", "null" ],
+                                "maxLength" : 500,
+                                "minLength" : 0
+                              }
+                            },
+                            "required" : [ "source", "text" ]
+                          },
+                          "url_button" : {
+                            "description" : "URL button element in the template column.",
+                            "type" : [ "null", "object" ],
+                            "additionalProperties" : false,
+                            "properties" : {
+                              "action" : {
+                                "description" : "Action of the URL button. Possible value: REDIRECT.",
+                                "type" : [ "string", "null" ],
+                                "const" : "REDIRECT",
+                                "maxLength" : 100,
+                                "minLength" : 0
+                              },
+                              "text" : {
+                                "description" : "Display label of the URL button.",
+                                "type" : [ "string", "null" ],
+                                "maxLength" : 500,
+                                "minLength" : 0
+                              },
+                              "source" : {
+                                "description" : "Target URL of the URL button.",
+                                "type" : [ "string", "null" ],
+                                "maxLength" : 500,
+                                "minLength" : 0
+                              }
+                            },
+                            "required" : [ "action", "source", "text" ]
+                          }
+                        },
+                        "required" : [ "type" ]
+                      }
+                    }
+                  },
+                  "required" : [ "arrangement", "columns" ]
+                }
+              }
+            }
+          },
+          "layout" : {
+            "description" : "Layout details of the message when type is LAYOUT.",
+            "type" : [ "null", "object" ],
+            "additionalProperties" : true,
+            "properties" : { }
+          },
+          "externalInfo" : {
+            "description" : "Additional information from an external system when type is EXTERNAL_INFO.",
+            "type" : [ "null", "object" ],
+            "additionalProperties" : true,
+            "properties" : { }
+          },
+          "action" : {
+            "description" : "Action details when the message type is ACTION.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
           }
         },
-        "required" : [ "actor", "attachment", "contentType", "createdTime", "direction", "displayMessage", "fullContentURL", "id", "index", "info", "isRead", "kbArticle", "location", "meta", "sessionId", "status", "statusUpdatedTime", "ticketWebUrl", "type" ]
+        "required" : [ "action", "actor", "attachment", "contentType", "createdTime", "direction", "displayMessage", "externalInfo", "fullContentURL", "id", "index", "info", "isRead", "kbArticle", "layout", "location", "meta", "sessionId", "status", "statusUpdatedTime", "template", "ticketWebUrl", "type" ]
       },
       "replyToMessage" : {
+        "description" : "Message view that includes reply-to-message details.",
         "additionalProperties" : false,
         "allOf" : [ {
           "$ref" : "./IM_Message.json#/components/schemas/getMessage_listview_main"
@@ -398,23 +1267,138 @@
           "type" : [ "null", "object" ],
           "properties" : {
             "replyToMessage" : {
+              "description" : "Details of the message being replied to.",
               "type" : [ "null", "object" ],
-              "additionalProperties" : false
+              "additionalProperties" : false,
+              "properties" : { }
             }
           },
           "required" : [ "replyToMessage" ]
         } ]
       },
-      "messageMetaArray" : {
+      "startSessionMetaItem" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "description" : "Meta item for session initiation",
+        "properties" : {
+          "name" : {
+            "type" : "string",
+            "description" : "Name of the session meta parameter",
+            "maxLength" : 50,
+            "minLength" : 0,
+            "pattern" : "^[a-zA-Z0-9_]*$"
+          },
+          "value" : {
+            "type" : "string",
+            "description" : "Value of the session meta parameter",
+            "maxLength" : 7000,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "name", "value" ]
+      },
+      "startSessionMeta" : {
+        "type" : "array",
+        "description" : "Session meta parameters to be added during session creation",
+        "items" : {
+          "$ref" : "./IM_Message.json#/components/schemas/startSessionMetaItem"
+        },
+        "maxItems" : 10
+      },
+      "getMessage_listView" : {
+        "description" : "Instant message returned by get-message and send-message APIs.",
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "./IM_Message.json#/components/schemas/getMessage_listview_main"
+        }, {
+          "type" : [ "null", "object" ],
+          "properties" : {
+            "replyToMessage" : {
+              "description" : "Details of the message being replied to.",
+              "$ref" : "./IM_Message.json#/components/schemas/replyToMessage"
+            }
+          },
+          "required" : [ "replyToMessage" ]
+        } ]
+      },
+      "getSessionAttachment_listView" : {
+        "type" : [ "null", "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "id" : {
+            "description" : "Unique ID of the attachment.",
+            "type" : [ "string", "null", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "name" : {
+            "description" : "Name of the attachment file.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 250,
+            "minLength" : 0
+          },
+          "type" : {
+            "description" : "MIME type of the attachment.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "createdTime" : {
+            "description" : "Time when the attachment was created.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "size" : {
+            "description" : "Size of the attachment in bytes.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "[0-9]+"
+          },
+          "status" : {
+            "description" : "Status of the attachment. For example, VALID.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "url" : {
+            "description" : "URL to download the attachment.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 500,
+            "minLength" : 0,
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+          }
+        },
+        "required" : [ "id", "name", "type", "createdTime", "size", "status", "url" ]
+      },
+      "getSessionAttachments_listView" : {
         "type" : [ "null", "array" ],
         "items" : {
-          "$ref" : "./IM_Channel.json#/components/schemas/listOfIMChanneMeta"
+          "$ref" : "./IM_Message.json#/components/schemas/getSessionAttachment_listView"
+        }
+      },
+      "getMessages_listView" : {
+        "type" : [ "null", "array" ],
+        "items" : {
+          "$ref" : "./IM_Message.json#/components/schemas/getMessage_listView"
+        }
+      },
+      "sessionIds" : {
+        "type" : "array",
+        "description" : "List of IM session IDs. Maximum 50 session IDs allowed.",
+        "maxItems" : 50,
+        "minItems" : 0,
+        "items" : {
+          "type" : [ "string", "integer" ],
+          "format" : "int64",
+          "pattern" : "([0-9]+)"
         }
       }
     },
     "responses" : {
       "getMessage_listView" : {
-        "description" : "getMessage_listView template definitions",
+        "description" : "Details of a single IM session message.",
         "content" : {
           "application/json" : {
             "schema" : {
@@ -425,6 +1409,7 @@
                 "type" : [ "null", "object" ],
                 "properties" : {
                   "replyToMessage" : {
+                    "description" : "Details of the message being replied to.",
                     "$ref" : "./IM_Message.json#/components/schemas/replyToMessage"
                   }
                 },
@@ -432,8 +1417,88 @@
               } ]
             },
             "examples" : {
-              "Valid responses Definitions" : {
-                "value" : null
+              "InitiateSession_200_bodyAndUrl" : {
+                "$ref" : "./examples/IM_Message.json#/components/examples/InitiateSession_200_bodyAndUrl"
+              },
+              "InitiateSession_200_headerAndBody" : {
+                "$ref" : "./examples/IM_Message.json#/components/examples/InitiateSession_200_headerAndBody"
+              },
+              "GetMessage_200_TEXT" : {
+                "$ref" : "./examples/IM_Message.json#/components/examples/GetMessage_200_TEXT"
+              },
+              "GetMessage_200_ATTACHMENT" : {
+                "$ref" : "./examples/IM_Message.json#/components/examples/GetMessage_200_ATTACHMENT"
+              },
+              "GetMessage_200_TEXT_withReply" : {
+                "$ref" : "./examples/IM_Message.json#/components/examples/GetMessage_200_TEXT_withReply"
+              }
+            }
+          }
+        }
+      },
+      "getSessionAttachments" : {
+        "description" : "List of IM session attachments with pagination metadata.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "./IM_Message.json#/components/schemas/getSessionAttachments_listView"
+                },
+                "hasMore" : {
+                  "type" : [ "boolean", "null" ],
+                  "description" : "Indicates whether more attachments are available beyond the current page."
+                }
+              },
+              "required" : [ "data", "hasMore" ]
+            },
+            "examples" : {
+              "GetSessionAttachments_200" : {
+                "$ref" : "./examples/IM_Message.json#/components/examples/GetSessionAttachments_200"
+              }
+            }
+          }
+        }
+      },
+      "getSessionConversation" : {
+        "description" : "List of IM session messages with pagination metadata.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "null", "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "./IM_Message.json#/components/schemas/getMessages_listView"
+                },
+                "hasMore" : {
+                  "type" : [ "boolean", "null" ],
+                  "description" : "Indicates whether more messages are available beyond the current page."
+                }
+              },
+              "required" : [ "data", "hasMore" ]
+            },
+            "examples" : {
+              "GetSessionConversation_200" : {
+                "$ref" : "./examples/IM_Message.json#/components/examples/GetSessionConversation_200"
+              }
+            }
+          }
+        }
+      },
+      "getMessageFullContent" : {
+        "description" : "This API returns the raw message content as a string value.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : "string",
+              "description" : "Raw message content as a string value."
+            },
+            "examples" : {
+              "GetMessageFullContent_200" : {
+                "$ref" : "./examples/IM_Message.json#/components/examples/GetMessageFullContent_200"
               }
             }
           }
@@ -445,56 +1510,231 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : "object",
               "additionalProperties" : false,
               "properties" : {
                 "receiverId" : {
-                  "type" : [ "string", "null" ],
-                  "description" : "ID to which Message Has to be sent",
+                  "type" : "string",
+                  "description" : "ID to which the message must be sent.",
                   "maxLength" : 100,
                   "minLength" : 0
                 },
                 "receiverType" : {
-                  "type" : [ "string", "null" ],
-                  "description" : "Specifies receiverID type. Allowed value @PHONENUMBER@",
-                  "enum" : [ "PHONENUMBER" ],
+                  "type" : "string",
+                  "description" : "Type of the receiver ID. Possible values: PHONENUMBER, EXTERNALID.",
+                  "enum" : [ "PHONENUMBER", "EXTERNALID" ],
                   "maxLength" : 100,
                   "minLength" : 0
                 },
                 "meta" : {
-                  "$ref" : "./IM_Message.json#/components/schemas/messageMetaArray"
+                  "description" : "Message metadata to add to the chat message.",
+                  "$ref" : "./IM_Message.json#/components/schemas/startSessionMeta"
                 },
                 "cannedMessageId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer" ],
                   "format" : "int64",
-                  "description" : "TemplateMessageId to send that template",
+                  "description" : "Unique ID of the template message to send.",
                   "pattern" : "([0-9]+)"
                 },
                 "language" : {
-                  "type" : [ "string", "null" ],
-                  "description" : "Language of Translation. Enter this input in ISO language code. For example @en@, @fr@, @de@, @bn@, @ta@ etc",
-                  "maxLength" : 100,
+                  "type" : "string",
+                  "description" : "Language of translation. Enter this input in ISO language code such as en, fr, de, bn, or ta.",
+                  "maxLength" : 50,
                   "minLength" : 0,
                   "pattern" : "af|sq|ar|az|bn|bg|ca|zh_CN|zh_HK|zh_TW|hr|cs|da|nl|en_GB|en_US|et|fil|fi|fr|ka|de|el|gu|ha|he|hi|hu|id|ga|it|ja|kn|kk|rw_RW|ko|ky_KG|lo|lv|lt|mk|ms|ml|mr|nb|fa|pl|pt_BR|pt_PT|pa|ro|ru|sr|sk|sl|es|es_AR|es_ES|es_MX|sw|sv|ta|te|th|tr|uk|ur|uz|vi|zu|en"
                 },
                 "message" : {
-                  "type" : [ "string", "null" ],
-                  "description" : "Content of the message",
-                  "maxLength" : 65535,
+                  "type" : "string",
+                  "description" : "Content of the message including the replaced value of message placeholders if present",
+                  "maxLength" : 1024,
+                  "minLength" : 0
+                },
+                "headerMessage" : {
+                  "type" : "string",
+                  "description" : "Content of the header message including the replaced value of header placeholder if present",
+                  "maxLength" : 60,
+                  "minLength" : 0
+                },
+                "urlMessage" : {
+                  "type" : "string",
+                  "description" : "Content of the URL message including the replaced value of URL placeholder if present",
+                  "maxLength" : 2000,
                   "minLength" : 0
                 }
               },
-              "required" : [ "cannedMessageId", "language", "message", "receiverId", "receiverType" ]
+              "required" : [ "cannedMessageId", "language", "message", "receiverId", "receiverType", "headerMessage", "urlMessage" ]
             },
             "examples" : {
-              "Valid requestBody Definitions" : {
-                "value" : {
-                  "receiverId" : "109000000002003",
-                  "receiverType" : "PHONENUMBER",
-                  "cannedMessageId" : "3942000001074175",
-                  "language" : "en",
-                  "message" : "Welcome to Tasty Bakery. What would you like to eat?"
+              "InitiateSession_request_bodyAndUrl" : {
+                "$ref" : "./examples/IM_Message.json#/components/examples/InitiateSession_request_bodyAndUrl"
+              },
+              "InitiateSession_request_headerAndBody" : {
+                "$ref" : "./examples/IM_Message.json#/components/examples/InitiateSession_request_headerAndBody"
+              }
+            }
+          }
+        }
+      },
+      "startSession" : {
+        "content" : {
+          "multipart/form-data" : {
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "properties" : {
+                "file" : {
+                  "type" : "string",
+                  "contentMediaType" : "application/octet-stream",
+                  "contentEncoding" : "binary",
+                  "description" : "File attachment to send with the Facebook Messenger session. Maximum size 20 MB. When a file is attached, pass the session JSON in the payload query parameter and omit message in facebookMessengerPayload."
                 }
+              },
+              "required" : [ "file" ]
+            },
+            "examples" : {
+              "StartSession_request_withAttachment" : {
+                "$ref" : "./examples/IM_Message.json#/components/examples/StartSession_request_withAttachment"
+              }
+            }
+          },
+          "application/json" : {
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "properties" : {
+                "integrationServiceId" : {
+                  "type" : "string",
+                  "description" : "Integration service of the channel. Possible values: FACEBOOKMESSENGER.",
+                  "const" : "FACEBOOKMESSENGER",
+                  "maxLength" : 100,
+                  "minLength" : 0
+                },
+                "facebookMessengerPayload" : {
+                  "type" : "object",
+                  "description" : "Facebook Messenger payload used to create the session and send the message.",
+                  "additionalProperties" : false,
+                  "properties" : {
+                    "message" : {
+                      "type" : "string",
+                      "description" : "Message content",
+                      "maxLength" : 15000,
+                      "minLength" : 0
+                    },
+                    "facebookUserId" : {
+                      "type" : [ "string", "integer" ],
+                      "format" : "int64",
+                      "description" : "Facebook user id",
+                      "pattern" : "([0-9]+)"
+                    },
+                    "facebookUserName" : {
+                      "type" : "string",
+                      "description" : "Facebook user Name",
+                      "maxLength" : 100,
+                      "minLength" : 0
+                    },
+                    "facebookCommentId" : {
+                      "type" : "string",
+                      "description" : "Facebook comment id to send reply to",
+                      "maxLength" : 100,
+                      "minLength" : 0
+                    }
+                  },
+                  "required" : [ "facebookCommentId", "facebookUserId" ]
+                },
+                "meta" : {
+                  "$ref" : "./IM_Message.json#/components/schemas/startSessionMeta"
+                }
+              },
+              "required" : [ "integrationServiceId", "facebookMessengerPayload" ]
+            },
+            "examples" : {
+              "StartSession_request_textOnly" : {
+                "$ref" : "./examples/IM_Message.json#/components/examples/StartSession_request_textOnly"
+              }
+            }
+          }
+        }
+      },
+      "addAttachmentMessage" : {
+        "content" : {
+          "multipart/form-data" : {
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "properties" : {
+                "file" : {
+                  "type" : "string",
+                  "contentMediaType" : "application/octet-stream",
+                  "contentEncoding" : "binary",
+                  "description" : "File to attach. Maximum file size is 20 MB."
+                }
+              },
+              "required" : [ "file" ]
+            },
+            "examples" : {
+              "AddAttachmentMessage_request" : {
+                "$ref" : "./examples/IM_Message.json#/components/examples/AddAttachmentMessage_request"
+              }
+            }
+          }
+        }
+      },
+      "addOutgoingMessage" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "properties" : {
+                "replyToMessageId" : {
+                  "type" : [ "string", "integer" ],
+                  "format" : "int64",
+                  "description" : "Unique ID of the message to which this message is a reply. Provide this to send a reply to a specific message in the session.",
+                  "pattern" : "([0-9]+)"
+                },
+                "message" : {
+                  "type" : "string",
+                  "description" : "Content of the outgoing message.",
+                  "maxLength" : 5000,
+                  "minLength" : 0
+                },
+                "location" : {
+                  "description" : "Location details to send as a location message. Includes latitude and longitude coordinates.",
+                  "$ref" : "./IM_Message.json#/components/schemas/location_input"
+                },
+                "meta" : {
+                  "description" : "Message metadata to be added to the session message.",
+                  "$ref" : "./IM_Message.json#/components/schemas/startSessionMeta"
+                }
+              }
+            },
+            "examples" : {
+              "AddOutgoingMessage_request_messageOnly" : {
+                "$ref" : "./examples/IM_Message.json#/components/examples/AddOutgoingMessage_request_messageOnly"
+              },
+              "AddOutgoingMessage_request_withReply" : {
+                "$ref" : "./examples/IM_Message.json#/components/examples/AddOutgoingMessage_request_withReply"
+              }
+            }
+          }
+        }
+      },
+      "getSessionsLastMessages" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "properties" : {
+                "sessionIds" : {
+                  "$ref" : "./IM_Message.json#/components/schemas/sessionIds"
+                }
+              },
+              "required" : [ "sessionIds" ]
+            },
+            "examples" : {
+              "GetSessionsLastMessages_request" : {
+                "$ref" : "./examples/IM_Message.json#/components/examples/GetSessionsLastMessages_request"
               }
             }
           }
@@ -502,6 +1742,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

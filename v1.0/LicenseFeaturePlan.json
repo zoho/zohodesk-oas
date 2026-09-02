@@ -2,29 +2,31 @@
   "openapi" : "3.1.0",
   "info" : {
     "title" : "License",
-    "version" : "v1",
-    "description" : "API for managing and querying license information, features, and plan details."
+    "version" : "1.0.0",
+    "description" : "These APIs work with licensing in Zoho Desk."
   },
   "tags" : [ {
     "name" : "License",
-    "description" : "Operations related to license features and plan information."
+    "description" : "These APIs work with licensing in Zoho Desk."
   } ],
   "paths" : {
     "/api/v1/licenses/features" : {
       "get" : {
         "tags" : [ "License" ],
-        "summary" : "Get License Feature Information",
-        "description" : "Fetches the list of all license features, with optional filters for active status and specific feature codes. Useful for retrieving their current availability (isAllowed) and usage limits. Returns either simple max values or detailed limit information based on the includeDetailedLimits parameter.",
+        "summary" : "Get License Feature Details",
+        "description" : "Retrieves all available license features in Desk along with their applicability and usage limits for the current portal.",
         "operationId" : "featureInfo",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "featureCodes",
           "in" : "query",
           "required" : false,
-          "description" : "Comma-separated list of feature codes to retrieve information for.",
+          "description" : "Returns feature details for the specified feature codes <p><b>Note:</b> Multiple codes can be provided by separating them with commas</p>",
           "schema" : {
-            "type" : "array",
+            "type" : [ "array" ],
+            "maxItems" : 50,
             "items" : {
-              "type" : "string"
+              "type" : [ "string" ]
             }
           },
           "style" : "form",
@@ -33,219 +35,101 @@
           "name" : "isAllowed",
           "in" : "query",
           "required" : false,
-          "description" : "Filter features based on their active status.",
+          "description" : "Filters features based on whether they are allowed for the current portal  <p><b>Possible values:</b>  - true = returns allowed features   - false = returns disallowed features</p>",
           "schema" : {
-            "type" : "boolean"
-          }
+            "type" : [ "boolean" ]
+          },
+          "style" : "form",
+          "explode" : true
         }, {
           "name" : "includeDetailedLimits",
           "in" : "query",
           "required" : false,
-          "description" : "Flag to include detailed per-unit feature limits (max, free, add-on values) instead of only max values.",
+          "description" : "Includes detailed per-unit feature limits instead of only max values <p><b>Possible values:</b>  - true = includes detailed per-unit limits   - false = includes only max values</p>",
           "schema" : {
-            "type" : "boolean"
-          }
+            "type" : [ "boolean" ]
+          },
+          "style" : "form",
+          "explode" : true
         } ],
         "responses" : {
           "200" : {
-            "description" : "Successfully retrieved feature information.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/LicenseFeatureListResponse"
-                },
-                "examples" : {
-                  "simple" : {
-                    "summary" : "Simple mode (includeDetailedLimits=false)",
-                    "value" : {
-                      "data" : [ {
-                        "featureCode" : "AGNT01",
-                        "featureName" : "Agent",
-                        "isAllowed" : true,
-                        "limits" : [ {
-                          "unitCode" : "ORG",
-                          "maxValue" : 33
-                        } ]
-                      } ]
-                    }
-                  },
-                  "detailed" : {
-                    "summary" : "Detailed mode (includeDetailedLimits=true)",
-                    "value" : {
-                      "data" : [ {
-                        "featureCode" : "AGNT01",
-                        "featureName" : "Agent",
-                        "isAllowed" : true,
-                        "limits" : [ {
-                          "unitCode" : "ORG",
-                          "maxValue" : 33,
-                          "freeValue" : 5,
-                          "addOnValue" : 3
-                        } ]
-                      } ]
-                    }
-                  }
-                }
-              }
-            }
+            "$ref" : "#/components/responses/featureInfoResponse"
           },
           "422" : {
             "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
           }
         },
-        "x-audience" : [ "external-public" ]
-      }
-    },
-    "/api/v1/licenses/features/{featureCode}/availability" : {
-      "get" : {
-        "tags" : [ "License" ],
-        "summary" : "Check License Availability",
-        "description" : "Checks if a specific license feature is available, potentially for a given entity and item count.",
-        "operationId" : "checkLicenseAvailability",
         "x-audience" : [ "external-public" ],
-        "parameters" : [ {
-          "name" : "featureCode",
-          "in" : "path",
-          "required" : true,
-          "description" : "The feature code to check availability for.",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "entityId",
-          "in" : "query",
-          "required" : false,
-          "description" : "The ID of the entity (e.g., Department ID) for which to check availability.",
-          "schema" : {
-            "type" : "string",
-            "format" : "int64"
-          }
-        }, {
-          "name" : "count",
-          "in" : "query",
-          "required" : false,
-          "description" : "The number of items for which the license is being checked.",
-          "schema" : {
-            "type" : "integer"
-          }
-        }, {
-          "name" : "criteria",
-          "in" : "query",
-          "required" : false,
-          "description" : "Refine license availability check based on constraints",
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "Successfully checked license availability.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/IsAllowedResponse"
-                },
-                "examples" : {
-                  "isAllowed" : {
-                    "value" : {
-                      "isAllowed" : true
-                    }
-                  },
-                  "notAllowed" : {
-                    "value" : {
-                      "isAllowed" : false
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "422" : {
-            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
-          }
-        }
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.settings.READ" ]
+        } ]
       }
     },
     "/api/v1/licenses/plan" : {
       "get" : {
         "tags" : [ "License" ],
-        "summary" : "Get License Plan Information",
-        "description" : "Retrieves details about the current license plan.",
+        "summary" : "Get License Plan Details",
+        "description" : "Retrieves the current portal's license plan information.",
         "operationId" : "planinfo",
+        "x-mcp-ready" : true,
         "x-audience" : [ "external-public" ],
         "responses" : {
           "200" : {
-            "description" : "Successfully retrieved plan information.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/PlanInfoResponse"
-                },
-                "examples" : {
-                  "success" : {
-                    "value" : {
-                      "planName" : "Enterprise",
-                      "planCode" : "ENTP01",
-                      "planStatus" : "Active",
-                      "expiryDate" : "1749203963937",
-                      "billingCycle" : "Annual",
-                      "storePlanId" : 12345,
-                      "storeProfileId" : "prof_abc123",
-                      "previousPlanCode" : "PRO01"
-                    }
-                  }
-                }
-              }
-            }
+            "$ref" : "#/components/responses/planinfoResponse"
           },
           "422" : {
             "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
           }
-        }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.settings.READ" ]
+        } ]
       }
     }
   },
   "components" : {
     "schemas" : {
       "LicenseUnitValue" : {
-        "type" : "object",
+        "type" : [ "object" ],
         "description" : "Detailed license unit value information",
         "properties" : {
           "unitCode" : {
-            "type" : "string",
-            "description" : "Type of unit for which the limit applies (e.g., ORG, AGENT, TEAM)",
+            "type" : [ "string" ],
+            "description" : "Type of unit for which the limit applies",
             "example" : "ORG"
           },
           "maxValue" : {
-            "type" : "integer",
-            "description" : "Maximum allowed value for this unit",
+            "type" : [ "integer" ],
+            "description" : "Maximum quota allowed for the feature  <p><b>Note:</b> A value of -1 indicates unlimited usage</p>",
             "example" : 33
           },
           "freeValue" : {
-            "type" : "integer",
-            "description" : "Free value included in the base plan",
+            "type" : [ "integer" ],
+            "description" : "Free quota available for the feature irrespective of plan or add-ons   <p><b>Note:</b> Returned when includeDetailedLimits is true</p>",
             "example" : 5
           },
           "addOnValue" : {
-            "type" : "integer",
-            "description" : "Additional value from add-ons",
+            "type" : [ "integer" ],
+            "description" : "Additional quota provided through purchased add-ons  <p><b>Note:</b> Returned when includeDetailedLimits is true</p>",
             "example" : 3
           }
         },
-        "required" : [ "unitCode", "maxValue" ]
+        "required" : [ "unitCode", "maxValue" ],
+        "additionalProperties" : false
       },
       "SimpleLicenseUnit" : {
-        "type" : "object",
+        "type" : [ "object" ],
         "description" : "Simple license unit with only max value",
         "properties" : {
           "unitCode" : {
-            "type" : "string",
-            "description" : "Type of unit for which the limit applies (e.g., ORG, AGENT, TEAM)",
+            "type" : [ "string" ],
+            "description" : "Type of unit for which the limit applies",
             "example" : "ORG"
           },
           "maxValue" : {
-            "type" : "integer",
-            "description" : "Maximum allowed value for this unit",
+            "type" : [ "integer" ],
+            "description" : "Maximum quota allowed for the feature  <p><b>Note:</b> A value of -1 indicates unlimited usage</p>",
             "example" : 33
           }
         },
@@ -253,27 +137,27 @@
         "additionalProperties" : false
       },
       "FeatureAllowed" : {
-        "type" : "object",
+        "type" : [ "object" ],
         "description" : "Details of an allowed feature with flexible limit information.",
         "properties" : {
           "featureCode" : {
-            "type" : "string",
-            "description" : "The unique code of the feature.",
+            "type" : [ "string" ],
+            "description" : "Unique feature code defined in the license framework",
             "example" : "AGNT01"
           },
           "featureName" : {
-            "type" : "string",
-            "description" : "The display name of the feature.",
+            "type" : [ "string" ],
+            "description" : "Display name of the feature",
             "example" : "Agent"
           },
           "isAllowed" : {
-            "type" : "boolean",
-            "description" : "Indicates if the feature is currently allowed under the license.",
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the feature is enabled for the current portal  <p><b>Possible values:</b>  - true = feature is enabled   - false = feature is disabled</p>",
             "example" : true
           },
           "limits" : {
-            "type" : "array",
-            "description" : "Array of license limits per applicable unit. Structure varies based on includeDetailedLimits parameter.",
+            "type" : [ "array" ],
+            "description" : "License limit details for the feature  <p><b>Note:</b> Returned as an empty list when data.isAllowed is false</p>",
             "items" : {
               "anyOf" : [ {
                 "$ref" : "#/components/schemas/SimpleLicenseUnit"
@@ -289,79 +173,146 @@
             } ]
           }
         },
-        "required" : [ "featureCode", "featureName", "isAllowed" ]
+        "required" : [ "featureCode", "featureName", "isAllowed" ],
+        "additionalProperties" : false
       },
       "LicenseFeatureListResponse" : {
-        "type" : "object",
+        "type" : [ "object" ],
         "properties" : {
           "data" : {
-            "type" : "array",
+            "type" : [ "array" ],
             "items" : {
               "$ref" : "#/components/schemas/FeatureAllowed"
-            }
-          }
-        }
-      },
-      "IsAllowedResponse" : {
-        "type" : "object",
-        "properties" : {
-          "isAllowed" : {
-            "type" : "boolean",
-            "description" : "Indicates whether the requested license feature is available/allowed.",
-            "example" : true
+            },
+            "description" : "List of license features"
           }
         },
-        "required" : [ "isAllowed" ]
+        "additionalProperties" : false
       },
       "PlanInfoResponse" : {
-        "type" : "object",
+        "type" : [ "object" ],
         "description" : "Detailed information about the current license plan.",
         "properties" : {
           "planName" : {
-            "type" : "string",
-            "description" : "The name of the current plan.",
+            "type" : [ "string" ],
+            "description" : "Name of the current plan",
             "example" : "Enterprise"
           },
           "planCode" : {
-            "type" : "string",
-            "description" : "The unique code for the current plan.",
-            "example" : "ENTP01"
+            "type" : [ "string" ],
+            "description" : "Code of the current plan",
+            "example" : "E2019"
           },
           "planStatus" : {
-            "type" : "string",
-            "description" : "The current status of the plan (e.g., Active, Trial, Expired).",
-            "example" : "Active"
+            "type" : [ "string" ],
+            "description" : "Status of the plan",
+            "example" : "PAID"
           },
           "expiryDate" : {
-            "type" : "integer",
+            "type" : [ "integer" ],
             "format" : "int64",
-            "description" : "The expiry date of the current plan represented as milliseconds since Unix epoch.",
+            "description" : "Expiry date of the current plan in epoch milliseconds",
             "example" : 1749203963937
           },
           "billingCycle" : {
-            "type" : "string",
-            "description" : "The billing cycle for the plan (e.g., Monthly, Annual).",
-            "example" : "Annual"
+            "type" : [ "string" ],
+            "description" : "Billing cycle of the plan",
+            "example" : "Yearly"
           },
           "storePlanId" : {
-            "type" : "integer",
-            "description" : "The ID of the plan in the billing/store system.",
+            "type" : [ "integer" ],
+            "description" : "Store plan ID of the current plan",
             "example" : 12345
           },
           "storeProfileId" : {
-            "type" : "string",
-            "description" : "The ID of the profile in the billing/store system.",
+            "type" : [ "string" ],
+            "description" : "Store profile ID associated with the plan",
             "example" : "prof_abc123"
           },
           "previousPlanCode" : {
             "type" : [ "string", "null" ],
-            "description" : "The code of the previous plan, if applicable.",
+            "description" : "Code of the previous plan",
             "example" : "PRO01"
+          }
+        },
+        "additionalProperties" : false
+      }
+    },
+    "responses" : {
+      "featureInfoResponse" : {
+        "description" : "Successfully retrieved feature information.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/LicenseFeatureListResponse"
+            },
+            "examples" : {
+              "simple" : {
+                "summary" : "Simple mode (includeDetailedLimits=false)",
+                "value" : {
+                  "data" : [ {
+                    "featureCode" : "AGNT01",
+                    "featureName" : "Agent",
+                    "isAllowed" : true,
+                    "limits" : [ {
+                      "unitCode" : "ORG",
+                      "maxValue" : 33
+                    } ]
+                  } ]
+                }
+              },
+              "detailed" : {
+                "summary" : "Detailed mode (includeDetailedLimits=true)",
+                "value" : {
+                  "data" : [ {
+                    "featureCode" : "AGNT01",
+                    "featureName" : "Agent",
+                    "isAllowed" : true,
+                    "limits" : [ {
+                      "unitCode" : "ORG",
+                      "maxValue" : 33,
+                      "freeValue" : 5,
+                      "addOnValue" : 3
+                    } ]
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "planinfoResponse" : {
+        "description" : "Successfully retrieved plan information.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/PlanInfoResponse"
+            },
+            "examples" : {
+              "success" : {
+                "value" : {
+                  "planName" : "Enterprise",
+                  "planCode" : "E2019",
+                  "planStatus" : "PAID",
+                  "expiryDate" : 1749203963937,
+                  "billingCycle" : "Yearly",
+                  "storePlanId" : 10218,
+                  "storeProfileId" : "REDS01012019",
+                  "previousPlanCode" : "E2019"
+                }
+              }
+            }
           }
         }
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

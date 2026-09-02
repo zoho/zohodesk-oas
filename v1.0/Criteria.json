@@ -7,296 +7,308 @@
   "paths" : { },
   "components" : {
     "schemas" : {
-      "availableConditionJson" : {
-        "type" : [ "null", "object" ],
+      "automationCriteriaResponse" : {
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
-        "description" : "",
+        "properties" : {
+          "displayValue" : {
+            "type" : [ "array", "null" ],
+            "items" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "uniqueItems" : false,
+            "description" : "Display values for the criteria condition"
+          },
+          "condition" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(.*|null|undefined)",
+            "description" : "Criteria condition operator"
+          },
+          "fieldName" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "Name of the field"
+          },
+          "fieldModule" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "tickets", "tasks", "contracts", "accounts", "contacts", "products", "calls", "events", "activities" ],
+            "description" : "Accepted values: tickets, tasks, contracts, accounts, contacts, products, calls, events, activities"
+          },
+          "value" : {
+            "type" : [ "array", "null" ],
+            "items" : { },
+            "uniqueItems" : false,
+            "description" : "Values associated with the criteria condition"
+          }
+        },
+        "required" : [ "condition", "displayValue", "fieldModule", "fieldName", "value" ]
+      },
+      "availableConditionJson" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
         "properties" : {
           "condition" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "(.*|null|undefined)"
+            "pattern" : "(.*|null|undefined)",
+            "description" : "Condition operator"
           },
           "i18NCondition" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "(.*|null|undefined)"
+            "pattern" : "(.*|null|undefined)",
+            "description" : "Internationalized label of the condition"
           },
           "value" : {
-            "type" : [ "null", "array" ],
-            "description" : "",
-            "items" : {
-              "description" : "",
-              "oneOf" : [ {
-                "type" : [ "string", "null" ],
-                "description" : "",
-                "maxLength" : 100,
-                "minLength" : 0,
-                "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
-              }, {
-                "type" : [ "null", "array" ],
-                "description" : "",
-                "items" : {
-                  "type" : [ "string", "null" ],
-                  "description" : "",
-                  "maxLength" : 100,
-                  "minLength" : 0,
-                  "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
-                },
-                "uniqueItems" : false
-              } ]
-            },
-            "uniqueItems" : false
+            "type" : [ "array", "null" ],
+            "items" : { },
+            "uniqueItems" : false,
+            "description" : "Predefined values available for the condition"
           }
         },
         "required" : [ "condition", "i18NCondition", "value" ]
       },
       "availableConditionArr" : {
-        "type" : [ "null", "array" ],
-        "description" : "",
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./Criteria.json#/components/schemas/availableConditionJson"
+          "$ref" : "#/components/schemas/availableConditionJson"
         }
       },
       "primitiveConditionJson" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
-        "description" : "",
         "properties" : {
           "condition" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "(.*|null|undefined)"
+            "pattern" : "(.*|null|undefined)",
+            "description" : "Criteria condition operator"
           },
           "conditionType" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "Type of the criteria condition"
           },
           "i18NCondition" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "(.*|null|undefined)"
+            "pattern" : "(.*|null|undefined)",
+            "description" : "Internationalized label for the condition"
           },
           "url" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "maxLength" : 500,
             "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "URL associated with the condition"
           }
         },
         "required" : [ "condition", "conditionType", "i18NCondition", "url" ]
       },
       "primitiveConditionJsonWithoutURL" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
-        "description" : "",
         "properties" : {
           "condition" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "(.*|null|undefined)"
+            "pattern" : "(.*|null|undefined)",
+            "description" : "Criteria condition operator"
           },
           "conditionType" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "Type of the criteria condition"
           },
           "i18NCondition" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "(.*|null|undefined)"
+            "pattern" : "(.*|null|undefined)",
+            "description" : "Internationalized label for the condition"
           }
         },
         "required" : [ "condition", "conditionType", "i18NCondition" ]
       },
       "primitiveConditionJsonWithAllowedValues" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
-        "description" : "",
         "properties" : {
           "allowedValues" : {
-            "type" : [ "null", "array" ],
-            "description" : "",
+            "type" : [ "array", "null" ],
             "items" : {
               "type" : [ "string", "null" ],
-              "description" : "",
               "maxLength" : 100,
               "minLength" : 0,
               "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
             },
-            "uniqueItems" : false
+            "uniqueItems" : false,
+            "description" : "Allowed values for the condition"
           },
           "condition" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "(.*|null|undefined)"
+            "pattern" : "(.*|null|undefined)",
+            "description" : "Criteria condition operator"
           },
           "conditionType" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "Type of the criteria condition"
           },
           "i18NCondition" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "(.*|null|undefined)"
+            "pattern" : "(.*|null|undefined)",
+            "description" : "Internationalized label for the condition"
           }
         },
         "required" : [ "allowedValues", "condition", "conditionType", "i18NCondition" ]
       },
       "primitiveConditionArr" : {
-        "type" : [ "null", "array" ],
-        "description" : "",
+        "type" : [ "array", "null" ],
         "items" : {
-          "description" : "",
           "oneOf" : [ {
-            "$ref" : "./Criteria.json#/components/schemas/primitiveConditionJson"
+            "$ref" : "#/components/schemas/primitiveConditionJson"
           }, {
-            "$ref" : "./Criteria.json#/components/schemas/primitiveConditionJsonWithoutURL"
+            "$ref" : "#/components/schemas/primitiveConditionJsonWithoutURL"
           }, {
-            "$ref" : "./Criteria.json#/components/schemas/primitiveConditionJsonWithAllowedValues"
+            "$ref" : "#/components/schemas/primitiveConditionJsonWithAllowedValues"
           } ]
         }
       },
       "criteriaJson" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
-        "description" : "",
         "properties" : {
           "availableConditions" : {
-            "$ref" : "./Criteria.json#/components/schemas/availableConditionArr"
+            "$ref" : "#/components/schemas/availableConditionArr"
           },
           "apiName" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "API name of the field"
           },
           "fieldName" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "Name of the field"
           },
           "fieldLabel" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "Display label of the field"
           },
           "i18NLabel" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "Internationalized label of the field"
           },
           "primitiveConditions" : {
-            "$ref" : "./Criteria.json#/components/schemas/primitiveConditionArr"
+            "$ref" : "#/components/schemas/primitiveConditionArr"
           },
           "id" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "Unique ID"
           },
           "type" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "Data type of the field"
           },
           "fieldType" : {
             "type" : [ "string", "null" ],
-            "description" : "",
-            "enum" : [ "Text", "URL", "Textarea", "Email", "Phone", "Multiselect", "Date", "DateTime", "Number", "Checkbox", "Percent", "Decimal", "Currency", "Picklist", "LookUp", "Lookup", "AutoNumber", "Boolean", "Fax", "Formula", "formula" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "Text", "URL", "Textarea", "Email", "Phone", "Multiselect", "Date", "DateTime", "Number", "Checkbox", "Percent", "Decimal", "Currency", "Picklist", "LookUp", "AutoNumber", "Boolean", "Fax", "Formula" ],
+            "description" : "Accepted values: Text, URL, Textarea, Email, Phone, Multiselect, Date, DateTime, Number, Checkbox, Percent, Decimal, Currency, Picklist, LookUp, AutoNumber, Boolean, Fax, Formula"
           }
         },
         "required" : [ "apiName", "availableConditions", "fieldLabel", "fieldName", "fieldType", "i18NLabel", "id", "primitiveConditions", "type" ]
       },
       "fieldDetailsArr" : {
-        "type" : [ "null", "array" ],
-        "description" : "",
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./Criteria.json#/components/schemas/criteriaJson"
+          "$ref" : "#/components/schemas/criteriaJson"
         }
       },
       "criteriaFieldsJson" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
-        "description" : "",
         "properties" : {
           "displayLabel" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "enum" : [ "Tickets", "Contacts", "Accounts", "Tasks", "Solutions", "Products", "Contracts", "Calls - Call Information", "Events - Event Information", "Activities", "TimeEntry", "Cases", "Calls", "Events" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "description" : "Display label of the criteria field group"
           },
           "name" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "enum" : [ "tickets", "contacts", "products", "accounts", "tasks", "social", "articles", "community", "timeEntry", "contracts", "topics", "departments", "agents", "category", "attachments", "solutions", "reports", "kbCategory", "dashboards", "chat", "calls", "events", "activities" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "description" : "API name of the criteria field group"
           },
           "fieldDetails" : {
-            "$ref" : "./Criteria.json#/components/schemas/fieldDetailsArr"
+            "$ref" : "#/components/schemas/fieldDetailsArr"
           }
         },
         "required" : [ "displayLabel", "fieldDetails", "name" ]
       },
       "criteriaFieldsArr" : {
-        "type" : [ "null", "array" ],
-        "description" : "",
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./Criteria.json#/components/schemas/criteriaFieldsJson"
+          "$ref" : "#/components/schemas/criteriaFieldsJson"
         }
       },
       "criteriaFieldsObject" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
-        "description" : "",
         "properties" : {
           "criteriaFields" : {
-            "$ref" : "./Criteria.json#/components/schemas/criteriaFieldsArr"
+            "$ref" : "#/components/schemas/criteriaFieldsArr"
           }
         },
         "required" : [ "criteriaFields" ]
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "jwt-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/jwt-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

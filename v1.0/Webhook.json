@@ -23,7 +23,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.events.READ" ]
+          "iam-oauth2-schema" : [ "Desk.events.READ", "Desk.settings.READ", "Desk.webhooks.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
       },
@@ -47,7 +47,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.CREATE", "Desk.events.CREATE" ]
+          "iam-oauth2-schema" : [ "Desk.events.CREATE", "Desk.settings.CREATE", "Desk.webhooks.CREATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -59,7 +59,16 @@
         "description" : "This API fetches a single webhook from your help desk.",
         "operationId" : "getWebhook",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/webhookId"
+          "name" : "webhookId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -69,7 +78,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.events.READ" ]
+          "iam-oauth2-schema" : [ "Desk.events.READ", "Desk.settings.READ", "Desk.webhooks.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
       },
@@ -79,7 +88,16 @@
         "description" : "This API deletes an existing webhook. After this API is executed, the URL in the webhook stops receiving event information.",
         "operationId" : "deleteWebhook",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/webhookId"
+          "name" : "webhookId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -89,7 +107,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.DELETE", "Desk.events.DELETE" ]
+          "iam-oauth2-schema" : [ "Desk.events.DELETE", "Desk.settings.DELETE", "Desk.webhooks.DELETE" ]
         } ],
         "x-audience" : [ "external-public" ]
       },
@@ -99,7 +117,16 @@
         "description" : "This API updates the details of an existing webhook. When the webhook's URL is altered, a validation GET request is sent to the new URL. If the 200 OK message is not received, a validation POST request is initiated.",
         "operationId" : "updateWebhook",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/webhookId"
+          "name" : "webhookId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -115,7 +142,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE", "Desk.events.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.events.UPDATE", "Desk.settings.UPDATE", "Desk.webhooks.UPDATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -124,43 +151,39 @@
   "components" : {
     "schemas" : {
       "subscriptions" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "Account_Add" : {
-            "type" : [ "null", "object" ],
-            "additionalProperties" : false
+            "type" : [ "string", "null" ]
           },
           "Event_Delete" : {
-            "type" : [ "null", "object" ],
-            "additionalProperties" : false
+            "type" : [ "string", "null" ]
           },
           "Article_Translation_Add" : {
-            "type" : [ "null", "object" ],
-            "additionalProperties" : false
+            "type" : [ "string", "null" ]
           },
           "Article_Translation_Delete" : {
-            "type" : [ "null", "object" ],
-            "additionalProperties" : false
+            "type" : [ "string", "null" ]
           },
           "Ticket_Attachment_Add" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
             "additionalProperties" : false
           },
           "Ticket_Attachment_Update" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
             "additionalProperties" : false
           },
           "Event_Update" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
             "additionalProperties" : false,
             "maxProperties" : 2,
             "minProperties" : 2,
             "properties" : {
               "departmentIds" : {
-                "type" : [ "null", "array" ],
+                "type" : [ "array", "null" ],
                 "items" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
@@ -173,26 +196,34 @@
             "required" : [ "departmentIds", "includePrevState" ]
           },
           "Agent_Presence_Update" : {
-            "type" : [ "null", "object" ],
-            "additionalProperties" : false
+            "type" : [ "string", "null" ]
           },
           "Ticket_Update" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
             "additionalProperties" : false,
-            "maxProperties" : 3,
-            "minProperties" : 3,
+            "maxProperties" : 4,
+            "minProperties" : 4,
             "properties" : {
-              "departmentIds" : {
-                "type" : [ "null", "array" ],
+              "departmentId" : {
+                "type" : [ "array", "null" ],
                 "items" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "uniqueItems" : false
+              },
+              "departmentIds" : {
+                "type" : [ "array", "null" ],
+                "items" : {
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "uniqueItems" : false
               },
               "fields" : {
-                "type" : [ "null", "array" ],
+                "type" : [ "array", "null" ],
                 "items" : {
                   "type" : [ "string", "null" ],
                   "maxLength" : 100,
@@ -207,40 +238,48 @@
                 "type" : [ "boolean", "null" ]
               }
             },
-            "required" : [ "departmentIds", "fields", "includePrevState" ]
+            "required" : [ "departmentId", "departmentIds", "fields", "includePrevState" ]
           },
           "Contact_Delete" : {
-            "type" : [ "null", "object" ],
-            "additionalProperties" : false
+            "type" : [ "string", "null" ]
           },
           "Ticket_Comment_Update" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
             "additionalProperties" : false,
-            "maxProperties" : 1,
-            "minProperties" : 1,
+            "maxProperties" : 2,
+            "minProperties" : 2,
             "properties" : {
-              "departmentIds" : {
-                "type" : [ "null", "array" ],
+              "departmentId" : {
+                "type" : [ "array", "null" ],
                 "items" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "uniqueItems" : false
+              },
+              "departmentIds" : {
+                "type" : [ "array", "null" ],
+                "items" : {
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "uniqueItems" : false
               }
             },
-            "required" : [ "departmentIds" ]
+            "required" : [ "departmentId", "departmentIds" ]
           },
           "Task_Add" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
             "additionalProperties" : false,
             "maxProperties" : 1,
             "minProperties" : 1,
             "properties" : {
               "departmentIds" : {
-                "type" : [ "null", "array" ],
+                "type" : [ "array", "null" ],
                 "items" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
@@ -250,33 +289,42 @@
             "required" : [ "departmentIds" ]
           },
           "Ticket_Add" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
             "additionalProperties" : false,
-            "maxProperties" : 1,
-            "minProperties" : 1,
+            "maxProperties" : 2,
+            "minProperties" : 2,
             "properties" : {
-              "departmentIds" : {
-                "type" : [ "null", "array" ],
+              "departmentId" : {
+                "type" : [ "array", "null" ],
                 "items" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "uniqueItems" : false
+              },
+              "departmentIds" : {
+                "type" : [ "array", "null" ],
+                "items" : {
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "uniqueItems" : false
               }
             },
-            "required" : [ "departmentIds" ]
+            "required" : [ "departmentId", "departmentIds" ]
           },
           "Task_Update" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
             "additionalProperties" : false,
             "maxProperties" : 2,
             "minProperties" : 2,
             "properties" : {
               "departmentIds" : {
-                "type" : [ "null", "array" ],
+                "type" : [ "array", "null" ],
                 "items" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
@@ -289,11 +337,10 @@
             "required" : [ "departmentIds", "includePrevState" ]
           },
           "Task_Delete" : {
-            "type" : [ "null", "object" ],
-            "additionalProperties" : false
+            "type" : [ "string", "null" ]
           },
           "KBRootCategory_Update" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
             "additionalProperties" : false,
             "maxProperties" : 1,
             "minProperties" : 1,
@@ -305,15 +352,15 @@
             "required" : [ "includePrevState" ]
           },
           "Call_Add" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
             "additionalProperties" : false,
             "maxProperties" : 1,
             "minProperties" : 1,
             "properties" : {
               "departmentIds" : {
-                "type" : [ "null", "array" ],
+                "type" : [ "array", "null" ],
                 "items" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
@@ -323,7 +370,7 @@
             "required" : [ "departmentIds" ]
           },
           "Article_Update" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
             "additionalProperties" : false,
             "maxProperties" : 1,
             "minProperties" : 1,
@@ -335,19 +382,16 @@
             "required" : [ "includePrevState" ]
           },
           "KBRootCategory_Delete" : {
-            "type" : [ "null", "object" ],
-            "additionalProperties" : false
+            "type" : [ "string", "null" ]
           },
           "Article_Delete" : {
-            "type" : [ "null", "object" ],
-            "additionalProperties" : false
+            "type" : [ "string", "null" ]
           },
           "KBRootCategory_Add" : {
-            "type" : [ "null", "object" ],
-            "additionalProperties" : false
+            "type" : [ "string", "null" ]
           },
           "Agent_Update" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
             "additionalProperties" : false,
             "maxProperties" : 1,
             "minProperties" : 1,
@@ -359,23 +403,19 @@
             "required" : [ "includePrevState" ]
           },
           "Department_Add" : {
-            "type" : [ "null", "object" ],
-            "additionalProperties" : false
+            "type" : [ "string", "null" ]
           },
           "Contact_Add" : {
-            "type" : [ "null", "object" ],
-            "additionalProperties" : false
+            "type" : [ "string", "null" ]
           },
           "KBSection_Delete" : {
-            "type" : [ "null", "object" ],
-            "additionalProperties" : false
+            "type" : [ "string", "null" ]
           },
           "Agent_Delete" : {
-            "type" : [ "null", "object" ],
-            "additionalProperties" : false
+            "type" : [ "string", "null" ]
           },
           "KBSection_Update" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
             "additionalProperties" : false,
             "maxProperties" : 1,
             "minProperties" : 1,
@@ -387,19 +427,18 @@
             "required" : [ "includePrevState" ]
           },
           "Account_Delete" : {
-            "type" : [ "null", "object" ],
-            "additionalProperties" : false
+            "type" : [ "string", "null" ]
           },
           "Event_Add" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
             "additionalProperties" : false,
             "maxProperties" : 1,
             "minProperties" : 1,
             "properties" : {
               "departmentIds" : {
-                "type" : [ "null", "array" ],
+                "type" : [ "array", "null" ],
                 "items" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
@@ -409,15 +448,15 @@
             "required" : [ "departmentIds" ]
           },
           "Call_Update" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
             "additionalProperties" : false,
             "maxProperties" : 2,
             "minProperties" : 2,
             "properties" : {
               "departmentIds" : {
-                "type" : [ "null", "array" ],
+                "type" : [ "array", "null" ],
                 "items" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
@@ -430,37 +469,43 @@
             "required" : [ "departmentIds", "includePrevState" ]
           },
           "Call_Delete" : {
-            "type" : [ "null", "object" ],
-            "additionalProperties" : false
+            "type" : [ "string", "null" ]
           },
           "Article_Add" : {
-            "type" : [ "null", "object" ],
-            "additionalProperties" : false
+            "type" : [ "string", "null" ]
           },
           "Ticket_Comment_Add" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
             "additionalProperties" : false,
-            "maxProperties" : 1,
-            "minProperties" : 1,
+            "maxProperties" : 2,
+            "minProperties" : 2,
             "properties" : {
-              "departmentIds" : {
-                "type" : [ "null", "array" ],
+              "departmentId" : {
+                "type" : [ "array", "null" ],
                 "items" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "uniqueItems" : false
+              },
+              "departmentIds" : {
+                "type" : [ "array", "null" ],
+                "items" : {
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "uniqueItems" : false
               }
             },
-            "required" : [ "departmentIds" ]
+            "required" : [ "departmentId", "departmentIds" ]
           },
           "KBSection_Add" : {
-            "type" : [ "null", "object" ],
-            "additionalProperties" : false
+            "type" : [ "string", "null" ]
           },
           "Contact_Update" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
             "additionalProperties" : false,
             "maxProperties" : 1,
             "minProperties" : 1,
@@ -472,11 +517,10 @@
             "required" : [ "includePrevState" ]
           },
           "Agent_Add" : {
-            "type" : [ "null", "object" ],
-            "additionalProperties" : false
+            "type" : [ "string", "null" ]
           },
           "Account_Update" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
             "additionalProperties" : false,
             "maxProperties" : 1,
             "minProperties" : 1,
@@ -488,19 +532,36 @@
             "required" : [ "includePrevState" ]
           },
           "Article_Feedback_Add" : {
-            "type" : [ "null", "object" ],
-            "additionalProperties" : false
+            "type" : [ "string", "null" ]
           },
           "IM_Message_Add" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
             "additionalProperties" : false,
             "maxProperties" : 1,
             "minProperties" : 1,
             "properties" : {
               "departmentIds" : {
-                "type" : [ "null", "array" ],
+                "type" : [ "array", "null" ],
                 "items" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "uniqueItems" : false
+              }
+            },
+            "required" : [ "departmentIds" ]
+          },
+          "IM_Message_Status" : {
+            "type" : [ "object", "null" ],
+            "additionalProperties" : false,
+            "maxProperties" : 1,
+            "minProperties" : 1,
+            "properties" : {
+              "departmentIds" : {
+                "type" : [ "array", "null" ],
+                "items" : {
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
@@ -510,7 +571,7 @@
             "required" : [ "departmentIds" ]
           },
           "Article_Translation_Update" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
             "additionalProperties" : false,
             "maxProperties" : 1,
             "minProperties" : 1,
@@ -522,7 +583,7 @@
             "required" : [ "includePrevState" ]
           },
           "Department_Update" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
             "additionalProperties" : false,
             "maxProperties" : 1,
             "minProperties" : 1,
@@ -534,15 +595,24 @@
             "required" : [ "includePrevState" ]
           },
           "Ticket_Thread_Add" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
             "additionalProperties" : false,
-            "maxProperties" : 2,
-            "minProperties" : 2,
+            "maxProperties" : 3,
+            "minProperties" : 3,
             "properties" : {
-              "departmentIds" : {
-                "type" : [ "null", "array" ],
+              "departmentId" : {
+                "type" : [ "array", "null" ],
                 "items" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "uniqueItems" : false
+              },
+              "departmentIds" : {
+                "type" : [ "array", "null" ],
+                "items" : {
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
@@ -550,28 +620,154 @@
               },
               "direction" : {
                 "type" : [ "string", "null" ],
-                "enum" : [ "in", "out" ],
-                "maxLength" : 100,
-                "minLength" : 0
+                "enum" : [ "in", "out" ]
               }
             },
-            "required" : [ "departmentIds", "direction" ]
+            "required" : [ "departmentId", "departmentIds", "direction" ]
           },
           "Ticket_Delete" : {
-            "type" : [ "null", "object" ],
-            "additionalProperties" : false
+            "type" : [ "string", "null" ]
+          },
+          "Agent_Channel_Preference_Update" : {
+            "type" : [ "string", "null" ],
+            "description" : "Agent channel preference update Event: This event does not support filters. Therefore, pass the value as null in the API request."
+          },
+          "IM_Session_Status" : {
+            "type" : [ "object", "null" ],
+            "additionalProperties" : false,
+            "maxProperties" : 2,
+            "minProperties" : 2,
+            "properties" : {
+              "departmentId" : {
+                "type" : [ "array", "null" ],
+                "items" : {
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "uniqueItems" : false
+              },
+              "departmentIds" : {
+                "type" : [ "array", "null" ],
+                "items" : {
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "uniqueItems" : false
+              }
+            },
+            "required" : [ "departmentId", "departmentIds" ]
+          },
+          "Ticket_Attachment_Trashed" : {
+            "type" : [ "object", "null" ],
+            "additionalProperties" : false,
+            "maxProperties" : 1,
+            "minProperties" : 1,
+            "properties" : {
+              "departmentIds" : {
+                "type" : [ "array", "null" ],
+                "items" : {
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "uniqueItems" : false
+              }
+            },
+            "required" : [ "departmentIds" ]
+          },
+          "Ticket_Attachment_Restored" : {
+            "type" : [ "object", "null" ],
+            "additionalProperties" : false,
+            "maxProperties" : 1,
+            "minProperties" : 1,
+            "properties" : {
+              "departmentIds" : {
+                "type" : [ "array", "null" ],
+                "items" : {
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "uniqueItems" : false
+              }
+            },
+            "required" : [ "departmentIds" ]
+          },
+          "Ticket_Attachment_Delete" : {
+            "type" : [ "object", "null" ],
+            "additionalProperties" : false,
+            "maxProperties" : 1,
+            "minProperties" : 1,
+            "properties" : {
+              "departmentIds" : {
+                "type" : [ "array", "null" ],
+                "items" : {
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "uniqueItems" : false
+              }
+            },
+            "required" : [ "departmentIds" ]
+          },
+          "Ticket_Comment_Attachment_Add" : {
+            "type" : [ "string", "null" ],
+            "description" : "Ticket Comment Attachment Add Event: This event does not support filters. Therefore, pass the value as null in the API request."
+          },
+          "Ticket_Comment_Attachment_Delete" : {
+            "type" : [ "string", "null" ],
+            "description" : "Ticket Comment Attachment Delete Event: This event does not support filters. Therefore, pass the value as null in the API request."
+          },
+          "TimeEntry_Add" : {
+            "type" : [ "string", "null" ],
+            "description" : "Time Entry Add Event: This event does not support filters. Therefore, pass the value as null in the API request."
+          },
+          "TimeEntry_Update" : {
+            "type" : [ "object", "null" ],
+            "additionalProperties" : false,
+            "maxProperties" : 1,
+            "minProperties" : 1,
+            "properties" : {
+              "includePrevState" : {
+                "type" : [ "boolean", "null" ]
+              }
+            },
+            "required" : [ "includePrevState" ]
+          },
+          "TimeEntry_Delete" : {
+            "type" : [ "string", "null" ],
+            "description" : "Time Entry Delete Event: This event does not support filters. Therefore, pass the value as null in the API request."
+          },
+          "Ticket_Approval_Add" : {
+            "type" : [ "string", "null" ],
+            "description" : "Ticket Approval Add Event: This event does not support filters. Therefore, pass the value as null in the API request."
+          },
+          "Ticket_Approval_Update" : {
+            "type" : [ "object", "null" ],
+            "additionalProperties" : false,
+            "maxProperties" : 1,
+            "minProperties" : 1,
+            "properties" : {
+              "includePrevState" : {
+                "type" : [ "boolean", "null" ]
+              }
+            },
+            "required" : [ "includePrevState" ]
           }
         }
       },
       "webhookjson" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "subscriptions" : {
-            "$ref" : "./Webhook.json#/components/schemas/subscriptions"
+            "$ref" : "#/components/schemas/subscriptions"
           },
           "includeEventsFrom" : {
-            "type" : [ "null", "array" ],
+            "type" : [ "array", "null" ],
             "items" : {
               "type" : [ "string", "null" ],
               "maxLength" : 100,
@@ -611,9 +807,9 @@
       "listViewJSON" : {
         "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Webhook.json#/components/schemas/webhookjson"
+          "$ref" : "#/components/schemas/webhookjson"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "modifiedTime" : {
               "type" : [ "string", "null" ],
@@ -622,7 +818,7 @@
               "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
             },
             "createdBy" : {
-              "type" : [ "string", "null", "integer" ],
+              "type" : [ "string", "integer", "null" ],
               "format" : "int64",
               "pattern" : "([0-9]+)"
             },
@@ -633,24 +829,23 @@
               "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
             },
             "id" : {
-              "type" : [ "string", "null", "integer" ],
+              "type" : [ "string", "integer", "null" ],
               "format" : "int64",
               "pattern" : "([0-9]+)"
             },
             "type" : {
               "type" : [ "string", "null" ],
-              "enum" : [ "CUSTOMER_WEBHOOK", "EXTENSION_WEBHOOK" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "enum" : [ "CUSTOMER_WEBHOOK", "EXTENSION_WEBHOOK" ]
             }
           },
-          "required" : [ "createdBy", "createdTime", "id", "modifiedTime", "type" ]
+          "required" : [ "createdBy", "createdTime", "id", "modifiedTime", "type" ],
+          "additionalProperties" : false
         } ]
       },
       "listViewData" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./Webhook.json#/components/schemas/listViewJSON"
+          "$ref" : "#/components/schemas/listViewJSON"
         }
       }
     },
@@ -661,15 +856,15 @@
           "application/json" : {
             "schema" : {
               "allOf" : [ {
-                "type" : "object",
+                "type" : [ "object" ],
                 "properties" : {
                   "data" : {
-                    "type" : "array",
+                    "type" : [ "array" ],
                     "items" : {
-                      "type" : "object",
+                      "type" : [ "object" ],
                       "properties" : {
                         "extension" : {
-                          "type" : [ "null", "object" ],
+                          "type" : [ "object", "null" ],
                           "additionalProperties" : false,
                           "maxProperties" : 10,
                           "minProperties" : 10,
@@ -695,7 +890,7 @@
                               "pattern" : "\\d+(\\.\\d{1,2})?"
                             },
                             "installationId" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
                               "pattern" : "([0-9]+)"
                             },
@@ -706,9 +901,9 @@
                               "type" : [ "boolean", "null" ]
                             },
                             "widgets" : {
-                              "type" : [ "null", "array" ],
+                              "type" : [ "array", "null" ],
                               "items" : {
-                                "type" : [ "null", "object" ],
+                                "type" : [ "object", "null" ],
                                 "additionalProperties" : false,
                                 "maxProperties" : 5,
                                 "minProperties" : 5,
@@ -730,9 +925,7 @@
                                   },
                                   "location" : {
                                     "type" : [ "string", "null" ],
-                                    "enum" : [ "desk.ticket.detail.rightpanel", "desk.ticket.detail.subtab", "desk.bottomband", "desk.background", "desk.topband", "desk.task.detail.rightpanel", "desk.extension.preference", "desk.ticket.detail.lefttab", "desk.contact.detail.lefttab", "desk.account.detail.lefttab", "desk.ticket.detail.moreaction", "desk.ticket.thread.moreaction", "desk.ticket.form.rightpanel", "desk.contact.form.rightpanel", "desk.account.form.rightpanel", "desk.extension.telephony", "desk.contact.detail.subtab", "desk.account.detail.subtab", "desk.contact.detail.rightpanel", "desk.account.detail.rightpanel", "helpcenter.ticket.list", "helpcenter.ticket.detail", "helpcenter.ticket.form", "helpcenter.homepage", "helpcenter.kb.homepage", "helpcenter.kb.article.list", "helpcenter.kb.article.detail", "helpcenter.community.homepage", "helpcenter.community.topic.list", "helpcenter.community.topic.detail", "desk.kb.article.detail.subtab" ],
-                                    "maxLength" : 100,
-                                    "minLength" : 0
+                                    "enum" : [ "desk.ticket.detail.rightpanel", "desk.ticket.detail.subtab", "desk.bottomband", "desk.background", "desk.topband", "desk.task.detail.rightpanel", "desk.extension.preference", "desk.ticket.detail.lefttab", "desk.contact.detail.lefttab", "desk.account.detail.lefttab", "desk.ticket.detail.moreaction", "desk.ticket.thread.moreaction", "desk.ticket.form.rightpanel", "desk.contact.form.rightpanel", "desk.account.form.rightpanel", "desk.extension.telephony", "desk.contact.detail.subtab", "desk.account.detail.subtab", "desk.contact.detail.rightpanel", "desk.account.detail.rightpanel", "helpcenter.ticket.list", "helpcenter.ticket.detail", "helpcenter.ticket.form", "helpcenter.homepage", "helpcenter.kb.homepage", "helpcenter.kb.article.list", "helpcenter.kb.article.detail", "helpcenter.community.homepage", "helpcenter.community.topic.list", "helpcenter.community.topic.detail", "desk.kb.article.detail.subtab" ]
                                   },
                                   "url" : {
                                     "type" : [ "string", "null" ],
@@ -759,16 +952,18 @@
                           },
                           "required" : [ "extensionName", "hashkey", "installationId", "isChannelApp", "isPermissionsEnabled", "isPrivate", "latestVersion", "uuId", "version", "widgets" ]
                         }
-                      }
+                      },
+                      "additionalProperties" : false
                     }
                   }
-                }
+                },
+                "additionalProperties" : false
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "data" : {
-                    "$ref" : "./Webhook.json#/components/schemas/listViewData"
+                    "$ref" : "#/components/schemas/listViewData"
                   }
                 },
                 "required" : [ "data" ]
@@ -805,7 +1000,7 @@
                     "description" : "This webhook listen to ticket events",
                     "ignoreSourceId" : "49ad222a-f812-11e7-8c3f-9a214cf093ae",
                     "id" : "1234567800",
-                    "type" : "CUSTOMER_WEBHOOK",
+                    "type" : [ "CUSTOMER_WEBHOOK" ],
                     "url" : "www.demoServer.com/webhookTest"
                   }, {
                     "modifiedTime" : 1528130625304,
@@ -824,7 +1019,7 @@
                     "description" : "This webhook handles desk events and trigger actions in google extension ",
                     "ignoreSourceId" : "49ad222a-f812-11e7-8c3f-9a204cf194bf",
                     "id" : "1234567801",
-                    "type" : "EXTENSION_WEBHOOK",
+                    "type" : [ "EXTENSION_WEBHOOK" ],
                     "url" : "www.demoServer2.com/webhookTest"
                   } ]
                 }
@@ -840,9 +1035,9 @@
             "schema" : {
               "additionalProperties" : false,
               "allOf" : [ {
-                "$ref" : "./Webhook.json#/components/schemas/webhookjson"
+                "$ref" : "#/components/schemas/webhookjson"
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "properties" : {
                   "modifiedTime" : {
                     "type" : [ "string", "null" ],
@@ -851,7 +1046,7 @@
                     "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
                   },
                   "createdBy" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
@@ -862,18 +1057,17 @@
                     "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
                   },
                   "id" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
                   "type" : {
                     "type" : [ "string", "null" ],
-                    "enum" : [ "CUSTOMER_WEBHOOK", "EXTENSION_WEBHOOK" ],
-                    "maxLength" : 100,
-                    "minLength" : 0
+                    "enum" : [ "CUSTOMER_WEBHOOK", "EXTENSION_WEBHOOK" ]
                   }
                 },
-                "required" : [ "createdBy", "createdTime", "id", "modifiedTime", "type" ]
+                "required" : [ "createdBy", "createdTime", "id", "modifiedTime", "type" ],
+                "additionalProperties" : false
               } ]
             },
             "examples" : {
@@ -885,35 +1079,21 @@
         }
       }
     },
-    "parameters" : {
-      "webhookId" : {
-        "name" : "webhookId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      }
-    },
     "requestBodies" : {
       "webhookjson" : {
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "subscriptions" : {
-                  "$ref" : "./Webhook.json#/components/schemas/subscriptions"
+                  "$ref" : "#/components/schemas/subscriptions"
                 },
                 "includeEventsFrom" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null" ],
+                    "type" : [ "string" ],
                     "maxLength" : 100,
                     "minLength" : 0,
                     "pattern" : "(AUTOMATION)"
@@ -921,29 +1101,27 @@
                   "uniqueItems" : false
                 },
                 "isEnabled" : {
-                  "type" : [ "boolean", "null" ]
+                  "type" : [ "boolean" ]
                 },
                 "name" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "maxLength" : 100,
-                  "minLength" : 0
+                  "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+"
                 },
                 "description" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "maxLength" : 3000,
-                  "minLength" : 0
+                  "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
                 },
                 "ignoreSourceId" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0,
+                  "type" : [ "string" ],
+                  "maxLength" : 250,
                   "pattern" : "^([0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12})$|^$"
                 },
                 "url" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0,
-                  "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+                  "type" : [ "string" ],
+                  "maxLength" : 500,
+                  "pattern" : "(^(ht|f)tp(s?)\\:\\/\\/[0-9a-zA-Z][-.\\w]*(:[0-9])*(\\/?)([a-zA-Z0-9\\-\\.\\?\\,|\\:\\'\\/\\\\\\+=&%\\$#_\\[\\]@!\\(\\)\\*;~]*)?$)|[*]"
                 }
               },
               "required" : [ "subscriptions", "url" ]
@@ -984,16 +1162,16 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "subscriptions" : {
-                  "$ref" : "./Webhook.json#/components/schemas/subscriptions"
+                  "$ref" : "#/components/schemas/subscriptions"
                 },
                 "includeEventsFrom" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null" ],
+                    "type" : [ "string" ],
                     "maxLength" : 100,
                     "minLength" : 0,
                     "pattern" : "(AUTOMATION)"
@@ -1001,26 +1179,26 @@
                   "uniqueItems" : false
                 },
                 "isEnabled" : {
-                  "type" : [ "boolean", "null" ]
+                  "type" : [ "boolean" ]
                 },
                 "name" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "maxLength" : 100,
                   "minLength" : 0
                 },
                 "description" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "maxLength" : 3000,
                   "minLength" : 0
                 },
                 "ignoreSourceId" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "maxLength" : 100,
                   "minLength" : 0,
                   "pattern" : "^([0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12})$|^$"
                 },
                 "url" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "maxLength" : 100,
                   "minLength" : 0,
                   "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
@@ -1038,6 +1216,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

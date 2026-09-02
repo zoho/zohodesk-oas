@@ -1,0 +1,923 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "ContractComments",
+    "version" : "1.0.0",
+    "description" : "APIs to manage comments on SLA contracts in the help desk portal. A contentType key is included in responses indicating whether the original comment contained HTML formatting. Possible contentType values: html, plainText."
+  },
+  "paths" : {
+    "/api/v1/contracts/{contractId}/comments" : {
+      "get" : {
+        "tags" : [ "ContractComments" ],
+        "summary" : "Get Contract Comments",
+        "description" : "Retrieves comments recorded on a contract, with pagination support.",
+        "operationId" : "getContractComments",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "include",
+          "in" : "query",
+          "description" : "Additional information to include in the response. Possible values: mentions.",
+          "required" : false,
+          "style" : "simple",
+          "explode" : true,
+          "schema" : {
+            "type" : "array",
+            "description" : "Additional information to include in the response. Possible values: mentions.",
+            "items" : {
+              "type" : "string",
+              "enum" : [ "mentions" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "uniqueItems" : true,
+            "maxItems" : 2
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of comments to fetch. Default is 50; range is 1-100.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Number of comments to fetch. Default is 50; range is 1-100.",
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "maximum" : 100,
+            "default" : 50
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number from which comments must be fetched. Default value is 0 if omitted.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Index number from which comments must be fetched. Default value is 0 if omitted.",
+            "pattern" : "([0-9]+)",
+            "minimum" : 0
+          }
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "description" : "Sorts comments by the specified attribute. Possible values: commentedTime. Default order is ascending. Prefix with '-' for descending order.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "Sorts comments by the specified attribute. Possible values: commentedTime. Default order is ascending. Prefix with '-' for descending order.",
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "-?(commentedTime)"
+          }
+        }, {
+          "name" : "contractId",
+          "in" : "path",
+          "description" : "Unique ID of the contract.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/getContractCommentsResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.contracts.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      },
+      "post" : {
+        "tags" : [ "ContractComments" ],
+        "summary" : "Create Contract Comment",
+        "description" : "Adds a comment to a specific contract.",
+        "operationId" : "createContractComment",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "contractId",
+          "in" : "path",
+          "description" : "Unique ID of the contract.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/createContractCommentRequest"
+        },
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/createContractCommentResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/unprocessableEntityErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.UPDATE", "Desk.contracts.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/contracts/{contractId}/comments/{commentId}" : {
+      "get" : {
+        "tags" : [ "ContractComments" ],
+        "summary" : "Get Contract Comment",
+        "description" : "Retrieves a specific comment from a contract.",
+        "operationId" : "getContractComment",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "include",
+          "in" : "query",
+          "description" : "Additional information to include in the response. Possible values: mentions.",
+          "required" : false,
+          "style" : "simple",
+          "explode" : true,
+          "schema" : {
+            "type" : "array",
+            "description" : "Additional information to include in the response. Possible values: mentions.",
+            "items" : {
+              "type" : "string",
+              "enum" : [ "mentions" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "uniqueItems" : true,
+            "maxItems" : 2
+          }
+        }, {
+          "name" : "contractId",
+          "in" : "path",
+          "description" : "Unique ID of the contract.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "commentId",
+          "in" : "path",
+          "description" : "Unique ID of the contract comment.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/getContractCommentResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.contracts.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      },
+      "put" : {
+        "tags" : [ "ContractComments" ],
+        "summary" : "Update Contract Comment",
+        "description" : "Updates an existing comment on a specific contract.",
+        "operationId" : "editContractComment",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "contractId",
+          "in" : "path",
+          "description" : "Unique ID of the contract.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "commentId",
+          "in" : "path",
+          "description" : "Unique ID of the contract comment.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/updateContractCommentRequest"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/patchContractCommentResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.UPDATE", "Desk.contracts.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      },
+      "patch" : {
+        "tags" : [ "ContractComments" ],
+        "summary" : "Update Contract Comment",
+        "description" : "Updates an existing comment on a specific contract.",
+        "operationId" : "patchContractComment",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "contractId",
+          "in" : "path",
+          "description" : "Unique ID of the contract.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "commentId",
+          "in" : "path",
+          "description" : "Unique ID of the contract comment.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/updateContractCommentRequest"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/patchContractCommentResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.UPDATE", "Desk.contracts.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      },
+      "delete" : {
+        "tags" : [ "ContractComments" ],
+        "summary" : "Delete a contract comment",
+        "description" : "This API deletes a contract comment.",
+        "operationId" : "deleteContractComment",
+        "parameters" : [ {
+          "name" : "contractId",
+          "in" : "path",
+          "description" : "ID of the contract",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "ID of the contract",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "commentId",
+          "in" : "path",
+          "description" : "ID of the contract comment",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "ID of the contract comment",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "200" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.UPDATE", "Desk.contracts.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/contracts/{contractId}/comments/{commentId}/attachments/{attachmentId}/content" : {
+      "get" : {
+        "tags" : [ "ContractComments" ],
+        "summary" : "Download contract comment attachment content",
+        "description" : "This API downloads the content of an attachment associated with a contract comment.",
+        "operationId" : "getContractCommentAttachmentContent",
+        "parameters" : [ {
+          "name" : "inline",
+          "in" : "query",
+          "description" : "Set this param as true if attachment is to be rendered inline",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "boolean",
+            "description" : "Set this param as true if attachment is to be rendered inline"
+          }
+        }, {
+          "name" : "contractId",
+          "in" : "path",
+          "description" : "ID of the contract",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "ID of the contract",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "commentId",
+          "in" : "path",
+          "description" : "ID of the contract comment",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "ID of the contract comment",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "attachmentId",
+          "in" : "path",
+          "description" : "ID of the comment attachment",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "ID of the comment attachment",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    }
+  },
+  "components" : {
+    "requestBodies" : {
+      "createContractCommentRequest" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "properties" : {
+                "contentType" : {
+                  "type" : "string",
+                  "description" : "Content type of the comment. Possible values: html, plainText. Default is html. Maximum 100 characters.",
+                  "enum" : [ "html", "plainText" ],
+                  "maxLength" : 100,
+                  "minLength" : 0
+                },
+                "content" : {
+                  "type" : "string",
+                  "description" : "Content of the comment. Maximum 32000 characters. To set user mentions, use the format zsu[user-zuid]zsu (replace user-zuid with the user's zuid).",
+                  "maxLength" : 32000,
+                  "minLength" : 0
+                },
+                "attachmentIds" : {
+                  "type" : "array",
+                  "description" : "List of file attachment IDs to include in the comment. Each ID corresponds to an attachment previously uploaded via the Upload Attachment API.",
+                  "items" : {
+                    "type" : "string",
+                    "format" : "int64",
+                    "description" : "ID of the attachment to be associated with the comment",
+                    "pattern" : "([0-9]+)"
+                  }
+                }
+              },
+              "required" : [ "content" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "contentType" : "html",
+                  "content" : "First Contract comment."
+                }
+              }
+            }
+          }
+        }
+      },
+      "updateContractCommentRequest" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "properties" : {
+                "contentType" : {
+                  "type" : "string",
+                  "description" : "Content type of the comment. Possible values: html, plainText. Default is html. Maximum 100 characters.",
+                  "enum" : [ "html", "plainText" ],
+                  "maxLength" : 100,
+                  "minLength" : 0
+                },
+                "content" : {
+                  "type" : "string",
+                  "description" : "Content of the comment. Maximum 32000 characters. To set user mentions, use the format zsu[user-zuid]zsu (replace user-zuid with the user's zuid).",
+                  "maxLength" : 32000,
+                  "minLength" : 0
+                }
+              }
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "content" : "Edit Contract comment"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "schemas" : {
+      "CreateContractCommentResponse" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "description" : "Response for creating a contract comment.",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "Unique ID of the comment.",
+            "pattern" : "([0-9]+)"
+          },
+          "content" : {
+            "type" : [ "string", "null" ],
+            "description" : "Content of the comment. To retrieve or set user mentions, the format is zsu[user-zuid]zsu (where user-zuid is the mentioned user's zuid).",
+            "maxLength" : 32000,
+            "minLength" : 0
+          },
+          "commenterId" : {
+            "type" : "string",
+            "description" : "Unique ID of the user who made the comment.",
+            "pattern" : "([0-9]+)"
+          },
+          "commentedTime" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "Time when the comment was created."
+          },
+          "modifiedTime" : {
+            "type" : "string",
+            "format" : "date-time",
+            "description" : "Time when the comment was last modified."
+          },
+          "contentType" : {
+            "type" : [ "string", "null" ],
+            "description" : "Content type of the comment. Possible values: html, plainText. Default is html.",
+            "enum" : [ "html", "plainText" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "isPublic" : {
+            "type" : "boolean",
+            "description" : "Indicates whether the comment is public. true means public; false means private/internal."
+          },
+          "commenter" : {
+            "$ref" : "#/components/schemas/ContractCommentCommenter"
+          },
+          "impersonatedUser" : {
+            "type" : [ "object", "null" ],
+            "description" : "Details of the impersonated user, if any"
+          },
+          "encodedContent" : {
+            "type" : [ "string", "null" ],
+            "description" : "Encoded content of the comment"
+          },
+          "attachments" : {
+            "type" : "array",
+            "description" : "List of attachments associated with the comment",
+            "items" : {
+              "$ref" : "#/components/schemas/ContractCommentAttachment"
+            }
+          }
+        },
+        "required" : [ "id", "content", "commenterId", "commentedTime", "modifiedTime", "contentType" ]
+      },
+      "GetContractCommentResponse" : {
+        "description" : "Response for a single contract comment with mention details.",
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/CreateContractCommentResponse"
+        }, {
+          "type" : "object",
+          "additionalProperties" : false,
+          "properties" : {
+            "mention" : {
+              "type" : "array",
+              "description" : "List of users mentioned in the comment",
+              "items" : {
+                "$ref" : "#/components/schemas/ContractCommentMention"
+              }
+            }
+          }
+        } ]
+      },
+      "GetContractCommentsResponse" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "description" : "Response containing a list of contract comments.",
+        "properties" : {
+          "data" : {
+            "type" : "array",
+            "description" : "List of contract comments",
+            "items" : {
+              "$ref" : "#/components/schemas/CreateContractCommentResponse"
+            }
+          }
+        },
+        "required" : [ "data" ]
+      },
+      "ContractCommentCommenter" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "description" : "Details of the commenter",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "Unique ID of the user.",
+            "pattern" : "([0-9]+)"
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "description" : "Full name of the user."
+          },
+          "email" : {
+            "type" : [ "string", "null" ],
+            "format" : "email",
+            "description" : "Email address of the user."
+          },
+          "photoURL" : {
+            "type" : [ "string", "null" ],
+            "description" : "URL to access the profile photo of the user. Note: To access this resource, the OAuth scope ZohoContacts.userphoto.READ is mandatory."
+          },
+          "type" : {
+            "type" : [ "string", "null" ],
+            "description" : "User type. Possible values: AGENT, END_USER."
+          },
+          "firstName" : {
+            "type" : [ "string", "null" ],
+            "description" : "First name of the user."
+          },
+          "lastName" : {
+            "type" : [ "string", "null" ],
+            "description" : "Last name of the user."
+          },
+          "roleName" : {
+            "type" : [ "string", "null" ],
+            "description" : "Name of the role assigned to the user."
+          }
+        },
+        "required" : [ "id", "name", "type" ]
+      },
+      "ContractCommentMention" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "description" : "Details of a mention referenced in a contract comment.",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "Unique ID of the mentioned entity.",
+            "pattern" : "([0-9]+)"
+          },
+          "type" : {
+            "type" : "string",
+            "description" : "Type of the mentioned entity. Possible values: AGENT, TEAM, TICKET.",
+            "enum" : [ "AGENT", "TEAM", "TICKET" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "offSet" : {
+            "type" : "string",
+            "description" : "Character position offset of the mention in the content.",
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "length" : {
+            "type" : "string",
+            "description" : "Character length of the mention text in the content.",
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "firstName" : {
+            "type" : [ "string", "null" ],
+            "description" : "First name of the mentioned user. Applicable when type is AGENT.",
+            "maxLength" : 250,
+            "minLength" : 0
+          },
+          "lastName" : {
+            "type" : [ "string", "null" ],
+            "description" : "Last name of the mentioned user. Applicable when type is AGENT.",
+            "maxLength" : 250,
+            "minLength" : 0
+          },
+          "photoURL" : {
+            "type" : [ "string", "null" ],
+            "description" : "URL of the mentioned user's profile photo. Applicable when type is AGENT."
+          },
+          "email" : {
+            "type" : [ "string", "null" ],
+            "format" : "email",
+            "description" : "Email address of the mentioned user. Applicable when type is AGENT."
+          },
+          "zuid" : {
+            "type" : [ "string", "null" ],
+            "description" : "Zoho user ID of the mentioned user. Applicable when type is AGENT.",
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "description" : "Name of the mentioned entity. Applicable when type is TEAM or TICKET.",
+            "maxLength" : 250,
+            "minLength" : 0
+          },
+          "departmentId" : {
+            "type" : [ "string", "null" ],
+            "description" : "Unique ID of the department. Applicable when type is TICKET.",
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "entityNumber" : {
+            "type" : [ "string", "null" ],
+            "description" : "Entity number of the mentioned ticket. Applicable when type is TICKET.",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }
+      },
+      "ContractCommentAttachment" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "description" : "Details of an attachment associated with a contract comment.",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "Unique ID of the attachment.",
+            "pattern" : "([0-9]+)"
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "Name of the attachment file.",
+            "maxLength" : 250,
+            "minLength" : 0
+          },
+          "size" : {
+            "type" : "string",
+            "description" : "Size of the attachment, expressed in KB.",
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "previewurl" : {
+            "type" : [ "string", "null" ],
+            "description" : "Preview URL of the attachment."
+          },
+          "href" : {
+            "type" : "string",
+            "description" : "URL to access the attachment."
+          }
+        }
+      }
+    },
+    "responses" : {
+      "getContractCommentsResponse" : {
+        "description" : "List of contract comments retrieved successfully",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/GetContractCommentsResponse"
+            },
+            "examples" : {
+              "Contract Comments List" : {
+                "value" : {
+                  "data" : [ {
+                    "id" : "97000003438103",
+                    "content" : "DataGen contract comment",
+                    "commenterId" : "97000000000459",
+                    "commentedTime" : "2026-03-21T12:18:03.000Z",
+                    "modifiedTime" : "2026-03-21T12:18:03.000Z",
+                    "contentType" : "html",
+                    "commenter" : {
+                      "id" : "97000000000459",
+                      "name" : "Sample Agent",
+                      "email" : "agent.sample0@example.com",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/97000000000459/photo?orgId=1234567890",
+                      "type" : "AGENT",
+                      "firstName" : "Sample",
+                      "lastName" : "Smith",
+                      "roleName" : "CEO"
+                    },
+                    "impersonatedUser" : null,
+                    "encodedContent" : "DataGen contract comment",
+                    "attachments" : [ ]
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "getContractCommentResponse" : {
+        "description" : "Contract comment retrieved successfully",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/GetContractCommentResponse"
+            },
+            "examples" : {
+              "Contract Comment" : {
+                "value" : {
+                  "id" : "97000003438089",
+                  "content" : "DataGen contract comment",
+                  "commenterId" : "97000000000459",
+                  "commentedTime" : "2026-03-21T12:18:03.000Z",
+                  "modifiedTime" : "2026-03-21T12:18:03.000Z",
+                  "contentType" : "html",
+                  "commenter" : {
+                    "id" : "97000000000459",
+                    "name" : "Sample Agent",
+                    "email" : "agent.sample@example.com",
+                    "photoURL" : "https://desk.example.com/api/v1/agents/97000000000459/photo?orgId=1234567890",
+                    "type" : "AGENT",
+                    "firstName" : "Sample",
+                    "lastName" : "Smith",
+                    "roleName" : "CEO"
+                  },
+                  "impersonatedUser" : null,
+                  "encodedContent" : "DataGen contract comment",
+                  "mention" : [ ],
+                  "attachments" : [ ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "patchContractCommentResponse" : {
+        "description" : "Contract comment partially updated successfully",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/GetContractCommentResponse"
+            },
+            "examples" : {
+              "Contract Comment Updated" : {
+                "value" : {
+                  "id" : "97000003438089",
+                  "content" : "DataGen contract comment",
+                  "commenterId" : "97000000000459",
+                  "commentedTime" : "2026-03-21T12:18:03.000Z",
+                  "modifiedTime" : "2026-03-21T12:18:03.000Z",
+                  "contentType" : "html",
+                  "commenter" : {
+                    "id" : "97000000000459",
+                    "name" : "Sample Agent",
+                    "email" : "agent.sample@example.com",
+                    "photoURL" : "https://desk.example.com/api/v1/agents/97000000000459/photo?orgId=1234567890",
+                    "type" : "AGENT",
+                    "firstName" : "Sample",
+                    "lastName" : "Smith",
+                    "roleName" : "CEO"
+                  },
+                  "impersonatedUser" : null,
+                  "encodedContent" : "DataGen contract comment",
+                  "mention" : [ ],
+                  "attachments" : [ ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "createContractCommentResponse" : {
+        "description" : "Contract comment created successfully",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/CreateContractCommentResponse"
+            },
+            "examples" : {
+              "Contract Comment Created" : {
+                "value" : {
+                  "id" : "93000003796088",
+                  "content" : "DataGen contract comment",
+                  "commenterId" : "93000000000459",
+                  "commentedTime" : "2026-03-21T12:10:39.951Z",
+                  "modifiedTime" : "2026-03-21T12:10:39.951Z",
+                  "contentType" : "html",
+                  "commenter" : {
+                    "id" : "93000000000459",
+                    "name" : "Sample Agent",
+                    "email" : "agent.sample@example.com",
+                    "photoURL" : "https://desk.example.com/api/v1/agents/93000000000459/photo?orgId=1234567890",
+                    "type" : "AGENT",
+                    "firstName" : "Sample",
+                    "lastName" : "Smith",
+                    "roleName" : "CEO"
+                  },
+                  "impersonatedUser" : null,
+                  "encodedContent" : "DataGen contract comment",
+                  "attachments" : [ ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "ContractComments"
+}

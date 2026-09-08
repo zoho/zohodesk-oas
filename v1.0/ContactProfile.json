@@ -11,17 +11,34 @@
         "summary" : "Get Contact Profiles",
         "description" : "This api fetches the list of profiles of this contact from various channels.",
         "operationId" : "getContactProfiles",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "contactId",
           "in" : "path",
           "required" : true,
+          "description" : "Unique ID of the contact",
           "style" : "simple",
           "explode" : false,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
+        }, {
+          "name" : "include",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "enum" : [ "source" ],
+              "description" : "Accepted values: source"
+            }
+          },
+          "style" : "form",
+          "explode" : false,
+          "description" : "Additional information related to the profile's channel. Values allowed are: source"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -40,70 +57,78 @@
   "components" : {
     "schemas" : {
       "source" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "appName" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Name of the channel application"
           },
           "permalink" : {
             "type" : [ "string", "null" ],
             "maxLength" : 65535,
             "minLength" : 0,
-            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+            "description" : "Permalink URL of the profile in the channel application"
           },
           "appPhotoURL" : {
             "type" : [ "string", "null" ],
             "maxLength" : 65535,
             "minLength" : 0,
-            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+            "description" : "URL of the channel application's photo"
           }
         },
         "required" : [ "appName", "appPhotoURL", "permalink" ]
       },
       "getContactProfileResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "photoURL" : {
             "type" : [ "string", "null" ],
             "maxLength" : 65535,
             "minLength" : 0,
-            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+            "description" : "URL of the contact's profile photo in the channel"
           },
           "displayName" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Display name of the contact in the channel"
           },
           "name" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Name of the contact in the channel"
           },
           "channel" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "([a-zA-Z0-9_\\-]+)"
+            "pattern" : "([a-zA-Z0-9_\\-]+)",
+            "description" : "Channel through which the contact profile is associated"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the contact profile in the channel"
           },
           "source" : {
-            "$ref" : "./ContactProfile.json#/components/schemas/source"
+            "$ref" : "#/components/schemas/source"
           }
         },
         "required" : [ "channel", "displayName", "id", "name", "photoURL", "source" ]
       },
       "getContactProfilesArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./ContactProfile.json#/components/schemas/getContactProfileResponse"
+          "$ref" : "#/components/schemas/getContactProfileResponse"
         }
       }
     },
@@ -113,11 +138,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./ContactProfile.json#/components/schemas/getContactProfilesArray"
+                  "$ref" : "#/components/schemas/getContactProfilesArray"
                 }
               },
               "required" : [ "data" ]
@@ -134,7 +159,7 @@
                     "source" : {
                       "appName" : "Youtube Sync App",
                       "permalink" : "https://www.examplechannel.com/apps/redirect.php?entity=profile&id=3290dweiod",
-                      "appPhotoURL" : "https://desk.zoho.com/api/v1/channels/youtube/photo?orgId=666236571"
+                      "appPhotoURL" : "https://desk.example.com/api/v1/channels/youtube/photo?orgId=1234567890"
                     }
                   }, {
                     "photoURL" : "https://www.intagram.com/johninsta/photo",
@@ -145,7 +170,7 @@
                     "source" : {
                       "appName" : "Instagram Syncing App",
                       "permalink" : "https://www.examplechannel.com/apps/redirect.php?entity=profile&id=3290dweiod",
-                      "appPhotoURL" : "https://desk.zoho.com/api/v1/channels/instagram/photo?orgId=666236571"
+                      "appPhotoURL" : "https://desk.example.com/api/v1/channels/instagram/photo?orgId=1234567890"
                     }
                   } ]
                 }
@@ -156,6 +181,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

@@ -1,0 +1,440 @@
+{
+  "openapi" : "3.1.0",
+  "x-mcp-group" : [ "IM Messages" ],
+  "info" : {
+    "title" : "IM_Search",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/im/messages/search" : {
+      "get" : {
+        "tags" : [ "IM_Search" ],
+        "summary" : "Search IM Messages",
+        "description" : "This API searches IM messages and returns message list-view details with an embedded session per result. Use searchStr or message to filter by text. Use from and limit to paginate results. Use sortBy and sortOrder to control result ordering.",
+        "operationId" : "searchMessages",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number, starting from which the messages must be fetched.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 0,
+            "minimum" : 0
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of messages to fetch. Defaults to 50 when omitted or zero. Maximum value is 50.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Number of messages to fetch. Defaults to 50 when omitted or zero. Maximum value is 50.",
+            "default" : 0,
+            "minimum" : 0,
+            "maximum" : 50
+          }
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "description" : "Sort messages by created time or status updated time.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "CREATED_TIME", "STATUS_UPDATED_TIME" ]
+          }
+        }, {
+          "name" : "sortOrder",
+          "in" : "query",
+          "description" : "Sort order for results.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "DESC", "ASC" ]
+          }
+        }, {
+          "name" : "searchStr",
+          "in" : "query",
+          "description" : "Search keyword applied across message and conversation fields. Supports wildcard suffix with asterisk.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "maxLength" : 65536
+          }
+        }, {
+          "name" : "message",
+          "in" : "query",
+          "description" : "Filter messages by message text.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "maxLength" : 65536
+          }
+        }, {
+          "name" : "sessionId",
+          "in" : "query",
+          "description" : "Filter messages by session IDs. Comma-separated list of session IDs.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "^([0-9]+)(,([0-9]+))*$",
+            "maxLength" : 1000
+          }
+        }, {
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "Filter messages for channels in the given department.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "channelId",
+          "in" : "query",
+          "description" : "Filter messages by channel IDs. Comma-separated list of channel IDs.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "^([0-9]+)(,([0-9]+))*$",
+            "maxLength" : 1000
+          }
+        }, {
+          "name" : "channelType",
+          "in" : "query",
+          "description" : "Filter messages by channel integration service. Comma-separated list. Possible values: TELEGRAM, TWILIO, IM_TALK, LINE, WECHAT, WECOM, WHATSAPP, FACEBOOKMESSENGER, INSTAGRAM.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "^(TELEGRAM|TWILIO|IM_TALK|LINE|WECHAT|WECOM|WHATSAPP|FACEBOOKMESSENGER|INSTAGRAM)(,(TELEGRAM|TWILIO|IM_TALK|LINE|WECHAT|WECOM|WHATSAPP|FACEBOOKMESSENGER|INSTAGRAM))*$",
+            "maxLength" : 200
+          }
+        }, {
+          "name" : "agentId",
+          "in" : "query",
+          "description" : "Filter messages sent by agent IDs. Comma-separated list of agent ZUIDs.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "^([0-9]+)(,([0-9]+))*$",
+            "maxLength" : 1000
+          }
+        }, {
+          "name" : "botId",
+          "in" : "query",
+          "description" : "Filter messages sent by bot IDs. Comma-separated list of bot IDs.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "^([0-9]+)(,([0-9]+))*$",
+            "maxLength" : 1000
+          }
+        }, {
+          "name" : "deskContactId",
+          "in" : "query",
+          "description" : "Filter messages by desk contact IDs. Comma-separated list of contact IDs.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "^([0-9]+)(,([0-9]+))*$",
+            "maxLength" : 1000
+          }
+        }, {
+          "name" : "convoName",
+          "in" : "query",
+          "description" : "Filter messages by conversation name.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "(^([a-zA-Z0-9\\s\\.\\?\\_\\-\\,\\@\\:/+\\(\\)])*$|null|undefined)",
+            "maxLength" : 100
+          }
+        }, {
+          "name" : "contactProfileName",
+          "in" : "query",
+          "description" : "Filter messages by contact profile name.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "(^([a-zA-Z0-9\\s\\.\\?\\_\\-\\,\\@\\:/+\\(\\)])*$|null|undefined)",
+            "maxLength" : 100
+          }
+        }, {
+          "name" : "participantId",
+          "in" : "query",
+          "description" : "Filter messages by participant IDs. Comma-separated list of participant IDs.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "^([0-9]+)(,([0-9]+))*$",
+            "maxLength" : 1000
+          }
+        }, {
+          "name" : "participantType",
+          "in" : "query",
+          "description" : "Filter messages by participant type. Comma-separated list. Possible values: AGENT, BOT, ENDUSER.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "^(AGENT|BOT|ENDUSER)(,(AGENT|BOT|ENDUSER))*$",
+            "maxLength" : 50
+          }
+        }, {
+          "name" : "messageType",
+          "in" : "query",
+          "description" : "Filter messages by message type. Comma-separated list. Possible values: TEXT, INFO, ATTACHMENT, LOCATION, TEMPLATE, CAROUSEL.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "^(TEXT|INFO|ATTACHMENT|LOCATION|TEMPLATE|CAROUSEL)(,(TEXT|INFO|ATTACHMENT|LOCATION|TEMPLATE|CAROUSEL))*$",
+            "maxLength" : 100
+          }
+        }, {
+          "name" : "metaType",
+          "in" : "query",
+          "description" : "Filter messages by meta type. Comma-separated list. Possible values: DESK_TICKET_ID, DESK_TICKET_NUMBER.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "^(DESK_TICKET_ID|DESK_TICKET_NUMBER)(,(DESK_TICKET_ID|DESK_TICKET_NUMBER))*$",
+            "maxLength" : 100
+          }
+        }, {
+          "name" : "metaValue",
+          "in" : "query",
+          "description" : "Filter messages by meta value. Example format: DESKTICKET|123458.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "maxLength" : 100
+          }
+        }, {
+          "name" : "attachmentType",
+          "in" : "query",
+          "description" : "Filter messages by attachment type.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "maxLength" : 100
+          }
+        }, {
+          "name" : "attachmentName",
+          "in" : "query",
+          "description" : "Filter messages by attachment name.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "maxLength" : 100
+          }
+        }, {
+          "name" : "convoCreatedTimeRange",
+          "in" : "query",
+          "description" : "Filter by conversation created time range. Enter dates in ISO format: yyyy-MM-ddThh:mm:ss.SSSZ,yyyy-MM-ddThh:mm:ss.SSSZ.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)),(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null",
+            "x-regex-name" : "APIDateTimeRange",
+            "maxLength" : 100
+          }
+        }, {
+          "name" : "convoUpdatedTimeRange",
+          "in" : "query",
+          "description" : "Filter by conversation updated time range. Enter dates in ISO format: yyyy-MM-ddThh:mm:ss.SSSZ,yyyy-MM-ddThh:mm:ss.SSSZ.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)),(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null",
+            "x-regex-name" : "APIDateTimeRange",
+            "maxLength" : 100
+          }
+        }, {
+          "name" : "createdTimeRange",
+          "in" : "query",
+          "description" : "Filter by message created time range. Enter dates in ISO format: yyyy-MM-ddThh:mm:ss.SSSZ,yyyy-MM-ddThh:mm:ss.SSSZ.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)),(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null",
+            "x-regex-name" : "APIDateTimeRange",
+            "maxLength" : 100
+          }
+        }, {
+          "name" : "updatedTimeRange",
+          "in" : "query",
+          "description" : "Filter by message updated time range. Enter dates in ISO format: yyyy-MM-ddThh:mm:ss.SSSZ,yyyy-MM-ddThh:mm:ss.SSSZ.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)),(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null",
+            "x-regex-name" : "APIDateTimeRange",
+            "maxLength" : 100
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/searchMessages"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.InstantMessages.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "replyToMessage" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "./IM_Message.json#/components/schemas/getMessage_listview_main"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "session" : {
+              "$ref" : "./IM_Session.json#/components/schemas/getSession"
+            },
+            "replyToMessage" : {
+              "type" : [ "object", "null" ],
+              "properties" : { },
+              "additionalProperties" : false
+            }
+          },
+          "required" : [ "replyToMessage", "session" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "getMessage_searchView" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "./IM_Message.json#/components/schemas/getMessage_listview_main"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "session" : {
+              "$ref" : "./IM_Session.json#/components/schemas/getSession"
+            },
+            "replyToMessage" : {
+              "$ref" : "#/components/schemas/replyToMessage"
+            }
+          },
+          "required" : [ "replyToMessage", "session" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "getMessages_searchListView" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/getMessage_searchView"
+        }
+      }
+    },
+    "responses" : {
+      "searchMessages" : {
+        "description" : "Returns paginated IM message search results. Each item includes message list-view fields with an embedded session and optional replyToMessage.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "#/components/schemas/getMessages_searchListView"
+                },
+                "hasMore" : {
+                  "type" : [ "boolean", "null" ]
+                }
+              },
+              "required" : [ "data", "hasMore" ]
+            },
+            "examples" : {
+              "SearchMessages_200" : {
+                "$ref" : "./examples/IM_Search.json#/components/examples/SearchMessages_200"
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "IM_Search"
+}

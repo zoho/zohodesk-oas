@@ -1,0 +1,58 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "ArticleVersion",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/articles/{id}/translations/{locale}/versions" : {
+      "get" : {
+        "tags" : [ "ArticleVersion" ],
+        "summary" : "Get Article Translation Versions",
+        "description" : "Retrieves the version history of an article translation.",
+        "operationId" : "getArticleTranslationVersions",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "id",
+          "description" : "Unique ID of the article",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "locale",
+          "description" : "Language code of the translation",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "en", "ja", "zh", "es", "de", "fr", "tr", "ru", "pt", "it", "nl", "da", "sv", "pl", "ar", "he", "af", "cs", "fr-ca", "bg", "fi", "el", "hu", "id", "nb", "ro", "th", "uk", "vi", "ur", "hi", "te", "kn", "ta", "mr", "ko", "fa", "bn", "gu", "ms", "ml", "en-gb", "sk", "hr", "sl", "zh_TW", "zh-tw", "ca", "ka", "kk", "my", "km", "pt-br" ],
+            "pattern" : "([a-zA-Z]{2,4}([-_][a-zA-Z]{2})?)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "200" : {
+            "$ref" : "./ArticleTranslation.json#/components/responses/versionListView"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    }
+  },
+  "x-entity" : "ArticleVersion"
+}

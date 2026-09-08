@@ -8,32 +8,80 @@
     "/api/v1/zohoFinance/{financeService}/invoices" : {
       "get" : {
         "tags" : [ "Finance" ],
-        "summary" : "List invoices",
-        "description" : "To list invoices.",
+        "summary" : "Get Invoices",
+        "description" : "Retrieves invoices associated with the specified Desk entity.",
         "operationId" : "getInvoices",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/deskEntityId"
-        }, {
-          "$ref" : "#/components/parameters/pageNumber"
-        }, {
-          "name" : "departmentId",
+          "name" : "deskEntityId",
           "in" : "query",
-          "description" : "Department Id",
+          "description" : "Unique ID of the Desk entity (contact, account, or ticket)",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
-            "description" : "Department Id",
             "pattern" : "([0-9]+)"
           }
         }, {
-          "$ref" : "#/components/parameters/deskModuleName"
+          "name" : "pageNumber",
+          "in" : "query",
+          "description" : "page number",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/status"
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "Unique ID of the department",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/financeService"
+          "name" : "deskModuleName",
+          "in" : "query",
+          "description" : "Desk Module Name:  Contacts or Cases or Accounts",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "Contacts", "Cases", "Accounts" ]
+          }
+        }, {
+          "name" : "status",
+          "in" : "query",
+          "description" : "To fetch invoice by status, Available status are sent, draft, overdue, paid, void, unpaid, partially_paid and viewed",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "sent", "draft", "overdue", "paid", "void", "partially_paid" ],
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
+          }
+        }, {
+          "name" : "financeService",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "books", "inventory", "invoice" ],
+            "pattern" : "([a-z]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -63,19 +111,68 @@
     "/api/v1/zohoFinance/{financeService}/estimates" : {
       "get" : {
         "tags" : [ "Finance" ],
-        "summary" : "List estimates",
-        "description" : "To list estimates.",
+        "summary" : "Get Estimates",
+        "description" : "Retrieves estimates associated with the specified Desk entity.",
         "operationId" : "getEstimates",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/deskEntityId"
+          "name" : "deskEntityId",
+          "in" : "query",
+          "description" : "Unique ID of the Desk entity (contact, account, or ticket)",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/pageNumber"
+          "name" : "pageNumber",
+          "in" : "query",
+          "description" : "page number",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/deskModuleName"
+          "name" : "deskModuleName",
+          "in" : "query",
+          "description" : "Desk Module Name:  Contacts or Cases or Accounts",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "Contacts", "Cases", "Accounts" ]
+          }
         }, {
-          "$ref" : "#/components/parameters/status"
+          "name" : "status",
+          "in" : "query",
+          "description" : "To fetch invoice by status, Available status are sent, draft, overdue, paid, void, unpaid, partially_paid and viewed",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "sent", "draft", "overdue", "paid", "void", "partially_paid" ],
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
+          }
         }, {
-          "$ref" : "#/components/parameters/financeService"
+          "name" : "financeService",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "books", "inventory", "invoice" ],
+            "pattern" : "([a-z]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -105,13 +202,31 @@
     "/api/v1/zohoFinance/{financeService}/estimates/{id}" : {
       "patch" : {
         "tags" : [ "Finance" ],
-        "summary" : "Update estimate status ",
-        "description" : "This will update status of estimate.",
+        "summary" : "Update Estimate Status",
+        "description" : "Updates the status of a specific estimate.",
         "operationId" : "updateEstimateStatus",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/financeService"
+          "name" : "financeService",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "books", "inventory", "invoice" ],
+            "pattern" : "([a-z]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/id"
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -141,13 +256,31 @@
     "/api/v1/zohoFinance/{financeService}/invoices/{id}" : {
       "patch" : {
         "tags" : [ "Finance" ],
-        "summary" : "Update invoice status ",
-        "description" : "This will  update status of invoice.",
+        "summary" : "Update Invoice Status",
+        "description" : "Updates the status of a specific invoice.",
         "operationId" : "updateInvoiceStatus",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/financeService"
+          "name" : "financeService",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "books", "inventory", "invoice" ],
+            "pattern" : "([a-z]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/id"
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -177,11 +310,20 @@
     "/api/v1/zohoFinance/{financeService}/invoices/markAsSent" : {
       "post" : {
         "tags" : [ "Finance" ],
-        "summary" : "MarkAllInvoicesSent",
-        "description" : "This will update status of invoice to sent.",
+        "summary" : "Mark Invoices as Sent",
+        "description" : "Updates the status of multiple invoices to sent.",
         "operationId" : "markInvoicesAsSent",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/financeService"
+          "name" : "financeService",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "books", "inventory", "invoice" ],
+            "pattern" : "([a-z]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -211,11 +353,21 @@
     "/api/v1/finance/invoices/{id}/tickets" : {
       "get" : {
         "tags" : [ "Finance" ],
-        "summary" : "Get tickets for invoices",
-        "description" : "To get associated tickets for invoice id.",
+        "summary" : "Get Tickets for Invoice",
+        "description" : "Retrieves tickets associated with the specified invoice.",
         "operationId" : "getTicketsForInvoiceId",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/id"
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -246,141 +398,160 @@
   "components" : {
     "schemas" : {
       "data4" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "date" : {
+            "description" : "Date when the invoice was created",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "^([12][0-9]{3})-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])$"
           },
           "total" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Total amount of the invoice",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           },
           "isViewdByClient" : {
+            "description" : "Indicates whether the invoice has been viewed by the client. Possible values: true = viewed by client, false = not viewed by client",
             "type" : [ "boolean", "null" ]
           },
           "totalFormatted" : {
+            "description" : "Formatted total amount with currency symbol",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "invoiceNumber" : {
+            "description" : "Invoice number",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "dateFormatted" : {
+            "description" : "Formatted date of the invoice",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the invoice",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "currencyCode" : {
+            "description" : "Currency code of the invoice",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "statusFormatted" : {
+            "description" : "Formatted display label for the invoice status",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "status" : {
+            "description" : "Status of the invoice",
             "type" : [ "string", "null" ],
-            "enum" : [ "sent", "draft", "overdue", "paid", "void", "partially_paid" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "sent", "draft", "overdue", "paid", "void", "partially_paid" ]
           }
         },
         "required" : [ "currencyCode", "date", "dateFormatted", "id", "invoiceNumber", "isViewdByClient", "status", "statusFormatted", "total", "totalFormatted" ]
       },
       "dataArr4" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./Finance.json#/components/schemas/data4"
+          "$ref" : "#/components/schemas/data4"
         }
       },
       "data5" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "date" : {
+            "description" : "Date when the estimate was created",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "^([12][0-9]{3})-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])$"
           },
           "total" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Total amount of the estimate",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           },
           "isViewdByClient" : {
+            "description" : "Indicates whether the estimate has been viewed by the client. Possible values: true = viewed by client, false = not viewed by client",
             "type" : [ "boolean", "null" ]
           },
           "estimateNumber" : {
+            "description" : "Estimate number",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "totalFormatted" : {
+            "description" : "Formatted total amount with currency symbol",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "dateFormatted" : {
+            "description" : "Formatted date of the estimate",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the estimate",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "currencyCode" : {
+            "description" : "Currency code of the estimate",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "statusFormatted" : {
+            "description" : "Formatted display label for the estimate status",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "status" : {
+            "description" : "Status of the estimate",
             "type" : [ "string", "null" ],
-            "enum" : [ "sent", "draft", "void", "invoiced", "accepted", "declined", "expired" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "sent", "draft", "void", "invoiced", "accepted", "declined", "expired" ]
           }
         },
         "required" : [ "currencyCode", "date", "dateFormatted", "estimateNumber", "id", "isViewdByClient", "status", "statusFormatted", "total", "totalFormatted" ]
       },
       "dataArr5" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./Finance.json#/components/schemas/data5"
+          "$ref" : "#/components/schemas/data5"
         }
       },
       "assignee" : {
-        "type" : [ "null", "object" ],
+        "description" : "Details of the agent assigned to the ticket",
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "firstName" : {
+            "description" : "First name of the assignee",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "lastName" : {
+            "description" : "Last name of the assignee",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
@@ -389,43 +560,50 @@
         "required" : [ "firstName", "lastName" ]
       },
       "data" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "ticketNumber" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Index or serial number of the ticket",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           },
           "subject" : {
+            "description" : "Subject of the ticket",
             "type" : [ "string", "null" ],
             "maxLength" : 1000,
             "minLength" : 0
           },
           "dueDate" : {
+            "description" : "Due date of the ticket",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the ticket",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "assignee" : {
-            "$ref" : "./Finance.json#/components/schemas/assignee"
+            "$ref" : "#/components/schemas/assignee"
           },
           "priority" : {
+            "description" : "Priority of the ticket",
             "type" : [ "string", "null" ],
             "x-dynamic-enum" : true
           },
           "status" : {
+            "description" : "Status of the ticket",
             "type" : [ "string", "null" ],
             "x-dynamic-enum" : true
           },
           "commentCount" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Number of comments on the ticket",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           }
@@ -433,34 +611,35 @@
         "required" : [ "assignee", "commentCount", "dueDate", "id", "priority", "status", "subject", "ticketNumber" ]
       },
       "dataArr" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./Finance.json#/components/schemas/data"
+          "$ref" : "#/components/schemas/data"
         }
       }
     },
     "responses" : {
       "getInvoices" : {
-        "description" : "getInvoices template definitions",
+        "description" : "Retrieves invoices associated with the specified Desk entity.",
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "deskEntityId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Unique ID of the associated Desk entity",
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "data" : {
-                  "$ref" : "./Finance.json#/components/schemas/dataArr4"
+                  "description" : "List of invoice entries for the specified Desk entity",
+                  "$ref" : "#/components/schemas/dataArr4"
                 },
                 "deskModuleName" : {
+                  "description" : "Name of the Desk module associated with the invoice",
                   "type" : [ "string", "null" ],
-                  "enum" : [ "Cases", "Contacts", "Accounts" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "enum" : [ "Cases", "Contacts", "Accounts" ]
                 }
               },
               "required" : [ "data", "deskEntityId", "deskModuleName" ]
@@ -493,22 +672,23 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "deskEntityId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Unique ID of the associated Desk entity",
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "data" : {
-                  "$ref" : "./Finance.json#/components/schemas/dataArr5"
+                  "description" : "List of estimate entries for the specified Desk entity",
+                  "$ref" : "#/components/schemas/dataArr5"
                 },
                 "deskModuleName" : {
+                  "description" : "Name of the Desk module associated with the estimate",
                   "type" : [ "string", "null" ],
-                  "enum" : [ "Cases", "Contacts", "Accounts" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "enum" : [ "Cases", "Contacts", "Accounts" ]
                 }
               },
               "required" : [ "data", "deskEntityId", "deskModuleName" ]
@@ -541,11 +721,12 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./Finance.json#/components/schemas/dataArr"
+                  "description" : "List of ticket entries associated with the specified invoice",
+                  "$ref" : "#/components/schemas/dataArr"
                 }
               },
               "required" : [ "data" ]
@@ -585,105 +766,19 @@
         }
       }
     },
-    "parameters" : {
-      "deskEntityId" : {
-        "name" : "deskEntityId",
-        "in" : "query",
-        "description" : "To fetch invoice by desk contact or account or ticket id",
-        "required" : true,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "description" : "To fetch invoice by desk contact or account or ticket id",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "pageNumber" : {
-        "name" : "pageNumber",
-        "in" : "query",
-        "description" : "page number",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int32",
-          "description" : "page number",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "deskModuleName" : {
-        "name" : "deskModuleName",
-        "in" : "query",
-        "description" : "Desk Module Name:  Contacts or Cases or Accounts",
-        "required" : true,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null" ],
-          "description" : "Desk Module Name:  Contacts or Cases or Accounts",
-          "enum" : [ "Cases", "Contacts", "Accounts" ],
-          "maxLength" : 100,
-          "minLength" : 0
-        }
-      },
-      "financeService" : {
-        "name" : "financeService",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null" ],
-          "enum" : [ "books", "inventory", "invoice" ],
-          "maxLength" : 100,
-          "minLength" : 0,
-          "pattern" : "([a-z]+)"
-        }
-      },
-      "id" : {
-        "name" : "id",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "status" : {
-        "name" : "status",
-        "in" : "query",
-        "description" : "To fetch invoice by status, Available status are sent, draft, overdue, paid, void, unpaid, partially_paid and viewed",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null" ],
-          "description" : "To fetch invoice by status, Available status are sent, draft, overdue, paid, void, unpaid, partially_paid and viewed",
-          "enum" : [ "sent", "draft", "overdue", "paid", "void", "partially_paid" ],
-          "maxLength" : 100,
-          "minLength" : 0
-        }
-      }
-    },
     "requestBodies" : {
       "financeUpdateStatus" : {
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "status" : {
-                  "type" : [ "string", "null" ],
+                  "description" : "Status to apply to the estimate",
+                  "type" : [ "string" ],
                   "enum" : [ "sent" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
                 }
               },
               "required" : [ "status" ]
@@ -702,14 +797,14 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "status" : {
-                  "type" : [ "string", "null" ],
+                  "description" : "Status to apply to the invoice",
+                  "type" : [ "string" ],
                   "enum" : [ "sent" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
                 }
               },
               "required" : [ "status" ]
@@ -728,13 +823,14 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "ids" : {
-                  "type" : [ "null", "array" ],
+                  "description" : "ID(s) of the invoices to mark as sent",
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
@@ -754,6 +850,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

@@ -8,17 +8,19 @@
   "components" : {
     "schemas" : {
       "stateObjectWithPrimaryDetails" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "name" : {
+            "description" : "Name of the state",
             "type" : [ "string", "null" ],
             "maxLength" : 120,
             "minLength" : 1,
             "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the state",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
@@ -26,17 +28,17 @@
         "required" : [ "id", "name" ]
       },
       "stateArrayWithPrimaryDetails" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./blueprintStates.json#/components/schemas/stateObjectWithPrimaryDetails"
+          "$ref" : "#/components/schemas/stateObjectWithPrimaryDetails"
         }
       },
       "stateObjectWithDueDate" : {
         "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./blueprintStates.json#/components/schemas/stateObjectWithPrimaryDetails"
+          "$ref" : "#/components/schemas/stateObjectWithPrimaryDetails"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "dueDate" : {
               "type" : [ "string", "null" ],
@@ -46,100 +48,104 @@
             },
             "type" : {
               "type" : [ "string", "null" ],
-              "enum" : [ "START", "INTERMEDIATE", "END" ],
-              "maxLength" : 100,
-              "minLength" : 1,
-              "pattern" : "START|INTERMEDIATE|END"
+              "enum" : [ "START", "INTERMEDIATE", "END", null ],
+              "pattern" : "START|INTERMEDIATE|END|null"
             }
           },
-          "required" : [ "dueDate", "type" ]
+          "required" : [ "dueDate", "type" ],
+          "additionalProperties" : false
         } ]
       },
       "agentIdsArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "type" : [ "string", "null", "integer" ],
+          "type" : [ "string", "integer", "null" ],
           "format" : "int64",
           "pattern" : "([0-9]+)"
         }
       },
       "teamIdsArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "type" : [ "string", "null", "integer" ],
+          "type" : [ "string", "integer", "null" ],
           "format" : "int64",
           "pattern" : "([0-9]+)"
         }
       },
       "otherRecptsArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
           "type" : [ "string", "null" ],
           "enum" : [ "RECORD_OWNER" ],
-          "maxLength" : 100,
-          "minLength" : 1,
           "pattern" : "RECORD_OWNER"
         }
       },
       "roleIdsArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "type" : [ "string", "null", "integer" ],
+          "type" : [ "string", "integer", "null" ],
           "format" : "int64",
           "pattern" : "([0-9]+)"
         }
       },
       "subordinateIdsArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "type" : [ "string", "null", "integer" ],
+          "type" : [ "string", "integer", "null" ],
           "format" : "int64",
           "pattern" : "([0-9]+)"
         }
       },
       "escalationRecipientsObject" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "agentIds" : {
-            "$ref" : "./blueprintStates.json#/components/schemas/agentIdsArray"
+            "description" : "Agent IDs configured as escalation recipients",
+            "$ref" : "#/components/schemas/agentIdsArray"
           },
           "subordinateIds" : {
-            "$ref" : "./blueprintStates.json#/components/schemas/subordinateIdsArray"
+            "description" : "Subordinate IDs configured as escalation recipients",
+            "$ref" : "#/components/schemas/subordinateIdsArray"
           },
           "roleIds" : {
-            "$ref" : "./blueprintStates.json#/components/schemas/roleIdsArray"
+            "description" : "Role IDs configured as escalation recipients",
+            "$ref" : "#/components/schemas/roleIdsArray"
           },
           "otherRecpts" : {
-            "$ref" : "./blueprintStates.json#/components/schemas/otherRecptsArray"
+            "description" : "Other recipients configured for the escalation",
+            "$ref" : "#/components/schemas/otherRecptsArray"
           },
           "teamIds" : {
-            "$ref" : "./blueprintStates.json#/components/schemas/teamIdsArray"
+            "description" : "Team IDs configured as escalation recipients",
+            "$ref" : "#/components/schemas/teamIdsArray"
           }
         },
         "required" : [ "agentIds", "otherRecpts", "roleIds", "subordinateIds", "teamIds" ]
       },
       "escalationsObject" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "escalationRecipients" : {
-            "$ref" : "./blueprintStates.json#/components/schemas/escalationRecipientsObject"
+            "description" : "Recipients to notify when the escalation is triggered",
+            "$ref" : "#/components/schemas/escalationRecipientsObject"
           },
           "templateId" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the email template used for the escalation",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "escalationLevel" : {
+            "description" : "Level of the escalation",
             "type" : [ "string", "null" ],
             "enum" : [ "1", "2", "3" ],
-            "maxLength" : 100,
-            "minLength" : 0,
             "pattern" : "1|2|3"
           },
           "whenToEscalate" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Time at which the escalation must be triggered",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "minimum" : 1,
             "pattern" : "([0-9]+)"
@@ -148,13 +154,13 @@
         "required" : [ "escalationLevel", "escalationRecipients", "templateId", "whenToEscalate" ]
       },
       "escalationsArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./blueprintStates.json#/components/schemas/escalationsObject"
+          "$ref" : "#/components/schemas/escalationsObject"
         }
       },
       "transitionsOrderArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
           "type" : [ "string", "null" ],
           "maxLength" : 120,
@@ -163,102 +169,112 @@
         }
       },
       "statesObjectForResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "timeInMins" : {
+            "description" : "SLA time limit in minutes for the state",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 1,
             "pattern" : "[0-9]+"
           },
           "escalations" : {
-            "$ref" : "./blueprintStates.json#/components/schemas/escalationsArray"
+            "description" : "Escalation rules configured for the state",
+            "$ref" : "#/components/schemas/escalationsArray"
           },
           "transitionsOrder" : {
-            "$ref" : "./blueprintStates.json#/components/schemas/transitionsOrderArray"
+            "description" : "Order in which transitions are displayed for the state",
+            "$ref" : "#/components/schemas/transitionsOrderArray"
           },
           "businessHrId" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the business hours associated with the state",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "name" : {
+            "description" : "Name of the state",
             "type" : [ "string", "null" ],
             "maxLength" : 120,
             "minLength" : 1,
             "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the state",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "type" : {
+            "description" : "Type of the state. Possible values: @START@, @INTERMEDIATE@, @END@",
             "type" : [ "string", "null" ],
             "enum" : [ "START", "INTERMEDIATE", "END" ],
-            "maxLength" : 100,
-            "minLength" : 1,
             "pattern" : "START|INTERMEDIATE|END"
           }
         },
         "required" : [ "businessHrId", "escalations", "id", "name", "timeInMins", "transitionsOrder", "type" ]
       },
       "statesArrayForResponse" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./blueprintStates.json#/components/schemas/statesObjectForResponse"
+          "$ref" : "#/components/schemas/statesObjectForResponse"
         }
       },
       "statesObject" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "timeInMins" : {
+            "description" : "SLA time limit in minutes for the state",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 1,
             "pattern" : "[0-9]+"
           },
           "escalations" : {
-            "$ref" : "./blueprintStates.json#/components/schemas/escalationsArray"
+            "description" : "Escalation rules configured for the state",
+            "$ref" : "#/components/schemas/escalationsArray"
           },
           "transitionsOrder" : {
-            "$ref" : "./blueprintStates.json#/components/schemas/transitionsOrderArray"
+            "description" : "Order in which transitions are displayed for the state",
+            "$ref" : "#/components/schemas/transitionsOrderArray"
           },
           "businessHrId" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the business hours associated with the state",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "name" : {
+            "description" : "Name of the state",
             "type" : [ "string", "null" ],
             "maxLength" : 120,
             "minLength" : 1,
             "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
           },
           "type" : {
+            "description" : "Type of the state. Possible values: @START@, @INTERMEDIATE@, @END@",
             "type" : [ "string", "null" ],
             "enum" : [ "START", "INTERMEDIATE", "END" ],
-            "maxLength" : 100,
-            "minLength" : 1,
             "pattern" : "START|INTERMEDIATE|END"
           }
         },
         "required" : [ "businessHrId", "escalations", "name", "timeInMins", "transitionsOrder", "type" ]
       },
       "statesArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./blueprintStates.json#/components/schemas/statesObject"
+          "$ref" : "#/components/schemas/statesObject"
         }
       },
       "stateObjectWithName" : {
-        "type" : [ "null", "object" ],
+        "type" : "object",
         "additionalProperties" : false,
         "properties" : {
           "name" : {
-            "type" : [ "string", "null" ],
+            "description" : "Name of the state",
+            "type" : "string",
             "maxLength" : 120,
             "minLength" : 1,
             "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
@@ -268,6 +284,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

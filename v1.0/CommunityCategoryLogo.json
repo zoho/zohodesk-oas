@@ -1,0 +1,145 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "CommunityCategoryLogo",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/communityCategoryLogo" : {
+      "post" : {
+        "tags" : [ "CommunityCategoryLogo" ],
+        "summary" : "Upload Category Logo",
+        "description" : "Uploads a logo for a community category.",
+        "operationId" : "addCommunityCategoryLogo",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "multipart/form-data" : {
+              "schema" : {
+                "type" : [ "object" ],
+                "properties" : {
+                  "file" : {
+                    "type" : [ "string" ],
+                    "format" : "binary",
+                    "description" : "Logo file to upload (Content-Type: multipart/form-data)."
+                  }
+                },
+                "required" : [ "file" ],
+                "additionalProperties" : false
+              }
+            }
+          }
+        },
+        "responses" : {
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/addAttachment"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.forums.CREATE", "Desk.community.CREATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "addAttachmentResponse" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "size" : {
+            "description" : "Size of the uploaded logo in bytes.",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "name" : {
+            "description" : "File name of the uploaded logo.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "id" : {
+            "description" : "Unique ID of the uploaded logo.",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        },
+        "required" : [ "id", "name", "size" ]
+      }
+    },
+    "responses" : {
+      "addAttachment" : {
+        "description" : "addAttachment template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/addAttachmentResponse",
+              "type" : [ "null", "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "size" : {
+                  "description" : "Size of the uploaded logo in bytes.",
+                  "type" : [ "string", "null", "integer" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "name" : {
+                  "description" : "File name of the uploaded logo.",
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 100,
+                  "minLength" : 0
+                },
+                "id" : {
+                  "description" : "Unique ID of the uploaded logo.",
+                  "type" : [ "string", "null", "integer" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                }
+              },
+              "required" : [ "id", "name", "size" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "size" : "1024",
+                  "name" : "logo.jpeg",
+                  "id" : "1004"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "CommunityCategoryLogo"
+}

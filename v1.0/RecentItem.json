@@ -1,0 +1,197 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "RecentItem",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/me/recentitems" : {
+      "get" : {
+        "tags" : [ "RecentItem" ],
+        "summary" : "List Recent Items",
+        "description" : "This API lists the recent items accessed by the current user.",
+        "operationId" : "getRecentItems",
+        "parameters" : [ {
+          "name" : "department",
+          "in" : "query",
+          "description" : "ID of the department from which the recent items must be fetched. You can pass a specific department ID or allDepartment in the API request.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "format" : "int64",
+            "pattern" : "allDepartment|[0-9]+",
+            "maxLength" : 100
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/recentItemsList"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.basic.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/me/recentitems/markRecent" : {
+      "post" : {
+        "tags" : [ "RecentItem" ],
+        "summary" : "Mark Recent Item",
+        "description" : "This API marks the specified item as a recently accessed item for the current user.",
+        "operationId" : "markRecentItems",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/markRecentItemJSON"
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "200" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.basic.CREATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "recentItemDetail" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "module" : {
+            "description" : "Module to which the recently accessed item belongs.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "id" : {
+            "description" : "Unique ID of the recently accessed item.",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "time" : {
+            "description" : "Timestamp, in milliseconds, when the item was last accessed.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "([0-9]+)"
+          },
+          "title" : {
+            "description" : "Title of the recently accessed item.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 500,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "id", "module", "time", "title" ]
+      },
+      "recentItemsArray" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/recentItemDetail"
+        }
+      }
+    },
+    "responses" : {
+      "recentItemsList" : {
+        "description" : "recentItemsList template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "description" : "List of recently accessed items.",
+                  "$ref" : "#/components/schemas/recentItemsArray"
+                },
+                "status" : {
+                  "description" : "Status of the API response.",
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 50,
+                  "minLength" : 0
+                }
+              },
+              "required" : [ "data", "status" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "data" : [ {
+                    "module" : "Cases",
+                    "id" : "220728000416662265",
+                    "time" : "1779691906173",
+                    "title" : "#1191396 Handle ElasticsearchStatusException in api/v1/tickets GET api"
+                  }, {
+                    "module" : "Cases",
+                    "id" : "220728000414898498",
+                    "time" : "1779686259887",
+                    "title" : "#1189559 Remove queueSlots API call when changing view in queue view"
+                  } ],
+                  "status" : "success"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "requestBodies" : {
+      "markRecentItemJSON" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "itemId" : {
+                  "description" : "Unique ID of the item to mark as recently accessed.",
+                  "type" : [ "string", "integer" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                }
+              },
+              "required" : [ "itemId" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "itemId" : "220728000462816422"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "RecentItem"
+}

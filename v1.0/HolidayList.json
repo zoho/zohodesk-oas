@@ -8,10 +8,13 @@
     "/api/v1/holidayList" : {
       "get" : {
         "tags" : [ "HolidayList" ],
-        "summary" : "List holiday lists",
-        "description" : "This API lists a particular number of holiday lists, based on the limit specified",
+        "summary" : "Get Holiday Lists",
+        "description" : "Retrieves holiday lists, with pagination support.",
         "operationId" : "getHolidayLists",
+        "x-mcp-ready" : true,
         "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        }, {
           "name" : "limit",
           "in" : "query",
           "description" : "Number of holiday lists to list",
@@ -53,8 +56,6 @@
             "maxLength" : 100,
             "minLength" : 0
           }
-        }, {
-          "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
           "200" : {
@@ -62,15 +63,18 @@
           }
         },
         "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.automations.READ", "Desk.settings.READ" ]
+        }, {
           "iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
       },
       "post" : {
         "tags" : [ "HolidayList" ],
-        "summary" : "Create holiday list",
-        "description" : "This API creates a holiday list in your help desk portal",
+        "summary" : "Create Holiday List",
+        "description" : "Creates a holiday list in the help desk portal.",
         "operationId" : "createHolidayList",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -86,6 +90,8 @@
           }
         },
         "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.automations.CREATE", "Desk.settings.CREATE" ]
+        }, {
           "iam-oauth2-schema" : [ "Desk.settings.CREATE" ]
         } ],
         "x-audience" : [ "external-public" ]
@@ -94,11 +100,21 @@
     "/api/v1/holidayList/{holidayListId}" : {
       "get" : {
         "tags" : [ "HolidayList" ],
-        "summary" : "Get holiday list",
-        "description" : "This API fetches the details of a holiday list configured in your help desk portal",
+        "summary" : "Get Holiday List",
+        "description" : "Retrieves the details of a holiday list configured in the help desk portal.",
         "operationId" : "getHolidayList",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/holidayListId"
+          "name" : "holidayListId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -111,17 +127,29 @@
           }
         },
         "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.automations.READ", "Desk.settings.READ" ]
+        }, {
           "iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
       },
       "patch" : {
         "tags" : [ "HolidayList" ],
-        "summary" : "Update holiday list",
-        "description" : "This API updates the details of a holiday list configured in your help desk portal",
+        "summary" : "Update Holiday List",
+        "description" : "Updates the details of a holiday list configured in the help desk portal.",
         "operationId" : "updateHolidayList",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/holidayListId"
+          "name" : "holidayListId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -137,6 +165,8 @@
           }
         },
         "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.automations.UPDATE", "Desk.settings.UPDATE" ]
+        }, {
           "iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
         } ],
         "x-audience" : [ "external-public" ]
@@ -146,7 +176,7 @@
   "components" : {
     "schemas" : {
       "associatedBusinessHoursJson" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "businessHourStatus" : {
@@ -156,7 +186,7 @@
             "minLength" : 0
           },
           "businessHourId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
@@ -170,13 +200,13 @@
         "required" : [ "businessHourId", "businessHourName", "businessHourStatus" ]
       },
       "associatedBusinessHoursArr" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./HolidayList.json#/components/schemas/associatedBusinessHoursJson"
+          "$ref" : "#/components/schemas/associatedBusinessHoursJson"
         }
       },
       "holidayListJSON" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "modifiedTime" : {
@@ -186,10 +216,10 @@
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "associatedBusinessHours" : {
-            "$ref" : "./HolidayList.json#/components/schemas/associatedBusinessHoursArr"
+            "$ref" : "#/components/schemas/associatedBusinessHoursArr"
           },
           "createdBy" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
@@ -206,12 +236,12 @@
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "modifiedBy" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
@@ -220,18 +250,28 @@
             "enum" : [ "ACTIVE", "INACTIVE" ],
             "maxLength" : 100,
             "minLength" : 0
+          },
+          "year" : {
+            "type" : [ "integer", "string", "null" ],
+            "format" : "int32",
+            "minimum" : 2000,
+            "maximum" : 2100
+          },
+          "holidayListType" : {
+            "type" : [ "string" ],
+            "enum" : [ "RECURRING", "YEAR_SPECIFIC" ]
           }
         },
-        "required" : [ "associatedBusinessHours", "createdBy", "createdTime", "id", "modifiedBy", "modifiedTime", "name", "status" ]
+        "required" : [ "year", "holidayListType", "associatedBusinessHours", "createdBy", "createdTime", "id", "modifiedBy", "modifiedTime", "name", "status" ]
       },
       "holidayListDataArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./HolidayList.json#/components/schemas/holidayListJSON"
+          "$ref" : "#/components/schemas/holidayListJSON"
         }
       },
       "holidayJson" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "from" : {
@@ -256,10 +296,43 @@
         "required" : [ "from", "holidayName", "to" ]
       },
       "holidayList" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./HolidayList.json#/components/schemas/holidayJson"
+          "$ref" : "#/components/schemas/holidayJson"
         }
+      },
+      "holidayListRequest" : {
+        "type" : [ "array" ],
+        "items" : {
+          "$ref" : "#/components/schemas/holidayJsonRequest"
+        },
+        "minItems" : 1,
+        "maxItems" : 100
+      },
+      "holidayJsonRequest" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "from" : {
+            "type" : [ "string" ],
+            "maxLength" : 5,
+            "minLength" : 5,
+            "pattern" : "^([0-1][0-2]|0[0-9])-([12][0-9]|3[01]|0[1-9])"
+          },
+          "to" : {
+            "type" : [ "string" ],
+            "maxLength" : 5,
+            "minLength" : 5,
+            "pattern" : "^([0-1][0-2]|0[0-9])-([12][0-9]|3[01]|0[1-9])"
+          },
+          "holidayName" : {
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "minLength" : 1,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          }
+        },
+        "required" : [ "from", "holidayName", "to" ]
       }
     },
     "responses" : {
@@ -268,11 +341,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./HolidayList.json#/components/schemas/holidayListDataArray"
+                  "$ref" : "#/components/schemas/holidayListDataArray"
                 }
               },
               "required" : [ "data" ]
@@ -300,7 +373,9 @@
                     "createdTime" : 1544438928772,
                     "modifiedBy" : "4000000016079",
                     "id" : "4000000191456",
-                    "status" : "ACTIVE"
+                    "status" : "ACTIVE",
+                    "year" : null,
+                    "holidayListType" : "RECURRING"
                   }, {
                     "modifiedTime" : 1544438136071,
                     "associatedBusinessHours" : [ ],
@@ -309,7 +384,9 @@
                     "createdTime" : 1544438136071,
                     "modifiedBy" : "4000000016079",
                     "id" : "4000000191337",
-                    "status" : "INACTIVE"
+                    "status" : "INACTIVE",
+                    "year" : null,
+                    "holidayListType" : "RECURRING"
                   }, {
                     "modifiedTime" : 1543935377481,
                     "associatedBusinessHours" : [ ],
@@ -318,7 +395,9 @@
                     "createdTime" : 1543843650454,
                     "modifiedBy" : "4000000016079",
                     "id" : "4000000117001",
-                    "status" : "INACTIVE"
+                    "status" : "INACTIVE",
+                    "year" : null,
+                    "holidayListType" : "RECURRING"
                   }, {
                     "modifiedTime" : 1543821414223,
                     "associatedBusinessHours" : [ {
@@ -331,7 +410,9 @@
                     "createdTime" : 1543410293327,
                     "modifiedBy" : "4000000016079",
                     "id" : "4000000105030",
-                    "status" : "ACTIVE"
+                    "status" : "ACTIVE",
+                    "year" : "2026",
+                    "holidayListType" : "YEAR_SPECIFIC"
                   } ]
                 }
               }
@@ -346,6 +427,17 @@
             "schema" : {
               "additionalProperties" : false,
               "allOf" : [ {
+                "$ref" : "#/components/schemas/holidayListJSON"
+              }, {
+                "type" : [ "object", "null" ],
+                "properties" : {
+                  "holidays" : {
+                    "$ref" : "#/components/schemas/holidayList"
+                  }
+                },
+                "required" : [ "holidays" ],
+                "additionalProperties" : false
+              }, {
                 "$ref" : "./HolidayList.json#/components/schemas/holidayListJSON"
               }, {
                 "type" : [ "null", "object" ],
@@ -392,25 +484,13 @@
                   "createdTime" : 1544438213136,
                   "modifiedBy" : "4000000016079",
                   "id" : "4000000191371",
-                  "status" : "ACTIVE"
+                  "status" : "ACTIVE",
+                  "year" : null,
+                  "holidayListType" : "RECURRING"
                 }
               }
             }
           }
-        }
-      }
-    },
-    "parameters" : {
-      "holidayListId" : {
-        "name" : "holidayListId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
         }
       }
     },
@@ -419,26 +499,28 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "associatedBusinessHourIds" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
-                  "uniqueItems" : false
+                  "uniqueItems" : false,
+                  "minItems" : 0,
+                  "maxItems" : 50
                 },
                 "holidays" : {
-                  "$ref" : "./HolidayList.json#/components/schemas/holidayList"
+                  "$ref" : "#/components/schemas/holidayListRequest"
                 },
                 "name" : {
                   "type" : [ "string", "null" ],
                   "maxLength" : 100,
-                  "minLength" : 1,
-                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+                  "minLength" : 1
                 },
                 "status" : {
                   "type" : [ "string", "null" ],
@@ -463,32 +545,44 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "associatedBusinessHourIds" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
-                  "uniqueItems" : false
+                  "uniqueItems" : false,
+                  "minItems" : 0,
+                  "maxItems" : 50
                 },
                 "holidays" : {
-                  "$ref" : "./HolidayList.json#/components/schemas/holidayList"
+                  "$ref" : "#/components/schemas/holidayListRequest"
                 },
                 "name" : {
                   "type" : [ "string", "null" ],
                   "maxLength" : 100,
-                  "minLength" : 1,
-                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+                  "minLength" : 1
                 },
                 "status" : {
                   "type" : [ "string", "null" ],
                   "enum" : [ "ACTIVE", "INACTIVE" ],
                   "maxLength" : 100,
                   "minLength" : 0
+                },
+                "year" : {
+                  "type" : [ "integer", "null" ],
+                  "format" : "int32",
+                  "minimum" : 2000,
+                  "maximum" : 2100
+                },
+                "holidayListType" : {
+                  "type" : [ "string" ],
+                  "enum" : [ "RECURRING", "YEAR_SPECIFIC" ]
                 }
               },
               "required" : [ "holidays", "name", "status" ]
@@ -520,6 +614,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

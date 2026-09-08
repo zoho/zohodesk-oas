@@ -1,0 +1,464 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "IM_IntegrationService",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/im/integrationServices/{id}" : {
+      "get" : {
+        "tags" : [ "IM_IntegrationService" ],
+        "operationId" : "getIntegrationService",
+        "summary" : "Get integration service by id",
+        "description" : "Returns metadata for one IM integration service (for example WhatsApp or LINE), including display fields and, in the full payload, `configParams` and `pricingParams` used when configuring channels.",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "description" : "Integration service identifier (for example WHATSAPP, TELEGRAM).",
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "FACEBOOKMESSENGER", "IM_TALK", "INSTAGRAM", "LINE", "TELEGRAM", "TWILIO", "WECHAT", "WECOM", "WHATSAPP" ],
+            "pattern" : "([a-zA-Z0-9_\\\\-]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/getIntegrationService"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.InstantMessages.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/im/integrationServices/{id}/configParams/{configParamName}/computeOptions" : {
+      "post" : {
+        "tags" : [ "IM_IntegrationService" ],
+        "operationId" : "getIntegrationConfigParamsComputedOptions",
+        "summary" : "Compute options for an integration service config parameter",
+        "description" : "Compute options for an integration service config parameter",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "description" : "Integration service identifier (for example WHATSAPP, TELEGRAM).",
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "FACEBOOKMESSENGER", "IM_TALK", "INSTAGRAM", "LINE", "TELEGRAM", "TWILIO", "WECHAT", "WECOM", "WHATSAPP" ],
+            "pattern" : "([a-zA-Z0-9_\\\\-]+)"
+          }
+        }, {
+          "name" : "configParamName",
+          "in" : "path",
+          "required" : true,
+          "description" : "Name of the configuration parameter to compute options for (alphanumeric and underscore).",
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "([a-zA-Z0-9_]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "./IM_Channel.json#/components/requestBodies/getIntegrationConfigParamsComputedOptions_getConfigParamsComputedOptions_input"
+        },
+        "responses" : {
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          },
+          "200" : {
+            "$ref" : "./IM_Channel.json#/components/responses/getConfigParamsComputedOptions"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          }
+        },
+        "x-audience" : [ "external-public" ],
+        "security" : [ {
+          "cookie-auth" : [ "cookie-auth" ]
+        } ]
+      }
+    },
+    "/api/v1/im/integrationServices" : {
+      "get" : {
+        "tags" : [ "IM_IntegrationService" ],
+        "summary" : "List available IM integration services",
+        "description" : "Returns the integration service types available to the current Desk org for Instant Messaging (for example WhatsApp, Telegram, LINE). Use this before creating channels or loading service-specific configuration. Response shape follows Desk list conventions (`data`, `kind`, `hasMore`).",
+        "operationId" : "getAvailableIntegrations",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/getAvailableIntegrations"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.InstantMessages.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "configParams" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "isInternal" : {
+            "type" : [ "boolean", "null" ]
+          },
+          "isRequired" : {
+            "type" : [ "boolean", "null" ]
+          },
+          "isDeprecated" : {
+            "type" : [ "boolean", "null" ]
+          },
+          "isSecured" : {
+            "type" : [ "boolean", "null" ]
+          },
+          "defaultValue" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 500,
+            "minLength" : 0,
+            "pattern" : "(null|^$|NULL|[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+)"
+          },
+          "parentParams" : {
+            "type" : [ "array", "null" ],
+            "items" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "minItems" : 0,
+            "uniqueItems" : false
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 500,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "options" : {
+            "type" : [ "array", "null" ],
+            "items" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "maxProperties" : 2,
+              "minProperties" : 2,
+              "properties" : {
+                "label" : {
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 500,
+                  "minLength" : 0,
+                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                },
+                "value" : {
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 500,
+                  "minLength" : 0
+                }
+              },
+              "required" : [ "label", "value" ]
+            },
+            "uniqueItems" : false
+          },
+          "index" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "[0-9]+"
+          },
+          "label" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 500,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "type" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "STRING", "NUMBER", "URL", "EMAIL", "PHONE", "OPTIONS", "PASSWORD", "DATE", "TIME", "DATETIME", "SYSTEM_DEFINED", "OPTIONS_COMPUTED", "BOOLEAN" ]
+          },
+          "maxLen" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "[0-9]+"
+          }
+        },
+        "required" : [ "defaultValue", "index", "isDeprecated", "isInternal", "isRequired", "isSecured", "label", "maxLen", "name", "options", "parentParams", "type" ]
+      },
+      "listofConfigParams" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/configParams"
+        }
+      },
+      "integrationServicePricingParam" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "maxProperties" : 5,
+        "minProperties" : 5,
+        "properties" : {
+          "name" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 500,
+            "minLength" : 0,
+            "description" : "Pricing parameter name."
+          },
+          "isVariable" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Whether the pricing value can vary."
+          },
+          "label" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 500,
+            "minLength" : 0,
+            "description" : "Display label for the pricing parameter."
+          },
+          "type" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "COSTS", "POINTS" ],
+            "description" : "Pricing model type: costs or points."
+          },
+          "value" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 500,
+            "minLength" : 0,
+            "description" : "Current or default value for the pricing parameter."
+          }
+        },
+        "required" : [ "isVariable", "label", "name", "type", "value" ]
+      },
+      "listOfIntegrationService_rowExtension" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "required" : [ "isParentAccountNeeded" ],
+        "properties" : {
+          "isParentAccountNeeded" : {
+            "type" : "boolean",
+            "description" : "Required for each row in GET /api/v1/im/integrationServices."
+          }
+        }
+      },
+      "getIntegrationService_listView" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "channelAlias" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 500,
+            "minLength" : 0,
+            "pattern" : "(null|^$|NULL|[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+)"
+          },
+          "provider" : {
+            "type" : [ "object", "null" ],
+            "additionalProperties" : false,
+            "maxProperties" : 2,
+            "minProperties" : 2,
+            "properties" : {
+              "domain" : {
+                "type" : [ "string", "null" ],
+                "maxLength" : 500,
+                "minLength" : 0,
+                "description" : "Provider site or home URL; may be scheme-less (e.g. www.whatsapp.com) or https."
+              },
+              "name" : {
+                "type" : [ "string", "null" ],
+                "maxLength" : 500,
+                "minLength" : 0,
+                "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+              }
+            },
+            "required" : [ "domain", "name" ]
+          },
+          "kind" : {
+            "type" : "string",
+            "const" : "single.integrationService",
+            "description" : "Discriminator for a single integration service row (including each element of a list response)."
+          },
+          "domain" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 500,
+            "minLength" : 0,
+            "description" : "Primary web domain or URL for the integration service."
+          },
+          "id" : {
+            "type" : [ "string", "null" ],
+            "description" : "Integration service code returned by IM.",
+            "enum" : [ "FACEBOOKMESSENGER", "IM_TALK", "INSTAGRAM", "LINE", "TELEGRAM", "TWILIO", "WECHAT", "WECOM", "WHATSAPP" ]
+          },
+          "label" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 500,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "logoURL" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 2048,
+            "minLength" : 0,
+            "description" : "CDN URL for the service logo; null when no asset is configured (e.g. WECOM)."
+          },
+          "isParentAccountNeeded" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Whether this integration requires linking a parent / external account before use. Always set on list responses; may be absent on single-resource payloads."
+          }
+        },
+        "required" : [ "channelAlias", "domain", "id", "kind", "label", "logoURL", "provider" ]
+      },
+      "listOfIntegrationService" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "allOf" : [ {
+            "$ref" : "#/components/schemas/getIntegrationService_listView"
+          }, {
+            "$ref" : "#/components/schemas/listOfIntegrationService_rowExtension"
+          } ]
+        }
+      },
+      "getIntegrationService_configAndPricingExtension" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "configParams" : {
+            "$ref" : "#/components/schemas/listofConfigParams"
+          },
+          "pricingParams" : {
+            "type" : [ "array", "null" ],
+            "items" : {
+              "$ref" : "#/components/schemas/integrationServicePricingParam"
+            },
+            "minItems" : 0,
+            "uniqueItems" : false,
+            "description" : "Optional pricing-related parameters for the integration service."
+          }
+        },
+        "required" : [ "configParams", "pricingParams" ]
+      },
+      "getIntegrationService_responseBody" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/getIntegrationService_listView"
+        }, {
+          "$ref" : "#/components/schemas/getIntegrationService_configAndPricingExtension"
+        } ]
+      },
+      "getAvailableIntegrations_responseBody" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "data" : {
+            "$ref" : "#/components/schemas/listOfIntegrationService"
+          },
+          "kind" : {
+            "type" : "string",
+            "const" : "list.integrationService",
+            "description" : "Always list.integrationService for this endpoint."
+          },
+          "hasMore" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "When true, additional integration service rows exist beyond this page."
+          }
+        },
+        "required" : [ "data", "hasMore", "kind" ]
+      }
+    },
+    "responses" : {
+      "getIntegrationService" : {
+        "description" : "200 response for GET /api/v1/im/integrationServices/{id}: list-style integration service fields merged with `configParams` and `pricingParams` needed for configuration and onboarding.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/getIntegrationService_responseBody"
+            },
+            "examples" : {
+              "FACEBOOKMESSENGER" : {
+                "$ref" : "./examples/IM_IntegrationService.json#/components/examples/GetIntegrationService_FACEBOOKMESSENGER_200"
+              },
+              "WHATSAPP" : {
+                "$ref" : "./examples/IM_IntegrationService.json#/components/examples/GetIntegrationService_WHATSAPP_200"
+              },
+              "INSTAGRAM" : {
+                "$ref" : "./examples/IM_IntegrationService.json#/components/examples/GetIntegrationService_INSTAGRAM_200"
+              },
+              "TELEGRAM" : {
+                "$ref" : "./examples/IM_IntegrationService.json#/components/examples/GetIntegrationService_TELEGRAM_200"
+              },
+              "LINE" : {
+                "$ref" : "./examples/IM_IntegrationService.json#/components/examples/GetIntegrationService_LINE_200"
+              },
+              "WECHAT" : {
+                "$ref" : "./examples/IM_IntegrationService.json#/components/examples/GetIntegrationService_WECHAT_200"
+              },
+              "WECOM" : {
+                "$ref" : "./examples/IM_IntegrationService.json#/components/examples/GetIntegrationService_WECOM_200"
+              }
+            }
+          }
+        }
+      },
+      "getAvailableIntegrations" : {
+        "description" : "200 response for GET /api/v1/im/integrationServices: paginated list of integration service types (`data`, `kind`, `hasMore`) available to the org.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/getAvailableIntegrations_responseBody"
+            },
+            "examples" : {
+              "GetAvailableIntegrations_200" : {
+                "$ref" : "./examples/IM_IntegrationService.json#/components/examples/GetAvailableIntegrations_200"
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "IM_IntegrationService"
+}

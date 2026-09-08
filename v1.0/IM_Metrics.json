@@ -1,5 +1,6 @@
 {
   "openapi" : "3.1.0",
+  "x-mcp-group" : [ "IM Metrics" ],
   "info" : {
     "title" : "IM_Metrics",
     "version" : "1.0.0"
@@ -9,102 +10,144 @@
       "get" : {
         "tags" : [ "IM_Metrics" ],
         "summary" : "Get Agents Metrics",
-        "description" : "This data provides leads/managers with a holistic details into agents performance and can be used in coaching them.",
+        "description" : "Retrieves agent performance metrics for IM sessions. This data provides leads and managers with holistic details into agent performance and can be used for coaching them.",
         "operationId" : "getAgentMetrics",
+        "x-mcp-ready" : true,
         "parameters" : [ {
+          "name" : "startDate",
+          "in" : "query",
+          "description" : "Start of the metrics date range. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the start time as a Unix timestamp in milliseconds.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "Start of the metrics date range. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the start time as a Unix timestamp in milliseconds.",
+            "pattern" : "[0-9\\-]+",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "endDate",
+          "in" : "query",
+          "description" : "End of the metrics date range. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the end time as a Unix timestamp in milliseconds.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "End of the metrics date range. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the end time as a Unix timestamp in milliseconds.",
+            "pattern" : "[0-9\\-]+",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
           "name" : "duration",
           "in" : "query",
-          "description" : "Duration to filter the metrics. Available values are @LAST24HOURS@, @TODAY@, @YESTERDAY@, @LAST_7_DAYS@, @LAST_30_DAYS@, @THIS_WEEK@, @LAST_WEEK@, @THIS_MONTH@, @LAST_MONTH@, @CUSTOM_IN_DATE@, @LAST_1_HOUR@",
+          "description" : "Duration to filter the metrics. Possible values: LAST24HOURS, TODAY, YESTERDAY, LAST_7_DAYS, LAST_30_DAYS, THIS_WEEK, LAST_WEEK, THIS_MONTH, LAST_MONTH, CUSTOM_IN_DATE, CUSTOM_IN_MILLIS, LAST_1_HOUR. When duration is CUSTOM_IN_DATE, also pass startDate and endDate as dates in dd-mm-yyyy format. When duration is CUSTOM_IN_MILLIS, also pass startDate and endDate as Unix timestamps in milliseconds.",
           "required" : true,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Duration to filter the metrics. Available values are @LAST24HOURS@, @TODAY@, @YESTERDAY@, @LAST_7_DAYS@, @LAST_30_DAYS@, @THIS_WEEK@, @LAST_WEEK@, @THIS_MONTH@, @LAST_MONTH@, @CUSTOM_IN_DATE@, @LAST_1_HOUR@",
-            "enum" : [ "LAST24HOURS", "TODAY", "YESTERDAY", "LAST_30_DAYS", "LAST_7_DAYS" ],
+            "type" : "string",
+            "description" : "Duration to filter the metrics. Possible values: LAST24HOURS, TODAY, YESTERDAY, LAST_7_DAYS, LAST_30_DAYS, THIS_WEEK, LAST_WEEK, THIS_MONTH, LAST_MONTH, CUSTOM_IN_DATE, CUSTOM_IN_MILLIS, LAST_1_HOUR. When duration is CUSTOM_IN_DATE, also pass startDate and endDate as dates in dd-mm-yyyy format. When duration is CUSTOM_IN_MILLIS, also pass startDate and endDate as Unix timestamps in milliseconds.",
+            "enum" : [ "LAST24HOURS", "TODAY", "YESTERDAY", "LAST_7_DAYS", "LAST_30_DAYS", "THIS_WEEK", "LAST_WEEK", "THIS_MONTH", "LAST_MONTH", "CUSTOM_IN_DATE", "CUSTOM_IN_MILLIS", "LAST_1_HOUR" ],
+            "pattern" : "(LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR)",
             "maxLength" : 100,
             "minLength" : 0
           }
         }, {
           "name" : "agentIds",
           "in" : "query",
-          "description" : "To filter Agent Metrics only for particular Agents. It's a Optional Param",
+          "description" : "Filter agent metrics for particular agents. Comma-separated list of agent IDs.",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
-            "description" : "To filter Agent Metrics only for particular Agents. It's a Optional Param",
-            "pattern" : "([0-9]+)"
+            "type" : "string",
+            "description" : "Filter agent metrics for particular agents. Comma-separated list of agent IDs.",
+            "pattern" : "^([0-9]+)(,([0-9]+))*$",
+            "maxLength" : 1000
           }
         }, {
           "name" : "attributeGroup",
           "in" : "query",
-          "description" : "Denotes which attribute group data is required. Eg: RESPONSIVENESS - AVG_RESPONSE_TIME comes under responsiveness group. It's Mandatory Param. Available value is @RESPONSIVENESS@",
+          "description" : "Denotes which attribute group data is required. For example, AVG_RESPONSE_TIME comes under the RESPONSIVENESS group. Possible values: RESPONSIVENESS",
           "required" : true,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Denotes which attribute group data is required. Eg: RESPONSIVENESS - AVG_RESPONSE_TIME comes under responsiveness group. It's Mandatory Param. Available value is @RESPONSIVENESS@",
-            "enum" : [ "RESPONSIVENESS" ],
+            "type" : "string",
+            "description" : "Denotes which attribute group data is required. For example, AVG_RESPONSE_TIME comes under the RESPONSIVENESS group. Possible values: RESPONSIVENESS",
+            "const" : "RESPONSIVENESS",
             "maxLength" : 100,
             "minLength" : 0
           }
         }, {
           "name" : "departmentId",
           "in" : "query",
-          "description" : "Filter agent metrics in given department Id",
+          "description" : "Filter session metrics in the given department.",
           "required" : true,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
-            "description" : "Filter agent metrics in given department Id",
             "pattern" : "([0-9]+)"
           }
         }, {
           "name" : "attributes",
           "in" : "query",
-          "description" : "Denotes which metrics are required in the response. Its a mandatory Param. Eg: AVG_RESPONSE_TIME of agent.This is a list-based parameter you can pass all the values or the rquired ones. Available values are @ATTENDED_CHATS@, @AVG_PICKUP_TIME@, @AVG_FIRST_RESPONSE_TIME@, @AVG_RESPONSE_TIME@",
+          "description" : "Denotes which metrics are required in the response. This is a list-based parameter; pass one or more comma-separated values. Possible values: ATTENDED_CHATS, AVG_PICKUP_TIME, AVG_FIRST_RESPONSE_TIME, AVG_RESPONSE_TIME",
           "required" : true,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Denotes which metrics are required in the response. Its a mandatory Param. Eg: AVG_RESPONSE_TIME of agent.This is a list-based parameter you can pass all the values or the rquired ones. Available values are @ATTENDED_CHATS@, @AVG_PICKUP_TIME@, @AVG_FIRST_RESPONSE_TIME@, @AVG_RESPONSE_TIME@",
-            "enum" : [ "AVG_RESPONSE_TIME", "AVG_FIRST_RESPONSE_TIME", "AVG_PICKUP_TIME", "ATTENDED_CHATS" ],
+            "type" : "string",
+            "description" : "Denotes which metrics are required in the response. This is a list-based parameter; pass one or more comma-separated values. Possible values: ATTENDED_CHATS, AVG_PICKUP_TIME, AVG_FIRST_RESPONSE_TIME, AVG_RESPONSE_TIME",
+            "pattern" : "^(ATTENDED_CHATS|AVG_PICKUP_TIME|AVG_FIRST_RESPONSE_TIME|AVG_RESPONSE_TIME)(,(ATTENDED_CHATS|AVG_PICKUP_TIME|AVG_FIRST_RESPONSE_TIME|AVG_RESPONSE_TIME)){0,3}$",
+            "example" : "ATTENDED_CHATS,AVG_PICKUP_TIME,AVG_RESPONSE_TIME",
             "maxLength" : 100,
             "minLength" : 0
           }
         }, {
           "name" : "integrationService",
           "in" : "query",
-          "description" : "Agent metrics for a particular integration service. Available values are @TELEGRAM@, @TWILIO@, @LINE@, @WECHAT@, @WHATSAPP@, @FACEBOOKMESSENGER@, @INSTAGRAM@",
+          "description" : "Filter metrics for a particular integration service. Possible values: TELEGRAM, TWILIO, IM_TALK, LINE, WECHAT, WHATSAPP, FACEBOOKMESSENGER, INSTAGRAM, WECOM",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Agent metrics for a particular integration service. Available values are @TELEGRAM@, @TWILIO@, @LINE@, @WECHAT@, @WHATSAPP@, @FACEBOOKMESSENGER@, @INSTAGRAM@",
-            "enum" : [ "TELEGRAM", "TWILIO", "IM_TALK", "LINE", "WECHAT", "WHATSAPP", "FACEBOOKMESSENGER" ],
+            "type" : "string",
+            "enum" : [ "TELEGRAM", "TWILIO", "IM_TALK", "LINE", "WECHAT", "WHATSAPP", "FACEBOOKMESSENGER", "INSTAGRAM", "WECOM" ],
+            "pattern" : "[a-zA-Z0-9\\_]*$",
             "maxLength" : 100,
             "minLength" : 0
           }
         }, {
           "name" : "channelIds",
           "in" : "query",
-          "description" : "To filter Agent Metrics only on a list of channelIds. It's a Optional Param",
+          "description" : "Filter Session metrics by channelId",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
-            "description" : "To filter Agent Metrics only on a list of channelIds. It's a Optional Param",
-            "pattern" : "([0-9]+)"
+            "type" : "string",
+            "pattern" : "^([0-9]+)(,([0-9]+))*$",
+            "maxLength" : 1000
+          }
+        }, {
+          "name" : "basedOn",
+          "in" : "query",
+          "description" : "Used to select the required metrics, based on Session Started time or Ended Time. Possible values: START_TIME, END_TIME",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "START_TIME", "END_TIME" ],
+            "maxLength" : 100,
+            "minLength" : 0
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -128,21 +171,194 @@
         } ],
         "x-audience" : [ "external-public" ]
       }
+    },
+    "/api/v1/im/metrics/sessions/timeseries" : {
+      "get" : {
+        "tags" : [ "IM_Metrics" ],
+        "summary" : "Get Session Metrics",
+        "description" : "Retrieves session-related metrics such as average first response time, average response time, and average pickup time, with time-series granularity.",
+        "operationId" : "getSessionTimeSeriesMetrics",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "startDate",
+          "in" : "query",
+          "description" : "Start of the metrics date range. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the start time as a Unix timestamp in milliseconds.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "Start of the metrics date range. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the start time as a Unix timestamp in milliseconds.",
+            "pattern" : "[0-9\\-]+",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "endDate",
+          "in" : "query",
+          "description" : "End of the metrics date range. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the end time as a Unix timestamp in milliseconds.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "End of the metrics date range. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the end time as a Unix timestamp in milliseconds.",
+            "pattern" : "[0-9\\-]+",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "duration",
+          "in" : "query",
+          "description" : "Duration to filter the metrics. Possible values: LAST24HOURS, TODAY, YESTERDAY, LAST_7_DAYS, LAST_30_DAYS, THIS_WEEK, LAST_WEEK, THIS_MONTH, LAST_MONTH, CUSTOM_IN_DATE, CUSTOM_IN_MILLIS, LAST_1_HOUR. When duration is CUSTOM_IN_DATE, also pass startDate and endDate as dates in dd-mm-yyyy format. When duration is CUSTOM_IN_MILLIS, also pass startDate and endDate as Unix timestamps in milliseconds.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "Duration to filter the metrics. Possible values: LAST24HOURS, TODAY, YESTERDAY, LAST_7_DAYS, LAST_30_DAYS, THIS_WEEK, LAST_WEEK, THIS_MONTH, LAST_MONTH, CUSTOM_IN_DATE, CUSTOM_IN_MILLIS, LAST_1_HOUR. When duration is CUSTOM_IN_DATE, also pass startDate and endDate as dates in dd-mm-yyyy format. When duration is CUSTOM_IN_MILLIS, also pass startDate and endDate as Unix timestamps in milliseconds.",
+            "enum" : [ "LAST24HOURS", "TODAY", "YESTERDAY", "LAST_7_DAYS", "LAST_30_DAYS", "THIS_WEEK", "LAST_WEEK", "THIS_MONTH", "LAST_MONTH", "CUSTOM_IN_DATE", "CUSTOM_IN_MILLIS", "LAST_1_HOUR" ],
+            "pattern" : "(LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR)",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "granularity",
+          "in" : "query",
+          "description" : "Time granularity for trend data. Use HOURLY when the range is within 24 hours, otherwise DAY.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "HOURLY", "DAY" ],
+            "pattern" : "HOURLY|DAY",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "dimension",
+          "in" : "query",
+          "description" : "Denotes the dimension in metrics. For example, responsiveness provides how responsive the sessions are in a particular time duration, such as average pickup time. Possible values: RESPONSIVENESS",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "const" : "RESPONSIVENESS",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "dimensionValue",
+          "in" : "query",
+          "description" : "Dimension values required in the response. This is a list-based parameter; pass one or more comma-separated values. Possible values: AVG_PICKUP_TIME, AVG_RESPONSE_TIME, AVG_FIRST_RESPONSE_TIME",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "Dimension values required in the response. This is a list-based parameter; pass one or more comma-separated values. Possible values: AVG_PICKUP_TIME, AVG_RESPONSE_TIME, AVG_FIRST_RESPONSE_TIME",
+            "pattern" : "^(AVG_PICKUP_TIME|AVG_RESPONSE_TIME|AVG_FIRST_RESPONSE_TIME)(,(AVG_PICKUP_TIME|AVG_RESPONSE_TIME|AVG_FIRST_RESPONSE_TIME)){0,2}$",
+            "example" : "AVG_PICKUP_TIME,AVG_FIRST_RESPONSE_TIME",
+            "maxLength" : 200,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "integrationService",
+          "in" : "query",
+          "description" : "Filter metrics for a particular integration service. Possible values: TELEGRAM, TWILIO, IM_TALK, LINE, WECHAT, WHATSAPP, FACEBOOKMESSENGER, INSTAGRAM, WECOM",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "TELEGRAM", "TWILIO", "IM_TALK", "LINE", "WECHAT", "WHATSAPP", "FACEBOOKMESSENGER", "INSTAGRAM", "WECOM" ],
+            "pattern" : "[a-zA-Z0-9\\_]*$",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "channelIds",
+          "in" : "query",
+          "description" : "Filter Session metrics by channelId",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "^([0-9]+)(,([0-9]+))*$",
+            "maxLength" : 1000
+          }
+        }, {
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "Filter session metrics in the given department.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "basedOn",
+          "in" : "query",
+          "description" : "Used to select the required metrics, based on Session Started time or Ended Time. Possible values: START_TIME, END_TIME",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "START_TIME", "END_TIME" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/SessionTimeSeriesMetrics"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.InstantMessages.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
     }
   },
   "components" : {
     "schemas" : {
       "IMMetricsColumn" : {
         "type" : [ "null", "object" ],
+        "description" : "Metric attribute and value pair object.",
         "additionalProperties" : false,
         "properties" : {
           "attribute" : {
             "type" : [ "string", "null" ],
+            "description" : "Name of the metric attribute. Possible values: ATTENDED_CHATS, AVG_FIRST_RESPONSE_TIME, AVG_PICKUP_TIME, AVG_RESPONSE_TIME",
+            "enum" : [ "ATTENDED_CHATS", "AVG_FIRST_RESPONSE_TIME", "AVG_PICKUP_TIME", "AVG_RESPONSE_TIME" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "value" : {
             "type" : [ "string", "null" ],
+            "description" : "Value of the metric. For ATTENDED_CHATS, a numeric count as a string (for example, \"4\"). For AVG_PICKUP_TIME, AVG_FIRST_RESPONSE_TIME, and AVG_RESPONSE_TIME, a duration in HH:MM:SS format (for example, \"00:00:23\"). Returns null when no data is available for the metric.",
             "maxLength" : 100,
             "minLength" : 0
           }
@@ -151,19 +367,23 @@
       },
       "IMMetricsColumnList" : {
         "type" : [ "null", "array" ],
+        "description" : "Array of objects containing metric attribute and value pairs.",
         "items" : {
           "$ref" : "./IM_Metrics.json#/components/schemas/IMMetricsColumn"
         }
       },
       "IMMetricsRow" : {
         "type" : [ "null", "object" ],
+        "description" : "Agent metrics row object containing metric values for one agent.",
         "additionalProperties" : false,
         "properties" : {
           "values" : {
+            "description" : "Array of metric value objects for the agent.",
             "$ref" : "./IM_Metrics.json#/components/schemas/IMMetricsColumnList"
           },
           "id" : {
             "type" : [ "string", "null" ],
+            "description" : "Desk Agent Id for the metrics row.",
             "maxLength" : 100,
             "minLength" : 0
           }
@@ -172,25 +392,122 @@
       },
       "IMMetricsRowList" : {
         "type" : [ "null", "array" ],
+        "description" : "Array of agent metrics row objects.",
         "items" : {
           "$ref" : "./IM_Metrics.json#/components/schemas/IMMetricsRow"
+        }
+      },
+      "IMMetricsEntityDetail" : {
+        "type" : [ "null", "object" ],
+        "description" : "Agent profile details associated with a metrics row.",
+        "additionalProperties" : false,
+        "properties" : {
+          "name" : {
+            "type" : [ "string", "null" ],
+            "description" : "Display name of the agent.",
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "photoURL" : {
+            "type" : [ "string", "null" ],
+            "description" : "URL of the agent profile photo.",
+            "maxLength" : 500,
+            "minLength" : 0
+          },
+          "id" : {
+            "type" : [ "string", "null" ],
+            "description" : "Desk agent ID.",
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "email" : {
+            "type" : [ "string", "null" ],
+            "description" : "Email address of the agent.",
+            "maxLength" : 200,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "name", "id" ]
+      },
+      "IMSessionMetric" : {
+        "type" : [ "null", "object" ],
+        "description" : "Metric dimension and value pair object.",
+        "additionalProperties" : false,
+        "properties" : {
+          "dimension" : {
+            "type" : [ "string", "null" ],
+            "description" : "Name of the metric dimension. Possible values: AVG_PICKUP_TIME, AVG_RESPONSE_TIME, AVG_FIRST_RESPONSE_TIME",
+            "enum" : [ "AVG_PICKUP_TIME", "AVG_RESPONSE_TIME", "AVG_FIRST_RESPONSE_TIME" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "value" : {
+            "type" : [ "string", "null" ],
+            "description" : "Value of the metric. A duration in HH:MM:SS format (for example, \"07:57:38\"). Returns null when no data is available for the time period.",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "dimension", "value" ]
+      },
+      "IMSessionMetricList" : {
+        "type" : [ "null", "array" ],
+        "description" : "Array of objects containing metric dimension and value pairs.",
+        "items" : {
+          "$ref" : "./IM_Metrics.json#/components/schemas/IMSessionMetric"
+        }
+      },
+      "IMSessionTrendData" : {
+        "type" : [ "null", "object" ],
+        "description" : "Time-series trend data entry object.",
+        "additionalProperties" : false,
+        "properties" : {
+          "data" : {
+            "description" : "Array of metric data objects for the time period.",
+            "$ref" : "./IM_Metrics.json#/components/schemas/IMSessionMetricList"
+          },
+          "time" : {
+            "type" : [ "string", "null" ],
+            "description" : "Date or datetime label for the trend data point. When granularity is DAY, the format is yyyy-MM-dd (for example, \"2024-11-16\"). When granularity is HOURLY, the format is yyyy-MM-dd HH:mm (for example, \"2026-03-12 00:00\").",
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "data", "time" ]
+      },
+      "IMSessionTrendDataList" : {
+        "type" : [ "null", "array" ],
+        "description" : "Array of objects containing time-series trend data entries.",
+        "items" : {
+          "$ref" : "./IM_Metrics.json#/components/schemas/IMSessionTrendData"
         }
       }
     },
     "responses" : {
       "IMMetrics" : {
-        "description" : "IMMetrics template definitions",
+        "description" : "Retrieves agent performance metrics for IM sessions. This data provides leads and managers with holistic details into agent performance and can be used for coaching them. ",
         "content" : {
           "application/json" : {
             "schema" : {
               "type" : [ "null", "object" ],
+              "description" : "Agent metrics response object containing per-agent metric rows and agent profile details.",
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
+                  "description" : "Array of per-agent metric rows for the requested duration, attribute group, and filters.",
                   "$ref" : "./IM_Metrics.json#/components/schemas/IMMetricsRowList"
+                },
+                "entityDetails" : {
+                  "type" : [ "object", "null" ],
+                  "description" : "Agent profile details keyed by agent ZUID.",
+                  "additionalProperties" : {
+                    "$ref" : "./IM_Metrics.json#/components/schemas/IMMetricsEntityDetail"
+                  }
                 },
                 "entity" : {
                   "type" : [ "string", "null" ],
+                  "description" : "Entity type for the metrics. Possible values: AGENT",
+                  "enum" : [ "AGENT" ],
                   "maxLength" : 100,
                   "minLength" : 0
                 }
@@ -198,214 +515,36 @@
               "required" : [ "data", "entity" ]
             },
             "examples" : {
-              "Valid responses Definitions" : {
-                "value" : {
-                  "data" : [ {
-                    "values" : [ {
-                      "attribute" : "ATTENDED_CHATS",
-                      "value" : "1"
-                    }, {
-                      "attribute" : "AVG_FIRST_RESPONSE_TIME",
-                      "value" : null
-                    }, {
-                      "attribute" : "AVG_PICKUP_TIME",
-                      "value" : "00:00:23"
-                    }, {
-                      "attribute" : "AVG_RESPONSE_TIME",
-                      "value" : null
-                    } ],
-                    "id" : "345343453"
-                  }, {
-                    "values" : [ {
-                      "attribute" : "ATTENDED_CHATS",
-                      "value" : "2"
-                    }, {
-                      "attribute" : "AVG_FIRST_RESPONSE_TIME",
-                      "value" : null
-                    }, {
-                      "attribute" : "AVG_PICKUP_TIME",
-                      "value" : null
-                    }, {
-                      "attribute" : "AVG_RESPONSE_TIME",
-                      "value" : null
-                    } ],
-                    "id" : "86434543"
-                  }, {
-                    "values" : [ {
-                      "attribute" : "ATTENDED_CHATS",
-                      "value" : "8"
-                    }, {
-                      "attribute" : "AVG_FIRST_RESPONSE_TIME",
-                      "value" : null
-                    }, {
-                      "attribute" : "AVG_PICKUP_TIME",
-                      "value" : null
-                    }, {
-                      "attribute" : "AVG_RESPONSE_TIME",
-                      "value" : null
-                    } ],
-                    "id" : "976543456"
-                  }, {
-                    "values" : [ {
-                      "attribute" : "ATTENDED_CHATS",
-                      "value" : "1"
-                    }, {
-                      "attribute" : "AVG_FIRST_RESPONSE_TIME",
-                      "value" : null
-                    }, {
-                      "attribute" : "AVG_PICKUP_TIME",
-                      "value" : null
-                    }, {
-                      "attribute" : "AVG_RESPONSE_TIME",
-                      "value" : null
-                    } ],
-                    "id" : "853447543"
-                  }, {
-                    "values" : [ {
-                      "attribute" : "ATTENDED_CHATS",
-                      "value" : "3"
-                    }, {
-                      "attribute" : "AVG_FIRST_RESPONSE_TIME",
-                      "value" : null
-                    }, {
-                      "attribute" : "AVG_PICKUP_TIME",
-                      "value" : null
-                    }, {
-                      "attribute" : "AVG_RESPONSE_TIME",
-                      "value" : null
-                    } ],
-                    "id" : "887764523"
-                  }, {
-                    "values" : [ {
-                      "attribute" : "ATTENDED_CHATS",
-                      "value" : "1"
-                    }, {
-                      "attribute" : "AVG_FIRST_RESPONSE_TIME",
-                      "value" : null
-                    }, {
-                      "attribute" : "AVG_PICKUP_TIME",
-                      "value" : null
-                    }, {
-                      "attribute" : "AVG_RESPONSE_TIME",
-                      "value" : null
-                    } ],
-                    "id" : "987654224"
-                  }, {
-                    "values" : [ {
-                      "attribute" : "ATTENDED_CHATS",
-                      "value" : "1"
-                    }, {
-                      "attribute" : "AVG_FIRST_RESPONSE_TIME",
-                      "value" : null
-                    }, {
-                      "attribute" : "AVG_PICKUP_TIME",
-                      "value" : null
-                    }, {
-                      "attribute" : "AVG_RESPONSE_TIME",
-                      "value" : null
-                    } ],
-                    "id" : "136000000321001"
-                  }, {
-                    "values" : [ {
-                      "attribute" : "ATTENDED_CHATS",
-                      "value" : "1"
-                    }, {
-                      "attribute" : "AVG_FIRST_RESPONSE_TIME",
-                      "value" : null
-                    }, {
-                      "attribute" : "AVG_PICKUP_TIME",
-                      "value" : null
-                    }, {
-                      "attribute" : "AVG_RESPONSE_TIME",
-                      "value" : null
-                    } ],
-                    "id" : "136000000414269"
-                  }, {
-                    "values" : [ {
-                      "attribute" : "ATTENDED_CHATS",
-                      "value" : "10"
-                    }, {
-                      "attribute" : "AVG_FIRST_RESPONSE_TIME",
-                      "value" : null
-                    }, {
-                      "attribute" : "AVG_PICKUP_TIME",
-                      "value" : null
-                    }, {
-                      "attribute" : "AVG_RESPONSE_TIME",
-                      "value" : null
-                    } ],
-                    "id" : "136000000537373"
-                  }, {
-                    "values" : [ {
-                      "attribute" : "ATTENDED_CHATS",
-                      "value" : "9"
-                    }, {
-                      "attribute" : "AVG_FIRST_RESPONSE_TIME",
-                      "value" : null
-                    }, {
-                      "attribute" : "AVG_PICKUP_TIME",
-                      "value" : null
-                    }, {
-                      "attribute" : "AVG_RESPONSE_TIME",
-                      "value" : null
-                    } ],
-                    "id" : "136000003639035"
-                  }, {
-                    "values" : [ {
-                      "attribute" : "ATTENDED_CHATS",
-                      "value" : "3"
-                    }, {
-                      "attribute" : "AVG_FIRST_RESPONSE_TIME",
-                      "value" : null
-                    }, {
-                      "attribute" : "AVG_PICKUP_TIME",
-                      "value" : null
-                    }, {
-                      "attribute" : "AVG_RESPONSE_TIME",
-                      "value" : null
-                    } ],
-                    "id" : "136000003759045"
-                  } ],
-                  "entityDetails" : {
-                    "345343453" : {
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/435798423232323001/photo?orgId=987876543",
-                      "name" : "john",
-                      "id" : "435798423232323001",
-                      "email" : "john@zykler.com"
-                    },
-                    "887764523" : {
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/232342342232323001/photo?orgId=987876543",
-                      "name" : "siya",
-                      "id" : "232342342232323001",
-                      "email" : "siya@zykler.com"
-                    },
-                    "853447543" : {
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/453223242232323001/photo?orgId=987876543",
-                      "name" : "robert",
-                      "id" : "453223242232323001",
-                      "email" : "robert@zykler.com"
-                    },
-                    "86434543" : {
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4212312313232323001/photo?orgId=987876543",
-                      "name" : "tina",
-                      "id" : "4212312313232323001",
-                      "email" : "tina@zykler.com"
-                    },
-                    "987654224" : {
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/642323432342342333/photo?orgId=987876543",
-                      "name" : "donald",
-                      "id" : "642323432342342333",
-                      "email" : "donald@zykler.com"
-                    },
-                    "976543456" : {
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/53234234234234234/photo?orgId=987876543",
-                      "name" : "ram",
-                      "id" : "53234234234234234",
-                      "email" : "ram@zykler.com"
-                    }
-                  },
-                  "entity" : "AGENT"
+              "GetIMAgentMetrics_200" : {
+                "$ref" : "./examples/IM_Metrics.json#/components/examples/GetIMAgentMetrics_200"
+              }
+            }
+          }
+        }
+      },
+      "SessionTimeSeriesMetrics" : {
+        "description" : "Retrieves session-related metrics such as average first response time, average response time, and average pickup time, with time-series granularity.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "null", "object" ],
+              "description" : "Session time-series metrics response object containing aggregated metrics and trend data points.",
+              "additionalProperties" : false,
+              "properties" : {
+                "aggregatedMetrics" : {
+                  "description" : "Array of aggregated metric value objects across the entire duration.",
+                  "$ref" : "./IM_Metrics.json#/components/schemas/IMSessionMetricList"
+                },
+                "trendDataList" : {
+                  "description" : "Array of trend data objects with time-series metric data points.",
+                  "$ref" : "./IM_Metrics.json#/components/schemas/IMSessionTrendDataList"
                 }
+              },
+              "required" : [ "aggregatedMetrics", "trendDataList" ]
+            },
+            "examples" : {
+              "GetIMSessionTimeSeriesMetrics_200" : {
+                "$ref" : "./examples/IM_Metrics.json#/components/examples/GetIMSessionTimeSeriesMetrics_200"
               }
             }
           }
@@ -413,6 +552,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

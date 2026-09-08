@@ -12,7 +12,17 @@
         "description" : "This API lists the duplicate entries of a contact.The _fieldName_ parameters is mandatory in the API request <br/></br/>_Note:_<br/> If you encounter a 202 status code while executing this API request, it means there are 100,000 or more contacts in the help desk portal. Matching the records and finding duplicates will be time-consuming in such a scenario. Therefore, the deduplication request will be accepted, and after the process is completed, an automated report will be sent to the user who initiated the deduplication.",
         "operationId" : "getDuplicateContactFieldValueCounts",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/fieldName"
+          "name" : "fieldName",
+          "in" : "query",
+          "description" : "Name of the field whose values must be matched for deduplication.Values allowed are: !@firstName,@! !@lastName,@! !@email,@! !@secondaryEmail,@! !@phone,@! !@fullName,@! and !@bothEmail.@!",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "firstName", "lastName", "email", "secondaryEmail", "phone", "fullName", "bothEmail" ],
+            "pattern" : "^(firstName|lastName|email|secondaryEmail|phone|fullName|bothEmail)"
+          }
         }, {
           "name" : "swFieldValue",
           "in" : "query",
@@ -21,16 +31,37 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Key that specifies the letter with which the field values must start",
-            "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "^([a-z0-9*#])$"
+            "type" : [ "string" ],
+            "maxLength" : 100
           }
         }, {
-          "$ref" : "#/components/parameters/limit"
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of contacts to fetch",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 100,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/from"
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number starting from which the contacts must be fetched",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "minimum" : 0,
+            "pattern" : "([0-9]+)",
+            "default" : 0
+          }
         }, {
           "name" : "sortBy",
           "in" : "query",
@@ -39,11 +70,9 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Key that sorts the contacts by a specific attribute: @count@ or @fieldValue@. The default sorting order is ascending. A @-@ prefix denotes descending order of sorting",
+            "type" : [ "string" ],
             "enum" : [ "count", "fieldValue" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "pattern" : "-?(count|fieldValue)"
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -126,23 +155,39 @@
           "in" : "query",
           "description" : "Secondary information related to the contact. Value allowed is: @accounts@",
           "required" : false,
-          "style" : "simple",
+          "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "null", "array" ],
-            "description" : "Secondary information related to the contact. Value allowed is: @accounts@",
-            "items" : {
-              "type" : [ "string", "null" ],
-              "enum" : [ "accounts" ],
-              "maxLength" : 100,
-              "minLength" : 0
-            },
-            "uniqueItems" : true
+            "uniqueItems" : true,
+            "type" : [ "string" ],
+            "pattern" : "(accounts)"
           }
         }, {
-          "$ref" : "#/components/parameters/fieldName"
+          "name" : "fieldName",
+          "in" : "query",
+          "description" : "Name of the field whose values must be matched for deduplication.Values allowed are: !@firstName,@! !@lastName,@! !@email,@! !@secondaryEmail,@! !@phone,@! !@fullName,@! and !@bothEmail.@!",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "firstName", "lastName", "email", "secondaryEmail", "phone", "fullName", "bothEmail" ],
+            "pattern" : "^(firstName|lastName|email|secondaryEmail|phone|fullName|bothEmail)"
+          }
         }, {
-          "$ref" : "#/components/parameters/limit"
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of contacts to fetch",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 100,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "name" : "sortBy",
           "in" : "query",
@@ -151,14 +196,24 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Key that sorts the contacts by a specific attribute:  !@firstName,@! !@lastName,@! !@fullName,@! !@phone,@! !@email,@! !@account,@! !@createdTime,@! !@modifiedTime@!",
+            "type" : [ "string" ],
             "enum" : [ "firstName", "lastName", "fullName", "phone", "email", "createdTime", "modifiedTime" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "pattern" : "-?(firstName|lastName|fullName|phone|email|createdTime|modifiedTime)"
           }
         }, {
-          "$ref" : "#/components/parameters/from"
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number starting from which the contacts must be fetched",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "minimum" : 0,
+            "pattern" : "([0-9]+)",
+            "default" : 0
+          }
         }, {
           "name" : "fieldValues",
           "in" : "query",
@@ -167,10 +222,8 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Actual values in each field related to the contact",
-            "maxLength" : 100,
-            "minLength" : 0
+            "type" : [ "string" ],
+            "maxLength" : 10000
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -193,11 +246,11 @@
   "components" : {
     "schemas" : {
       "countResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "count" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           },
@@ -210,19 +263,19 @@
         "required" : [ "count", "fieldValue" ]
       },
       "counts" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./ContactDeduplication.json#/components/schemas/countResponse"
+          "$ref" : "#/components/schemas/countResponse"
         }
       },
       "contactsArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
           "$ref" : "./Contact.json#/components/schemas/listViewObject"
         }
       },
       "duplicateResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "fieldValue" : {
@@ -231,15 +284,15 @@
             "minLength" : 0
           },
           "contacts" : {
-            "$ref" : "./ContactDeduplication.json#/components/schemas/contactsArray"
+            "$ref" : "#/components/schemas/contactsArray"
           }
         },
         "required" : [ "contacts", "fieldValue" ]
       },
       "duplicateResponseData" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./ContactDeduplication.json#/components/schemas/duplicateResponse"
+          "$ref" : "#/components/schemas/duplicateResponse"
         }
       }
     },
@@ -249,11 +302,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./ContactDeduplication.json#/components/schemas/counts"
+                  "$ref" : "#/components/schemas/counts"
                 }
               },
               "required" : [ "data" ]
@@ -266,7 +319,7 @@
                     "fieldValue" : "Jade"
                   }, {
                     "count" : 2,
-                    "fieldValue" : "saran"
+                    "fieldValue" : "William"
                   } ]
                 }
               }
@@ -279,7 +332,7 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "fieldName" : {
@@ -305,15 +358,15 @@
           "application/json" : {
             "schema" : {
               "allOf" : [ {
-                "type" : "object",
+                "type" : [ "object" ],
                 "properties" : {
                   "data" : {
-                    "type" : "array",
+                    "type" : [ "array" ],
                     "items" : {
-                      "type" : "object",
+                      "type" : [ "object" ],
                       "properties" : {
                         "account" : {
-                          "type" : [ "null", "object" ],
+                          "type" : [ "object", "null" ],
                           "additionalProperties" : false,
                           "maxProperties" : 3,
                           "minProperties" : 3,
@@ -329,23 +382,25 @@
                               "minLength" : 0
                             },
                             "id" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
                               "pattern" : "([0-9]+)"
                             }
                           },
                           "required" : [ "accountName", "id", "website" ]
                         }
-                      }
+                      },
+                      "additionalProperties" : false
                     }
                   }
-                }
+                },
+                "additionalProperties" : false
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "data" : {
-                    "$ref" : "./ContactDeduplication.json#/components/schemas/duplicateResponseData"
+                    "$ref" : "#/components/schemas/duplicateResponseData"
                   }
                 },
                 "required" : [ "data" ]
@@ -363,9 +418,9 @@
                       "type" : null,
                       "accountId" : "1892000000091433",
                       "firstName" : "Jonathan",
-                      "photoURL" : "https://desk.zoho.com/api/v1/contacts/1892000000772003/photo",
+                      "photoURL" : "https://desk.example.com/api/v1/contacts/1892000000772003/photo",
                       "phone" : "555555",
-                      "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Contacts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
+                      "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Contacts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
                       "createdTime" : 1507813910000,
                       "zohoCRMContact" : null,
                       "id" : "1892000000772003",
@@ -382,14 +437,14 @@
                       "ownerId" : null,
                       "type" : null,
                       "accountId" : "1892000000052077",
-                      "firstName" : "Christ",
+                      "firstName" : "Chris",
                       "photoURL" : null,
                       "phone" : null,
-                      "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Contacts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
+                      "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Contacts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
                       "createdTime" : 1507813910000,
                       "zohoCRMContact" : {
                         "id" : "1892000000772030",
-                        "type" : "contacts_leads"
+                        "type" : [ "contacts_leads" ]
                       },
                       "id" : "1892000000772001",
                       "isSpam" : false,
@@ -408,10 +463,10 @@
                       "ownerId" : null,
                       "type" : null,
                       "accountId" : "1892000000091433",
-                      "firstName" : "Christ",
-                      "photoURL" : "https://desk.zoho.com/api/v1/contacts/1892000000772003/photo",
+                      "firstName" : "Chris",
+                      "photoURL" : "https://desk.example.com/api/v1/contacts/1892000000772003/photo",
                       "phone" : "555555",
-                      "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Contacts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
+                      "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Contacts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
                       "createdTime" : 1507813910000,
                       "zohoCRMContact" : null,
                       "id" : "1892000000772003",
@@ -428,14 +483,14 @@
                       "ownerId" : null,
                       "type" : null,
                       "accountId" : "1892000000052077",
-                      "firstName" : "Christ",
+                      "firstName" : "Chris",
                       "photoURL" : null,
                       "phone" : null,
-                      "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Contacts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
+                      "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Contacts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
                       "createdTime" : 1507813910000,
                       "zohoCRMContact" : {
                         "id" : "1892000000772030",
-                        "type" : "contacts_leads"
+                        "type" : [ "contacts_leads" ]
                       },
                       "id" : "1892000000772001",
                       "isSpam" : false,
@@ -454,70 +509,21 @@
         }
       }
     },
-    "parameters" : {
-      "fieldName" : {
-        "name" : "fieldName",
-        "in" : "query",
-        "description" : "Name of the field whose values must be matched for deduplication.Values allowed are: !@firstName,@! !@lastName,@! !@email,@! !@secondaryEmail,@! !@phone,@! !@fullName,@! and !@bothEmail.@!",
-        "required" : true,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null" ],
-          "description" : "Name of the field whose values must be matched for deduplication.Values allowed are: !@firstName,@! !@lastName,@! !@email,@! !@secondaryEmail,@! !@phone,@! !@fullName,@! and !@bothEmail.@!",
-          "enum" : [ "firstName", "lastName", "email", "secondaryEmail", "phone", "fullName", "bothEmail" ],
-          "maxLength" : 100,
-          "minLength" : 0
-        }
-      },
-      "limit" : {
-        "name" : "limit",
-        "in" : "query",
-        "description" : "Number of contacts to fetch",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int32",
-          "description" : "Number of contacts to fetch",
-          "maximum" : 100,
-          "minimum" : 1,
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "from" : {
-        "name" : "from",
-        "in" : "query",
-        "description" : "Index number starting from which the contacts must be fetched",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int32",
-          "description" : "Index number starting from which the contacts must be fetched",
-          "minimum" : 0,
-          "pattern" : "([0-9]+)"
-        }
-      }
-    },
     "requestBodies" : {
       "setDefaultField" : {
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "fieldName" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "enum" : [ "firstName", "lastName", "email", "secondaryEmail", "phone", "fullName", "bothEmail" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "pattern" : "^(firstName|lastName|email|secondaryEmail|phone|fullName|bothEmail)"
                 },
                 "markDefault" : {
-                  "type" : [ "boolean", "null" ]
+                  "type" : [ "boolean" ]
                 }
               },
               "required" : [ "fieldName", "markDefault" ]
@@ -535,6 +541,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

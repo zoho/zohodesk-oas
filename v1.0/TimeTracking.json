@@ -12,7 +12,17 @@
         "description" : "This API fetches the details of the TimeTrack Settings configured in your helpdesk.",
         "operationId" : "getTimeTrackingSetup",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/depId"
+          "name" : "depId",
+          "in" : "query",
+          "description" : "ID of the department",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -85,7 +95,54 @@
         "description" : "This API fetches the history of changes made to the billing preferences in time tracking settings. The different events supported are @BILLING_PREFERENCE_ENABLED@, @BILLING_PREFERENCE_DISABLED@, @BILLING_TYPE_SELECTED@, @BILLING_TYPE_CHANGED@, @FIXED_COST_ENTERED@, @FIXED_COST_EDITED@, @AGENT_ADDED@, @AGENT_COST_EDITED@, @AGENT_DELETED@, @PROFILE_ADDED@, @PROFILE_COST_EDITED@, and @PROFILE_DELETED@.",
         "operationId" : "getTimeTrackBillingHistory",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/depId"
+          "name" : "from",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "default" : 0
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Index number, starting from which the events must be fetched."
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "minimum" : 1,
+            "maximum" : 50
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Number of events to be fetched."
+        }, {
+          "name" : "include",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "owner" ],
+            "pattern" : "(owner)"
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Secondary information related to the time entry. Value supported is @owner@."
+        }, {
+          "name" : "depId",
+          "in" : "query",
+          "description" : "ID of the department",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -107,17 +164,17 @@
   "components" : {
     "schemas" : {
       "timeTrackingJson" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "ticketPreference" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
             "additionalProperties" : false,
             "maxProperties" : 5,
             "minProperties" : 5,
             "properties" : {
               "autoTrackAction" : {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "maxProperties" : 9,
                 "minProperties" : 9,
@@ -173,7 +230,7 @@
             "enum" : [ "FIXED_COST_FOR_TICKETS", "FIXED_COST_FOR_AGENTS", "SPECIFIC_COST_PER_AGENT", "SPECIFIC_COST_PER_PROFILE", null ]
           },
           "activityPreference" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
             "additionalProperties" : false,
             "maxProperties" : 4,
             "minProperties" : 4,
@@ -189,9 +246,7 @@
               },
               "trackMode" : {
                 "type" : [ "string", "null" ],
-                "enum" : [ "CONSECUTIVE", "CONCURRENT" ],
-                "maxLength" : 100,
-                "minLength" : 0
+                "enum" : [ "CONSECUTIVE", "CONCURRENT" ]
               }
             },
             "required" : [ "canAutoTrackCalls", "isEventsEnabled", "isTasksEnabled", "trackMode" ]
@@ -201,11 +256,11 @@
             "format" : "double"
           },
           "profiles" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
             "additionalProperties" : false
           },
           "depId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
@@ -216,21 +271,19 @@
             "type" : [ "boolean", "null" ]
           },
           "agents" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
             "additionalProperties" : false
           }
         },
         "required" : [ "activityPreference", "agents", "billingType", "depId", "fixedCost", "isBillable", "isTimeTracking", "profiles", "ticketPreference" ]
       },
       "getBillingTypeChangedHistory" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "newValue" : {
             "type" : [ "string", "null" ],
-            "enum" : [ "FIXED_COST_FOR_TICKETS", "FIXED_COST_FOR_AGENTS", "SPECIFIC_COST_PER_AGENT", "SPECIFIC_COST_PER_PROFILE" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "FIXED_COST_FOR_TICKETS", "FIXED_COST_FOR_AGENTS", "SPECIFIC_COST_PER_AGENT", "SPECIFIC_COST_PER_PROFILE" ]
           },
           "modifiedTime" : {
             "type" : [ "string", "null" ],
@@ -240,26 +293,22 @@
           },
           "name" : {
             "type" : [ "string", "null" ],
-            "enum" : [ "FIXED_COST_ENTERED", "BILLING_TYPE_CHANGED", "BILLING_PREFERENCE_DISABLED", "BILLING_PREFERENCE_ENABLED", "FIXED_COST_EDITED", "BILLING_TYPE_SELECTED", "AGENT_ADDED", "AGENT_COST_EDITED", "AGENT_DELETED", "PROFILE_ADDED", "PROFILE_COST_EDITED", "PROFILE_DELETED" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "FIXED_COST_ENTERED", "BILLING_TYPE_CHANGED", "BILLING_PREFERENCE_DISABLED", "BILLING_PREFERENCE_ENABLED", "FIXED_COST_EDITED", "BILLING_TYPE_SELECTED", "AGENT_ADDED", "AGENT_COST_EDITED", "AGENT_DELETED", "PROFILE_ADDED", "PROFILE_COST_EDITED", "PROFILE_DELETED" ]
           },
           "modifiedBy" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "oldValue" : {
             "type" : [ "string", "null" ],
-            "enum" : [ "FIXED_COST_FOR_TICKETS", "FIXED_COST_FOR_AGENTS", "SPECIFIC_COST_PER_AGENT", "SPECIFIC_COST_PER_PROFILE" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "FIXED_COST_FOR_TICKETS", "FIXED_COST_FOR_AGENTS", "SPECIFIC_COST_PER_AGENT", "SPECIFIC_COST_PER_PROFILE" ]
           }
         },
         "required" : [ "modifiedBy", "modifiedTime", "name", "newValue", "oldValue" ]
       },
       "getBillingPreferenceEnabledHistory" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "modifiedTime" : {
@@ -270,12 +319,10 @@
           },
           "name" : {
             "type" : [ "string", "null" ],
-            "enum" : [ "FIXED_COST_ENTERED", "BILLING_TYPE_CHANGED", "BILLING_PREFERENCE_DISABLED", "BILLING_PREFERENCE_ENABLED", "FIXED_COST_EDITED", "BILLING_TYPE_SELECTED", "AGENT_ADDED", "AGENT_COST_EDITED", "AGENT_DELETED", "PROFILE_ADDED", "PROFILE_COST_EDITED", "PROFILE_DELETED" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "FIXED_COST_ENTERED", "BILLING_TYPE_CHANGED", "BILLING_PREFERENCE_DISABLED", "BILLING_PREFERENCE_ENABLED", "FIXED_COST_EDITED", "BILLING_TYPE_SELECTED", "AGENT_ADDED", "AGENT_COST_EDITED", "AGENT_DELETED", "PROFILE_ADDED", "PROFILE_COST_EDITED", "PROFILE_DELETED" ]
           },
           "modifiedBy" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
@@ -283,7 +330,7 @@
         "required" : [ "modifiedBy", "modifiedTime", "name" ]
       },
       "getFixedCostEditedHistory" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "newValue" : {
@@ -298,12 +345,10 @@
           },
           "name" : {
             "type" : [ "string", "null" ],
-            "enum" : [ "FIXED_COST_ENTERED", "BILLING_TYPE_CHANGED", "BILLING_PREFERENCE_DISABLED", "BILLING_PREFERENCE_ENABLED", "FIXED_COST_EDITED", "BILLING_TYPE_SELECTED", "AGENT_ADDED", "AGENT_COST_EDITED", "AGENT_DELETED", "PROFILE_ADDED", "PROFILE_COST_EDITED", "PROFILE_DELETED" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "FIXED_COST_ENTERED", "BILLING_TYPE_CHANGED", "BILLING_PREFERENCE_DISABLED", "BILLING_PREFERENCE_ENABLED", "FIXED_COST_EDITED", "BILLING_TYPE_SELECTED", "AGENT_ADDED", "AGENT_COST_EDITED", "AGENT_DELETED", "PROFILE_ADDED", "PROFILE_COST_EDITED", "PROFILE_DELETED" ]
           },
           "modifiedBy" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
@@ -315,7 +360,7 @@
         "required" : [ "modifiedBy", "modifiedTime", "name", "newValue", "oldValue" ]
       },
       "data" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
           "oneOf" : [ {
             "$ref" : "#/components/schemas/getBillingTypeChangedHistory"
@@ -337,16 +382,17 @@
               "allOf" : [ {
                 "$ref" : "#/components/schemas/timeTrackingJson"
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "properties" : {
                   "depId" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "description" : "ID of the department",
                     "pattern" : "([0-9]+)"
                   }
                 },
-                "required" : [ "depId" ]
+                "required" : [ "depId" ],
+                "additionalProperties" : false
               } ]
             },
             "examples" : {
@@ -405,7 +451,7 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
@@ -419,8 +465,8 @@
                 "value" : {
                   "data" : [ {
                     "owner" : [ {
-                      "photoURL" : "'https://contacts.zoho.com/file?t=user&fs=thumb&ID=5166343&nps=404&exp=20'",
-                      "name" : "meenakshi"
+                      "photoURL" : "'https://contacts.example.com/file?t=user&fs=thumb&ID=1234567890&nps=404&exp=20'",
+                      "name" : "Steve"
                     } ],
                     "modifiedTime" : 1519044829000,
                     "agentId" : "15000000009148",
@@ -428,8 +474,8 @@
                     "modifiedBy" : "15000000009148"
                   }, {
                     "owner" : {
-                      "photoURL" : "https://contacts.zoho.com/file?t=user&fs=thumb&ID=5166891&nps=404&exp=600'",
-                      "name" : "meenakshi"
+                      "photoURL" : "https://contacts.example.com/file?t=user&fs=thumb&ID=1234567890&nps=404&exp=600'",
+                      "name" : "Steve"
                     },
                     "modifiedTime" : 1519044829000,
                     "agentId" : "15000000009321",
@@ -437,13 +483,13 @@
                     "name" : "AGENT_ADDED",
                     "modifiedBy" : "15000000009148",
                     "modifiedAgent" : {
-                      "photoURL" : "https://contacts.zoho.com/file?t=user&fs=thumb&ID=5166343&nps=404&exp=20",
-                      "name" : "meenakshi"
+                      "photoURL" : "https://contacts.example.com/file?t=user&fs=thumb&ID=1234567890&nps=404&exp=20",
+                      "name" : "Steve"
                     }
                   }, {
                     "owner" : {
-                      "photoURL" : "https://contacts.zoho.com/file?t=user&fs=thumb&ID=5166343&nps=404&exp=20",
-                      "name" : "meenakshi"
+                      "photoURL" : "https://contacts.example.com/file?t=user&fs=thumb&ID=1234567890&nps=404&exp=20",
+                      "name" : "Steve"
                     },
                     "modifiedTime" : 1519044317000,
                     "agentId" : "15000000009148",
@@ -451,13 +497,13 @@
                     "name" : "AGENT_ADDED",
                     "modifiedBy" : "15000000009148",
                     "modifiedAgent" : {
-                      "photoURL" : "https://contacts.zoho.com/file?t=user&fs=thumb&ID=5166343&nps=404&exp=20",
-                      "name" : "meenakshi"
+                      "photoURL" : "https://contacts.example.com/file?t=user&fs=thumb&ID=1234567890&nps=404&exp=20",
+                      "name" : "Steve"
                     }
                   }, {
                     "owner" : {
-                      "photoURL" : "https://contacts.zoho.com/file?t=user&fs=thumb&ID=5166343&nps=404&exp=20",
-                      "name" : "meenakshi"
+                      "photoURL" : "https://contacts.example.com/file?t=user&fs=thumb&ID=1234567890&nps=404&exp=20",
+                      "name" : "Steve"
                     },
                     "newValue" : "SPECIFIC_COST_PER_AGENT",
                     "modifiedTime" : 1519044317000,
@@ -467,16 +513,16 @@
                     "modifiedAgent" : null
                   }, {
                     "owner" : {
-                      "photoURL" : "https://contacts.zoho.com/file?t=user&fs=thumb&ID=5166343&nps=404&exp=20",
-                      "name" : "meenakshi"
+                      "photoURL" : "https://contacts.example.com/file?t=user&fs=thumb&ID=1234567890&nps=404&exp=20",
+                      "name" : "Steve"
                     },
                     "modifiedTime" : 1518167350000,
                     "name" : "BILLING_PREFERENCE_ENABLED",
                     "modifiedBy" : "15000000009148"
                   }, {
                     "owner" : {
-                      "photoURL" : "https://contacts.zoho.com/file?t=user&fs=thumb&ID=5166343&nps=404&exp=20",
-                      "name" : "meenakshi"
+                      "photoURL" : "https://contacts.example.com/file?t=user&fs=thumb&ID=1234567890&nps=404&exp=20",
+                      "name" : "Steve"
                     },
                     "newValue" : null,
                     "modifiedTime" : 1518167337000,
@@ -486,8 +532,8 @@
                     "modifiedAgent" : null
                   }, {
                     "owner" : {
-                      "photoURL" : "https://contacts.zoho.com/file?t=user&fs=thumb&ID=5166343&nps=404&exp=20",
-                      "name" : "meenakshi"
+                      "photoURL" : "https://contacts.example.com/file?t=user&fs=thumb&ID=1234567890&nps=404&exp=20",
+                      "name" : "Steve"
                     },
                     "newValue" : "FIXED_COST_FOR_TICKETS",
                     "modifiedTime" : 1518167337000,
@@ -497,8 +543,8 @@
                     "modifiedAgent" : null
                   }, {
                     "owner" : {
-                      "photoURL" : "https://contacts.zoho.com/file?t=user&fs=thumb&ID=5166343&nps=404&exp=20",
-                      "name" : "meenakshi"
+                      "photoURL" : "https://contacts.example.com/file?t=user&fs=thumb&ID=1234567890&nps=404&exp=20",
+                      "name" : "Steve"
                     },
                     "modifiedTime" : 1518162601000,
                     "name" : "BILLING_PREFERENCE_DISABLED",
@@ -506,8 +552,8 @@
                     "modifiedAgent" : null
                   }, {
                     "owner" : {
-                      "photoURL" : "https://contacts.zoho.com/file?t=user&fs=thumb&ID=5166343&nps=404&exp=20",
-                      "name" : "meenakshi"
+                      "photoURL" : "https://contacts.example.com/file?t=user&fs=thumb&ID=1234567890&nps=404&exp=20",
+                      "name" : "Steve"
                     },
                     "newValue" : "1300",
                     "modifiedTime" : 1518153180000,
@@ -517,8 +563,8 @@
                     "modifiedAgent" : null
                   }, {
                     "owner" : {
-                      "photoURL" : "https://contacts.zoho.com/file?t=user&fs=thumb&ID=5166343&nps=404&exp=20",
-                      "name" : "meenakshi"
+                      "photoURL" : "https://contacts.example.com/file?t=user&fs=thumb&ID=1234567890&nps=404&exp=20",
+                      "name" : "Steve"
                     },
                     "newValue" : "FIXED_COST_FOR_AGENTS",
                     "modifiedTime" : 1518153180000,
@@ -534,155 +580,142 @@
         }
       }
     },
-    "parameters" : {
-      "depId" : {
-        "name" : "depId",
-        "in" : "query",
-        "description" : "ID of the department",
-        "required" : true,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "description" : "ID of the department",
-          "pattern" : "([0-9]+)"
-        }
-      }
-    },
     "requestBodies" : {
       "timeTrackingJson" : {
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "ticketPreference" : {
-                  "type" : [ "null", "object" ],
+                  "type" : [ "object" ],
                   "additionalProperties" : false,
                   "maxProperties" : 5,
                   "minProperties" : 5,
                   "properties" : {
                     "autoTrackAction" : {
-                      "type" : [ "null", "object" ],
+                      "type" : [ "object" ],
                       "additionalProperties" : false,
                       "maxProperties" : 9,
                       "minProperties" : 9,
                       "properties" : {
                         "fieldUpdate" : {
-                          "type" : [ "boolean", "null" ],
+                          "type" : [ "boolean" ],
                           "description" : "Whether to create timeentry when upaating field in a ticket in auto track mode"
                         },
                         "onChatComplete" : {
-                          "type" : [ "boolean", "null" ],
+                          "type" : [ "boolean" ],
                           "description" : "Whether to create timeentry when closing a chat for a ticket in auto track mode"
                         },
                         "commentActions" : {
-                          "type" : [ "boolean", "null" ],
+                          "type" : [ "boolean" ],
                           "description" : "Whether to create timeentry when commenting in a ticket in auto track mode"
                         },
                         "approvalActions" : {
-                          "type" : [ "boolean", "null" ],
+                          "type" : [ "boolean" ],
                           "description" : "Whether to create timeentry while create, edit, delete approvals in a ticket in auto track mode"
                         },
                         "sendReply" : {
-                          "type" : [ "boolean", "null" ],
+                          "type" : [ "boolean" ],
                           "description" : "Whether to create timeentry when replying in a ticket in auto track mode"
                         },
                         "manualDraft" : {
-                          "type" : [ "boolean", "null" ],
+                          "type" : [ "boolean" ],
                           "description" : "Whether to create timeentry when saving draft manually in a ticket in auto track mode"
                         },
                         "resolutionActions" : {
-                          "type" : [ "boolean", "null" ],
+                          "type" : [ "boolean" ],
                           "description" : "Whether to create timeentry when create, edit, delete resolution in a ticket in auto track mode"
                         },
                         "attachmentActions" : {
-                          "type" : [ "boolean", "null" ],
+                          "type" : [ "boolean" ],
                           "description" : "Whether to create timeentry while create, edit, delete attachments in a ticket in auto track mode"
                         }
                       },
-                      "required" : [ "approvalActions", "attachmentActions", "commentActions", "fieldUpdate", "manualDraft", "onChatComplete", "onRemoteAssist", "resolutionActions", "sendReply" ]
+                      "required" : [ "approvalActions", "attachmentActions", "commentActions", "fieldUpdate", "manualDraft", "onChatComplete", "resolutionActions", "sendReply" ]
                     },
                     "isReviewTime" : {
-                      "type" : [ "boolean", "null" ],
+                      "type" : [ "boolean" ],
                       "description" : "Type of track preference (either Manual  Automatic)"
                     },
                     "isAutoPause" : {
-                      "type" : [ "boolean", "null" ],
+                      "type" : [ "boolean" ],
                       "description" : "Type of track preference (either Manual  Automatic)"
                     },
                     "isHideTimeTracking" : {
-                      "type" : [ "boolean", "null" ],
+                      "type" : [ "boolean" ],
                       "description" : "Type of track preference (either Manual  Automatic)"
                     },
                     "isAutoTimer" : {
-                      "type" : [ "boolean", "null" ],
+                      "type" : [ "boolean" ],
                       "description" : "Type of track preference (either Manual  Automatic)"
                     }
                   },
                   "required" : [ "autoTrackAction", "isAutoPause", "isAutoTimer", "isHideTimeTracking", "isReviewTime" ]
                 },
                 "billingType" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "description" : "Type of billing configured. Values supported are @FIXED_COST_FOR_TICKETS@ @FIXED_COST_FOR_AGENTS@ @SPECIFIC_COST_PER_AGENT@ and @SPECIFIC_COST_PER_PROFILE@ ",
                   "enum" : [ "FIXED_COST_FOR_TICKETS", "FIXED_COST_FOR_AGENTS", "SPECIFIC_COST_PER_AGENT", "SPECIFIC_COST_PER_PROFILE", null ]
                 },
                 "activityPreference" : {
-                  "type" : [ "null", "object" ],
+                  "type" : [ "object" ],
                   "additionalProperties" : false,
                   "maxProperties" : 4,
                   "minProperties" : 4,
                   "properties" : {
                     "isTasksEnabled" : {
-                      "type" : [ "boolean", "null" ],
+                      "type" : [ "boolean" ],
                       "description" : "To enable time tracking for tasks in manual mode"
                     },
                     "isEventsEnabled" : {
-                      "type" : [ "boolean", "null" ],
+                      "type" : [ "boolean" ],
                       "description" : "To enable time tracking for events in manual mode"
                     },
                     "canAutoTrackCalls" : {
-                      "type" : [ "boolean", "null" ],
+                      "type" : [ "boolean" ],
                       "description" : "To enable time tracking for calls in auto mode"
                     },
                     "trackMode" : {
-                      "type" : [ "string", "null" ],
+                      "type" : [ "string" ],
                       "description" : "Track Mode for activity. Supported values arw @CONSECUTIVE@ @CONCURRENT@",
-                      "enum" : [ "CONSECUTIVE", "CONCURRENT" ],
-                      "maxLength" : 100,
-                      "minLength" : 0
+                      "enum" : [ "CONSECUTIVE", "CONCURRENT" ]
                     }
                   },
                   "required" : [ "canAutoTrackCalls", "isEventsEnabled", "isTasksEnabled", "trackMode" ]
                 },
                 "fixedCost" : {
-                  "type" : [ "number", "string", "null" ],
+                  "type" : [ "number", "string" ],
                   "format" : "double",
                   "description" : "Cost fixed for either billing category - by ticket or by agent."
                 },
                 "profiles" : {
-                  "type" : [ "null", "object" ],
+                  "type" : [ "object" ],
                   "additionalProperties" : false
                 },
                 "depId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer" ],
                   "format" : "int64",
                   "description" : "ID of the department in which time tracking must be enabled or disabled.",
                   "pattern" : "([0-9]+)"
                 },
                 "isTimeTracking" : {
-                  "type" : [ "boolean", "null" ],
+                  "type" : [ "boolean" ],
                   "description" : "Time tracking refers to the process of recording the time agents take to resolve tickets. This information can be recorded manually or automatically, based on your organization's requirement and preference. APIs related to this endpoint help you configure the settings for automated time tracking."
                 },
                 "isBillable" : {
-                  "type" : [ "boolean", "null" ],
+                  "type" : [ "boolean" ],
                   "description" : "Key that returns if the time tracked is billable or not."
                 },
                 "agents" : {
-                  "type" : [ "null", "object" ],
+                  "type" : [ "object" ],
                   "additionalProperties" : false
+                },
+                "timerAction" : {
+                  "type" : [ "string" ],
+                  "enum" : [ "ADD", "DISCARD" ],
+                  "x-regex-name" : "timerActionOnSetup"
                 }
               },
               "required" : [ "depId", "isTimeTracking" ]
@@ -743,134 +776,144 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "ticketPreference" : {
-                  "type" : [ "null", "object" ],
+                  "type" : [ "object" ],
                   "additionalProperties" : false,
                   "maxProperties" : 5,
                   "minProperties" : 5,
                   "properties" : {
                     "autoTrackAction" : {
-                      "type" : [ "null", "object" ],
+                      "type" : [ "object" ],
                       "additionalProperties" : false,
                       "maxProperties" : 9,
                       "minProperties" : 9,
                       "properties" : {
                         "fieldUpdate" : {
-                          "type" : [ "boolean", "null" ],
+                          "type" : [ "boolean" ],
                           "description" : "Whether to create timeentry when upaating field in a ticket in auto track mode"
                         },
                         "onChatComplete" : {
-                          "type" : [ "boolean", "null" ],
+                          "type" : [ "boolean" ],
                           "description" : "Whether to create timeentry when closing a chat for a ticket in auto track mode"
                         },
                         "commentActions" : {
-                          "type" : [ "boolean", "null" ],
+                          "type" : [ "boolean" ],
                           "description" : "Whether to create timeentry when commenting in a ticket in auto track mode"
                         },
                         "approvalActions" : {
-                          "type" : [ "boolean", "null" ],
+                          "type" : [ "boolean" ],
                           "description" : "Whether to create timeentry while create, edit, delete approvals in a ticket in auto track mode"
                         },
                         "sendReply" : {
-                          "type" : [ "boolean", "null" ],
+                          "type" : [ "boolean" ],
                           "description" : "Whether to create timeentry when replying in a ticket in auto track mode"
                         },
                         "manualDraft" : {
-                          "type" : [ "boolean", "null" ],
+                          "type" : [ "boolean" ],
                           "description" : "Whether to create timeentry when saving draft manually in a ticket in auto track mode"
                         },
                         "resolutionActions" : {
-                          "type" : [ "boolean", "null" ],
+                          "type" : [ "boolean" ],
                           "description" : "Whether to create timeentry when create, edit, delete resolution in a ticket in auto track mode"
                         },
                         "attachmentActions" : {
-                          "type" : [ "boolean", "null" ],
+                          "type" : [ "boolean" ],
                           "description" : "Whether to create timeentry while create, edit, delete attachments in a ticket in auto track mode"
                         }
                       },
-                      "required" : [ "approvalActions", "attachmentActions", "commentActions", "fieldUpdate", "manualDraft", "onChatComplete", "onRemoteAssist", "resolutionActions", "sendReply" ]
+                      "required" : [ "approvalActions", "attachmentActions", "commentActions", "fieldUpdate", "manualDraft", "onChatComplete", "resolutionActions", "sendReply" ]
                     },
                     "isReviewTime" : {
-                      "type" : [ "boolean", "null" ],
+                      "type" : [ "boolean" ],
                       "description" : "Type of track preference (either Manual  Automatic)"
                     },
                     "isAutoPause" : {
-                      "type" : [ "boolean", "null" ],
+                      "type" : [ "boolean" ],
                       "description" : "Type of track preference (either Manual  Automatic)"
                     },
                     "isHideTimeTracking" : {
-                      "type" : [ "boolean", "null" ],
+                      "type" : [ "boolean" ],
                       "description" : "Type of track preference (either Manual  Automatic)"
                     },
                     "isAutoTimer" : {
-                      "type" : [ "boolean", "null" ],
+                      "type" : [ "boolean" ],
                       "description" : "Type of track preference (either Manual  Automatic)"
                     }
                   },
                   "required" : [ "autoTrackAction", "isAutoPause", "isAutoTimer", "isHideTimeTracking", "isReviewTime" ]
                 },
                 "billingType" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "description" : "Type of billing configured. Values supported are @FIXED_COST_FOR_TICKETS@ @FIXED_COST_FOR_AGENTS@ @SPECIFIC_COST_PER_AGENT@ and @SPECIFIC_COST_PER_PROFILE@ ",
-                  "enum" : [ "FIXED_COST_FOR_TICKETS", "FIXED_COST_FOR_AGENTS", "SPECIFIC_COST_PER_AGENT", "SPECIFIC_COST_PER_PROFILE", null ]
+                  "pattern" : "FIXED_COST_FOR_TICKETS|FIXED_COST_FOR_AGENTS|SPECIFIC_COST_PER_PROFILE|SPECIFIC_COST_PER_AGENT"
                 },
                 "activityPreference" : {
-                  "type" : [ "null", "object" ],
+                  "type" : [ "object" ],
                   "additionalProperties" : false,
                   "maxProperties" : 4,
                   "minProperties" : 4,
                   "properties" : {
                     "isTasksEnabled" : {
-                      "type" : [ "boolean", "null" ],
+                      "type" : [ "boolean" ],
                       "description" : "To enable time tracking for tasks in manual mode"
                     },
                     "isEventsEnabled" : {
-                      "type" : [ "boolean", "null" ],
+                      "type" : [ "boolean" ],
                       "description" : "To enable time tracking for events in manual mode"
                     },
                     "canAutoTrackCalls" : {
-                      "type" : [ "boolean", "null" ],
+                      "type" : [ "boolean" ],
                       "description" : "To enable time tracking for calls in auto mode"
                     },
                     "trackMode" : {
-                      "type" : [ "string", "null" ],
+                      "type" : [ "string" ],
                       "description" : "Track Mode for activity. Supported values arw @CONSECUTIVE@ @CONCURRENT@",
-                      "enum" : [ "CONSECUTIVE", "CONCURRENT" ],
-                      "maxLength" : 100,
-                      "minLength" : 0
+                      "enum" : [ "CONSECUTIVE", "CONCURRENT" ]
                     }
                   },
                   "required" : [ "canAutoTrackCalls", "isEventsEnabled", "isTasksEnabled", "trackMode" ]
                 },
                 "fixedCost" : {
-                  "type" : [ "number", "string", "null" ],
+                  "type" : [ "number", "string" ],
                   "format" : "double",
-                  "description" : "Cost fixed for either billing category - by ticket or by agent."
+                  "description" : "Cost fixed for either billing category - by ticket or by agent.",
+                  "pattern" : "[0-9]{0,5}(\\.[0-9]{0,2})?"
                 },
                 "profiles" : {
-                  "type" : [ "null", "object" ],
-                  "additionalProperties" : false
+                  "type" : [ "array" ],
+                  "items" : {
+                    "type" : [ "object" ],
+                    "additionalProperties" : true
+                  }
                 },
                 "depId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer" ],
                   "format" : "int64",
                   "description" : "ID of the department in which time tracking must be enabled or disabled.",
                   "pattern" : "([0-9]+)"
                 },
                 "isTimeTracking" : {
-                  "type" : [ "boolean", "null" ],
+                  "type" : [ "boolean" ],
                   "description" : "Time tracking refers to the process of recording the time agents take to resolve tickets. This information can be recorded manually or automatically, based on your organization's requirement and preference. APIs related to this endpoint help you configure the settings for automated time tracking."
                 },
                 "isBillable" : {
-                  "type" : [ "boolean", "null" ],
+                  "type" : [ "boolean" ],
                   "description" : "Key that returns if the time tracked is billable or not."
                 },
                 "agents" : {
-                  "type" : [ "null", "object" ],
-                  "additionalProperties" : false
+                  "type" : [ "array" ],
+                  "items" : {
+                    "type" : [ "object" ],
+                    "additionalProperties" : true
+                  }
+                },
+                "timerAction" : {
+                  "type" : [ "string" ],
+                  "enum" : [ "ADD", "DISCARD" ],
+                  "x-regex-name" : "timerActionOnSetup"
                 }
               },
               "required" : [ "depId", "isTimeTracking" ]
@@ -928,6 +971,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

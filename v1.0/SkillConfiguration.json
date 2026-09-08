@@ -9,19 +9,18 @@
       "get" : {
         "tags" : [ "SkillConfiguration" ],
         "summary" : "Get Skill Configuration",
-        "description" : "This API gets Configuration of Skill in a Department",
+        "description" : "Retrieves the skill configuration for the specified department.",
         "operationId" : "getSkillConfiguration",
         "parameters" : [ {
           "name" : "departmentId",
           "in" : "query",
-          "description" : "Department Id",
+          "description" : "Unique ID of the department",
           "required" : true,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string" ],
             "format" : "int64",
-            "description" : "Department Id",
             "pattern" : "([0-9]+)"
           }
         }, {
@@ -42,14 +41,15 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.automations.READ", "Desk.settings.READ" ]
         } ],
-        "x-audience" : [ "external-public" ]
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
       },
       "patch" : {
         "tags" : [ "SkillConfiguration" ],
         "summary" : "Update Skill Configuration",
-        "description" : "This API updates Configuration of Skill in a Department",
+        "description" : "Updates the skill configuration for a department.",
         "operationId" : "updateSkillConfiguration",
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -72,41 +72,63 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.automations.UPDATE", "Desk.settings.UPDATE" ]
         } ],
-        "x-audience" : [ "external-public" ]
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
       }
     }
   },
   "components" : {
+    "schemas" : {
+      "skillConfigurationResponseSchema" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "autoSkillStamping" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "ACTIVE", "INACTIVE" ]
+          },
+          "departmentId" : {
+            "type" : [ "string" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "attachSkillsOption" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "AT_FIRST", "AT_THE_END", "BY_SKILL_ORDER" ]
+          }
+        },
+        "required" : [ "attachSkillsOption", "autoSkillStamping", "departmentId" ]
+      },
+      "skillConfigurationRequestSchema" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "autoSkillStamping" : {
+            "type" : [ "string" ],
+            "enum" : [ "ACTIVE", "INACTIVE" ]
+          },
+          "departmentId" : {
+            "type" : [ "string" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "attachSkillsOption" : {
+            "type" : [ "string" ],
+            "enum" : [ "AT_FIRST", "AT_THE_END", "BY_SKILL_ORDER" ]
+          }
+        },
+        "required" : [ "departmentId" ]
+      }
+    },
     "responses" : {
       "skillConfigurationJson" : {
         "description" : "skillConfigurationJson template definitions",
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
-              "additionalProperties" : false,
-              "properties" : {
-                "autoSkillStamping" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "ACTIVE", "INACTIVE" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                },
-                "departmentId" : {
-                  "type" : [ "string", "null", "integer" ],
-                  "format" : "int64",
-                  "pattern" : "([0-9]+)"
-                },
-                "attachSkillsOption" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "AT_FIRST", "AT_THE_END", "BY_SKILL_ORDER" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                }
-              },
-              "required" : [ "attachSkillsOption", "autoSkillStamping", "departmentId" ]
+              "$ref" : "#/components/schemas/skillConfigurationResponseSchema"
             },
             "examples" : {
               "Valid responses Definitions" : {
@@ -126,28 +148,7 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
-              "additionalProperties" : false,
-              "properties" : {
-                "autoSkillStamping" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "ACTIVE", "INACTIVE" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                },
-                "departmentId" : {
-                  "type" : [ "string", "null", "integer" ],
-                  "format" : "int64",
-                  "pattern" : "([0-9]+)"
-                },
-                "attachSkillsOption" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "AT_FIRST", "AT_THE_END", "BY_SKILL_ORDER" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                }
-              },
-              "required" : [ "departmentId" ]
+              "$ref" : "#/components/schemas/skillConfigurationRequestSchema"
             },
             "examples" : {
               "Valid requestBody Definitions" : {
@@ -163,6 +164,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

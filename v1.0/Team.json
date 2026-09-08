@@ -8,8 +8,8 @@
     "/api/v1/departments/{departmentId}/teams" : {
       "get" : {
         "tags" : [ "Team" ],
-        "summary" : "List teams in department",
-        "description" : "This API fetches details of all the teams in a particular department.",
+        "summary" : "Get Teams in Department",
+        "description" : "Retrieves details of all teams in a specific department, with pagination support.",
         "operationId" : "getTeamsInDepartment",
         "parameters" : [ {
           "name" : "departmentId",
@@ -18,10 +18,46 @@
           "style" : "simple",
           "explode" : false,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the department"
           }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer",
+            "default" : 0,
+            "minimum" : 0
+          },
+          "description" : "Zero-based index number starting from which the teams must be fetched"
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer",
+            "default" : 0,
+            "minimum" : 0,
+            "maximum" : 200
+          },
+          "description" : "Number of teams to fetch\n\nNote: If limit is omitted or set to 0, the API returns all teams with no upper bound."
+        }, {
+          "name" : "searchStr",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "description" : "Search string used to filter teams by name."
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -31,18 +67,44 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.basic.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.departments.READ", "Desk.settings.READ", "Desk.teams.READ" ]
         } ],
-        "x-audience" : [ "external-public" ]
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
       }
     },
     "/api/v1/teams" : {
       "get" : {
         "tags" : [ "Team" ],
-        "summary" : "List teams from all associated departments",
-        "description" : "This API fetches details of all teams created in all departments to which the current user belongs.",
+        "summary" : "Get Teams from All Associated Departments",
+        "description" : "Retrieves details of all teams created in all departments to which the current user belongs, with pagination support.",
         "operationId" : "getTeams",
         "parameters" : [ {
+          "name" : "from",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer",
+            "default" : 0,
+            "minimum" : 0
+          },
+          "description" : "Zero-based index number starting from which the teams must be fetched"
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer",
+            "default" : 0,
+            "minimum" : 0,
+            "maximum" : 200
+          },
+          "description" : "Number of teams to fetch\n\nNote: If limit is omitted or set to 0, the API returns all teams with no upper bound."
+        }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
@@ -51,15 +113,17 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.basic.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.settings.READ", "Desk.teams.READ" ]
         } ],
-        "x-audience" : [ "external-public" ]
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
       },
       "post" : {
         "tags" : [ "Team" ],
-        "summary" : "Create team",
-        "description" : "This API creates a team in your help desk portal.",
+        "summary" : "Create Team",
+        "description" : "Creates a team in the help desk portal.",
         "operationId" : "createTeam",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -75,7 +139,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.CREATE", "Desk.basic.CREATE" ]
+          "iam-oauth2-schema" : [ "Desk.basic.CREATE", "Desk.settings.CREATE", "Desk.teams.CREATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -83,11 +147,12 @@
     "/api/v1/teams/{team_id}/deleteTeam" : {
       "post" : {
         "tags" : [ "Team" ],
-        "summary" : "Delete team",
-        "description" : "This API deletes an existing team from your help desk portal. To reassign the open and on hold tickets and tasks of the deleted team to a different team, pass the <b>ticketNewTeam</b>, <b>taskNewTeam</b>, <b>ticketNewAgent</b>, and <b>taskNewAgent</b> team parameters in the API request. If you do not want to assign the tickets to another team, pass the values of <b>ticketNewTeam</b> and <b>ticketNewAgent</b> as null. However, in the case of tasks, either <b>taskNewTeam</b> or <b>taskNewAgent</b> must have a valid value. Both parameters cannot be passed as null.",
+        "summary" : "Delete Team",
+        "description" : "Deletes an existing team from the help desk portal. <p><b>Note:</b> To reassign the open and on hold tickets and tasks of the deleted team to a different team, pass ticketNewTeam, taskNewTeam, ticketNewAgent, and taskNewAgent in the request. If you do not want</p>",
         "operationId" : "deleteTeam",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/team_id"
+          "$ref" : "#/components/parameters/team_id",
+          "description" : "Unique ID of the team"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -103,7 +168,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.DELETE", "Desk.basic.DELETE" ]
+          "iam-oauth2-schema" : [ "Desk.basic.DELETE", "Desk.settings.DELETE", "Desk.teams.DELETE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -111,11 +176,21 @@
     "/api/v1/teams/{teamId}/associables" : {
       "get" : {
         "tags" : [ "Team" ],
-        "summary" : "List associable teams",
-        "description" : "This API lists the other teams that can be added as sub-teams to the current team.",
+        "summary" : "Get Associable Teams",
+        "description" : "Retrieves teams that can be added as sub-teams to the specified team.",
         "operationId" : "getSubTeamsIds",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/teamId"
+          "name" : "teamId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the team"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -125,16 +200,17 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.basic.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.settings.READ", "Desk.teams.READ" ]
         } ],
-        "x-audience" : [ "external-public" ]
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
       }
     },
     "/api/v1/roles/{role_id}/teams" : {
       "get" : {
         "tags" : [ "Team" ],
-        "summary" : "List associated teams for a role",
-        "description" : "This API fetches details of all the teams associated with a particular role.",
+        "summary" : "Get Teams for a Role",
+        "description" : "Retrieves details of all teams associated with a specific role, with pagination support.",
         "operationId" : "getAssociatedTeamsForRole",
         "parameters" : [ {
           "name" : "role_id",
@@ -143,10 +219,36 @@
           "style" : "simple",
           "explode" : false,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
-          }
+          },
+          "description" : "Unique ID of the role"
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer",
+            "default" : 0,
+            "minimum" : 0
+          },
+          "description" : "Zero-based index number starting from which the teams must be fetched"
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer",
+            "default" : 0,
+            "minimum" : 0,
+            "maximum" : 200
+          },
+          "description" : "Number of teams to fetch\n\nNote: If limit is omitted or set to 0, the API returns all teams with no upper bound."
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -156,16 +258,17 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.basic.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.settings.READ", "Desk.teams.READ" ]
         } ],
-        "x-audience" : [ "external-public" ]
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
       }
     },
     "/api/v1/agents/{agentId}/teams" : {
       "get" : {
         "tags" : [ "Team" ],
-        "summary" : "List associated teams of agent",
-        "description" : "This API fetches details of all the teams to which an agent belongs.",
+        "summary" : "Get Teams of an Agent",
+        "description" : "Retrieves details of all teams to which an agent belongs, with pagination support.",
         "operationId" : "listAssociatedTeamsForAgent",
         "parameters" : [ {
           "name" : "agentId",
@@ -174,10 +277,36 @@
           "style" : "simple",
           "explode" : false,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the agent"
           }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer",
+            "default" : 0,
+            "minimum" : 0
+          },
+          "description" : "Zero-based index number starting from which the teams must be fetched"
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer",
+            "default" : 0,
+            "minimum" : 0,
+            "maximum" : 200
+          },
+          "description" : "Number of teams to fetch\n\nNote: If limit is omitted or set to 0, the API returns all teams with no upper bound."
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -187,38 +316,46 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.basic.READ" ]
+          "iam-oauth2-schema" : [ "Desk.agents.READ", "Desk.basic.READ", "Desk.settings.READ", "Desk.teams.READ" ]
         } ],
-        "x-audience" : [ "external-public" ]
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
       }
     },
     "/api/v1/teams/{team_id}/members" : {
       "get" : {
         "tags" : [ "Team" ],
-        "summary" : "List details of team members",
-        "description" : "This API fetches details of all the members of a particular team.",
+        "summary" : "Get Team Members",
+        "description" : "Retrieves details of all members of a specific team.",
         "operationId" : "getTeamMembersDetails",
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
-          "description" : "Secondary information related to the team. Values allowed are @profile@, @role@. You can include all two values by separating them with commas in the API request.",
+          "description" : "Secondary information related to the team.  <p><b>Possible values: </b> profile, role </p><p><b>  Note:</b> Both values can be included by separating them with commas in the API request</p>",
           "required" : false,
-          "style" : "simple",
+          "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "null", "array" ],
-            "description" : "Secondary information related to the team. Values allowed are @profile@, @role@. You can include all two values by separating them with commas in the API request.",
+            "type" : [ "array" ],
             "items" : {
-              "type" : [ "string", "null" ],
-              "enum" : [ "profile", "role" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "type" : [ "string" ],
+              "enum" : [ "profile", "role" ]
             },
             "maxItems" : 2,
             "uniqueItems" : true
           }
         }, {
-          "$ref" : "#/components/parameters/team_id"
+          "name" : "team_id",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the team"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -228,19 +365,30 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.basic.READ" ]
+          "iam-oauth2-schema" : [ "Desk.agents.READ", "Desk.basic.READ", "Desk.settings.READ", "Desk.teams.READ" ]
         } ],
-        "x-audience" : [ "external-public" ]
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
       }
     },
     "/api/v1/teams/{teamId}" : {
       "get" : {
         "tags" : [ "Team" ],
-        "summary" : "Get team",
-        "description" : "This API fetches the details of a team.",
+        "summary" : "Get Team",
+        "description" : "Retrieves details of a specific team.",
         "operationId" : "getTeam",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/teamId"
+          "name" : "teamId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the team"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -250,19 +398,31 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.basic.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.settings.READ", "Desk.teams.READ" ]
         } ],
-        "x-audience" : [ "external-public" ]
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
       }
     },
     "/api/v1/teams/{team_id}" : {
       "patch" : {
         "tags" : [ "Team" ],
-        "summary" : "Update team",
-        "description" : "This API updates details of an existing team.",
+        "summary" : "Update Team",
+        "description" : "Updates details of an existing team.",
         "operationId" : "updateTeam",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/team_id"
+          "name" : "team_id",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the team"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -278,7 +438,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE", "Desk.basic.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.basic.UPDATE", "Desk.settings.UPDATE", "Desk.teams.UPDATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -287,20 +447,22 @@
   "components" : {
     "schemas" : {
       "teamRequestJson" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "roles" : {
-            "type" : [ "null", "array" ],
+            "type" : [ "array", "null" ],
             "items" : {
-              "type" : [ "string", "null", "integer" ],
+              "type" : [ "string", "integer", "null" ],
               "format" : "int64",
               "pattern" : "([0-9]+)"
             },
+            "description" : "ID(s) of the role(s) added to the team",
             "uniqueItems" : true
           },
           "departmentId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
+            "description" : "Unique ID of the department to which the team belongs",
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
@@ -308,30 +470,34 @@
             "type" : [ "string", "null" ],
             "maxLength" : 50,
             "minLength" : 1,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "Name of the team"
           },
           "description" : {
             "type" : [ "string", "null" ],
             "maxLength" : 255,
             "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "Short description of the team"
           },
           "subTeams" : {
-            "type" : [ "null", "array" ],
+            "type" : [ "array", "null" ],
             "items" : {
-              "type" : [ "string", "null", "integer" ],
+              "type" : [ "string", "integer", "null" ],
               "format" : "int64",
               "pattern" : "([0-9]+)"
             },
+            "description" : "ID(s) of the sub-team(s) within the team",
             "uniqueItems" : true
           },
           "agents" : {
-            "type" : [ "null", "array" ],
+            "type" : [ "array", "null" ],
             "items" : {
-              "type" : [ "string", "null", "integer" ],
+              "type" : [ "string", "integer", "null" ],
               "format" : "int64",
               "pattern" : "([0-9]+)"
             },
+            "description" : "ID(s) of the agent(s) added to the team",
             "uniqueItems" : true
           }
         },
@@ -340,142 +506,161 @@
       "teamJson" : {
         "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Team.json#/components/schemas/teamRequestJson"
+          "$ref" : "#/components/schemas/teamRequestJson"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "rolesWithSubordinates" : {
-              "type" : [ "null", "array" ],
+              "type" : [ "array", "null" ],
               "items" : {
-                "type" : [ "string", "null", "integer" ],
+                "type" : [ "string", "integer", "null" ],
                 "format" : "int64",
                 "pattern" : "([0-9]+)"
               },
-              "uniqueItems" : true
+              "uniqueItems" : true,
+              "description" : "ID(s) of the role(s) with subordinates added to the team"
             }
           },
-          "required" : [ "rolesWithSubordinates" ]
+          "required" : [ "rolesWithSubordinates" ],
+          "additionalProperties" : false
         } ]
       },
       "teamResponse" : {
         "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Team.json#/components/schemas/teamJson"
+          "$ref" : "#/components/schemas/teamJson"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "derivedAgents" : {
-              "type" : [ "null", "array" ],
+              "type" : [ "array", "null" ],
               "items" : {
-                "type" : [ "string", "null", "integer" ],
+                "type" : [ "string", "integer", "null" ],
                 "format" : "int64",
                 "pattern" : "([0-9]+)"
               },
+              "description" : "ID(s) of the agent(s) derived from the properties set for the team",
               "uniqueItems" : true
             },
             "id" : {
-              "type" : [ "string", "null", "integer" ],
+              "type" : [ "string", "integer", "null" ],
               "format" : "int64",
-              "pattern" : "([0-9]+)"
+              "pattern" : "([0-9]+)",
+              "description" : "Unique ID of the team"
             },
             "logoUrl" : {
               "type" : [ "string", "null" ],
               "maxLength" : 200,
               "minLength" : 0,
-              "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+              "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+              "description" : "URL of the team logo"
             }
           },
-          "required" : [ "derivedAgents", "id", "logoUrl" ]
+          "required" : [ "derivedAgents", "id", "logoUrl" ],
+          "additionalProperties" : false
         } ]
       },
       "teamResponseArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./Team.json#/components/schemas/teamResponse"
-        }
+          "$ref" : "#/components/schemas/teamResponse"
+        },
+        "description" : "List of team entries"
       },
       "teamIds" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "type" : [ "null", "integer" ],
+          "type" : [ "integer", "null" ],
           "format" : "int64"
-        }
+        },
+        "description" : "ID(s) of the teams that can be added as sub-teams to the current team"
       },
       "teamMembersDetails" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "firstName" : {
             "type" : [ "string", "null" ],
             "maxLength" : 50,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "First name of the team member"
           },
           "lastName" : {
             "type" : [ "string", "null" ],
             "maxLength" : 50,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Last name of the team member"
           },
           "photoURL" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "URL of the member's photo"
           },
           "roleId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the role"
           },
           "profileId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the profile"
           },
           "emailId" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+            "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$",
+            "description" : "Email address of the team member"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the member"
           },
           "zuid" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int32",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ZUID of the member"
           }
         },
         "required" : [ "emailId", "firstName", "id", "lastName", "photoURL", "profileId", "roleId", "zuid" ]
       },
       "teamMembersDetailsList" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./Team.json#/components/schemas/teamMembersDetails"
+          "$ref" : "#/components/schemas/teamMembersDetails"
         }
       },
       "teamsObjectForGetAppliedBlueprintDetails" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "name" : {
             "type" : [ "string", "null" ],
             "maxLength" : 50,
             "minLength" : 1,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "Name of the team"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the team"
           },
           "logoUrl" : {
             "type" : [ "string", "null" ],
             "maxLength" : 200,
             "minLength" : 0,
-            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+            "description" : "URL of the team logo"
           }
         },
         "required" : [ "id", "logoUrl", "name" ]
@@ -487,11 +672,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "teams" : {
-                  "$ref" : "./Team.json#/components/schemas/teamResponseArray"
+                  "$ref" : "#/components/schemas/teamResponseArray"
                 }
               },
               "required" : [ "teams" ]
@@ -535,32 +720,36 @@
             "schema" : {
               "additionalProperties" : false,
               "allOf" : [ {
-                "$ref" : "./Team.json#/components/schemas/teamJson"
+                "$ref" : "#/components/schemas/teamJson"
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "properties" : {
                   "derivedAgents" : {
-                    "type" : [ "null", "array" ],
+                    "type" : [ "array", "null" ],
                     "items" : {
-                      "type" : [ "string", "null", "integer" ],
+                      "type" : [ "string", "integer", "null" ],
                       "format" : "int64",
                       "pattern" : "([0-9]+)"
                     },
+                    "description" : "ID(s) of the agent(s) derived from the properties set for the team",
                     "uniqueItems" : true
                   },
                   "id" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
-                    "pattern" : "([0-9]+)"
+                    "pattern" : "([0-9]+)",
+                    "description" : "Unique ID of the team"
                   },
                   "logoUrl" : {
                     "type" : [ "string", "null" ],
                     "maxLength" : 200,
                     "minLength" : 0,
-                    "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+                    "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+                    "description" : "URL of the team logo"
                   }
                 },
-                "required" : [ "derivedAgents", "id", "logoUrl" ]
+                "required" : [ "derivedAgents", "id", "logoUrl" ],
+                "additionalProperties" : false
               } ]
             },
             "examples" : {
@@ -587,11 +776,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "teams" : {
-                  "$ref" : "./Team.json#/components/schemas/teamIds"
+                  "$ref" : "#/components/schemas/teamIds"
                 }
               },
               "required" : [ "teams" ]
@@ -612,15 +801,16 @@
           "application/json" : {
             "schema" : {
               "allOf" : [ {
-                "type" : "object",
+                "type" : [ "object" ],
                 "properties" : {
                   "members" : {
-                    "type" : "array",
+                    "type" : [ "array" ],
+                    "description" : "List of member entries of the team",
                     "items" : {
-                      "type" : "object",
+                      "type" : [ "object" ],
                       "properties" : {
                         "role" : {
-                          "type" : [ "null", "object" ],
+                          "type" : [ "object", "null" ],
                           "additionalProperties" : false,
                           "maxProperties" : 2,
                           "minProperties" : 2,
@@ -628,18 +818,20 @@
                             "name" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 100,
-                              "minLength" : 0
+                              "minLength" : 0,
+                              "description" : "Name of the role"
                             },
                             "id" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
-                              "pattern" : "([0-9]+)"
+                              "pattern" : "([0-9]+)",
+                              "description" : "Unique ID of the role"
                             }
                           },
                           "required" : [ "id", "name" ]
                         },
                         "profile" : {
-                          "type" : [ "null", "object" ],
+                          "type" : [ "object", "null" ],
                           "additionalProperties" : false,
                           "maxProperties" : 2,
                           "minProperties" : 2,
@@ -647,26 +839,30 @@
                             "name" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 50,
-                              "minLength" : 0
+                              "minLength" : 0,
+                              "description" : "Name of the profile"
                             },
                             "id" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
-                              "pattern" : "([0-9]+)"
+                              "pattern" : "([0-9]+)",
+                              "description" : "Unique ID of the profile"
                             }
                           },
                           "required" : [ "id", "name" ]
                         }
-                      }
+                      },
+                      "additionalProperties" : false
                     }
                   }
-                }
+                },
+                "additionalProperties" : false
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "members" : {
-                    "$ref" : "./Team.json#/components/schemas/teamMembersDetailsList"
+                    "$ref" : "#/components/schemas/teamMembersDetailsList"
                   }
                 },
                 "required" : [ "members" ]
@@ -678,12 +874,12 @@
                   "members" : [ {
                     "firstName" : "",
                     "lastName" : "John",
-                    "photoURL" : "https://contacts.zoho.com/file?t=user&ID=437793",
+                    "photoURL" : "https://contacts.example.com/file?t=user&ID=1234567890",
                     "roleId" : "7000000012324",
                     "profileId" : "7000000012339",
                     "emailId" : "john@zylker.com",
                     "id" : "7000000013328",
-                    "zuid" : "437793"
+                    "zuid" : "1234567890"
                   }, {
                     "firstName" : "Steve",
                     "lastName" : "Kyle",
@@ -692,7 +888,7 @@
                     "profileId" : "7000000012339",
                     "emailId" : "kyle@zylker.com",
                     "id" : "7000000012958",
-                    "zuid" : "5625416"
+                    "zuid" : "1234567890"
                   } ]
                 }
               }
@@ -702,18 +898,6 @@
       }
     },
     "parameters" : {
-      "teamId" : {
-        "name" : "teamId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      },
       "team_id" : {
         "name" : "team_id",
         "in" : "path",
@@ -721,10 +905,11 @@
         "style" : "simple",
         "explode" : false,
         "schema" : {
-          "type" : [ "string", "null", "integer" ],
+          "type" : [ "string", "integer" ],
           "format" : "int64",
           "pattern" : "([0-9]+)"
-        }
+        },
+        "description" : "Unique ID of the team"
       }
     },
     "requestBodies" : {
@@ -732,52 +917,68 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "roles" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
-                  "uniqueItems" : true
+                  "uniqueItems" : true,
+                  "description" : "ID(s) of the role(s) added to the team"
                 },
                 "departmentId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer" ],
                   "format" : "int64",
-                  "pattern" : "([0-9]+)"
+                  "pattern" : "([0-9]+)",
+                  "description" : "Unique ID of the department to which the team belongs"
                 },
                 "name" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "maxLength" : 50,
-                  "minLength" : 1,
-                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+                  "description" : "Name of the team",
+                  "x-unique" : true
                 },
                 "description" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 255,
-                  "minLength" : 0,
-                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                  "type" : [ "string" ],
+                  "maxLength" : 30000,
+                  "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+",
+                  "description" : "Short description of the team"
                 },
                 "subTeams" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
+                  "description" : "ID(s) of the sub-team(s) within the team",
                   "uniqueItems" : true
                 },
                 "agents" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
-                  "uniqueItems" : true
+                  "uniqueItems" : true,
+                  "description" : "ID(s) of the agent(s) added to the team"
+                },
+                "rolesWithSubordinates" : {
+                  "type" : [ "array" ],
+                  "items" : {
+                    "type" : [ "string", "integer" ],
+                    "format" : "int64",
+                    "pattern" : "([0-9]+)"
+                  },
+                  "description" : "ID(s) of the role(s) with subordinates to add to the team",
+                  "minItems" : 0,
+                  "maxItems" : 20
                 }
               },
               "required" : [ "departmentId", "name" ]
@@ -802,28 +1003,32 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "ticketNewAgent" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer" ],
                   "format" : "int64",
-                  "pattern" : "([0-9]+)"
+                  "pattern" : "([0-9]*|null|undefined)",
+                  "description" : "Unique ID of the agent to whom open and on hold tickets must be reassigned"
                 },
                 "ticketNewTeam" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer" ],
                   "format" : "int64",
-                  "pattern" : "([0-9]+)"
+                  "pattern" : "([0-9]*|null|undefined)",
+                  "description" : "Unique ID of the team to which open and on hold tickets must be reassigned"
                 },
                 "taskNewTeam" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer" ],
                   "format" : "int64",
-                  "pattern" : "([0-9]+)"
+                  "pattern" : "([0-9]*|null|undefined)",
+                  "description" : "Unique ID of the team to which open tasks must be reassigned"
                 },
                 "taskNewAgent" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer" ],
                   "format" : "int64",
-                  "pattern" : "([0-9]+)"
+                  "pattern" : "([0-9]*|null|undefined)",
+                  "description" : "Unique ID of the agent to whom open tasks must be reassigned"
                 }
               },
               "required" : [ "taskNewAgent", "taskNewTeam", "ticketNewAgent", "ticketNewTeam" ]
@@ -845,47 +1050,61 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "roles" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
+                  "description" : "ID(s) of the role(s) to add to the team",
                   "uniqueItems" : true
                 },
                 "name" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "maxLength" : 50,
-                  "minLength" : 1,
-                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+                  "description" : "Name of the team"
                 },
                 "description" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 255,
-                  "minLength" : 0,
-                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                  "type" : [ "string" ],
+                  "maxLength" : 30000,
+                  "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+",
+                  "description" : "Short description of the team"
                 },
                 "subTeams" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
+                  "description" : "ID(s) of the sub-team(s) within the team",
                   "uniqueItems" : true
                 },
                 "agents" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
+                  "description" : "ID(s) of the agent(s) to add to the team",
                   "uniqueItems" : true
+                },
+                "rolesWithSubordinates" : {
+                  "type" : [ "array" ],
+                  "items" : {
+                    "type" : [ "string", "integer" ],
+                    "format" : "int64",
+                    "pattern" : "([0-9]+)"
+                  },
+                  "minItems" : 0,
+                  "maxItems" : 20,
+                  "description" : "ID(s) of the role(s) with subordinates to add to the team"
                 }
               }
             },
@@ -905,6 +1124,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

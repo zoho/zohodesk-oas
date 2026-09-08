@@ -8,13 +8,16 @@
     "/api/v1/communityTopics/{topicId}/attachments/{attachmentId}/content" : {
       "get" : {
         "tags" : [ "Community" ],
-        "summary" : "Get community topic attachment",
-        "description" : "This API fetches a file attachment from a topic.",
+        "summary" : "Get Topic Attachment",
+        "description" : "Retrieves a file attachment from a community topic.",
         "operationId" : "getCommunityTopicAttachment",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/topicId"
+          "$ref" : "#/components/parameters/topicId",
+          "description" : "Unique ID of the topic containing the attachment"
         }, {
-          "$ref" : "#/components/parameters/attachmentId"
+          "$ref" : "#/components/parameters/attachmentId",
+          "description" : "Unique ID of the attachment to retrieve"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -32,19 +35,32 @@
     "/api/v1/communityTopics/{topicId}/voters/trend" : {
       "get" : {
         "tags" : [ "Community" ],
-        "summary" : "Topic voters trend",
-        "description" : "To get trend of voters of a topic",
+        "summary" : "Get Topic Voters Trend",
+        "description" : "Retrieves the voting trend for a community topic over time.",
         "operationId" : "getCommunityTopicVotersTrend",
         "parameters" : [ {
+          "name" : "topicId",
+          "in" : "path",
+          "description" : "Unique ID of the topic from which the voters trend must be retrieved.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        }, {
           "name" : "startTime",
           "in" : "query",
-          "description" : "Starting time of the time range for which the statistics should be fetched. The value must be expressed according to the GMT time zone.",
+          "description" : "Starting time of the time range for which the statistics must be fetched. The value must be expressed according to the GMT time zone.",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
             "type" : [ "string", "null" ],
-            "description" : "Starting time of the time range for which the statistics should be fetched. The value must be expressed according to the GMT time zone.",
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
@@ -52,21 +68,16 @@
         }, {
           "name" : "endTime",
           "in" : "query",
-          "description" : "Ending time of the time range for which the statistics should be fetched. The value must be expressed according to the GMT time zone.",
+          "description" : "Ending time of the time range for which the statistics must be fetched. The value must be expressed according to the GMT time zone.",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
             "type" : [ "string", "null" ],
-            "description" : "Ending time of the time range for which the statistics should be fetched. The value must be expressed according to the GMT time zone.",
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           }
-        }, {
-          "$ref" : "#/components/parameters/topicId"
-        }, {
-          "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
           "200" : {
@@ -76,17 +87,20 @@
         "security" : [ {
           "iam-oauth2-schema" : [ "Desk.forums.READ", "Desk.community.READ" ]
         } ],
-        "x-audience" : [ "external-public" ]
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
       }
     },
     "/api/v1/communityTopics/{topicId}/moveToTrash" : {
       "post" : {
         "tags" : [ "Community" ],
-        "summary" : "Trash community topic",
-        "description" : "This API moves a forum topic to trash of your help desk portal.",
+        "summary" : "Move Topic to Recycle Bin",
+        "description" : "Moves a community topic to the Recycle Bin.",
         "operationId" : "deleteCommunityTopic",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/topicId"
+          "$ref" : "#/components/parameters/topicId",
+          "description" : "Unique ID of the topic to move to the Recycle Bin"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -104,14 +118,22 @@
     "/api/v1/communityTopics/{topicId}/replies/{replyId}/attachments/{attachmentId}/content" : {
       "get" : {
         "tags" : [ "Community" ],
-        "summary" : "Get community topic reply attachment",
-        "description" : "This API fetches a file attachment from a reply to a topic comment.",
+        "summary" : "Get Reply Attachment",
+        "description" : "Retrieves a file attachment from a reply to a topic comment.",
         "operationId" : "getCommunityTopicReplyAttachment",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/topicId"
+          "$ref" : "#/components/parameters/topicId",
+          "description" : "Unique ID of the topic containing the reply"
+        }, {
+          "$ref" : "#/components/parameters/attachmentId",
+          "description" : "Unique ID of the attachment to retrieve"
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
         }, {
           "name" : "replyId",
           "in" : "path",
+          "description" : "Unique ID of the reply containing the attachment",
           "required" : true,
           "style" : "simple",
           "explode" : false,
@@ -120,10 +142,6 @@
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
-        }, {
-          "$ref" : "#/components/parameters/attachmentId"
-        }, {
-          "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
           "200" : {
@@ -139,11 +157,13 @@
     "/api/v1/communityTopics/{topicId}/lock" : {
       "post" : {
         "tags" : [ "Community" ],
-        "summary" : "Lock community topic",
-        "description" : "This API helps lock a forum topic, so that further user actions are restricted.",
+        "summary" : "Lock Topic",
+        "description" : "Locks a community topic to restrict further user actions.",
         "operationId" : "lockCommunityTopic",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/topicId"
+          "$ref" : "#/components/parameters/topicId",
+          "description" : "Unique ID of the topic to lock"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -165,7 +185,30 @@
         "description" : "This API fetches a file attachment from a topic comment.",
         "operationId" : "getCommunityTopicCommentAttachment",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/topicId"
+          "name" : "topicId",
+          "in" : "path",
+          "description" : "Unique ID of the topic from which the voters trend must be retrieved.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "attachmentId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
         }, {
           "name" : "commentId",
           "in" : "path",
@@ -177,10 +220,6 @@
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
-        }, {
-          "$ref" : "#/components/parameters/attachmentId"
-        }, {
-          "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
           "200" : {
@@ -197,7 +236,7 @@
   "components" : {
     "schemas" : {
       "trendDetails" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "date" : {
@@ -206,7 +245,7 @@
             "minLength" : 0
           },
           "count" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
@@ -214,9 +253,9 @@
         "required" : [ "count", "date" ]
       },
       "commentsArr" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./Community.json#/components/schemas/trendDetails"
+          "$ref" : "#/components/schemas/trendDetails"
         }
       }
     },
@@ -226,11 +265,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "topicVoterTrend" : {
-                  "$ref" : "./Community.json#/components/schemas/commentsArr"
+                  "$ref" : "#/components/schemas/commentsArr"
                 }
               },
               "required" : [ "topicVoterTrend" ]
@@ -265,11 +304,12 @@
       "topicId" : {
         "name" : "topicId",
         "in" : "path",
+        "description" : "Unique ID of the topic from which the voters trend must be retrieved.",
         "required" : true,
         "style" : "simple",
         "explode" : false,
         "schema" : {
-          "type" : [ "string", "null", "integer" ],
+          "type" : [ "string", "integer", "null" ],
           "format" : "int64",
           "pattern" : "([0-9]+)"
         }
@@ -281,13 +321,19 @@
         "style" : "simple",
         "explode" : false,
         "schema" : {
-          "type" : [ "string", "null", "integer" ],
+          "type" : [ "string", "integer", "null" ],
           "format" : "int64",
           "pattern" : "([0-9]+)"
         }
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

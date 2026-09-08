@@ -14,65 +14,64 @@
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
-          "description" : "",
           "required" : false,
-          "style" : "simple",
+          "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "null", "array" ],
-            "description" : "",
+            "type" : [ "array" ],
             "items" : {
-              "type" : [ "string", "null" ],
-              "description" : "",
-              "enum" : [ "creator" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "type" : [ "string" ],
+              "enum" : [ "creator" ]
             },
             "uniqueItems" : true
           }
         }, {
           "name" : "limit",
           "in" : "query",
-          "description" : "",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "integer" ],
             "format" : "int32",
-            "description" : "",
             "maximum" : 100,
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "minimum" : 1
           }
         }, {
           "name" : "sortBy",
           "in" : "query",
-          "description" : "",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "",
+            "type" : [ "string" ],
             "maxLength" : 100,
-            "minLength" : 0,
             "pattern" : "-?(createdTime)"
           }
         }, {
           "name" : "from",
           "in" : "query",
-          "description" : "",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "integer" ],
             "format" : "int32",
-            "description" : "",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "default" : 0
           }
         }, {
-          "$ref" : "#/components/parameters/productId"
+          "name" : "productId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -85,7 +84,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.products.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.products.READ", "Desk.settings.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
       },
@@ -95,7 +94,16 @@
         "description" : "This API attaches a file to a product.",
         "operationId" : "createProductAttachment",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/productId"
+          "name" : "productId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -103,15 +111,15 @@
           "content" : {
             "multipart/form-data" : {
               "schema" : {
-                "type" : "object",
+                "type" : [ "object" ],
                 "properties" : {
                   "file" : {
-                    "type" : "string",
-                    "format" : "binary",
-                    "description" : ""
+                    "type" : [ "string" ],
+                    "format" : "binary"
                   }
                 },
-                "required" : [ "file" ]
+                "required" : [ "file" ],
+                "additionalProperties" : false
               }
             }
           }
@@ -125,7 +133,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.products.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.products.UPDATE", "Desk.settings.UPDATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -137,9 +145,27 @@
         "description" : "This API deletes an attachment from a product.",
         "operationId" : "deleteProductAttachment",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/productId"
+          "name" : "productId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/attachmentId"
+          "name" : "attachmentId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -155,7 +181,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.products.DELETE" ]
+          "iam-oauth2-schema" : [ "Desk.products.UPDATE", "Desk.settings.UPDATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -164,50 +190,43 @@
   "components" : {
     "schemas" : {
       "attachmentJson" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "previewurl" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "maxLength" : 16000000,
             "minLength" : 0,
             "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
           },
           "size" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "description" : "",
             "pattern" : "([0-9]+)"
           },
           "creatorId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "description" : "",
             "pattern" : "([0-9]+)"
           },
           "name" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "maxLength" : 100,
             "minLength" : 0
           },
           "createdTime" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "description" : "",
             "pattern" : "([0-9]+)"
           },
           "href" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "maxLength" : 16000000,
             "minLength" : 0,
             "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
@@ -216,9 +235,9 @@
         "required" : [ "createdTime", "creatorId", "href", "id", "name", "previewurl", "size" ]
       },
       "data" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./ProductAttachment.json#/components/schemas/attachmentJson"
+          "$ref" : "#/components/schemas/attachmentJson"
         }
       }
     },
@@ -229,48 +248,42 @@
           "application/json" : {
             "schema" : {
               "allOf" : [ {
-                "type" : "object",
+                "type" : [ "object" ],
                 "properties" : {
                   "data" : {
-                    "type" : "array",
+                    "type" : [ "array" ],
                     "items" : {
-                      "type" : "object",
+                      "type" : [ "object" ],
                       "properties" : {
                         "creator" : {
-                          "type" : [ "null", "object" ],
+                          "type" : [ "object", "null" ],
                           "additionalProperties" : false,
-                          "description" : "",
                           "maxProperties" : 5,
                           "minProperties" : 5,
                           "properties" : {
                             "firstName" : {
                               "type" : [ "string", "null" ],
-                              "description" : "",
                               "maxLength" : 40,
                               "minLength" : 0
                             },
                             "lastName" : {
                               "type" : [ "string", "null" ],
-                              "description" : "",
                               "maxLength" : 200,
                               "minLength" : 0
                             },
                             "photoURL" : {
                               "type" : [ "string", "null" ],
-                              "description" : "",
                               "maxLength" : 100,
                               "minLength" : 0,
                               "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
                             },
                             "id" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
-                              "description" : "",
                               "pattern" : "([0-9]+)"
                             },
                             "email" : {
                               "type" : [ "string", "null" ],
-                              "description" : "",
                               "maxLength" : 255,
                               "minLength" : 0,
                               "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'\\&\\~]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
@@ -278,16 +291,18 @@
                           },
                           "required" : [ "email", "firstName", "id", "lastName", "photoURL" ]
                         }
-                      }
+                      },
+                      "additionalProperties" : false
                     }
                   }
-                }
+                },
+                "additionalProperties" : false
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "data" : {
-                    "$ref" : "./ProductAttachment.json#/components/schemas/data"
+                    "$ref" : "#/components/schemas/data"
                   }
                 },
                 "required" : [ "data" ]
@@ -306,50 +321,43 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "previewurl" : {
                   "type" : [ "string", "null" ],
-                  "description" : "",
                   "maxLength" : 16000000,
                   "minLength" : 0,
                   "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
                 },
                 "size" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
-                  "description" : "",
                   "pattern" : "([0-9]+)"
                 },
                 "creatorId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
-                  "description" : "",
                   "pattern" : "([0-9]+)"
                 },
                 "name" : {
                   "type" : [ "string", "null" ],
-                  "description" : "",
                   "maxLength" : 100,
                   "minLength" : 0
                 },
                 "createdTime" : {
                   "type" : [ "string", "null" ],
-                  "description" : "",
                   "maxLength" : 100,
                   "minLength" : 0,
                   "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
                 },
                 "id" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
-                  "description" : "",
                   "pattern" : "([0-9]+)"
                 },
                 "href" : {
                   "type" : [ "string", "null" ],
-                  "description" : "",
                   "maxLength" : 16000000,
                   "minLength" : 0,
                   "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
@@ -366,37 +374,13 @@
         }
       }
     },
-    "parameters" : {
-      "productId" : {
-        "name" : "productId",
-        "in" : "path",
-        "description" : "",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "description" : "",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "attachmentId" : {
-        "name" : "attachmentId",
-        "in" : "path",
-        "description" : "",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "description" : "",
-          "pattern" : "([0-9]+)"
-        }
-      }
-    },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

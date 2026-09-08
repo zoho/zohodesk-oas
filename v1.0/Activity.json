@@ -42,23 +42,42 @@
           "in" : "query",
           "description" : "Allowed values are : contacts, assignee,tickets,teams,projects,integInfo.",
           "required" : false,
-          "style" : "simple",
+          "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "null", "array" ],
-            "description" : "Allowed values are : contacts, assignee,tickets,teams,projects,integInfo.",
+            "type" : [ "array" ],
             "items" : {
-              "type" : [ "string", "null" ],
-              "enum" : [ "contacts", "tickets", "assignee", "teams" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "type" : [ "string" ],
+              "enum" : [ "contacts", "tickets", "assignee", "teams" ]
             },
             "uniqueItems" : true
           }
         }, {
-          "$ref" : "#/components/parameters/limit"
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of activities to list",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 100,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/from"
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number, starting from which the activities must be fetched",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "name" : "sortBy",
           "in" : "query",
@@ -67,16 +86,30 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Sort by a specific attribute: @activityTime@ or @createdTime@.The default sorting order is ascending. A @-@ prefix denotes descending order of sorting.",
+            "type" : [ "string" ],
             "enum" : [ "activityTime", "createdTime" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "pattern" : "-?(createdTime|activityTime)"
           }
         }, {
-          "$ref" : "#/components/parameters/isSpam"
+          "name" : "isSpam",
+          "in" : "query",
+          "description" : "Key that denotes whether to fetch spam activities or not",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "boolean" ]
+          }
         }, {
-          "$ref" : "#/components/parameters/isCompleted"
+          "name" : "isCompleted",
+          "in" : "query",
+          "description" : "Key that denotes whether the activity is completed or not",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "boolean" ]
+          }
         }, {
           "name" : "ticketId",
           "in" : "path",
@@ -84,7 +117,7 @@
           "style" : "simple",
           "explode" : false,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
@@ -113,16 +146,15 @@
         "allOf" : [ {
           "$ref" : "./Event.json#/components/schemas/contactOrAccountEventListViewJson"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "activityType" : {
               "type" : [ "string", "null" ],
-              "enum" : [ "Calls", "Events", "Tasks" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "enum" : [ "Calls", "Events", "Tasks" ]
             }
           },
-          "required" : [ "activityType" ]
+          "required" : [ "activityType" ],
+          "additionalProperties" : false
         } ]
       },
       "calljson" : {
@@ -130,16 +162,15 @@
         "allOf" : [ {
           "$ref" : "./Call.json#/components/schemas/contactOrAccountCallsListViewJson"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "activityType" : {
               "type" : [ "string", "null" ],
-              "enum" : [ "Calls", "Events", "Tasks" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "enum" : [ "Calls", "Events", "Tasks" ]
             }
           },
-          "required" : [ "activityType" ]
+          "required" : [ "activityType" ],
+          "additionalProperties" : false
         } ]
       },
       "taskjson" : {
@@ -147,27 +178,26 @@
         "allOf" : [ {
           "$ref" : "./Task.json#/components/schemas/taskListByContactOrAccountJson"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "activityType" : {
               "type" : [ "string", "null" ],
-              "enum" : [ "Calls", "Events", "Tasks" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "enum" : [ "Calls", "Events", "Tasks" ]
             }
           },
-          "required" : [ "activityType" ]
+          "required" : [ "activityType" ],
+          "additionalProperties" : false
         } ]
       },
       "data" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
           "oneOf" : [ {
-            "$ref" : "./Activity.json#/components/schemas/eventjson"
+            "$ref" : "#/components/schemas/eventjson"
           }, {
-            "$ref" : "./Activity.json#/components/schemas/calljson"
+            "$ref" : "#/components/schemas/calljson"
           }, {
-            "$ref" : "./Activity.json#/components/schemas/taskjson"
+            "$ref" : "#/components/schemas/taskjson"
           } ]
         }
       }
@@ -179,21 +209,21 @@
           "application/json" : {
             "schema" : {
               "allOf" : [ {
-                "type" : "object",
+                "type" : [ "object" ],
                 "properties" : {
                   "data" : {
-                    "type" : "array",
+                    "type" : [ "array" ],
                     "items" : {
-                      "type" : "object",
+                      "type" : [ "object" ],
                       "properties" : {
                         "ticket" : {
-                          "type" : [ "null", "object" ],
+                          "type" : [ "object", "null" ],
                           "additionalProperties" : false,
                           "maxProperties" : 13,
                           "minProperties" : 13,
                           "properties" : {
                             "ticketNumber" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int32",
                               "pattern" : "([0-9]+)"
                             },
@@ -228,7 +258,7 @@
                               "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\(\\)\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
                             },
                             "teamId" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
                               "pattern" : "([0-9]+)"
                             },
@@ -239,12 +269,12 @@
                               "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
                             },
                             "id" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
                               "pattern" : "([0-9]+)"
                             },
                             "assignee" : {
-                              "type" : [ "null", "object" ],
+                              "type" : [ "object", "null" ],
                               "additionalProperties" : false,
                               "maxProperties" : 4,
                               "minProperties" : 4,
@@ -266,7 +296,7 @@
                                   "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                                 },
                                 "id" : {
-                                  "type" : [ "string", "null", "integer" ],
+                                  "type" : [ "string", "integer", "null" ],
                                   "format" : "int64",
                                   "pattern" : "([0-9]+)"
                                 }
@@ -284,7 +314,7 @@
                           "required" : [ "assignee", "channel", "closedTime", "createdTime", "dueDate", "id", "isArchived", "isSpam", "phone", "status", "subject", "teamId", "ticketNumber" ]
                         },
                         "contact" : {
-                          "type" : [ "null", "object" ],
+                          "type" : [ "object", "null" ],
                           "additionalProperties" : false,
                           "maxProperties" : 8,
                           "minProperties" : 8,
@@ -300,7 +330,7 @@
                               "minLength" : 0
                             },
                             "accountId" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
                               "pattern" : "([0-9]+)"
                             },
@@ -317,7 +347,7 @@
                               "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\(\\)\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
                             },
                             "id" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
                               "pattern" : "([0-9]+)"
                             },
@@ -334,7 +364,7 @@
                           "required" : [ "accountId", "email", "firstName", "id", "isSpam", "lastName", "mobile", "phone" ]
                         },
                         "assignee" : {
-                          "type" : [ "null", "object" ],
+                          "type" : [ "object", "null" ],
                           "additionalProperties" : false,
                           "maxProperties" : 5,
                           "minProperties" : 5,
@@ -362,7 +392,7 @@
                               "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
                             },
                             "id" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
                               "pattern" : "([0-9]+)"
                             }
@@ -370,7 +400,7 @@
                           "required" : [ "emailId", "firstName", "id", "lastName", "photoURL" ]
                         },
                         "team" : {
-                          "type" : [ "null", "object" ],
+                          "type" : [ "object", "null" ],
                           "additionalProperties" : false,
                           "maxProperties" : 3,
                           "minProperties" : 3,
@@ -382,7 +412,7 @@
                               "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                             },
                             "id" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
                               "pattern" : "([0-9]+)"
                             },
@@ -395,16 +425,18 @@
                           },
                           "required" : [ "id", "logoUrl", "name" ]
                         }
-                      }
+                      },
+                      "additionalProperties" : false
                     }
                   }
-                }
+                },
+                "additionalProperties" : false
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "data" : {
-                    "$ref" : "./Activity.json#/components/schemas/data"
+                    "$ref" : "#/components/schemas/data"
                   }
                 },
                 "required" : [ "data" ]
@@ -416,7 +448,7 @@
                   "data" : [ {
                     "ticket" : {
                       "ticketNumber" : "101",
-                      "phone" : "1 888 900 9646",
+                      "phone" : "1 555 010 0000",
                       "subject" : "Here's your first ticket.",
                       "dueDate" : 1553853086000,
                       "teamId" : null,
@@ -440,7 +472,7 @@
                     "ownerId" : "5000000015911",
                     "priority" : "High",
                     "isCommented" : false,
-                    "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Events/dv/9d4883f2d94d59e484b8a02355a7e402",
+                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Events/dv/9d4883f2d94d59e484b8a02355a7e402",
                     "createdTime" : 1555046481000,
                     "startTime" : 1577292731000,
                     "assignee" : {
@@ -459,7 +491,7 @@
                   }, {
                     "ticket" : {
                       "ticketNumber" : "101",
-                      "phone" : "1 888 900 9646",
+                      "phone" : "1 555 010 0000",
                       "subject" : "Here's your first ticket.",
                       "dueDate" : 1553853086000,
                       "teamId" : "3000000008763",
@@ -467,7 +499,7 @@
                       "team" : {
                         "name" : "Responsive Team",
                         "id" : "3000000008763",
-                        "logoUrl" : "https://desk.zoho.com/api/v1/teams/3000000008763/logo?orgId=11278831"
+                        "logoUrl" : "https://desk.example.com/api/v1/teams/3000000008763/logo?orgId=1234567890"
                       },
                       "assignee" : {
                         "photoURL" : null,
@@ -487,12 +519,12 @@
                     "team" : {
                       "name" : "Responsive Team",
                       "id" : "3000000008763",
-                      "logoUrl" : "https://desk.zoho.com/api/v1/teams/3000000008763/logo?orgId=11278831"
+                      "logoUrl" : "https://desk.example.com/api/v1/teams/3000000008763/logo?orgId=1234567890"
                     },
                     "ownerId" : "5000000015911",
                     "priority" : "High",
                     "isCommented" : true,
-                    "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Calls/dv/9d4883f2d94d59e4c0ddb2a7dd8a14ee",
+                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Calls/dv/9d4883f2d94d59e4c0ddb2a7dd8a14ee",
                     "teamId" : "3000000008763",
                     "createdTime" : 1554892255000,
                     "startTime" : 1554964200000,
@@ -512,7 +544,7 @@
                   }, {
                     "ticket" : {
                       "ticketNumber" : "101",
-                      "phone" : "1 888 900 9646",
+                      "phone" : "1 555 010 0000",
                       "subject" : "Here's your first ticket.",
                       "dueDate" : 1553853086000,
                       "teamId" : null,
@@ -536,7 +568,7 @@
                     "ownerId" : "5000000015911",
                     "priority" : "High",
                     "isCommented" : false,
-                    "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Tasks/dv/9d4883f2d94d59e40af0073cf7981c2f",
+                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Tasks/dv/9d4883f2d94d59e40af0073cf7981c2f",
                     "createdTime" : 1554890846000,
                     "startTime" : 1556087400000,
                     "assignee" : {
@@ -560,72 +592,16 @@
         }
       }
     },
-    "parameters" : {
-      "limit" : {
-        "name" : "limit",
-        "in" : "query",
-        "description" : "Number of activities to list",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int32",
-          "description" : "Number of activities to list",
-          "maximum" : 99,
-          "minimum" : 1,
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "from" : {
-        "name" : "from",
-        "in" : "query",
-        "description" : "Index number, starting from which the activities must be fetched",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int32",
-          "description" : "Index number, starting from which the activities must be fetched",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "isSpam" : {
-        "name" : "isSpam",
-        "in" : "query",
-        "description" : "Key that denotes whether to fetch spam activities or not",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "boolean", "null" ],
-          "description" : "Key that denotes whether to fetch spam activities or not"
-        }
-      },
-      "isCompleted" : {
-        "name" : "isCompleted",
-        "in" : "query",
-        "description" : "Key that denotes whether the activity is completed or not",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "boolean", "null" ],
-          "description" : "Key that denotes whether the activity is completed or not"
-        }
-      }
-    },
     "requestBodies" : {
       "emptyActivitiesSpamResponse" : {
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "departmentId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer" ],
                   "format" : "int64",
                   "description" : "ID of the department to which the activities belong",
                   "pattern" : "([0-9]+)"
@@ -645,6 +621,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

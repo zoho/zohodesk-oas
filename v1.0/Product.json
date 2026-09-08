@@ -8,29 +8,37 @@
     "/api/v1/products/{productId}" : {
       "get" : {
         "tags" : [ "Product" ],
-        "summary" : "Get product",
+        "summary" : "Get Product",
         "description" : "This API fetches a single product from your helpdesk.",
         "operationId" : "getProduct",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
-          "description" : "Key that fetches secondary information related to the product. Values allowed are: @departments@ and @owner@. You can pass multiple values by separating them with commas.",
+          "description" : "Key that fetches secondary information related to the product. Values allowed are: departments and owner. You can pass multiple values by separating them with commas.",
           "required" : false,
-          "style" : "simple",
+          "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "null", "array" ],
-            "description" : "Key that fetches secondary information related to the product. Values allowed are: @departments@ and @owner@. You can pass multiple values by separating them with commas.",
+            "type" : [ "array" ],
             "items" : {
-              "type" : [ "string", "null" ],
-              "enum" : [ "departments", "owner" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "type" : [ "string" ],
+              "enum" : [ "departments", "owner" ]
             },
             "uniqueItems" : true
           }
         }, {
-          "$ref" : "#/components/parameters/productId"
+          "name" : "productId",
+          "in" : "path",
+          "description" : "Unique ID of the product",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -47,10 +55,21 @@
       "patch" : {
         "tags" : [ "Product" ],
         "operationId" : "updateProduct",
-        "summary" : "Update product",
+        "x-mcp-ready" : true,
+        "summary" : "Update Product",
         "description" : "This API updates details of a product in your help desk portal.",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/productId"
+          "name" : "productId",
+          "in" : "path",
+          "description" : "Unique ID of the product",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -74,49 +93,115 @@
     "/api/v1/products" : {
       "get" : {
         "tags" : [ "Product" ],
-        "summary" : "List Products",
-        "description" : "This API lists a specific number of products from your help desk portal, based on the limit defined. (Note: The departmentIds key will soon be deprecated and not included in API responses.)",
+        "summary" : "Get Products",
+        "description" : "This API lists a specific number of products from your help desk portal, based on the limit defined. This API does not support filtering by product name; to find products by name, use the searchProductDuplicates operation. (Note: The departmentIds key will soon be deprecated and not included in API responses.)",
         "operationId" : "getProducts",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
-          "description" : "Secondary information related to the contact.Value supported is @owner@.",
+          "description" : "Secondary information related to the product. Value supported is owner.",
           "required" : false,
-          "style" : "simple",
+          "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "null", "array" ],
-            "description" : "Secondary information related to the contact.Value supported is @owner@.",
+            "type" : [ "array" ],
             "items" : {
-              "type" : [ "string", "null" ],
+              "type" : [ "string" ],
               "enum" : [ "owner" ]
             },
             "uniqueItems" : true
           }
         }, {
-          "$ref" : "#/components/parameters/viewId"
-        }, {
-          "$ref" : "#/components/parameters/departmentId"
-        }, {
-          "$ref" : "#/components/parameters/limit"
-        }, {
-          "$ref" : "#/components/parameters/from"
-        }, {
-          "name" : "sortBy",
+          "name" : "viewId",
           "in" : "query",
-          "description" : "Sort by a specific attribute : @productName@, @productCode@, @unitPrice@, @createdTime@ or @modifiedTime@. The default sorting order is ascending. A @-@ prefix denotes descending order of sorting.",
+          "description" : "ID of the view to apply while fetching the products",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Sort by a specific attribute : @productName@, @productCode@, @unitPrice@, @createdTime@ or @modifiedTime@. The default sorting order is ascending. A @-@ prefix denotes descending order of sorting.",
-            "enum" : [ "productName", "productCode", "unitPrice", "createdTime", "modifiedTime" ]
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
           }
         }, {
-          "$ref" : "#/components/parameters/ownerId"
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "ID of the department from which the products count must be computed. If you want to count of the products configured in all accessible departments, pass the value 0.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "No. of products to fetch",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 100,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number, starting from which the products must be fetched. The index is zero-based (the first product is at index 0).",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "description" : "Sort by a specific attribute : productName, productCode, unitPrice, createdTime or modifiedTime. The default sorting order is ascending. A '-' prefix denotes descending order of sorting.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "productName", "productCode", "unitPrice", "createdTime", "modifiedTime", "-productName", "-productCode", "-unitPrice", "-createdTime", "-modifiedTime" ],
+            "pattern" : "-?(productName|productCode|unitPrice|createdTime|modifiedTime)",
+            "maxLength" : 100
+          }
+        }, {
+          "name" : "ownerId",
+          "in" : "query",
+          "description" : "Displays the number of products of only a particular owner",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
+        }, {
+          "name" : "fields",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ]
+            }
+          },
+          "description" : "Key that returns the values of mentioned fields (both pre-defined and custom) in your portal. All field types except multi-text are supported. Standard, non-editable fields are supported too. These fields include: layoutId. Maximum of 30 fields is supported as comma separated values.",
+          "style" : "form",
+          "explode" : false
         } ],
         "responses" : {
           "204" : {
@@ -133,9 +218,10 @@
       },
       "post" : {
         "tags" : [ "Product" ],
-        "summary" : "Create product",
+        "summary" : "Create Product",
         "description" : "This API adds a product to your helpdesk.",
         "operationId" : "createProduct",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -159,7 +245,7 @@
     "/api/v1/products/moveToTrash" : {
       "post" : {
         "tags" : [ "Product" ],
-        "summary" : "Move Products to trash",
+        "summary" : "Delete Products",
         "description" : "This API moves products to the Recycle Bin of your help desk portal.",
         "operationId" : "deleteProduct",
         "parameters" : [ {
@@ -185,11 +271,22 @@
     "/api/v1/products/{productId}/associateAccounts" : {
       "post" : {
         "tags" : [ "Product" ],
-        "summary" : "Associate accounts with a product",
+        "summary" : "Associate Accounts with Product",
         "description" : "This API associates accounts with a product. Only a maximum of 10 accounts can be associated with a product through a single API request.",
         "operationId" : "associateAccountsWithProduct",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/productId"
+          "name" : "productId",
+          "in" : "path",
+          "description" : "Unique ID of the product",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -213,11 +310,22 @@
     "/api/v1/products/{productId}/associateContacts" : {
       "post" : {
         "tags" : [ "Product" ],
-        "summary" : "Associate contacts with a product",
+        "summary" : "Associate Contacts with Product",
         "description" : "This API associates contacts with a product. Only a maximum of 10 contacts can be associated with a product through a single API request.",
         "operationId" : "associateContactsWithProduct",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/productId"
+          "name" : "productId",
+          "in" : "path",
+          "description" : "Unique ID of the product",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -241,15 +349,47 @@
     "/api/v1/products/searchDuplicates" : {
       "get" : {
         "tags" : [ "Product" ],
-        "summary" : "Search for duplicate records",
+        "summary" : "Search Duplicate Products",
         "description" : "This API searches for duplicate records of a product.",
         "operationId" : "searchProductDuplicates",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/limit"
+          "name" : "limit",
+          "in" : "query",
+          "description" : "No. of products to fetch",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 100,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/from"
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number, starting from which the products must be fetched. The index is zero-based (the first product is at index 0).",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/productName"
+          "name" : "productName",
+          "in" : "query",
+          "description" : "Name of the product, used as the keyword for the search",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "maxLength" : 200
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -276,12 +416,45 @@
         "summary" : "List products by account",
         "description" : "This API lists products associated for a specific account.",
         "operationId" : "getProductsUnderAccount",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/departmentId"
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "ID of the department from which the products count must be computed. If you want to count of the products configured in all accessible departments, pass the value 0.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/limit"
+          "name" : "limit",
+          "in" : "query",
+          "description" : "No. of products to fetch",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 100,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/from"
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number, starting from which the products must be fetched. The index is zero-based (the first product is at index 0).",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "name" : "accountId",
           "in" : "path",
@@ -289,9 +462,9 @@
           "style" : "simple",
           "explode" : false,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
-            "description" : "ID of the account associated with the product !@exact match@!",
+            "description" : "ID of the account associated with the product (exact match)",
             "pattern" : "([0-9]+)"
           }
         }, {
@@ -317,12 +490,45 @@
         "summary" : "List products by contact",
         "description" : "This API lists products associated for a specific contact.",
         "operationId" : "getProductsUnderContact",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/departmentId"
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "ID of the department from which the products count must be computed. If you want to count of the products configured in all accessible departments, pass the value 0.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/limit"
+          "name" : "limit",
+          "in" : "query",
+          "description" : "No. of products to fetch",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 100,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/from"
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number, starting from which the products must be fetched. The index is zero-based (the first product is at index 0).",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "name" : "contactId",
           "in" : "path",
@@ -330,9 +536,9 @@
           "style" : "simple",
           "explode" : false,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
-            "description" : "ID of the contact associated with the product !@exact match@! ",
+            "description" : "ID of the contact associated with the product (exact match)",
             "pattern" : "([0-9]+)"
           }
         }, {
@@ -356,57 +562,127 @@
   "components" : {
     "schemas" : {
       "commonJson" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "unitPrice" : {
-            "type" : [ "string", "null" ],
+            "description" : "Price of the product",
             "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "([0-9]{1,13}(\\.[0-9]*)?)"
+            "type" : [ "number", "string" ],
+            "format" : "double"
           },
           "productCode" : {
+            "description" : "Reference code of the product",
             "type" : [ "string", "null" ],
             "maxLength" : 200,
-            "minLength" : 0
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
           },
           "productName" : {
+            "description" : "Name of the product",
             "type" : [ "string", "null" ],
-            "maxLength" : 200,
-            "minLength" : 0
+            "maxLength" : 200
           }
-        },
-        "required" : [ "productCode", "productName", "unitPrice" ]
+        }
       },
       "curdCommonJson" : {
         "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Product.json#/components/schemas/commonJson"
+          "$ref" : "#/components/schemas/commonJson"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "departmentIds" : {
-              "type" : [ "null", "array" ],
+              "description" : "ID(s) of the department(s) associated with the product",
+              "type" : [ "array", "null" ],
               "items" : {
-                "type" : [ "string", "null", "integer" ],
+                "type" : [ "string", "integer", "null" ],
                 "format" : "int64",
                 "pattern" : "([0-9]+)"
               },
               "uniqueItems" : true
             }
           },
-          "required" : [ "departmentIds" ]
+          "required" : [ "departmentIds" ],
+          "additionalProperties" : false
         } ]
+      },
+      "updateCommonJson" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "unitPrice" : {
+            "description" : "Price of the product",
+            "maxLength" : 100,
+            "type" : [ "number", "string", "null" ],
+            "format" : "double"
+          },
+          "productCode" : {
+            "description" : "Reference code of the product",
+            "type" : [ "string", "null" ],
+            "maxLength" : 200,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+          },
+          "productName" : {
+            "description" : "Name of the product",
+            "type" : [ "string" ],
+            "maxLength" : 200
+          },
+          "departmentIds" : {
+            "description" : "ID(s) of the department(s) to associate with the product",
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string", "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "uniqueItems" : true
+          }
+        }
+      },
+      "createProductCommonJson" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "unitPrice" : {
+            "description" : "Price of the product",
+            "maxLength" : 100,
+            "type" : [ "number", "string" ],
+            "format" : "double"
+          },
+          "productCode" : {
+            "description" : "Reference code of the product",
+            "type" : [ "string" ],
+            "maxLength" : 200,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+          },
+          "productName" : {
+            "description" : "Name of the product",
+            "type" : [ "string" ],
+            "maxLength" : 200
+          },
+          "departmentIds" : {
+            "description" : "ID(s) of the department(s) to associate with the product",
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string", "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "uniqueItems" : true
+          }
+        },
+        "required" : [ "departmentIds" ]
       },
       "productjson" : {
         "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Product.json#/components/schemas/curdCommonJson"
+          "$ref" : "#/components/schemas/curdCommonJson"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "cf" : {
-              "type" : [ "null", "object" ],
+              "description" : "User-defined fields related to the product",
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "patternProperties" : {
                 "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
@@ -418,7 +694,8 @@
               }
             },
             "customFields" : {
-              "type" : [ "null", "object" ],
+              "description" : "User-defined fields related to the product. Note: This attribute is deprecated.",
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "patternProperties" : {
                 "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
@@ -430,114 +707,66 @@
               }
             },
             "description" : {
+              "description" : "Description of the product",
               "type" : [ "string", "null" ],
               "maxLength" : 65535,
               "minLength" : 0,
               "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
             },
             "ownerId" : {
-              "type" : [ "string", "null", "integer" ],
+              "description" : "ID of the user to whom the product is assigned",
+              "type" : [ "string", "integer", "null" ],
               "format" : "int64",
               "pattern" : "([0-9]+)"
             },
             "productCategory" : {
+              "description" : "Category to which the product belongs",
               "type" : [ "string", "null" ],
               "x-dynamic-enum" : true
             },
             "manufacturer" : {
+              "description" : "Organization that manufactures the product",
               "type" : [ "string", "null" ],
               "x-dynamic-enum" : true
             }
           },
-          "required" : [ "cf", "customFields", "description", "manufacturer", "ownerId", "productCategory" ]
+          "required" : [ "cf", "customFields", "description", "manufacturer", "ownerId", "productCategory" ],
+          "additionalProperties" : false
         } ]
       },
       "productCommonKeysWithIdJson" : {
         "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Product.json#/components/schemas/commonJson"
+          "$ref" : "#/components/schemas/commonJson"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "id" : {
-              "type" : [ "string", "null", "integer" ],
+              "description" : "Unique ID of the product",
+              "type" : [ "string", "integer", "null" ],
               "format" : "int64",
               "pattern" : "([0-9]+)"
             }
           },
-          "required" : [ "id" ]
+          "required" : [ "id" ],
+          "additionalProperties" : false
+        }, {
+          "type" : [ "object" ],
+          "required" : [ "productCode", "productName", "unitPrice" ]
         } ]
       },
       "productWithOutDeptArray" : {
-        "type" : [ "null", "array" ],
+        "description" : "List of product entries",
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./Product.json#/components/schemas/productCommonKeysWithIdJson"
+          "$ref" : "#/components/schemas/productCommonKeysWithIdJson"
         }
-      },
-      "searchProducts" : {
-        "additionalProperties" : false,
-        "allOf" : [ {
-          "$ref" : "./Product.json#/components/schemas/productjson"
-        }, {
-          "type" : [ "null", "object" ],
-          "properties" : {
-            "modifiedTime" : {
-              "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0,
-              "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
-            },
-            "createdBy" : {
-              "type" : [ "string", "null", "integer" ],
-              "format" : "int64",
-              "pattern" : "([0-9]+)"
-            },
-            "createdTime" : {
-              "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0,
-              "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
-            },
-            "modifiedBy" : {
-              "type" : [ "string", "null", "integer" ],
-              "format" : "int64",
-              "pattern" : "([0-9]+)"
-            },
-            "id" : {
-              "type" : [ "string", "null", "integer" ],
-              "format" : "int64",
-              "pattern" : "([0-9]+)"
-            }
-          },
-          "required" : [ "createdBy", "createdTime", "id", "modifiedBy", "modifiedTime" ]
-        } ]
-      },
-      "searchData" : {
-        "type" : [ "null", "array" ],
-        "items" : {
-          "$ref" : "./Product.json#/components/schemas/searchProducts"
-        }
-      },
-      "productListViewJson" : {
-        "additionalProperties" : false,
-        "allOf" : [ {
-          "$ref" : "./Product.json#/components/schemas/commonJson"
-        }, {
-          "type" : [ "null", "object" ],
-          "properties" : {
-            "id" : {
-              "type" : [ "string", "null", "integer" ],
-              "format" : "int64",
-              "pattern" : "([0-9]+)"
-            }
-          },
-          "required" : [ "id" ]
-        } ]
       },
       "data" : {
-        "type" : [ "null", "array" ],
+        "description" : "List of product entries",
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./Product.json#/components/schemas/productListViewJson"
+          "$ref" : "#/components/schemas/productCommonKeysWithIdJson"
         }
       }
     },
@@ -549,57 +778,67 @@
             "schema" : {
               "additionalProperties" : false,
               "allOf" : [ {
-                "$ref" : "./Product.json#/components/schemas/productjson"
+                "$ref" : "#/components/schemas/productjson"
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "properties" : {
                   "modifiedTime" : {
                     "type" : [ "string", "null" ],
                     "maxLength" : 100,
                     "minLength" : 0,
-                    "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+                    "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+                    "description" : "Time when the product details were last modified"
                   },
                   "isDeleted" : {
+                    "description" : "Indicates whether the product is in the Recycle Bin (true = in the Recycle Bin, false = not in the Recycle Bin)",
                     "type" : [ "boolean", "null" ]
                   },
                   "createdBy" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
-                    "pattern" : "([0-9]+)"
+                    "pattern" : "([0-9]+)",
+                    "description" : "ID of the user who added the product to the help desk portal"
                   },
                   "createdTime" : {
                     "type" : [ "string", "null" ],
                     "maxLength" : 100,
                     "minLength" : 0,
-                    "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+                    "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+                    "description" : "Time when the product was added to the help desk portal"
                   },
                   "modifiedBy" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
-                    "pattern" : "([0-9]+)"
+                    "pattern" : "([0-9]+)",
+                    "description" : "ID of the user who last modified the product details"
                   },
                   "id" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
-                    "pattern" : "([0-9]+)"
+                    "pattern" : "([0-9]+)",
+                    "description" : "Unique ID of the product"
                   },
                   "layoutId" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
-                    "pattern" : "([0-9]+)"
+                    "pattern" : "([0-9]+)",
+                    "description" : "Unique ID of the product layout"
                   },
                   "layoutDetails" : {
-                    "type" : [ "null", "object" ],
+                    "description" : "Details of the layout associated with the product",
+                    "type" : [ "object", "null" ],
                     "additionalProperties" : false,
                     "maxProperties" : 2,
                     "minProperties" : 2,
                     "properties" : {
                       "id" : {
-                        "type" : [ "string", "null", "integer" ],
+                        "description" : "Unique ID of the product layout",
+                        "type" : [ "string", "integer", "null" ],
                         "format" : "int64",
                         "pattern" : "([0-9]+)"
                       },
                       "layoutName" : {
+                        "description" : "Name of the product layout",
                         "type" : [ "string", "null" ],
                         "maxLength" : 120,
                         "minLength" : 0,
@@ -609,7 +848,8 @@
                     "required" : [ "id", "layoutName" ]
                   }
                 },
-                "required" : [ "createdBy", "createdTime", "id", "isDeleted", "layoutDetails", "layoutId", "modifiedBy", "modifiedTime" ]
+                "required" : [ "createdBy", "createdTime", "id", "isDeleted", "layoutDetails", "layoutId", "modifiedBy", "modifiedTime" ],
+                "additionalProperties" : false
               } ]
             },
             "examples" : {
@@ -641,11 +881,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./Product.json#/components/schemas/productWithOutDeptArray"
+                  "$ref" : "#/components/schemas/productWithOutDeptArray"
                 }
               },
               "required" : [ "data" ]
@@ -665,107 +905,73 @@
           }
         }
       },
-      "searchProductListViewArray" : {
-        "description" : "searchProductListViewArray template definitions",
-        "content" : {
-          "application/json" : {
-            "schema" : {
-              "type" : [ "null", "object" ],
-              "additionalProperties" : false,
-              "properties" : {
-                "data" : {
-                  "$ref" : "./Product.json#/components/schemas/searchData"
-                },
-                "count" : {
-                  "type" : [ "string", "null", "integer" ],
-                  "format" : "int64",
-                  "pattern" : "([0-9]+)"
-                }
-              },
-              "required" : [ "count", "data" ]
-            },
-            "examples" : {
-              "Valid responses Definitions" : {
-                "value" : {
-                  "data" : [ {
-                    "modifiedTime" : 1509618695000,
-                    "productCode" : "Search2",
-                    "cf" : {
-                      "cf_productTagName" : null
-                    },
-                    "createdBy" : "5000000009116",
-                    "description" : null,
-                    "createdTime" : 1509618695000,
-                    "modifiedBy" : "5000000009116",
-                    "departmentIds" : [ "5000000007235" ],
-                    "id" : "5000000009882",
-                    "productName" : "Search2"
-                  } ],
-                  "count" : 1
-                }
-              }
-            }
-          }
-        }
-      },
       "productListViewArray" : {
         "description" : "productListViewArray template definitions",
         "content" : {
           "application/json" : {
             "schema" : {
               "allOf" : [ {
-                "type" : "object",
+                "type" : [ "object" ],
                 "properties" : {
                   "data" : {
-                    "type" : "array",
+                    "description" : "List of product entries",
+                    "type" : [ "array" ],
                     "items" : {
-                      "type" : "object",
+                      "type" : [ "object" ],
                       "properties" : {
                         "owner" : {
-                          "type" : [ "null", "object" ],
+                          "description" : "Details of the user assigned to the product",
+                          "type" : [ "object", "null" ],
                           "additionalProperties" : false,
                           "maxProperties" : 5,
                           "minProperties" : 5,
                           "properties" : {
                             "firstName" : {
+                              "description" : "First name of the owner",
                               "type" : [ "string", "null" ],
                               "maxLength" : 50,
                               "minLength" : 0
                             },
                             "photoURL" : {
+                              "description" : "URL of the owner's profile photo",
                               "type" : [ "string", "null" ],
                               "maxLength" : 200,
                               "minLength" : 0,
                               "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
                             },
                             "lastName" : {
+                              "description" : "Last name of the owner",
                               "type" : [ "string", "null" ],
                               "maxLength" : 50,
                               "minLength" : 0
                             },
                             "name" : {
+                              "description" : "Full name of the owner",
                               "type" : [ "string", "null" ],
                               "maxLength" : 100,
                               "minLength" : 0
                             },
                             "id" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "description" : "Unique ID of the owner",
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
                               "pattern" : "([0-9]+)"
                             }
                           },
                           "required" : [ "firstName", "id", "lastName", "name", "photoURL" ]
                         }
-                      }
+                      },
+                      "additionalProperties" : false
                     }
                   }
-                }
+                },
+                "additionalProperties" : false
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "data" : {
-                    "$ref" : "./Product.json#/components/schemas/data"
+                    "$ref" : "#/components/schemas/data"
                   }
                 },
                 "required" : [ "data" ]
@@ -800,134 +1006,6 @@
         }
       }
     },
-    "parameters" : {
-      "accountId" : {
-        "name" : "accountId",
-        "in" : "query",
-        "description" : "ID of the account associated with the product !@exact match@!",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "description" : "ID of the account associated with the product !@exact match@!",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "viewId" : {
-        "name" : "viewId",
-        "in" : "query",
-        "description" : "Custom view Id",
-        "required" : true,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "description" : "Custom view Id",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "productId" : {
-        "name" : "productId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "contactId" : {
-        "name" : "contactId",
-        "in" : "query",
-        "description" : "ID of the contact associated with the product !@exact match@! ",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "description" : "ID of the contact associated with the product !@exact match@! ",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "departmentId" : {
-        "name" : "departmentId",
-        "in" : "query",
-        "description" : "ID of the department from which the products count must be computed. If you want to count of the products configured in all accessible departments, pass the value 0.",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "description" : "ID of the department from which the products count must be computed. If you want to count of the products configured in all accessible departments, pass the value 0.",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "limit" : {
-        "name" : "limit",
-        "in" : "query",
-        "description" : "No. of products to fetch",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int32",
-          "description" : "No. of products to fetch",
-          "maximum" : 100,
-          "minimum" : 1,
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "from" : {
-        "name" : "from",
-        "in" : "query",
-        "description" : "Index number, starting from which the products must be fetched",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int32",
-          "description" : "Index number, starting from which the products must be fetched",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "ownerId" : {
-        "name" : "ownerId",
-        "in" : "query",
-        "description" : "Displays the number of products of only a particular owner",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "description" : "Displays the number of products of only a particular owner",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "productName" : {
-        "name" : "productName",
-        "in" : "query",
-        "description" : "Name of the product, used as the keyword for the search",
-        "required" : true,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null" ],
-          "description" : "Name of the product, used as the keyword for the search",
-          "maxLength" : 200,
-          "minLength" : 0
-        }
-      }
-    },
     "requestBodies" : {
       "productjson" : {
         "content" : {
@@ -935,16 +1013,17 @@
             "schema" : {
               "additionalProperties" : false,
               "allOf" : [ {
-                "$ref" : "./Product.json#/components/schemas/curdCommonJson"
+                "$ref" : "#/components/schemas/updateCommonJson"
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object" ],
                 "properties" : {
                   "cf" : {
-                    "type" : [ "null", "object" ],
+                    "description" : "User-defined fields related to the product",
+                    "type" : [ "object" ],
                     "additionalProperties" : false,
                     "patternProperties" : {
                       "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
-                        "type" : [ "string", "null" ],
+                        "type" : [ "string" ],
                         "maxLength" : 100,
                         "minLength" : 0,
                         "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
@@ -952,11 +1031,12 @@
                     }
                   },
                   "customFields" : {
-                    "type" : [ "null", "object" ],
+                    "description" : "User-defined fields related to the product. Note: This attribute is deprecated.",
+                    "type" : [ "object" ],
                     "additionalProperties" : false,
                     "patternProperties" : {
                       "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
-                        "type" : [ "string", "null" ],
+                        "type" : [ "string" ],
                         "maxLength" : 100,
                         "minLength" : 0,
                         "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
@@ -964,27 +1044,40 @@
                     }
                   },
                   "description" : {
-                    "type" : [ "string", "null" ],
+                    "description" : "Description of the product",
+                    "type" : [ "string" ],
                     "maxLength" : 65535,
                     "minLength" : 0,
                     "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                   },
                   "ownerId" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "ID of the user to whom the product must be assigned",
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
                   "productCategory" : {
-                    "type" : [ "string", "null" ],
+                    "description" : "Category to which the product belongs",
+                    "type" : [ "string" ],
                     "x-dynamic-enum" : true
                   },
                   "manufacturer" : {
-                    "type" : [ "string", "null" ],
+                    "description" : "Organization that manufactures the product",
+                    "type" : [ "string" ],
                     "x-dynamic-enum" : true
                   }
-                }
+                },
+                "additionalProperties" : false
               }, {
-                "type" : "object"
+                "type" : [ "object" ],
+                "properties" : {
+                  "layoutId" : {
+                    "description" : "Unique ID of the product layout",
+                    "type" : [ "string", "integer" ],
+                    "format" : "int64",
+                    "pattern" : "([0-9]+)"
+                  }
+                }
               } ]
             },
             "examples" : {
@@ -1001,16 +1094,17 @@
             "schema" : {
               "additionalProperties" : false,
               "allOf" : [ {
-                "$ref" : "./Product.json#/components/schemas/curdCommonJson"
+                "$ref" : "#/components/schemas/createProductCommonJson"
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object" ],
                 "properties" : {
                   "cf" : {
-                    "type" : [ "null", "object" ],
+                    "description" : "User-defined fields related to the product",
+                    "type" : [ "object" ],
                     "additionalProperties" : false,
                     "patternProperties" : {
                       "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
-                        "type" : [ "string", "null" ],
+                        "type" : [ "string" ],
                         "maxLength" : 100,
                         "minLength" : 0,
                         "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
@@ -1018,11 +1112,12 @@
                     }
                   },
                   "customFields" : {
-                    "type" : [ "null", "object" ],
+                    "description" : "User-defined fields related to the product. Note: This attribute is deprecated.",
+                    "type" : [ "object" ],
                     "additionalProperties" : false,
                     "patternProperties" : {
                       "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
-                        "type" : [ "string", "null" ],
+                        "type" : [ "string" ],
                         "maxLength" : 100,
                         "minLength" : 0,
                         "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
@@ -1030,28 +1125,40 @@
                     }
                   },
                   "description" : {
-                    "type" : [ "string", "null" ],
-                    "maxLength" : 65535,
-                    "minLength" : 0,
-                    "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                    "description" : "Description of the product",
+                    "type" : [ "string" ],
+                    "maxLength" : 65535
                   },
                   "ownerId" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "ID of the user to whom the product must be assigned",
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
                   "productCategory" : {
-                    "type" : [ "string", "null" ],
-                    "x-dynamic-enum" : true
+                    "description" : "Category to which the product belongs",
+                    "type" : [ "string" ],
+                    "x-dynamic-enum" : true,
+                    "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
                   },
                   "manufacturer" : {
-                    "type" : [ "string", "null" ],
-                    "x-dynamic-enum" : true
+                    "description" : "Organization that manufactures the product",
+                    "type" : [ "string" ],
+                    "x-dynamic-enum" : true,
+                    "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
+                  }
+                },
+                "additionalProperties" : false
+              }, {
+                "type" : [ "object" ],
+                "properties" : {
+                  "layoutId" : {
+                    "description" : "Unique ID of the product layout",
+                    "type" : [ "string", "integer" ],
+                    "format" : "int64",
+                    "pattern" : "([0-9]+)"
                   }
                 }
-              }, {
-                "type" : "object",
-                "required" : [ "departmentIds", "productName" ]
               } ]
             },
             "examples" : {
@@ -1071,20 +1178,22 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "productIds" : {
-                  "type" : [ "null", "array" ],
+                  "description" : "ID(s) of the product(s) to move to the Recycle Bin (maximum of 50 IDs allowed)",
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
                   "uniqueItems" : false
                 },
                 "departmentId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "ID of the department containing the products",
+                  "type" : [ "string", "integer" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 }
@@ -1106,20 +1215,22 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "ids" : {
-                  "type" : [ "null", "array" ],
+                  "description" : "ID(s) of the account(s) to associate or dissociate (maximum of 10 IDs allowed)",
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
                   "uniqueItems" : true
                 },
                 "associate" : {
-                  "type" : [ "boolean", "null" ]
+                  "description" : "Marks or unmarks the association between the account(s) and the product (true = associate, false = dissociate)",
+                  "type" : [ "boolean" ]
                 }
               },
               "required" : [ "associate", "ids" ]
@@ -1139,20 +1250,22 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "ids" : {
-                  "type" : [ "null", "array" ],
+                  "description" : "ID(s) of the contact(s) to associate or dissociate (maximum of 10 IDs allowed)",
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
                   "uniqueItems" : true
                 },
                 "associate" : {
-                  "type" : [ "boolean", "null" ]
+                  "description" : "Marks or unmarks the association between the contact(s) and the product (true = associate, false = dissociate)",
+                  "type" : [ "boolean" ]
                 }
               },
               "required" : [ "associate", "ids" ]
@@ -1170,6 +1283,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

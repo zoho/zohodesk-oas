@@ -11,6 +11,7 @@
         "summary" : "List email delivery failure alerts",
         "description" : "This API lists the email delivery failure alerts configured in a particular department.",
         "operationId" : "getEmailFailureAlerts",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "limit",
           "in" : "query",
@@ -19,10 +20,10 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : "integer",
             "format" : "int32",
-            "description" : "Number of alerts to list",
-            "pattern" : "([0-9]+)"
+            "minimum" : 1,
+            "maximum" : 50
           }
         }, {
           "name" : "from",
@@ -32,13 +33,21 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : "integer",
             "format" : "int32",
-            "description" : "Index number, starting from which the alerts must be listed",
-            "pattern" : "([0-9]+)"
+            "default" : 0
           }
         }, {
-          "$ref" : "#/components/parameters/department"
+          "name" : "department",
+          "in" : "query",
+          "description" : "ID of the department from which the email delivery failure alerts must be fetched. You can pass a specific department ID or @allDepartment@ in the API request.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "allDepartment|[0-9]+"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -61,7 +70,16 @@
         "description" : "This API deletes all email delivery failure alerts configured in a particular department.",
         "operationId" : "clearEmailFailureAlerts",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/department"
+          "name" : "department",
+          "in" : "query",
+          "description" : "ID of the department from which the email delivery failure alerts must be fetched. You can pass a specific department ID or @allDepartment@ in the API request.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "allDepartment|[0-9]+"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -83,63 +101,69 @@
   "components" : {
     "schemas" : {
       "commonKeys" : {
-        "type" : [ "null", "object" ],
+        "type" : "object",
         "additionalProperties" : false,
         "properties" : {
           "departmentName" : {
-            "type" : [ "string", "null" ],
+            "description" : "Name of the department",
+            "type" : "string",
             "maxLength" : 150,
             "minLength" : 0
           },
           "threadId" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
+            "description" : "Unique ID of the email thread",
+            "type" : "string",
             "pattern" : "([0-9]+)"
           },
           "ticketNumber" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int32",
+            "description" : "Ticket number identifier",
+            "type" : "string",
             "pattern" : "([0-9]+)"
           },
           "reason" : {
-            "type" : [ "string", "null" ],
+            "description" : "Reason for the email delivery failure",
+            "type" : "string",
             "maxLength" : 300,
             "minLength" : 0
           },
           "subject" : {
-            "type" : [ "string", "null" ],
+            "description" : "Ticket subject",
+            "type" : "string",
             "maxLength" : 255,
             "minLength" : 0
           },
           "departmentId" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
+            "description" : "Unique ID of the department",
+            "type" : "string",
             "pattern" : "([0-9]+)"
           },
           "channel" : {
-            "type" : [ "string", "null" ],
+            "description" : "Communication channel type of the ticket (e.g., EMAIL, TWITTER)",
+            "type" : "string",
             "x-dynamic-enum" : true
           },
           "errorMessage" : {
-            "type" : [ "string", "null" ],
+            "description" : "Error message describing the email delivery failure",
+            "type" : "string",
             "maxLength" : 100,
             "minLength" : 0
           },
           "assignee" : {
+            "description" : "Agent assigned to the ticket",
             "$ref" : "./Ticket.json#/components/schemas/assignee"
           },
           "ticketId" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
+            "description" : "Unique ID of the ticket",
+            "type" : "string",
             "pattern" : "([0-9]+)"
           }
         },
         "required" : [ "assignee", "channel", "departmentId", "departmentName", "errorMessage", "reason", "subject", "threadId", "ticketId", "ticketNumber" ]
       },
       "emailFailureAlertsArray" : {
-        "type" : [ "null", "array" ],
+        "type" : "array",
         "items" : {
-          "$ref" : "./EmailFailureAlert.json#/components/schemas/commonKeys"
+          "$ref" : "#/components/schemas/commonKeys"
         }
       }
     },
@@ -149,11 +173,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : "object",
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./EmailFailureAlert.json#/components/schemas/emailFailureAlertsArray"
+                  "$ref" : "#/components/schemas/emailFailureAlertsArray"
                 }
               },
               "required" : [ "data" ]
@@ -173,7 +197,7 @@
                     "assignee" : {
                       "firstName" : "John",
                       "lastName" : "Carol",
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/1892000000056007/photo",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/1892000000056007/photo",
                       "id" : "1892000000056007",
                       "email" : "carol@zylker.com"
                     },
@@ -190,7 +214,7 @@
                     "assignee" : {
                       "firstName" : "John",
                       "lastName" : "Carol",
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/1892000000056007/photo",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/1892000000056007/photo",
                       "id" : "1892000000056007",
                       "email" : "carol@zylker.com"
                     },
@@ -203,23 +227,13 @@
         }
       }
     },
-    "parameters" : {
-      "department" : {
-        "name" : "department",
-        "in" : "query",
-        "description" : "ID of the department from which the email delivery failure alerts must be fetched. You can pass a specific department ID or @allDepartment@ in the API request.",
-        "required" : true,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "description" : "ID of the department from which the email delivery failure alerts must be fetched. You can pass a specific department ID or @allDepartment@ in the API request.",
-          "pattern" : "([0-9]+)"
-        }
-      }
-    },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

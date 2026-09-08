@@ -9,44 +9,42 @@
       "get" : {
         "tags" : [ "AutomationFeatureCount" ],
         "summary" : "Get Automation Feature Count",
-        "description" : "This API is used to Get Automation Feature Limits, For BusinessHours and HoldiayList, There are no mandatory params, For Workflows valid and mandatory params are @module@ and @departmentId@, Valid module param values for Workflows are @tickets@,@contacts@,@contracts@,@accounts@,@tasks@,@products@,@timeEntry@. For Skills and SkillTye @departmentId@ is mandatory param",
+        "description" : "Retrieves automation feature limits for the specified feature. For businesshours and holidaylist, no additional parameters are mandatory. For workflows, both module and departmentId are mandatory. Valid module values for workflows are tickets, contacts, contracts, accounts, tasks, products, and timeEntry. For Skills and SkillType, departmentId is mandatory.",
         "operationId" : "getUsedCountForAutomationFeature",
         "parameters" : [ {
           "name" : "feature",
           "in" : "query",
-          "description" : "Feature, allowed values @businesshours@,@holidaylist@,@Skills@,@SkillType@,@workflows@,@blueprints@,@automationAlerts@,@fieldUpdates@,@automationTasks@,@customFunctions@",
+          "description" : "Automation feature for which the count must be retrieved. Possible values: businesshours, holidaylist, Skills, SkillType, workflows, blueprints, automationAlerts, fieldUpdates, automationTasks, customFunctions",
           "required" : true,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : "string",
-            "description" : "Feature, allowed values @businesshours@,@holidaylist@,@Skills@,@SkillType@,@workflows@,@blueprints@,@automationAlerts@,@fieldUpdates@,@automationTasks@,@customFunctions@",
-            "enum" : [ "workflows", "businesshours", "holidaylist", "blueprints", "Skills", "SkillType", "SupportPlans", "automationAlerts", "fieldUpdates", "automationTasks", "customFunctions" ]
+            "type" : [ "string" ],
+            "enum" : [ "businesshours", "holidaylist", "Skills", "SkillType", "workflows", "blueprints", "SupportPlans", "automationAlerts", "fieldUpdates", "automationTasks", "customFunctions" ]
           }
         }, {
           "name" : "departmentId",
           "in" : "query",
-          "description" : "Department Id",
-          "required" : true,
+          "description" : "Unique ID of the department for which the feature count must be retrieved. Required for all features except businesshours and holidaylist.",
+          "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string" ],
             "format" : "int64",
-            "description" : "Department Id",
             "pattern" : "([0-9]+)"
           }
         }, {
           "name" : "module",
           "in" : "query",
-          "description" : "Module, allowed values @tickets@,@contacts@,@contracts@,@accounts@,@tasks@,@products@,@timeEntry@,@events@,@calls@,@customModule@",
-          "required" : true,
+          "description" : "Module for which the feature count must be retrieved. Required for workflows, blueprints (must be tickets), automationAlerts, and customFunctions. Ignored for Skills, SkillType, SupportPlans, automationTasks, fieldUpdates, businesshours, and holidaylist. Possible values: tickets, contacts, contracts, accounts, tasks, products, timeEntry, events, calls, customModule",
+          "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : "string",
-            "description" : "Module, allowed values @tickets@,@contacts@,@contracts@,@accounts@,@tasks@,@products@,@timeEntry@,@events@,@calls@,@customModule@",
-            "enum" : [ "tickets", "contacts", "contracts", "accounts", "tasks", "products", "timeEntry", "events", "calls", "customModule" ]
+            "type" : [ "string" ],
+            "enum" : [ "tickets", "contacts", "contracts", "accounts", "tasks", "products", "timeEntry", "events", "calls", "customModule" ],
+            "pattern" : "tickets|contacts|contracts|accounts|tasks|products|timeEntry|events|calls|(cm_[a-zA-Z0-9\\_]+)"
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -63,59 +61,66 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.automations.READ", "Desk.basic.READ", "Desk.settings.READ" ]
         } ],
-        "x-audience" : [ "external-public" ]
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
       }
     }
   },
   "components" : {
+    "schemas" : {
+      "usedCountInfoResponse" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "maxProperties" : 2,
+        "minProperties" : 2,
+        "properties" : {
+          "usedTotalCount" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "usedActiveCount" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          }
+        },
+        "required" : [ "usedActiveCount", "usedTotalCount" ]
+      },
+      "automationFeatureCountResponse" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "featureName" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "workflows", "businesshours", "holidaylist", "blueprints", "Skills", "SkillType", "SupportPlans", "automationAlerts", "fieldUpdates", "automationTasks", "customFunctions" ]
+          },
+          "maxTotalCount" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "maxActiveCount" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "usedCountInfo" : {
+            "$ref" : "#/components/schemas/usedCountInfoResponse"
+          }
+        },
+        "required" : [ "featureName", "maxActiveCount", "maxTotalCount", "usedCountInfo" ]
+      }
+    },
     "responses" : {
       "automationFeatureCountJSONResponse" : {
         "description" : "automationFeatureCountJSONResponse template definitions",
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
-              "additionalProperties" : false,
-              "properties" : {
-                "featureName" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "workflows", "businesshours", "holidaylist", "blueprints", "Skills", "SkillType", "SupportPlans", "automationAlerts", "fieldUpdates", "automationTasks", "customFunctions" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                },
-                "maxTotalCount" : {
-                  "type" : [ "string", "null", "integer" ],
-                  "format" : "int32",
-                  "pattern" : "([0-9]+)"
-                },
-                "maxActiveCount" : {
-                  "type" : [ "string", "null", "integer" ],
-                  "format" : "int32",
-                  "pattern" : "([0-9]+)"
-                },
-                "usedCountInfo" : {
-                  "type" : [ "null", "object" ],
-                  "additionalProperties" : false,
-                  "maxProperties" : 2,
-                  "minProperties" : 2,
-                  "properties" : {
-                    "usedTotalCount" : {
-                      "type" : [ "string", "null", "integer" ],
-                      "format" : "int32",
-                      "pattern" : "([0-9]+)"
-                    },
-                    "usedActiveCount" : {
-                      "type" : [ "string", "null", "integer" ],
-                      "format" : "int32",
-                      "pattern" : "([0-9]+)"
-                    }
-                  },
-                  "required" : [ "usedActiveCount", "usedTotalCount" ]
-                }
-              },
-              "required" : [ "featureName", "maxActiveCount", "maxTotalCount", "usedCountInfo" ]
+              "$ref" : "#/components/schemas/automationFeatureCountResponse"
             },
             "examples" : {
               "Valid responses Definitions" : {
@@ -135,6 +140,15 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "jwt-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/jwt-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

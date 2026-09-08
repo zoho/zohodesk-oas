@@ -5,23 +5,215 @@
     "version" : "1.0.0"
   },
   "paths" : {
+    "/api/v1/dependencyMappingsCount" : {
+      "get" : {
+        "tags" : [ "DependencyMappings" ],
+        "summary" : "Get Dependency Mappings Count For Layout",
+        "description" : "This API gets dependency mapping count details for a layout.",
+        "operationId" : "getDependencyMappingsCount",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "layoutId",
+          "in" : "query",
+          "description" : "ID of the layout in which the dependency is mapped",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "./Layout.json#/components/responses/layoutCountDetails"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/licenseErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.basic.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
     "/api/v1/availableDependencyMappings" : {
       "get" : {
         "tags" : [ "DependencyMappings" ],
         "summary" : "Get possible dependency mappings in a layout",
         "description" : "This API fetches the parent and child fields using which you can configure dependency mappings in a layout.",
         "operationId" : "getAvailableDepMappings",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/layoutId"
+          "name" : "layoutId",
+          "in" : "query",
+          "description" : "ID of the layout in which the dependency is mapped",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/getAvailableDepMappings"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/licenseErrorResponse"
+          },
           "422" : {
             "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
           },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.fields.READ", "Desk.settings.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/layouts/{layoutId}/fields/{fieldId}/dependentValues" : {
+      "get" : {
+        "tags" : [ "DependencyMappings" ],
+        "summary" : "Get dependent child field values",
+        "description" : "This API fetches the dependent child field values for a given parent field value in a layout.",
+        "operationId" : "getDependentChildValues",
+        "parameters" : [ {
+          "name" : "searchString",
+          "in" : "query",
+          "description" : "Search keyword related to the tag",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "no of values to be fetched",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 99,
+            "default" : 50
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "from index",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "minimum" : 0,
+            "default" : 0
+          }
+        }, {
+          "name" : "parentValue",
+          "in" : "query",
+          "description" : "PickList Value.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
+          }
+        }, {
+          "name" : "parentFieldId",
+          "in" : "query",
+          "description" : "Parent field ID",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "layoutId",
+          "in" : "path",
+          "description" : "ID of the layout in which the dependency is mapped",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "fieldId",
+          "in" : "path",
+          "description" : "ID of the field for which dependent values must be fetched",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
           "200" : {
-            "$ref" : "#/components/responses/getAvailableDepMappings"
+            "$ref" : "#/components/responses/dependentChildValues"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/licenseErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
           }
         },
         "security" : [ {
@@ -34,26 +226,234 @@
       "get" : {
         "tags" : [ "DependencyMappings" ],
         "summary" : "List dependency mappings in a layout",
-        "description" : "This API lists the dependency mappings configured in a layout. ",
+        "description" : "This API lists the dependency mappings configured in a layout.",
         "operationId" : "getDependencyMappingsByLayoutId",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/layoutId"
+          "name" : "layoutId",
+          "in" : "query",
+          "description" : "ID of the layout in which the dependency is mapped",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
-          "422" : {
-            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
-          },
           "200" : {
             "$ref" : "#/components/responses/getDependencyMappingsByLayoutIdResponse"
           },
           "204" : {
             "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/licenseErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.fields.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      },
+      "post" : {
+        "tags" : [ "DependencyMappings" ],
+        "summary" : "Create dependency mapping",
+        "description" : "This API creates a dependency mapping between two fields.",
+        "operationId" : "createDependencyMapping",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/createDependencyMappingjson"
+        },
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/licenseErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/dependencyMappingResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.CREATE", "Desk.fields.CREATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/dependencyMappings/{dependencyMappingId}" : {
+      "get" : {
+        "tags" : [ "DependencyMappings" ],
+        "summary" : "Get dependency mapping",
+        "description" : "This API fetches details of an existing dependency mapping.",
+        "operationId" : "getDependencyMapping",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "dependencyMappingId",
+          "in" : "path",
+          "description" : "ID of the dependency mapping",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/licenseErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/dependencyMappingResponse"
           }
         },
         "security" : [ {
           "iam-oauth2-schema" : [ "Desk.basic.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      },
+      "patch" : {
+        "tags" : [ "DependencyMappings" ],
+        "summary" : "Update dependency mapping",
+        "description" : "This API updates details of an existing dependency mapping.",
+        "operationId" : "editDependencyMapping",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "dependencyMappingId",
+          "in" : "path",
+          "description" : "ID of the dependency mapping",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/editDependencyMappingjson"
+        },
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/licenseErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/dependencyMappingResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.UPDATE", "Desk.fields.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      },
+      "delete" : {
+        "tags" : [ "DependencyMappings" ],
+        "summary" : "Delete dependency mapping",
+        "description" : "This API deletes a dependency mapping from a layout.",
+        "operationId" : "deleteDependencyMapping",
+        "parameters" : [ {
+          "name" : "dependencyMappingId",
+          "in" : "path",
+          "description" : "ID of the dependency mapping",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/licenseErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "200" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.DELETE", "Desk.fields.DELETE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -62,17 +462,19 @@
   "components" : {
     "schemas" : {
       "picklistJSON" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "displayLabel" : {
+            "description" : "Display label of the picklist field",
             "type" : [ "string", "null" ],
             "maxLength" : 200,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "allowedValues" : {
-            "type" : [ "null", "array" ],
+            "description" : "List of allowed values for the picklist field",
+            "type" : [ "array", "null" ],
             "items" : {
               "type" : [ "string", "null" ],
               "maxLength" : 120,
@@ -82,7 +484,8 @@
             "uniqueItems" : false
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
@@ -90,24 +493,46 @@
         "required" : [ "allowedValues", "displayLabel", "id" ]
       },
       "picklistJSONArr" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./DependencyMappings.json#/components/schemas/picklistJSON"
+          "$ref" : "#/components/schemas/picklistJSON"
+        }
+      },
+      "dependentChildValuesJSON" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "actualValue" : {
+            "description" : "Actual value of the dependent child field",
+            "type" : [ "string", "null" ],
+            "maxLength" : 120,
+            "minLength" : 0,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
+          }
+        },
+        "required" : [ "actualValue" ]
+      },
+      "dependentChildValuesJSONArr" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/dependentChildValuesJSON"
         }
       },
       "dependencyJSON" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "parent" : {
-            "$ref" : "./DependencyMappings.json#/components/schemas/picklistJSON"
+            "description" : "Parent field configuration including its display label, allowed values, and ID",
+            "$ref" : "#/components/schemas/picklistJSON"
           },
           "mappings" : {
-            "type" : [ "null", "object" ],
+            "description" : "Dependency mappings between parent field values and their corresponding child field values",
+            "type" : [ "object", "null" ],
             "additionalProperties" : false,
             "patternProperties" : {
               "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+" : {
-                "type" : [ "null", "array" ],
+                "type" : [ "array", "null" ],
                 "items" : {
                   "type" : [ "string", "null" ],
                   "maxLength" : 120,
@@ -119,35 +544,40 @@
             }
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "childId" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "ID of the child field",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "layoutId" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "ID of the layout in which the dependency is mapped",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "parentId" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "ID of the parent field",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "child" : {
-            "$ref" : "./DependencyMappings.json#/components/schemas/picklistJSON"
+            "description" : "Child field configuration including its display label, allowed values, and ID",
+            "$ref" : "#/components/schemas/picklistJSON"
           }
         },
         "required" : [ "child", "childId", "id", "layoutId", "mappings", "parent", "parentId" ]
       },
       "dependencyJSONArr" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./DependencyMappings.json#/components/schemas/dependencyJSON"
+          "$ref" : "#/components/schemas/dependencyJSON"
         }
       }
     },
@@ -157,14 +587,14 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "children" : {
-                  "$ref" : "./DependencyMappings.json#/components/schemas/picklistJSONArr"
+                  "$ref" : "#/components/schemas/picklistJSONArr"
                 },
                 "parents" : {
-                  "$ref" : "./DependencyMappings.json#/components/schemas/picklistJSONArr"
+                  "$ref" : "#/components/schemas/picklistJSONArr"
                 }
               },
               "required" : [ "children", "parents" ]
@@ -204,30 +634,41 @@
           }
         }
       },
+      "dependentChildValues" : {
+        "description" : "dependentChildValues template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "allowedValues" : {
+                  "$ref" : "#/components/schemas/dependentChildValuesJSONArr"
+                }
+              },
+              "required" : [ "allowedValues" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : null
+              }
+            }
+          }
+        }
+      },
       "getDependencyMappingsByLayoutIdResponse" : {
         "description" : "getDependencyMappingsByLayoutIdResponse template definitions",
         "content" : {
           "application/json" : {
             "schema" : {
-              "oneOf" : [ {
-                "type" : [ "null", "object" ],
-                "additionalProperties" : false,
-                "properties" : {
-                  "data" : {
-                    "$ref" : "./DependencyMappings.json#/components/schemas/dependencyJSONArr"
-                  }
-                },
-                "required" : [ "data" ]
-              }, {
-                "type" : [ "null", "object" ],
-                "additionalProperties" : false,
-                "properties" : {
-                  "data" : {
-                    "$ref" : "./DependencyMappings.json#/components/schemas/dependencyJSONArr"
-                  }
-                },
-                "required" : [ "data" ]
-              } ]
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "#/components/schemas/dependencyJSONArr"
+                }
+              },
+              "required" : [ "data" ]
             },
             "examples" : {
               "Valid responses Definitions" : {
@@ -302,25 +743,125 @@
             }
           }
         }
+      },
+      "dependencyMappingResponse" : {
+        "description" : "dependencyMappingResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/dependencyJSON"
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "mappings" : {
+                    "General" : [ "High", "Medium" ],
+                    "Defects" : [ "Low" ]
+                  },
+                  "id" : "4000000047001",
+                  "parentId" : "4000000000421",
+                  "childId" : "4000000000407",
+                  "layoutId" : "4000000007177"
+                }
+              }
+            }
+          }
+        }
       }
     },
-    "parameters" : {
-      "layoutId" : {
-        "name" : "layoutId",
-        "in" : "query",
-        "description" : "ID of the layout in which the dependency is mapped",
+    "requestBodies" : {
+      "createDependencyMappingjson" : {
         "required" : true,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "description" : "ID of the layout in which the dependency is mapped",
-          "pattern" : "([0-9]+)"
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : "object",
+              "properties" : {
+                "parentId" : {
+                  "description" : "ID of the parent picklist field",
+                  "type" : [ "string", "integer" ],
+                  "format" : "int64"
+                },
+                "childId" : {
+                  "description" : "ID of the child picklist field",
+                  "type" : [ "string", "integer" ],
+                  "format" : "int64"
+                },
+                "layoutId" : {
+                  "description" : "ID of the layout in which the dependency mapping is created",
+                  "type" : [ "string", "integer" ],
+                  "format" : "int64"
+                },
+                "mappings" : {
+                  "description" : "Dependency mappings between parent field values and their corresponding allowed child field values",
+                  "type" : "object",
+                  "additionalProperties" : {
+                    "type" : "array",
+                    "items" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              },
+              "required" : [ "parentId", "childId", "layoutId", "mappings" ]
+            },
+            "examples" : {
+              "Create dependency mapping" : {
+                "value" : {
+                  "parentId" : "4000000000421",
+                  "childId" : "4000000000423",
+                  "layoutId" : "4000000007177",
+                  "mappings" : {
+                    "General" : [ "Sub General" ],
+                    "Defects" : [ "Sub Defects" ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "editDependencyMappingjson" : {
+        "required" : true,
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : "object",
+              "properties" : {
+                "mappings" : {
+                  "description" : "Updated dependency mappings between parent field values and their corresponding allowed child field values",
+                  "type" : "object",
+                  "additionalProperties" : {
+                    "type" : "array",
+                    "items" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              },
+              "required" : [ "mappings" ]
+            },
+            "examples" : {
+              "Update dependency mapping" : {
+                "value" : {
+                  "mappings" : {
+                    "General" : [ "Sub General", "Sub General 2" ],
+                    "Defects" : [ "Sub Defects" ]
+                  }
+                }
+              }
+            }
+          }
         }
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

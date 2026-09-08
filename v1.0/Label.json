@@ -11,12 +11,48 @@
         "summary" : "List users under a label",
         "description" : "This API lists a particular number of users under a label, based on the limit defined.",
         "operationId" : "getUsersByLabel",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/limit"
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of users to list. The default value is 50 and the maximum value allowed is 100",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 50,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)",
+            "default" : 50
+          }
         }, {
-          "$ref" : "#/components/parameters/searchBy"
+          "name" : "searchBy",
+          "in" : "query",
+          "description" : "Search keyword to use for finding a particular user. The keyword must contain at least two characters.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+"
+          }
         }, {
-          "$ref" : "#/components/parameters/from"
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number, starting from which the users must be fetched. The default value is 1. ",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "minimum" : 1,
+            "pattern" : "([0-9]+)",
+            "default" : 1
+          }
         }, {
           "name" : "sortBy",
           "in" : "query",
@@ -25,14 +61,21 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Key that sorts the list of users by a specific attribute: -(@assignedTime@)",
+            "type" : [ "string" ],
             "maxLength" : 100,
-            "minLength" : 0,
             "pattern" : "-?(assignedTime)"
           }
         }, {
-          "$ref" : "#/components/parameters/labelId"
+          "name" : "labelId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -62,12 +105,48 @@
         "summary" : "List labels",
         "description" : "This API lists a particular number of labels, based on the limit defined. ",
         "operationId" : "getLabels",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/limit"
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of users to list. The default value is 50 and the maximum value allowed is 100",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 50,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)",
+            "default" : 50
+          }
         }, {
-          "$ref" : "#/components/parameters/searchBy"
+          "name" : "searchBy",
+          "in" : "query",
+          "description" : "Search keyword to use for finding a particular user. The keyword must contain at least two characters.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+"
+          }
         }, {
-          "$ref" : "#/components/parameters/from"
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number, starting from which the users must be fetched. The default value is 1. ",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "minimum" : 1,
+            "pattern" : "([0-9]+)",
+            "default" : 1
+          }
         }, {
           "name" : "sortBy",
           "in" : "query",
@@ -76,10 +155,8 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Key that sorts the list of labels by a particular attribute: -(@createdTime@ or @modifiedTime@, or @name@)",
+            "type" : [ "string" ],
             "maxLength" : 100,
-            "minLength" : 0,
             "pattern" : "-?(createdTime|modifiedTime|name)"
           }
         }, {
@@ -90,9 +167,8 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
-            "description" : "ID of the help center from which the labels must be fetched",
             "pattern" : "([0-9]+)"
           }
         }, {
@@ -119,6 +195,7 @@
         "summary" : "Create label",
         "description" : "This API creates a label in your help center.",
         "operationId" : "createLabel",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -148,8 +225,18 @@
         "summary" : "Get details of label",
         "description" : "This API fetches the details of a particular label.",
         "operationId" : "getLabel",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/labelId"
+          "name" : "labelId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -177,8 +264,18 @@
         "summary" : "Delete label",
         "description" : "This API deletes a label from your help center.",
         "operationId" : "deleteLabel",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/labelId"
+          "name" : "labelId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -206,8 +303,18 @@
         "summary" : "Update label",
         "description" : "This API helps update the details of a label.",
         "operationId" : "updateLabel",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/labelId"
+          "name" : "labelId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -240,8 +347,18 @@
         "summary" : "Assign label to users",
         "description" : "This API assigns a particular label to multiple users.",
         "operationId" : "assignLabelToUsers",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/labelId"
+          "name" : "labelId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -274,8 +391,18 @@
         "summary" : "Remove users under a label",
         "description" : "This API removes all users under a particular label. ",
         "operationId" : "removeLabelsFromUsers",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/labelId"
+          "name" : "labelId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -306,26 +433,24 @@
   "components" : {
     "schemas" : {
       "labelPreferenceResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "bgColor" : {
             "type" : [ "string", "null" ],
-            "description" : "background color of the label",
+            "description" : "Background color of the badge.",
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "^#?(([a-fA-F0-9]){3}){1,2}$"
           },
           "shape" : {
             "type" : [ "string", "null" ],
-            "description" : "shape of the label",
-            "enum" : [ "ROUNDED", "RECTANGLE" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "description" : "Shape of the badge.",
+            "enum" : [ "ROUNDED", "RECTANGLE" ]
           },
           "textColor" : {
             "type" : [ "string", "null" ],
-            "description" : "text color of the label",
+            "description" : "Text color of the badge.",
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "^#?(([a-fA-F0-9]){3}){1,2}$"
@@ -334,24 +459,29 @@
         "required" : [ "bgColor", "shape", "textColor" ]
       },
       "labelMetaResponse" : {
-        "type" : [ "null", "object" ],
+        "description" : "Label details assigned to the mentioned user",
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "preferences" : {
-            "$ref" : "./Label.json#/components/schemas/labelPreferenceResponse"
+            "description" : "Display preferences for the badge.",
+            "$ref" : "#/components/schemas/labelPreferenceResponse"
           },
           "name" : {
+            "description" : "Name of the badge label.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the badge label.",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "logoUrl" : {
+            "description" : "URL of the badge logo image.",
             "type" : [ "string", "null" ],
             "maxLength" : 200,
             "minLength" : 0,
@@ -361,7 +491,7 @@
         "required" : [ "id", "logoUrl", "name", "preferences" ]
       },
       "creatorResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "photoUrl" : {
@@ -376,7 +506,7 @@
             "minLength" : 0
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
@@ -388,10 +518,10 @@
         "allOf" : [ {
           "$ref" : "./User.json#/components/schemas/userMetaJson"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "assignee" : {
-              "$ref" : "./Label.json#/components/schemas/creatorResponse"
+              "$ref" : "#/components/schemas/creatorResponse"
             },
             "assignedTime" : {
               "type" : [ "string", "null" ],
@@ -400,44 +530,44 @@
               "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
             }
           },
-          "required" : [ "assignedTime", "assignee" ]
+          "required" : [ "assignedTime", "assignee" ],
+          "additionalProperties" : false
         } ]
       },
       "userLabelData" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./Label.json#/components/schemas/userLabelResponse"
+          "$ref" : "#/components/schemas/userLabelResponse"
         }
       },
       "updateLabelPayloadJSON" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "preferences" : {
-            "$ref" : "./Label.json#/components/schemas/labelPreferenceResponse"
+            "$ref" : "#/components/schemas/labelPreferenceResponse"
           },
           "name" : {
             "type" : [ "string", "null" ],
             "description" : "Name of the label",
             "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+            "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+",
+            "x-unique" : true
           },
           "logoId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "description" : "ID of the logo set for the label",
             "pattern" : "([0-9]+)"
           }
-        },
-        "required" : [ "logoId", "name", "preferences" ]
+        }
       },
       "labelDetailViewResponse" : {
         "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Label.json#/components/schemas/labelMetaResponse"
+          "$ref" : "#/components/schemas/labelMetaResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "modifiedTime" : {
               "type" : [ "string", "null" ],
@@ -446,13 +576,13 @@
               "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
             },
             "creator" : {
-              "$ref" : "./Label.json#/components/schemas/creatorResponse"
+              "$ref" : "#/components/schemas/creatorResponse"
             },
             "modifier" : {
-              "$ref" : "./Label.json#/components/schemas/creatorResponse"
+              "$ref" : "#/components/schemas/creatorResponse"
             },
             "count" : {
-              "type" : [ "string", "null", "integer" ],
+              "type" : [ "string", "integer", "null" ],
               "format" : "int32",
               "pattern" : "([0-9]+)"
             },
@@ -463,32 +593,33 @@
               "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
             },
             "helpCenterId" : {
-              "type" : [ "string", "null", "integer" ],
+              "type" : [ "string", "integer", "null" ],
               "format" : "int64",
               "pattern" : "([0-9]+)"
             }
           },
-          "required" : [ "count", "createdTime", "creator", "helpCenterId", "modifiedTime", "modifier" ]
+          "required" : [ "count", "createdTime", "creator", "helpCenterId", "modifiedTime", "modifier" ],
+          "additionalProperties" : false
         } ]
       },
       "labelData" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./Label.json#/components/schemas/labelDetailViewResponse"
+          "$ref" : "#/components/schemas/labelDetailViewResponse"
         }
       },
       "userLabelMetaResponse" : {
         "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./Label.json#/components/schemas/labelMetaResponse"
+          "$ref" : "#/components/schemas/labelMetaResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "isPrimary" : {
               "type" : [ "boolean", "null" ]
             },
             "helpCenterId" : {
-              "type" : [ "string", "null", "integer" ],
+              "type" : [ "string", "integer", "null" ],
               "format" : "int64",
               "pattern" : "([0-9]+)"
             },
@@ -499,13 +630,14 @@
               "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
             }
           },
-          "required" : [ "assignedTime", "helpCenterId", "isPrimary" ]
+          "required" : [ "assignedTime", "helpCenterId", "isPrimary" ],
+          "additionalProperties" : false
         } ]
       },
       "labelIdsArr" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "type" : [ "string", "null", "integer" ],
+          "type" : [ "string", "integer", "null" ],
           "format" : "int64",
           "pattern" : "([0-9]+)"
         }
@@ -517,11 +649,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./Label.json#/components/schemas/userLabelData"
+                  "$ref" : "#/components/schemas/userLabelData"
                 }
               },
               "required" : [ "data" ]
@@ -535,7 +667,7 @@
                     "name" : "svega RM",
                     "userType" : "ENDUSER",
                     "assignee" : {
-                      "photoUrl" : "https://desk.zoho.com/portal/api/user/6000000015895/photo?orgId=143315",
+                      "photoUrl" : "https://desk.example.com/portal/api/user/6000000015895/photo?orgId=1234567890",
                       "name" : "Chris",
                       "id" : "6000000015895"
                     },
@@ -556,9 +688,9 @@
             "schema" : {
               "additionalProperties" : false,
               "allOf" : [ {
-                "$ref" : "./Label.json#/components/schemas/labelMetaResponse"
+                "$ref" : "#/components/schemas/labelMetaResponse"
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "properties" : {
                   "modifiedTime" : {
                     "type" : [ "string", "null" ],
@@ -567,13 +699,13 @@
                     "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
                   },
                   "creator" : {
-                    "$ref" : "./Label.json#/components/schemas/creatorResponse"
+                    "$ref" : "#/components/schemas/creatorResponse"
                   },
                   "modifier" : {
-                    "$ref" : "./Label.json#/components/schemas/creatorResponse"
+                    "$ref" : "#/components/schemas/creatorResponse"
                   },
                   "count" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int32",
                     "pattern" : "([0-9]+)"
                   },
@@ -584,12 +716,13 @@
                     "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
                   },
                   "helpCenterId" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   }
                 },
-                "required" : [ "count", "createdTime", "creator", "helpCenterId", "modifiedTime", "modifier" ]
+                "required" : [ "count", "createdTime", "creator", "helpCenterId", "modifiedTime", "modifier" ],
+                "additionalProperties" : false
               } ]
             },
             "examples" : {
@@ -602,12 +735,12 @@
                     "textColor" : "#FFEE"
                   },
                   "creator" : {
-                    "photoURL" : "https://desk.zoho.com/portal/api/user/6000000015895/photo?orgId=143315",
+                    "photoURL" : "https://desk.example.com/portal/api/user/6000000015895/photo?orgId=1234567890",
                     "name" : "SupportAdmin",
                     "id" : "310975130121"
                   },
                   "modifier" : {
-                    "photoURL" : "https://desk.zoho.com/portal/api/user/6000000015895/photo?orgId=143315",
+                    "photoURL" : "https://desk.example.com/portal/api/user/6000000015895/photo?orgId=1234567890",
                     "name" : "SupportAdmin",
                     "id" : "310975130121"
                   },
@@ -616,7 +749,7 @@
                   "createdTime" : 1505797130000,
                   "id" : "310975130110",
                   "helpCenterId" : "310975130119",
-                  "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/310975130121?portalId=5c9470fcc808cc98932703e28221d6c302e105dc4da8b23fafb6719abeecaa48"
+                  "logoUrl" : "https://desk.example.com/portal/api/publicImages/310975130121?portalId=5c9470fcc808cc98932703e28221d6c302e105dc4da8b23fafb6719abeecaa48"
                 }
               }
             }
@@ -628,11 +761,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./Label.json#/components/schemas/labelData"
+                  "$ref" : "#/components/schemas/labelData"
                 }
               },
               "required" : [ "data" ]
@@ -648,12 +781,12 @@
                       "textColor" : "#FFEE"
                     },
                     "creator" : {
-                      "photoURL" : "https://desk.zoho.com/portal/api/user/6000000015895/photo?orgId=143315",
+                      "photoURL" : "https://desk.example.com/portal/api/user/6000000015895/photo?orgId=1234567890",
                       "name" : "SupportAdmin",
                       "id" : "310975130121"
                     },
                     "modifier" : {
-                      "photoURL" : "https://desk.zoho.com/portal/api/user/6000000015895/photo?orgId=143315",
+                      "photoURL" : "https://desk.example.com/portal/api/user/6000000015895/photo?orgId=1234567890",
                       "name" : "SupportAdmin",
                       "id" : "310975130121"
                     },
@@ -662,71 +795,12 @@
                     "createdTime" : 1505797130000,
                     "id" : "310975130110",
                     "helpCenterId" : "310975130119",
-                    "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/310975130121?portalId=5c9470fcc808cc98932703e28221d6c302e105dc4da8b23fafb6719abeecaa48"
+                    "logoUrl" : "https://desk.example.com/portal/api/publicImages/310975130121?portalId=5c9470fcc808cc98932703e28221d6c302e105dc4da8b23fafb6719abeecaa48"
                   } ]
                 }
               }
             }
           }
-        }
-      }
-    },
-    "parameters" : {
-      "labelId" : {
-        "name" : "labelId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "limit" : {
-        "name" : "limit",
-        "in" : "query",
-        "description" : "Number of users to list. The default value is 50 and the maximum value allowed is 100",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int32",
-          "description" : "Number of users to list. The default value is 50 and the maximum value allowed is 100",
-          "maximum" : 50,
-          "minimum" : 1,
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "searchBy" : {
-        "name" : "searchBy",
-        "in" : "query",
-        "description" : "Search keyword to use for finding a particular user. The keyword must contain at least two characters.",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null" ],
-          "description" : "Search keyword to use for finding a particular user. The keyword must contain at least two characters.",
-          "maxLength" : 100,
-          "minLength" : 0
-        }
-      },
-      "from" : {
-        "name" : "from",
-        "in" : "query",
-        "description" : "Index number, starting from which the users must be fetched. The default value is 1. ",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int32",
-          "description" : "Index number, starting from which the users must be fetched. The default value is 1. ",
-          "minimum" : 1,
-          "pattern" : "([0-9]+)"
         }
       }
     },
@@ -737,20 +811,18 @@
             "schema" : {
               "additionalProperties" : false,
               "allOf" : [ {
-                "$ref" : "./Label.json#/components/schemas/updateLabelPayloadJSON"
+                "$ref" : "#/components/schemas/updateLabelPayloadJSON"
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object" ],
                 "properties" : {
                   "helpCenterId" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "description" : "ID of the help center in which the label must be created",
                     "pattern" : "([0-9]+)"
                   }
-                }
-              }, {
-                "type" : "object",
-                "required" : [ "helpCenterId", "name" ]
+                },
+                "additionalProperties" : false
               } ]
             },
             "examples" : {
@@ -774,13 +846,13 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "userIds" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
@@ -803,21 +875,20 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "preferences" : {
-                  "$ref" : "./Label.json#/components/schemas/labelPreferenceResponse"
+                  "$ref" : "#/components/schemas/labelPreferenceResponse"
                 },
                 "name" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "description" : "Name of the label",
                   "maxLength" : 100,
-                  "minLength" : 0,
-                  "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+                  "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+"
                 },
                 "logoId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer" ],
                   "format" : "int64",
                   "description" : "ID of the logo set for the label",
                   "pattern" : "([0-9]+)"
@@ -844,13 +915,13 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "userIds" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
@@ -873,11 +944,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "labelIds" : {
-                  "$ref" : "./Label.json#/components/schemas/labelIdsArr"
+                  "$ref" : "#/components/schemas/labelIdsArr"
                 }
               },
               "required" : [ "labelIds" ]
@@ -894,6 +965,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

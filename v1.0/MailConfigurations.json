@@ -1,0 +1,234 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "MailConfigurations",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/departments/{departmentId}/mailConfigurations" : {
+      "get" : {
+        "tags" : [ "MailConfigurations" ],
+        "summary" : "List department mail configurations",
+        "description" : "This API lists the Mail configurations set for a specific department.",
+        "operationId" : "getMailConfigurations",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "departmentId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/mailConfigurationsResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.basic.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      },
+      "put" : {
+        "tags" : [ "MailConfigurations" ],
+        "summary" : "Update department mail configurations",
+        "description" : "This API updates the Mail configurations set for a specific department.",
+        "operationId" : "updateMailConfigurationsPut",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "departmentId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/mailConfig"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/mailConfigurationsResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      },
+      "patch" : {
+        "tags" : [ "MailConfigurations" ],
+        "summary" : "Update department mail configurations",
+        "description" : "This API updates the Mail configurations set for a specific department.",
+        "operationId" : "updateMailConfigurations",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "departmentId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/mailConfig"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/mailConfigurationsResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/mailConfigurations" : {
+      "get" : {
+        "tags" : [ "MailConfigurations" ],
+        "summary" : "List organization mail configurations",
+        "description" : "This API lists the Mail configurations set for the entire help desk portal.",
+        "operationId" : "getMailConfigurationsForOrg",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/mailConfigurationsResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.basic.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      },
+      "put" : {
+        "tags" : [ "MailConfigurations" ],
+        "summary" : "Update organization mail configurations",
+        "description" : "This API updates the Mail configurations set for the entire help desk portal.",
+        "operationId" : "updateMailConfigurationsForOrgPut",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/mailConfig"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/mailConfigurationsResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      },
+      "patch" : {
+        "tags" : [ "MailConfigurations" ],
+        "summary" : "Update organization mail configurations",
+        "description" : "This API updates the Mail configurations set for the entire help desk portal.",
+        "operationId" : "updateMailConfigurationsForOrg",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/mailConfig"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/mailConfigurationsResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "mailConfigurations" : {
+        "type" : "object",
+        "properties" : {
+          "createContactWithReplyTo" : {
+            "description" : "Whether to create contacts using the Reply-To email address from incoming emails",
+            "type" : "boolean"
+          },
+          "autoCCToMailbox" : {
+            "description" : "Whether to automatically CC the support mailbox on outgoing ticket replies",
+            "type" : "boolean"
+          },
+          "agentNameInTicketReply" : {
+            "description" : "Whether to include the agent's name as display name in ticket reply from address",
+            "type" : "boolean"
+          },
+          "createTicketForOriginalSender" : {
+            "description" : "Whether to create a ticket for the original sender when an email is forwarded",
+            "type" : "boolean"
+          },
+          "privateThreadConfig" : {
+            "description" : "Whether private thread configuration is enabled for email communications",
+            "type" : "boolean"
+          }
+        }
+      }
+    },
+    "responses" : {
+      "mailConfigurationsResponse" : {
+        "description" : "Success",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/mailConfigurations"
+            }
+          }
+        }
+      }
+    },
+    "requestBodies" : {
+      "mailConfig" : {
+        "required" : true,
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/mailConfigurations"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "MailConfigurations"
+}

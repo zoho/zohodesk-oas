@@ -18,7 +18,7 @@
           "style" : "simple",
           "explode" : false,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
@@ -50,11 +50,8 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : " Action of the timer.Supported actions are  @START@, @STOP@, @PAUSE@ and @RESUME@",
-            "enum" : [ "START" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "type" : [ "string" ],
+            "enum" : [ "START", "STOP", "PAUSE", "RESUME" ]
           }
         }, {
           "name" : "taskId",
@@ -63,7 +60,7 @@
           "style" : "simple",
           "explode" : false,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
@@ -98,11 +95,9 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Secondary information related to the timers. Value supported is @owner@.",
+            "type" : [ "string" ],
             "enum" : [ "owner" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "pattern" : "(owner)"
           }
         }, {
           "name" : "limit",
@@ -112,10 +107,11 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "integer" ],
             "format" : "int32",
-            "description" : "Number of timers to fetch",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "maximum" : 100
           }
         }, {
           "name" : "from",
@@ -125,10 +121,10 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "integer" ],
             "format" : "int32",
-            "description" : "Index number, starting from which the timers must be fetched",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "default" : 0
           }
         }, {
           "name" : "entityId",
@@ -137,7 +133,7 @@
           "style" : "simple",
           "explode" : false,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
@@ -162,42 +158,40 @@
   "components" : {
     "schemas" : {
       "taskTimerJson" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "hours" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           },
           "seconds" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           },
           "minutes" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           },
           "state" : {
             "type" : [ "string", "null" ],
-            "enum" : [ "RUNNING", "PAUSED", "INIT" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "RUNNING", "PAUSED", "INIT" ]
           }
         },
         "required" : [ "hours", "minutes", "seconds", "state" ]
       },
       "activeTimerJson" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "timer" : {
-            "$ref" : "./TaskTimer.json#/components/schemas/taskTimerJson"
+            "$ref" : "#/components/schemas/taskTimerJson"
           },
           "userId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
@@ -205,9 +199,9 @@
         "required" : [ "timer", "userId" ]
       },
       "data" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./TaskTimer.json#/components/schemas/activeTimerJson"
+          "$ref" : "#/components/schemas/activeTimerJson"
         }
       }
     },
@@ -217,29 +211,27 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "hours" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int32",
                   "pattern" : "([0-9]+)"
                 },
                 "seconds" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int32",
                   "pattern" : "([0-9]+)"
                 },
                 "minutes" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int32",
                   "pattern" : "([0-9]+)"
                 },
                 "state" : {
                   "type" : [ "string", "null" ],
-                  "enum" : [ "RUNNING", "PAUSED", "INIT" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "enum" : [ "RUNNING", "PAUSED", "INIT" ]
                 }
               },
               "required" : [ "hours", "minutes", "seconds", "state" ]
@@ -263,10 +255,10 @@
           "application/json" : {
             "schema" : {
               "allOf" : [ {
-                "type" : "object",
+                "type" : [ "object" ],
                 "properties" : {
                   "owner" : {
-                    "type" : [ "null", "object" ],
+                    "type" : [ "object", "null" ],
                     "additionalProperties" : false,
                     "maxProperties" : 5,
                     "minProperties" : 5,
@@ -293,20 +285,21 @@
                         "minLength" : 0
                       },
                       "id" : {
-                        "type" : [ "string", "null", "integer" ],
+                        "type" : [ "string", "integer", "null" ],
                         "format" : "int64",
                         "pattern" : "([0-9]+)"
                       }
                     },
                     "required" : [ "firstName", "id", "lastName", "name", "photoURL" ]
                   }
-                }
+                },
+                "additionalProperties" : false
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "data" : {
-                    "$ref" : "./TaskTimer.json#/components/schemas/data"
+                    "$ref" : "#/components/schemas/data"
                   }
                 },
                 "required" : [ "data" ]
@@ -319,7 +312,7 @@
                     "owner" : {
                       "firstName" : "Sam",
                       "lastName" : "Jones",
-                      "photoURL" : "https://contacts.zoho.com/file?t=user&fs=thumb&ID=56934690&nps=404&exp=20",
+                      "photoURL" : "https://contacts.example.com/file?t=user&fs=thumb&ID=1234567890&nps=404&exp=20",
                       "name" : "Sam Jones",
                       "id" : "7000000020001"
                     },
@@ -334,7 +327,7 @@
                     "owner" : {
                       "firstName" : "Robert",
                       "lastName" : "Downey",
-                      "photoURL" : "https://contacts.zoho.com/file?t=user&fs=thumb&ID=56934690&nps=404&exp=20",
+                      "photoURL" : "https://contacts.example.com/file?t=user&fs=thumb&ID=1234567890&nps=404&exp=20",
                       "name" : "Robert Downey",
                       "id" : "7000000030001"
                     },
@@ -354,6 +347,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

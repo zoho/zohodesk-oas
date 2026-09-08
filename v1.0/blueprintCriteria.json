@@ -8,16 +8,18 @@
   "components" : {
     "schemas" : {
       "criteriaValuesObject" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "displayValue" : {
+            "description" : "Display value shown for the criteria value",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 1,
             "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
           },
           "value" : {
+            "description" : "Actual value of the criteria value",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 1,
@@ -27,86 +29,77 @@
         "required" : [ "displayValue", "value" ]
       },
       "criteriaValuesArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./blueprintCriteria.json#/components/schemas/criteriaValuesObject"
+          "$ref" : "#/components/schemas/criteriaValuesObject"
         }
       },
       "valueArray" : {
-        "type" : [ "null", "array" ],
-        "items" : {
-          "oneOf" : [ {
-            "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
-          }, {
-            "type" : [ "null", "array" ],
-            "items" : {
-              "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0,
-              "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
-            },
-            "uniqueItems" : false
-          } ]
-        }
+        "type" : "array",
+        "items" : { }
       },
       "fieldConditionsObjectForTransitionResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "criteriaValues" : {
-            "$ref" : "./blueprintCriteria.json#/components/schemas/criteriaValuesArray"
+            "description" : "Criteria values configured for the field condition",
+            "$ref" : "#/components/schemas/criteriaValuesArray"
           },
           "displayValue" : {
-            "$ref" : "./blueprintCriteria.json#/components/schemas/valueArray"
+            "description" : "Display values of the field condition",
+            "$ref" : "#/components/schemas/valueArray"
           },
           "condition" : {
+            "description" : "Condition operator applied to the field in the criteria",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 1
           },
           "fieldName" : {
+            "description" : "API name of the field used in the condition",
             "type" : [ "string", "null" ],
             "maxLength" : 200,
             "minLength" : 1
           },
           "staticFieldName" : {
+            "description" : "Static API name of the field used in the condition",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "fieldModule" : {
+            "description" : "Module to which the field used in the condition belongs",
             "type" : [ "string", "null" ],
             "enum" : [ "tickets", "contacts", "accounts" ],
-            "maxLength" : 100,
-            "minLength" : 0,
             "pattern" : "tickets|contacts|accounts"
           },
           "fieldType" : {
+            "description" : "Data type of the field used in the condition",
             "type" : [ "string", "null" ],
-            "enum" : [ "Text", "URL", "Textarea", "Email", "Phone", "Multiselect", "Date", "DateTime", "Number", "Checkbox", "Percent", "Decimal", "Currency", "Picklist", "LookUp", "Lookup", "AutoNumber", "Boolean", "Fax" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "Text", "URL", "Textarea", "Email", "Phone", "Multiselect", "Date", "DateTime", "Number", "Checkbox", "Percent", "Decimal", "Currency", "Picklist", "LookUp", "AutoNumber", "Boolean", "Fax" ]
           },
           "value" : {
-            "$ref" : "./blueprintCriteria.json#/components/schemas/valueArray"
+            "description" : "Values compared against the field in the condition",
+            "$ref" : "#/components/schemas/valueArray"
           },
           "i18nLabel" : {
+            "description" : "Internationalized label of the field used in the condition",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "tableName" : {
+            "description" : "Name of the table to which the field belongs",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 1,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "columnName" : {
+            "description" : "Name of the column to which the field maps",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 1,
@@ -116,19 +109,21 @@
         "required" : [ "columnName", "condition", "criteriaValues", "displayValue", "fieldModule", "fieldName", "fieldType", "i18nLabel", "staticFieldName", "tableName", "value" ]
       },
       "fieldConditionsArrayForTransitionResponse" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./blueprintCriteria.json#/components/schemas/fieldConditionsObjectForTransitionResponse"
+          "$ref" : "#/components/schemas/fieldConditionsObjectForTransitionResponse"
         }
       },
       "criteriaObjectForTransitionResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "fieldConditions" : {
-            "$ref" : "./blueprintCriteria.json#/components/schemas/fieldConditionsArrayForTransitionResponse"
+            "description" : "Field conditions used for the blueprint criteria",
+            "$ref" : "#/components/schemas/fieldConditionsArrayForTransitionResponse"
           },
           "pattern" : {
+            "description" : "Logical pattern used in the blueprint criteria",
             "type" : [ "string", "null" ],
             "maxLength" : 200,
             "minLength" : 1,
@@ -138,49 +133,54 @@
         "required" : [ "fieldConditions", "pattern" ]
       },
       "fieldConditionsObjectForResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "displayValue" : {
-            "$ref" : "./blueprintCriteria.json#/components/schemas/valueArray"
+            "description" : "Display values of the field condition",
+            "$ref" : "#/components/schemas/valueArray"
           },
           "condition" : {
+            "description" : "Condition operator applied to the field in the criteria",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 1
           },
           "fieldName" : {
+            "description" : "API name of the field used in the condition",
             "type" : [ "string", "null" ],
             "maxLength" : 200,
             "minLength" : 1
           },
           "fieldModule" : {
+            "description" : "Module to which the field used in the condition belongs",
             "type" : [ "string", "null" ],
             "enum" : [ "tickets", "contacts", "accounts" ],
-            "maxLength" : 100,
-            "minLength" : 0,
             "pattern" : "tickets|contacts|accounts"
           },
           "value" : {
-            "$ref" : "./blueprintCriteria.json#/components/schemas/valueArray"
+            "description" : "Values compared against the field in the condition",
+            "$ref" : "#/components/schemas/valueArray"
           }
         },
         "required" : [ "condition", "displayValue", "fieldModule", "fieldName", "value" ]
       },
       "fieldConditionsArrayForResponse" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./blueprintCriteria.json#/components/schemas/fieldConditionsObjectForResponse"
+          "$ref" : "#/components/schemas/fieldConditionsObjectForResponse"
         }
       },
       "criteriaObjectForResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object" ],
         "additionalProperties" : false,
         "properties" : {
           "fieldConditions" : {
-            "$ref" : "./blueprintCriteria.json#/components/schemas/fieldConditionsArrayForResponse"
+            "description" : "Field conditions used for the blueprint criteria",
+            "$ref" : "#/components/schemas/fieldConditionsArrayForResponse"
           },
           "pattern" : {
+            "description" : "Logical pattern used in the blueprint criteria",
             "type" : [ "string", "null" ],
             "maxLength" : 200,
             "minLength" : 1,
@@ -189,47 +189,51 @@
         }
       },
       "fieldConditionsObject" : {
-        "type" : [ "null", "object" ],
+        "type" : "object",
         "additionalProperties" : false,
         "properties" : {
           "condition" : {
-            "type" : [ "string", "null" ],
+            "description" : "Condition operator applied to the field in the criteria",
+            "type" : "string",
             "maxLength" : 100,
             "minLength" : 1
           },
           "fieldName" : {
-            "type" : [ "string", "null" ],
+            "description" : "API name of the field used in the condition",
+            "type" : "string",
             "maxLength" : 200,
             "minLength" : 1
           },
           "fieldModule" : {
-            "type" : [ "string", "null" ],
+            "description" : "Module to which the field used in the condition belongs",
+            "type" : "string",
             "enum" : [ "tickets", "contacts", "accounts" ],
-            "maxLength" : 100,
-            "minLength" : 0,
             "pattern" : "tickets|contacts|accounts"
           },
           "value" : {
-            "$ref" : "./blueprintCriteria.json#/components/schemas/valueArray"
+            "description" : "Values compared against the field in the condition",
+            "$ref" : "#/components/schemas/valueArray"
           }
         },
         "required" : [ "condition", "fieldModule", "fieldName", "value" ]
       },
       "fieldConditionsArray" : {
-        "type" : [ "null", "array" ],
+        "type" : "array",
         "items" : {
-          "$ref" : "./blueprintCriteria.json#/components/schemas/fieldConditionsObject"
+          "$ref" : "#/components/schemas/fieldConditionsObject"
         }
       },
       "criteriaObject" : {
-        "type" : [ "null", "object" ],
+        "type" : "object",
         "additionalProperties" : false,
         "properties" : {
           "fieldConditions" : {
-            "$ref" : "./blueprintCriteria.json#/components/schemas/fieldConditionsArray"
+            "description" : "Field conditions used for the blueprint criteria",
+            "$ref" : "#/components/schemas/fieldConditionsArray"
           },
           "pattern" : {
-            "type" : [ "string", "null" ],
+            "description" : "Logical pattern used in the blueprint criteria",
+            "type" : "string",
             "maxLength" : 200,
             "minLength" : 1,
             "pattern" : "[andor()0-9\\s]*"
@@ -239,6 +243,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

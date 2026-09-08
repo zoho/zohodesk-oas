@@ -1,0 +1,264 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "ArticleFeedbackResolution",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/articleFeedbacks/{feedbackId}/resolution" : {
+      "post" : {
+        "tags" : [ "ArticleFeedbackResolution" ],
+        "summary" : "Add Article Feedback Resolution",
+        "description" : "Adds a resolution to a specific article feedback.",
+        "operationId" : "addArticleFeedbackResolution",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "description" : "Unique ID of the article feedback to which the resolution must be added",
+          "$ref" : "#/components/parameters/feedbackId"
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/addResolution_resolutionAddPayload"
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/resolutionResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.CREATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "modifiedBy" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "photoURL" : {
+            "description" : "URL of the user's profile photo",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "name" : {
+            "description" : "Name of the user who last modified the resolution",
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "minLength" : 0
+          },
+          "id" : {
+            "description" : "Unique ID of the user who last modified the resolution",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "status" : {
+            "description" : "Status of the user",
+            "type" : [ "string", "null" ],
+            "enum" : [ "ACTIVE", "DISABLED", "LICENSE_DOWNGRADED", "DELETED", "ANONYMIZED", "CLOSED" ]
+          },
+          "zuid" : {
+            "description" : "Zoho user ID of the user who last modified the resolution",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          }
+        },
+        "required" : [ "id", "name", "photoURL", "status", "zuid" ]
+      },
+      "createdBy" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "photoURL" : {
+            "description" : "URL of the user's profile photo",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "name" : {
+            "description" : "Name of the user who added the resolution",
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "minLength" : 0
+          },
+          "id" : {
+            "description" : "Unique ID of the user who added the resolutio",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "status" : {
+            "description" : "Status of the user",
+            "type" : [ "string", "null" ],
+            "enum" : [ "ACTIVE", "DISABLED", "LICENSE_DOWNGRADED", "DELETED", "ANONYMIZED", "CLOSED" ]
+          },
+          "zuid" : {
+            "description" : "Zoho user ID of the user who added the resolution",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          }
+        },
+        "required" : [ "id", "name", "photoURL", "status", "zuid" ]
+      }
+    },
+    "responses" : {
+      "resolutionResponse" : {
+        "description" : "resolutionResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "modifiedTime" : {
+                  "description" : "Time when the resolution was last modified",
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 100,
+                  "minLength" : 0,
+                  "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+                },
+                "createdBy" : {
+                  "description" : "Details of the user who added the resolution",
+                  "$ref" : "#/components/schemas/createdBy"
+                },
+                "feedbackId" : {
+                  "description" : "Unique ID of the feedback associated with the resolution",
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "createdTime" : {
+                  "description" : "Time when the resolution was added",
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 100,
+                  "minLength" : 0,
+                  "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+                },
+                "modifiedBy" : {
+                  "description" : "Details of the user who last modified the resolution",
+                  "$ref" : "#/components/schemas/modifiedBy"
+                },
+                "id" : {
+                  "description" : "Unique ID of the resolution",
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "resolution" : {
+                  "description" : "Text content of the resolution",
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 1000,
+                  "minLength" : 0
+                },
+                "contentType" : {
+                  "description" : "Format of the resolution content. Possible values:PLAIN_TEXT, RICH_TEXT",
+                  "type" : [ "string", "null" ],
+                  "enum" : [ "RICH_TEXT", "PLAIN_TEXT" ]
+                }
+              },
+              "required" : [ "contentType", "createdBy", "createdTime", "feedbackId", "id", "modifiedBy", "modifiedTime", "resolution" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "modifiedTime" : 1606972101000,
+                  "createdBy" : {
+                    "photoURL" : "https://desk.example.com/api/v1/agents/22372000000000063/photo?orgId=1234567890",
+                    "name" : "Charlie",
+                    "id" : "22372000000000063",
+                    "status" : "ACTIVE",
+                    "zuid" : "1234567890"
+                  },
+                  "feedbackId" : "227800000075038",
+                  "createdTime" : 1606972101000,
+                  "modifiedBy" : {
+                    "photoURL" : "https://desk.example.com/api/v1/agents/22372000000000063/photo?orgId=1234567890",
+                    "name" : "Charlie",
+                    "id" : "22372000000000063",
+                    "status" : "ACTIVE",
+                    "zuid" : "1234567890"
+                  },
+                  "id" : "22372340000106009",
+                  "resolution" : "Content has been modified in user basis",
+                  "contentType" : "PLAIN_TEXT"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "parameters" : {
+      "feedbackId" : {
+        "name" : "feedbackId",
+        "in" : "path",
+        "required" : true,
+        "style" : "simple",
+        "explode" : false,
+        "schema" : {
+          "type" : [ "string", "integer" ],
+          "format" : "int64",
+          "pattern" : "([0-9]+)"
+        }
+      }
+    },
+    "requestBodies" : {
+      "addResolution_resolutionAddPayload" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "resolution" : {
+                  "type" : [ "string" ],
+                  "description" : "Textual content of the resolution.",
+                  "maxLength" : 1000,
+                  "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+"
+                },
+                "contentType" : {
+                  "description" : "Format of the resolution text. Possible values:PLAIN_TEXT, RICH_TEXT",
+                  "type" : [ "string" ],
+                  "enum" : [ "RICH_TEXT", "PLAIN_TEXT" ]
+                }
+              },
+              "required" : [ "resolution" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "resolution" : "Content has been modified in user basis",
+                  "contentType" : "PLAIN_TEXT"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "ArticleFeedbackResolution"
+}

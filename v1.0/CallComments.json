@@ -11,7 +11,32 @@
         "summary" : "Get a call comment",
         "description" : "This API fetches a call comment from the portal.",
         "operationId" : "getCallComment",
+        "x-mcp-ready" : true,
         "parameters" : [ {
+          "name" : "callId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "commentId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        }, {
           "name" : "include",
           "in" : "query",
           "description" : "Secondary information related to the comments. Value allowed is @mentions@, which returns the details of users mentioned in the comments.",
@@ -29,12 +54,6 @@
             },
             "uniqueItems" : true
           }
-        }, {
-          "$ref" : "#/components/parameters/callId"
-        }, {
-          "$ref" : "#/components/parameters/commentId"
-        }, {
-          "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
           "200" : {
@@ -51,10 +70,29 @@
         "summary" : "Update a call comment",
         "description" : "This API updates an existing call comment.",
         "operationId" : "updateCallComment",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/callId"
+          "name" : "callId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/commentId"
+          "name" : "commentId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -73,6 +111,92 @@
           "iam-oauth2-schema" : [ "Desk.activities.calls.UPDATE", "Desk.tasks.UPDATE" ]
         } ],
         "x-audience" : [ "external-public" ]
+      },
+      "patch" : {
+        "tags" : [ "CallComments" ],
+        "summary" : "Partially update a call comment",
+        "description" : "This API partially updates an existing call comment.",
+        "operationId" : "partialUpdateCallComment",
+        "parameters" : [ {
+          "name" : "callId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "commentId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/addCallCommentRequest"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/addCallComment"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.activities.calls.UPDATE", "Desk.tasks.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      },
+      "delete" : {
+        "tags" : [ "CallComments" ],
+        "summary" : "Delete a call comment",
+        "description" : "This API deletes an existing call comment.",
+        "operationId" : "deleteCallComment",
+        "parameters" : [ {
+          "name" : "callId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "commentId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.activities.calls.UPDATE", "Desk.tasks.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
       }
     },
     "/api/v1/calls/{entityId}/comments" : {
@@ -81,7 +205,10 @@
         "summary" : "List all call comments",
         "description" : "This API lists a particular number of comments recorded on a call, based on the limit specified.",
         "operationId" : "getCallComments",
+        "x-mcp-ready" : true,
         "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        }, {
           "name" : "include",
           "in" : "query",
           "description" : "Secondary information related to the comments. Value allowed is @mentions@, which returns the details of users mentioned in the comments.",
@@ -150,8 +277,6 @@
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
-        }, {
-          "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
           "200" : {
@@ -170,8 +295,18 @@
         "summary" : "Create a call comment",
         "description" : "This API adds a comment to a call.",
         "operationId" : "createCallComment",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/callId"
+          "name" : "callId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -196,7 +331,7 @@
   "components" : {
     "schemas" : {
       "addCallComment" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "modifiedTime" : {
@@ -206,6 +341,7 @@
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "attachments" : {
+            "$ref" : "./TicketComment.json#/components/schemas/attachmentResponse",
             "type" : [ "null", "array" ],
             "items" : {
               "type" : [ "null", "object" ],
@@ -225,7 +361,7 @@
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
@@ -241,7 +377,7 @@
             "minLength" : 0
           },
           "commenterId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
@@ -255,15 +391,15 @@
         "required" : [ "attachments", "commentedTime", "commenter", "commenterId", "content", "contentType", "encodedContent", "id", "impersonatedUser", "modifiedTime" ]
       },
       "data" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./CallComments.json#/components/schemas/addCallComment"
+          "$ref" : "#/components/schemas/addCallComment"
         }
       },
       "mention" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "additionalProperties" : false,
           "properties" : {
             "firstName" : {
@@ -283,17 +419,17 @@
               "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
             },
             "offset" : {
-              "type" : [ "string", "null", "integer" ],
+              "type" : [ "string", "integer", "null" ],
               "format" : "int32",
               "pattern" : "([0-9]+)"
             },
             "length" : {
-              "type" : [ "string", "null", "integer" ],
+              "type" : [ "string", "integer", "null" ],
               "format" : "int32",
               "pattern" : "([0-9]+)"
             },
             "id" : {
-              "type" : [ "string", "null", "integer" ],
+              "type" : [ "string", "integer", "null" ],
               "format" : "int64",
               "pattern" : "([0-9]+)"
             },
@@ -310,7 +446,7 @@
               "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
             },
             "zuid" : {
-              "type" : [ "string", "null", "integer" ],
+              "type" : [ "string", "integer", "null" ],
               "format" : "int32",
               "pattern" : "([0-9]+)"
             }
@@ -327,6 +463,32 @@
           "application/json" : {
             "schema" : {
               "allOf" : [ {
+                "type" : [ "object" ],
+                "properties" : {
+                  "data" : {
+                    "type" : [ "array" ],
+                    "items" : {
+                      "type" : [ "object" ],
+                      "properties" : {
+                        "mention" : {
+                          "$ref" : "#/components/schemas/mention"
+                        }
+                      },
+                      "additionalProperties" : false
+                    }
+                  }
+                },
+                "additionalProperties" : false
+              }, {
+                "type" : [ "object", "null" ],
+                "additionalProperties" : false,
+                "properties" : {
+                  "data" : {
+                    "$ref" : "#/components/schemas/data"
+                  }
+                },
+                "required" : [ "data" ]
+              }, {
                 "type" : "object",
                 "properties" : {
                   "data" : {
@@ -366,7 +528,47 @@
                     "commenter" : {
                       "firstName" : "Jade",
                       "lastName" : "Tywin",
-                      "photoURL" : "https://desk.zoho.com/api/v1/agent/4000000008692/photo",
+                      "photoURL" : "https://desk.example.com/api/v1/agent/4000000008692/photo",
+                      "name" : "Jade Tywin",
+                      "roleName" : "LightAgent",
+                      "type" : [ "AGENT" ],
+                      "email" : "jade12tywin@zylker.com"
+                    }
+                  }, {
+                    "modifiedTime" : 1485269780000,
+                    "attachments" : [ {
+                      "size" : "12734",
+                      "name" : "Attachment_list.png",
+                      "id" : "4000000008994",
+                      "href" : "https://desk.example.com/api/v1/calls/4000000528005/comments/4000000529001/attachments/4000000008994/content"
+                    } ],
+                    "commentedTime" : 1485269673000,
+                    "id" : "4000000530003",
+                    "contentType" : "html",
+                    "commenterId" : "4000000008692",
+                    "content" : "Edit Call comment",
+                    "mention" : [ ],
+                    "commenter" : {
+                      "firstName" : "Jade",
+                      "lastName" : "Tywin",
+                      "photoURL" : "https://desk.example.com/api/v1/portalUser/4000000008692/photo",
+                      "name" : "Jade Tywin",
+                      "roleName" : "PortalUser",
+                      "type" : [ "END_USER" ],
+                      "email" : "jade12tywin@zylker.com"
+                    }
+                  }, {
+                    "modifiedTime" : null,
+                    "commentedTime" : 1485270287000,
+                    "id" : "4000000530005",
+                    "contentType" : "plainText",
+                    "commenterId" : "4000000008692",
+                    "content" : "Second Call Comment......",
+                    "mention" : [ ],
+                    "commenter" : {
+                      "firstName" : "Jade",
+                      "lastName" : "Tywin",
+                      "photoURL" : "https://desk.example.com/api/v1/agent/4000000008692/photo",
                       "name" : "Jade Tywin",
                       "roleName" : "LightAgent",
                       "type" : "AGENT",
@@ -378,7 +580,7 @@
                       "size" : "12734",
                       "name" : "Attachment_list.png",
                       "id" : "4000000008994",
-                      "href" : "https://desk.zoho.com/api/v1/calls/4000000528005/comments/4000000529001/attachments/4000000008994/content"
+                      "href" : "https://desk.example.com/api/v1/calls/4000000528005/comments/4000000529001/attachments/4000000008994/content"
                     } ],
                     "commentedTime" : 1485269673000,
                     "id" : "4000000530003",
@@ -389,7 +591,7 @@
                     "commenter" : {
                       "firstName" : "Jade",
                       "lastName" : "Tywin",
-                      "photoURL" : "https://desk.zoho.com/api/v1/portalUser/4000000008692/photo",
+                      "photoURL" : "https://desk.example.com/api/v1/portalUser/4000000008692/photo",
                       "name" : "Jade Tywin",
                       "roleName" : "PortalUser",
                       "type" : "END_USER",
@@ -417,7 +619,7 @@
                     "size" : "12734",
                     "name" : "Attachment.png",
                     "id" : "4000000008994",
-                    "href" : "https://desk.zoho.com/api/v1/calls/4000000528005/comments/4000000529001/attachments/4000000008994/content"
+                    "href" : "https://desk.example.com/api/v1/calls/4000000528005/comments/4000000529001/attachments/4000000008994/content"
                   } ],
                   "commentedTime" : 1485269673534,
                   "id" : "4000000530003",
@@ -427,10 +629,10 @@
                   "commenter" : {
                     "firstName" : "Jade",
                     "lastName" : "Tywin",
-                    "photoURL" : "https://desk.zoho.com/api/v1/agent/4000000008692/photo",
+                    "photoURL" : "https://desk.example.com/api/v1/agent/4000000008692/photo",
                     "name" : "Jade Tywin",
                     "roleName" : "LightAgent",
-                    "type" : "AGENT",
+                    "type" : [ "AGENT" ],
                     "email" : "jade12tywin@zylker.com"
                   }
                 }
@@ -445,14 +647,22 @@
           "application/json" : {
             "schema" : {
               "allOf" : [ {
+                "type" : [ "object" ],
+                "properties" : {
+                  "mention" : {
+                    "$ref" : "#/components/schemas/mention"
+                  }
+                },
+                "additionalProperties" : false
+              }, {
+                "$ref" : "#/components/schemas/addCallComment"
+              }, {
                 "type" : "object",
                 "properties" : {
                   "mention" : {
                     "$ref" : "#/components/schemas/mention"
                   }
                 }
-              }, {
-                "$ref" : "#/components/schemas/addCallComment"
               } ]
             },
             "examples" : {
@@ -463,7 +673,7 @@
                     "size" : "12734",
                     "name" : "Attachment.png",
                     "id" : "4000000008994",
-                    "href" : "https://desk.zoho.com/api/v1/calls/4000000528005/comments/4000000529001/attachments/4000000008994/content"
+                    "href" : "https://desk.example.com/api/v1/calls/4000000528005/comments/4000000529001/attachments/4000000008994/content"
                   } ],
                   "commentedTime" : 1485269673534,
                   "id" : "4000000530003",
@@ -473,10 +683,10 @@
                   "commenter" : {
                     "firstName" : "Jade",
                     "lastName" : "Tywin",
-                    "photoURL" : "https://desk.zoho.com/api/v1/agent/4000000008692/photo",
+                    "photoURL" : "https://desk.example.com/api/v1/agent/4000000008692/photo",
                     "name" : "Jade Tywin",
                     "roleName" : "LightAgent",
-                    "type" : "AGENT",
+                    "type" : [ "AGENT" ],
                     "email" : "jade12tywin@zylker.com"
                   }
                 }
@@ -486,38 +696,12 @@
         }
       }
     },
-    "parameters" : {
-      "callId" : {
-        "name" : "callId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "commentId" : {
-        "name" : "commentId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      }
-    },
     "requestBodies" : {
       "addCallCommentRequest" : {
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "contentType" : {
@@ -530,6 +714,14 @@
                   "type" : [ "string", "null" ],
                   "maxLength" : 32000,
                   "minLength" : 0
+                },
+                "attachmentIds" : {
+                  "type" : [ "array" ],
+                  "items" : {
+                    "type" : [ "string", "integer" ],
+                    "format" : "int64",
+                    "pattern" : "([0-9]+)"
+                  }
                 }
               }
             },
@@ -547,12 +739,13 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "contentType" : {
                   "type" : [ "string", "null" ],
                   "enum" : [ "html", "plainText" ],
+                  "default" : "html",
                   "maxLength" : 100,
                   "minLength" : 0
                 },
@@ -560,6 +753,14 @@
                   "type" : [ "string", "null" ],
                   "maxLength" : 32000,
                   "minLength" : 0
+                },
+                "attachmentIds" : {
+                  "type" : [ "array" ],
+                  "items" : {
+                    "type" : [ "string", "integer" ],
+                    "format" : "int64",
+                    "pattern" : "([0-9]+)"
+                  }
                 }
               },
               "required" : [ "content" ]
@@ -577,6 +778,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

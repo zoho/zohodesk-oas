@@ -8,11 +8,22 @@
     "/api/v1/tickets/{ticketId}/tags" : {
       "get" : {
         "tags" : [ "TicketTag" ],
-        "summary" : "List tags in a ticket",
-        "description" : "This API lists tags associated with a ticket.",
-        "operationId" : "getTicketTags",
+        "summary" : "Get Tags in a Ticket",
+        "description" : "Retrieves tags associated with the specified ticket.",
+        "operationId" : "getTagsByTicket",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/ticketId"
+          "name" : "ticketId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the ticket"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -30,11 +41,22 @@
     "/api/v1/tickets/{ticketId}/dissociateTag" : {
       "post" : {
         "tags" : [ "TicketTag" ],
-        "summary" : "Dissociate Ticket Tags",
-        "description" : "This API removes a single tag or multiple tags from a ticket.",
-        "operationId" : "dissociateTicketTags",
+        "summary" : "Dissociate Tag",
+        "description" : "Removes one or more tags from a ticket.",
+        "operationId" : "dissociateTagsFromTicket",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/ticketId"
+          "name" : "ticketId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the ticket"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -58,11 +80,22 @@
     "/api/v1/recentTicketTags" : {
       "get" : {
         "tags" : [ "TicketTag" ],
-        "summary" : "List recent tags",
-        "description" : "This API lists the five most recent tags associated with tickets.",
+        "summary" : "Get Recent Tags",
+        "description" : "Retrieves the five most recent tags associated with tickets for the specified department.",
         "operationId" : "getRecentTags",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/departmentId"
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "ID of the department from which tags must be fetched",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -83,11 +116,22 @@
     "/api/v1/recentTicketTags/{tagId}" : {
       "post" : {
         "tags" : [ "TicketTag" ],
-        "summary" : "Update recent tags",
-        "description" : "This API adds a tag to the list of recently viewed tags. tag_id is a mandatory parameter in the API request.",
-        "operationId" : "updateRecentTags",
+        "summary" : "Update Recent Tags",
+        "description" : "Adds a tag to the list of recently viewed tags.",
+        "operationId" : "addRecentTag",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/tagId"
+          "name" : "tagId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the tag"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -105,9 +149,10 @@
     "/api/v1/tags/{currentTagId}/replace" : {
       "patch" : {
         "tags" : [ "TicketTag" ],
-        "summary" : "Replace the specified tags",
-        "description" : "This API replaces a tag to the specified tag. tag_id is a mandatory parameter in the API request.",
+        "summary" : "Replace Tag",
+        "description" : "Replaces an existing tag with another specified tag.",
         "operationId" : "replaceTag",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "currentTagId",
           "in" : "path",
@@ -115,10 +160,11 @@
           "style" : "simple",
           "explode" : false,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
-          }
+          },
+          "description" : "Unique ID of the tag to replace"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -145,28 +191,59 @@
     "/api/v1/ticketTags" : {
       "get" : {
         "tags" : [ "TicketTag" ],
-        "summary" : "List tickets tags",
-        "description" : "This API lists the ticket tags added in your help desk portal.�",
-        "operationId" : "getTicketsTags",
+        "summary" : "Get Ticket Tags",
+        "description" : "Retrieves ticket tags in the help desk portal for the specified department, with pagination support.",
+        "operationId" : "listTicketTags",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/departmentId"
-        }, {
-          "$ref" : "#/components/parameters/limit"
-        }, {
-          "$ref" : "#/components/parameters/from"
-        }, {
-          "name" : "sortBy",
+          "name" : "departmentId",
           "in" : "query",
-          "description" : "Key that sorts tags by a specific attribute: createdTime or count. The default sorting order is descending.",
+          "description" : "ID of the department from which tags must be fetched",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of tags to fetch",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Key that sorts tags by a specific attribute: createdTime or count. The default sorting order is descending.",
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "maximum" : 100
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number from which tags must be fetched",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "description" : "Sorts tags by a specific attribute. Possible values: createdTime, count. Note: Default sorting order is descending.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
             "enum" : [ "createdTime", "count" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "pattern" : "-?(createdTime|count)"
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -188,11 +265,22 @@
     "/api/v1/tickets/{ticketId}/associateTag" : {
       "post" : {
         "tags" : [ "TicketTag" ],
-        "summary" : "Associate Ticket Tags",
-        "description" : "This API adds a single tag or multiple tags to a ticket.",
-        "operationId" : "associateTicketTags",
+        "summary" : "Associate Tag",
+        "description" : "Adds one or more tags to a ticket.",
+        "operationId" : "associateTagsToTicket",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/ticketId"
+          "name" : "ticketId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the ticket"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -216,29 +304,60 @@
     "/api/v1/tags/search" : {
       "get" : {
         "tags" : [ "TicketTag" ],
-        "summary" : "Search tags",
-        "description" : "This API searches for tags added in your help desk portal.",
-        "operationId" : "getTags",
+        "summary" : "Search Tags",
+        "description" : "Searches for tags in the help desk portal for the specified department, with pagination support.",
+        "operationId" : "searchTags",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "searchVal",
           "in" : "query",
-          "description" : "Search keyword related to the tag.",
+          "description" : "Search keyword related to the tag",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Search keyword related to the tag.",
+            "type" : [ "string" ],
             "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "[a-z0-9\\_\\-\\+\\%\\P{InBasicLatin}\\s]+"
+            "pattern" : "[a-zA-Z0-9\\_\\.\\-\\+\\%\\P{InBasicLatin}\\s]+"
           }
         }, {
-          "$ref" : "#/components/parameters/departmentId"
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "ID of the department from which tags must be fetched",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/limit"
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of tags to fetch",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "maximum" : 100
+          }
         }, {
-          "$ref" : "#/components/parameters/from"
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number from which tags must be fetched",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -259,43 +378,148 @@
     "/api/v1/tags/{tagId}/tickets" : {
       "get" : {
         "tags" : [ "TicketTag" ],
-        "summary" : "List tickets by tag",
-        "description" : "This API lists tickets containing the tag specified.",
+        "summary" : "Get Tickets by Tag",
+        "description" : "Retrieves tickets associated with a specific tag, with pagination support.",
         "operationId" : "getTicketsByTag",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
-          "description" : "Additional information related to the tickets. Values allowed are: @contacts@, @products@, @departments@, @team@, @isRead@ and @assignee@. You can pass multiple values by separating them with commas.",
+          "description" : "Additional information to include in the response. Possible values: contacts, products, departments, team, isRead, assignee. Note: Multiple values can be provided by separating them with commas.",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Additional information related to the tickets. Values allowed are: @contacts@, @products@, @departments@, @team@, @isRead@ and @assignee@. You can pass multiple values by separating them with commas.",
-            "enum" : [ "contacts", "isRead", "products", "assignee" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "type" : [ "array" ],
+            "maxItems" : 7,
+            "items" : {
+              "type" : "string",
+              "enum" : [ "contacts", "isRead", "products", "assignee", "departments", "team" ]
+            }
           }
         }, {
-          "$ref" : "#/components/parameters/limit"
+          "name" : "assignee",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "pattern" : "^([0-9]+|Unassigned)$"
+            },
+            "maxItems" : 20
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Agent assigned to resolve the ticket. Possible values: Unassigned, assigneeId. Note: Multiple values can be provided by separating them with commas."
         }, {
-          "$ref" : "#/components/parameters/from"
+          "name" : "channel",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+            },
+            "maxItems" : 20
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Channel through which the tickets were received. Note: Multiple values can be provided by separating them with commas."
+        }, {
+          "name" : "status",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "pattern" : "^([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s()]+|\\$\\{OPEN\\}|\\$\\{ONHOLD\\}|\\$\\{CLOSED\\})$",
+              "x-regex-name" : "ticketStatusPicklistAPI"
+            },
+            "maxItems" : 20
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Resolution status of the tickets. Note: Multiple values can be provided by separating them with commas."
+        }, {
+          "name" : "receivedInDays",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "15", "30", "90", "-1" ]
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Number of days since the tickets were received. Possible values: 15, 30, 90"
+        }, {
+          "name" : "priority",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+",
+              "x-regex-name" : "picklistValue"
+            },
+            "maxItems" : 20
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Priority of the tickets. Note: Multiple values can be provided by separating them with commas."
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of tickets to fetch",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "maximum" : 100
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number from which tickets must be fetched",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "name" : "sortBy",
           "in" : "query",
-          "description" : "Key that sorts the tickets by a specific attribute: @dueDate@, @recentThread@, @createdTime@, or @ticketNumber@. The default sorting order is ascending. A - prefix denotes a descending order of sorting.",
+          "description" : "Sorts tickets by a specific attribute. Possible values: dueDate, recentThread, createdTime, ticketNumber. Note: Default sorting order is ascending. Prefix with - for descending.",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Key that sorts the tickets by a specific attribute: @dueDate@, @recentThread@, @createdTime@, or @ticketNumber@. The default sorting order is ascending. A - prefix denotes a descending order of sorting.",
-            "enum" : [ "createdTime", "modifiedTime" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "type" : [ "string" ],
+            "enum" : [ "createdTime", "modifiedTime", "dueDate", "recentThread", "ticketNumber" ],
+            "pattern" : "-?(ticketNumber|dueDate|createdTime|recentThread|modifiedTime)"
           }
         }, {
-          "$ref" : "#/components/parameters/tagId"
+          "name" : "tagId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the tag"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -317,74 +541,77 @@
   "components" : {
     "schemas" : {
       "tagJson" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "name" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "^(?!^null$)[a-zA-Z0-9\\_\\.\\-\\+\\%\\P{InBasicLatin}\\s]{3,}$"
+            "pattern" : "^(?!^null$)[a-zA-Z0-9\\_\\.\\-\\+\\%\\P{InBasicLatin}\\s]{3,}$",
+            "description" : "Name of the tag"
           },
           "tagType" : {
             "type" : [ "string", "null" ],
             "enum" : [ "SYSTEM", "MANUAL" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "description" : "Type of the tag. Possible values: MANUAL, SYSTEM"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the tag"
           }
         },
         "required" : [ "id", "name", "tagType" ]
       },
       "data" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
           "$ref" : "#/components/schemas/tagJson"
         }
       },
       "getTicketTagJson" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "ticketCount" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int32",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Number of tickets associated with the tag"
           },
           "name" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "^(?!^null$)[a-zA-Z0-9\\_\\.\\-\\+\\%\\P{InBasicLatin}\\s]{3,}$"
+            "pattern" : "^(?!^null$)[a-zA-Z0-9\\_\\.\\-\\+\\%\\P{InBasicLatin}\\s]{3,}$",
+            "description" : "Name of the tag"
           },
           "tagType" : {
             "type" : [ "string", "null" ],
             "enum" : [ "SYSTEM", "MANUAL", null ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "description" : "Type of the tag. Possible values: MANUAL, SYSTEM"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the tag"
           }
         },
         "required" : [ "id", "name", "tagType", "ticketCount" ]
       },
       "getTicketTagData" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
           "$ref" : "#/components/schemas/getTicketTagJson"
         }
       },
       "ticketData" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./Ticket.json#/components/schemas/ticketTags"
+          "$ref" : "./Ticket.json#/components/schemas/listviewJson"
         }
       }
     },
@@ -394,7 +621,7 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "tags" : {
@@ -426,7 +653,7 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
@@ -460,7 +687,7 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
@@ -493,34 +720,37 @@
           "application/json" : {
             "schema" : {
               "allOf" : [ {
-                "type" : "object",
+                "type" : [ "object" ],
                 "properties" : {
                   "data" : {
-                    "type" : "array",
+                    "type" : [ "array" ],
                     "items" : {
-                      "type" : "object",
+                      "type" : [ "object" ],
                       "properties" : {
                         "product" : {
-                          "type" : [ "null", "object" ],
+                          "type" : [ "object", "null" ],
                           "additionalProperties" : false,
                           "maxProperties" : 2,
                           "minProperties" : 2,
                           "properties" : {
                             "id" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
-                              "pattern" : "([0-9]+)"
+                              "pattern" : "([0-9]+)",
+                              "description" : "Unique ID of the product"
                             },
                             "productName" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 200,
-                              "minLength" : 0
+                              "minLength" : 0,
+                              "description" : "Name of the product"
                             }
                           },
-                          "required" : [ "id", "productName" ]
+                          "required" : [ "id", "productName" ],
+                          "description" : "Details of the product associated with the ticket"
                         },
                         "contact" : {
-                          "type" : [ "null", "object" ],
+                          "type" : [ "object", "null" ],
                           "additionalProperties" : false,
                           "maxProperties" : 8,
                           "minProperties" : 8,
@@ -528,42 +758,49 @@
                             "lastName" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 200,
-                              "minLength" : 0
+                              "minLength" : 0,
+                              "description" : "Last name of the contact"
                             },
                             "firstName" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 40,
-                              "minLength" : 0
+                              "minLength" : 0,
+                              "description" : "First name of the contact"
                             },
                             "phone" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 50,
                               "minLength" : 0,
-                              "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\(\\)\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+                              "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\(\\)\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+",
+                              "description" : "Phone number of the contact"
                             },
                             "mobile" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 50,
                               "minLength" : 0,
-                              "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\(\\)\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+                              "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\(\\)\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+",
+                              "description" : "Mobile number of the contact"
                             },
                             "id" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
-                              "pattern" : "([0-9]+)"
+                              "pattern" : "([0-9]+)",
+                              "description" : "Unique ID of the contact"
                             },
                             "type" : {
                               "type" : [ "string", "null" ],
-                              "x-dynamic-enum" : true
+                              "x-dynamic-enum" : true,
+                              "description" : "Type of the contact"
                             },
                             "email" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 255,
                               "minLength" : 0,
-                              "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'\\&\\~]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+                              "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'\\&\\~]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$",
+                              "description" : "Email address of the contact"
                             },
                             "account" : {
-                              "type" : [ "null", "object" ],
+                              "type" : [ "object", "null" ],
                               "additionalProperties" : false,
                               "maxProperties" : 3,
                               "minProperties" : 3,
@@ -571,29 +808,35 @@
                                 "website" : {
                                   "type" : [ "string", "null" ],
                                   "maxLength" : 120,
-                                  "minLength" : 0
+                                  "minLength" : 0,
+                                  "description" : "Website of the account"
                                 },
                                 "accountName" : {
                                   "type" : [ "string", "null" ],
                                   "maxLength" : 200,
-                                  "minLength" : 0
+                                  "minLength" : 0,
+                                  "description" : "Name of the account"
                                 },
                                 "id" : {
-                                  "type" : [ "string", "null", "integer" ],
+                                  "type" : [ "string", "integer", "null" ],
                                   "format" : "int64",
-                                  "pattern" : "([0-9]+)"
+                                  "pattern" : "([0-9]+)",
+                                  "description" : "Unique ID of the account"
                                 }
                               },
-                              "required" : [ "accountName", "id", "website" ]
+                              "required" : [ "accountName", "id", "website" ],
+                              "description" : "Account associated with the contact"
                             }
                           },
-                          "required" : [ "account", "email", "firstName", "id", "lastName", "mobile", "phone", "type" ]
+                          "required" : [ "account", "email", "firstName", "id", "lastName", "mobile", "phone", "type" ],
+                          "description" : "Details of the contact who raised the ticket"
                         },
                         "isRead" : {
-                          "type" : [ "boolean", "null" ]
+                          "type" : [ "boolean", "null" ],
+                          "description" : "Indicates whether the ticket has been read. Possible values: true = read, false = unread"
                         },
                         "assignee" : {
-                          "type" : [ "null", "object" ],
+                          "type" : [ "object", "null" ],
                           "additionalProperties" : false,
                           "maxProperties" : 5,
                           "minProperties" : 5,
@@ -601,35 +844,41 @@
                             "firstName" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 50,
-                              "minLength" : 0
+                              "minLength" : 0,
+                              "description" : "First name of the assignee"
                             },
                             "photoURL" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 200,
                               "minLength" : 0,
-                              "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+                              "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+                              "description" : "URL of the assignee's profile photo"
                             },
                             "lastName" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 50,
-                              "minLength" : 0
+                              "minLength" : 0,
+                              "description" : "Last name of the assignee"
                             },
                             "id" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
-                              "pattern" : "([0-9]+)"
+                              "pattern" : "([0-9]+)",
+                              "description" : "Unique ID of the assignee"
                             },
                             "email" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 100,
                               "minLength" : 0,
-                              "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+                              "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$",
+                              "description" : "Email address of the assignee"
                             }
                           },
-                          "required" : [ "email", "firstName", "id", "lastName", "photoURL" ]
+                          "required" : [ "email", "firstName", "id", "lastName", "photoURL" ],
+                          "description" : "Details of the agent assigned to the ticket"
                         },
                         "team" : {
-                          "type" : [ "null", "object" ],
+                          "type" : [ "object", "null" ],
                           "additionalProperties" : false,
                           "maxProperties" : 3,
                           "minProperties" : 3,
@@ -638,24 +887,28 @@
                               "type" : [ "string", "null" ],
                               "maxLength" : 50,
                               "minLength" : 1,
-                              "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                              "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+                              "description" : "Name of the team"
                             },
                             "id" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
-                              "pattern" : "([0-9]+)"
+                              "pattern" : "([0-9]+)",
+                              "description" : "Unique ID of the team"
                             },
                             "logoUrl" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 200,
                               "minLength" : 0,
-                              "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+                              "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+                              "description" : "URL of the team's logo"
                             }
                           },
-                          "required" : [ "id", "logoUrl", "name" ]
+                          "required" : [ "id", "logoUrl", "name" ],
+                          "description" : "Details of the team assigned to the ticket"
                         },
                         "department" : {
-                          "type" : [ "null", "object" ],
+                          "type" : [ "object", "null" ],
                           "additionalProperties" : false,
                           "maxProperties" : 2,
                           "minProperties" : 2,
@@ -664,22 +917,28 @@
                               "type" : [ "string", "null" ],
                               "maxLength" : 200,
                               "minLength" : 0,
-                              "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                              "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+                              "description" : "Name of the department"
                             },
                             "id" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
-                              "pattern" : "([0-9]+)"
+                              "pattern" : "([0-9]+)",
+                              "description" : "Unique ID of the department"
                             }
                           },
-                          "required" : [ "id", "name" ]
+                          "required" : [ "id", "name" ],
+                          "description" : "Details of the department associated with the ticket"
                         }
-                      }
-                    }
+                      },
+                      "additionalProperties" : false
+                    },
+                    "description" : "The response returns a data array"
                   }
-                }
+                },
+                "additionalProperties" : false
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "data" : {
@@ -705,11 +964,11 @@
                     "contact" : {
                       "lastName" : "Carol",
                       "firstName" : "Lucas",
-                      "phone" : "1 888 900 9646",
-                      "mobile" : "8838109870",
+                      "phone" : "1 555 010 0000",
+                      "mobile" : "5550100004",
                       "id" : "1892000000042032",
                       "isSpam" : false,
-                      "type" : "paid",
+                      "type" : [ "paid" ],
                       "email" : "carol@zylker.com",
                       "account" : {
                         "website" : "www.desk.com",
@@ -731,19 +990,19 @@
                     "team" : {
                       "name" : "kjsdfjks",
                       "id" : "8920000000069071",
-                      "logoUrl" : "https://desk.zoho.com/api/v1/teams/8920000000069071/logo?orgId=11278831"
+                      "logoUrl" : "https://desk.example.com/api/v1/teams/8920000000069071/logo?orgId=1234567890"
                     },
                     "priority" : "High",
                     "assigneeId" : "1892000000056007",
                     "commentCount" : "1",
                     "accountId" : "189200000005345",
                     "phone" : null,
-                    "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Cases/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
+                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Cases/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
                     "teamId" : "8920000000069071",
                     "assignee" : {
-                      "firstName" : "dasca",
-                      "lastName" : "vins",
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/1892000000056007/photo?orgId=298902",
+                      "firstName" : "George",
+                      "lastName" : "Vincent",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/1892000000056007/photo?orgId=1234567890",
                       "id" : "1892000000056007",
                       "email" : "jack@zylker.com"
                     },
@@ -761,11 +1020,11 @@
                     "contact" : {
                       "lastName" : "Richard",
                       "firstName" : "Lucas",
-                      "phone" : "1 888 900 9646",
-                      "mobile" : "8838109870",
+                      "phone" : "1 555 010 0000",
+                      "mobile" : "5550100004",
                       "id" : "1892000000093203",
                       "isSpam" : false,
-                      "type" : "paid",
+                      "type" : [ "paid" ],
                       "email" : "richard@zylker.com",
                       "account" : {
                         "website" : "www.desk.com",
@@ -787,18 +1046,18 @@
                     "team" : {
                       "name" : "kjsdfjks",
                       "id" : "8920000000069071",
-                      "logoUrl" : "https://desk.zoho.com/api/v1/teams/8920000000069071/logo?orgId=11278831"
+                      "logoUrl" : "https://desk.example.com/api/v1/teams/8920000000069071/logo?orgId=1234567890"
                     },
                     "priority" : null,
                     "assigneeId" : "1892000000042001",
                     "commentCount" : "0",
                     "phone" : null,
-                    "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Cases/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
+                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Cases/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
                     "teamId" : "8920000000069071",
                     "assignee" : {
-                      "firstName" : "dasca",
-                      "lastName" : "vins",
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/1892000000042001/photo?orgId=298902",
+                      "firstName" : "George",
+                      "lastName" : "Vincent",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/1892000000042001/photo?orgId=1234567890",
                       "id" : "1892000000042001",
                       "email" : "jack@zylker.com"
                     },
@@ -812,91 +1071,26 @@
         }
       }
     },
-    "parameters" : {
-      "tagId" : {
-        "name" : "tagId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "departmentId" : {
-        "name" : "departmentId",
-        "in" : "query",
-        "description" : "ID of the department from which the tags must be fetched",
-        "required" : true,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "description" : "ID of the department from which the tags must be fetched",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "limit" : {
-        "name" : "limit",
-        "in" : "query",
-        "description" : "Number of tags to fetch",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int32",
-          "description" : "Number of tags to fetch",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "from" : {
-        "name" : "from",
-        "in" : "query",
-        "description" : "Index number, starting from which the tags must be fetched",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int32",
-          "description" : "Index number, starting from which the tags must be fetched",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "ticketId" : {
-        "name" : "ticketId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      }
-    },
     "requestBodies" : {
       "tagArray" : {
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "tags" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
+                  "minItems" : 1,
+                  "maxItems" : 51,
                   "items" : {
-                    "type" : [ "string", "null" ],
-                    "maxLength" : 100,
-                    "minLength" : 0,
+                    "type" : [ "string" ],
+                    "maxLength" : 50,
+                    "minLength" : 3,
                     "pattern" : "^(?!^null$)[a-zA-Z0-9\\_\\.\\-\\+\\%\\P{InBasicLatin}\\s]{3,}$"
                   },
-                  "uniqueItems" : false
+                  "uniqueItems" : false,
+                  "description" : "Name(s) of the tag(s) to remove from the ticket"
                 }
               },
               "required" : [ "tags" ]
@@ -915,13 +1109,13 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "id" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer" ],
                   "format" : "int64",
-                  "description" : "Tag ID of the Replacing Tag",
+                  "description" : "Unique ID of the replacement tag",
                   "pattern" : "([0-9]+)"
                 }
               },
@@ -941,18 +1135,21 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "tags" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
+                  "minItems" : 1,
+                  "maxItems" : 51,
                   "items" : {
-                    "type" : [ "string", "null" ],
-                    "maxLength" : 100,
-                    "minLength" : 0,
+                    "type" : [ "string" ],
+                    "maxLength" : 50,
+                    "minLength" : 3,
                     "pattern" : "^(?!^null$)[a-zA-Z0-9\\_\\.\\-\\+\\%\\P{InBasicLatin}\\s]{3,}$"
                   },
-                  "uniqueItems" : false
+                  "uniqueItems" : false,
+                  "description" : "Name(s) of the tag(s) to associate with the ticket"
                 }
               },
               "required" : [ "tags" ]
@@ -969,6 +1166,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

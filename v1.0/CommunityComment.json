@@ -8,13 +8,16 @@
     "/api/v1/communityTopics/{topicId}/comments/{commentId}/markSpam" : {
       "post" : {
         "tags" : [ "CommunityComment" ],
-        "summary" : "Report topic comment as spam",
-        "description" : "This API marks a comment on a forum topic as spam.",
+        "summary" : "Report Comment as Spam",
+        "description" : "Marks a comment on a community topic as spam.",
         "operationId" : "markACommentAsSpam",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/topicId"
+          "$ref" : "#/components/parameters/topicId",
+          "description" : "Unique ID of the topic containing the comment"
         }, {
-          "$ref" : "#/components/parameters/commentId"
+          "$ref" : "#/components/parameters/commentId",
+          "description" : "Unique ID of the comment to report as spam"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -44,9 +47,10 @@
     "/api/v1/community/markAllCommentsAsSpam" : {
       "post" : {
         "tags" : [ "CommunityComment" ],
-        "summary" : "Report multiple comments as spam",
-        "description" : "This API marks multiple comments on a forum topic as spam.",
+        "summary" : "Report Comments as Spam",
+        "description" : "Marks multiple comments on community topics as spam.",
         "operationId" : "markAllCommentsAsSpam",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -102,28 +106,52 @@
     "/api/v1/communityModeration/comments" : {
       "get" : {
         "tags" : [ "CommunityComment" ],
-        "summary" : "List comments pending moderation",
-        "description" : "This API lists a particular number of comments that are pending moderation, based on the limit defined.",
+        "summary" : "Get Comments Pending Moderation",
+        "description" : "Retrieves comments that are pending moderation, with pagination support.",
         "operationId" : "getCommunityTopicModerationComments",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/limit"
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of comments to list",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 25,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)",
+            "default" : 25
+          }
         }, {
-          "$ref" : "#/components/parameters/from"
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number from which comments must be listed",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "default" : 1
+          }
         }, {
-          "$ref" : "#/components/parameters/categoryId"
+          "$ref" : "#/components/parameters/categoryId",
+          "description" : "Unique ID of the community category from which comments must be listed"
         }, {
           "name" : "status",
           "in" : "query",
-          "description" : "Moderation status of the comments. Values allowed are: @AWAITINGAPPROVAL@, @SPAM@, and @TRASHED@.",
+          "description" : "Moderation status of comments to list. Possible values: AWAITINGAPPROVAL, SPAM, TRASHED",
           "required" : true,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Moderation status of the comments. Values allowed are: @AWAITINGAPPROVAL@, @SPAM@, and @TRASHED@.",
-            "enum" : [ "SPAM", "TRASHED", "AWAITINGAPPROVAL" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "type" : [ "string" ],
+            "enum" : [ "AWAITINGAPPROVAL", "SPAM", "TRASHED" ]
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -185,9 +213,8 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
-            "description" : "ID of a view for which you need to get the count",
             "pattern" : "([0-9]+)"
           }
         }, {
@@ -198,14 +225,21 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Type of topics to list. Values allowed are: @ANNOUNCEMENT@, @DISCUSSION@, @IDEA@, @PROBLEM@, and @QUESTION@.",
-            "enum" : [ "QUESTION", "IDEA", "ANNOUNCEMENT", "PROBLEM", "DISCUSSION" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "type" : [ "string" ],
+            "enum" : [ "QUESTION", "IDEA", "ANNOUNCEMENT", "PROBLEM", "DISCUSSION" ]
           }
         }, {
-          "$ref" : "#/components/parameters/categoryId"
+          "name" : "categoryId",
+          "in" : "query",
+          "description" : "ID of the community category from which the comments must be fetched",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -229,13 +263,15 @@
     "/api/v1/communityTopics/{topicId}/comments/{commentId}" : {
       "get" : {
         "tags" : [ "CommunityComment" ],
-        "summary" : "Get community topic comment",
-        "description" : "This API fetches a comment received on a topic.",
+        "summary" : "Get Comment",
+        "description" : "Retrieves a comment posted on a community topic.",
         "operationId" : "getCommunityTopicComment",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/topicId"
+          "$ref" : "#/components/parameters/topicId",
+          "description" : "Unique ID of the topic from which the comment must be retrieved"
         }, {
-          "$ref" : "#/components/parameters/commentId"
+          "$ref" : "#/components/parameters/commentId",
+          "description" : "Unique ID of the comment to retrieve"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -244,7 +280,7 @@
             "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
           },
           "200" : {
-            "$ref" : "#/components/responses/singleComment"
+            "$ref" : "#/components/responses/singleCommentRead"
           },
           "422" : {
             "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
@@ -259,17 +295,21 @@
         "security" : [ {
           "iam-oauth2-schema" : [ "Desk.forums.READ", "Desk.community.READ" ]
         } ],
-        "x-audience" : [ "external-public" ]
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
       },
       "patch" : {
         "tags" : [ "CommunityComment" ],
-        "summary" : "Update community topic comment",
-        "description" : "This API helps update a published comment.",
+        "summary" : "Update Comment",
+        "description" : "Updates a published comment on a community topic.",
         "operationId" : "updateCommunityTopicComment",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/topicId"
+          "$ref" : "#/components/parameters/topicId",
+          "description" : "Unique ID of the topic containing the comment"
         }, {
-          "$ref" : "#/components/parameters/commentId"
+          "$ref" : "#/components/parameters/commentId",
+          "description" : "Unique ID of the comment to update"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -302,13 +342,16 @@
     "/api/v1/communityTopics/{topicId}/comments/{commentId}/moveToTrash" : {
       "post" : {
         "tags" : [ "CommunityComment" ],
-        "summary" : "Delete community topic comment",
-        "description" : "This API deletes a comment from a topic.",
-        "operationId" : "deleteCommunityTopicComment",
+        "summary" : "Move Comment to Recycle Bin",
+        "description" : "Moves a comment on a community topic to the Recycle Bin.",
+        "operationId" : "moveTopicCommentToRecyclebin",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/topicId"
+          "$ref" : "#/components/parameters/topicId",
+          "description" : "Unique ID of the topic containing the comment"
         }, {
-          "$ref" : "#/components/parameters/commentId"
+          "$ref" : "#/components/parameters/commentId",
+          "description" : "Unique ID of the comment to move to the Recycle Bin"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -361,11 +404,13 @@
     "/api/v1/communityTopics/{topicId}/comments/{parentCommentId}/replies" : {
       "post" : {
         "tags" : [ "CommunityComment" ],
-        "summary" : "Add community topic reply",
-        "description" : "This API helps add a reply to a comment on a forum topic.",
+        "summary" : "Create Reply",
+        "description" : "Adds a reply to a comment on a community topic.",
         "operationId" : "addCommunityTopicReply",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/topicId"
+          "$ref" : "#/components/parameters/topicId",
+          "description" : "Unique ID of the topic containing the comment"
         }, {
           "name" : "parentCommentId",
           "in" : "path",
@@ -373,10 +418,11 @@
           "style" : "simple",
           "explode" : false,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
-          }
+          },
+          "description" : "Unique ID of the comment to which the reply must be added"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -409,15 +455,19 @@
     "/api/v1/communityTopics/{topicId}/comments/{commentId}/replies/{replyId}/moveToTrash" : {
       "post" : {
         "tags" : [ "CommunityComment" ],
-        "summary" : "Trash community topic reply",
-        "description" : "This API deletes a reply to a topic comment.",
-        "operationId" : "deleteCommunityTopicReply",
+        "summary" : "Move Reply to Recycle Bin",
+        "description" : "Moves a reply to a community topic comment to the Recycle Bin.",
+        "operationId" : "moveTopicReplyToRecyclebin",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/topicId"
+          "$ref" : "#/components/parameters/topicId",
+          "description" : "Unique ID of the topic containing the comment"
         }, {
-          "$ref" : "#/components/parameters/replyId"
+          "$ref" : "#/components/parameters/replyId",
+          "description" : "Unique ID of the reply to move to the Recycle Bin"
         }, {
-          "$ref" : "#/components/parameters/commentId"
+          "$ref" : "#/components/parameters/commentId",
+          "description" : "Unique ID of the comment containing the reply"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -444,19 +494,73 @@
     "/api/v1/communityUsers/{userId}/comments" : {
       "get" : {
         "tags" : [ "CommunityComment" ],
-        "summary" : "List community topic comments by user",
-        "description" : "This API lists a particular number of comments by a user, based on the limit defined.",
+        "summary" : "Get Comments by User",
+        "description" : "Retrieves comments posted by a community user, with pagination support.",
         "operationId" : "getCommunityTopicUserComments",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/limit"
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of comments to list",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 25,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)",
+            "default" : 25
+          }
         }, {
-          "$ref" : "#/components/parameters/from"
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number from which comments must be listed",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "default" : 1
+          }
         }, {
-          "$ref" : "#/components/parameters/startTime"
+          "name" : "startTime",
+          "in" : "query",
+          "description" : "Starting time of the time range in which the comments should have been created. The value must be expressed according to the GMT time zone",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null"
+          }
         }, {
-          "$ref" : "#/components/parameters/endTime"
+          "name" : "endTime",
+          "in" : "query",
+          "description" : "Ending time of the time range in which the comments should have been created. The value must be expressed according to the GMT time zone",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null"
+          }
         }, {
-          "$ref" : "#/components/parameters/categoryId"
+          "name" : "categoryId",
+          "in" : "query",
+          "required" : false,
+          "description" : "Unique ID of the community category from which comments must be listed",
+          "schema" : {
+            "$ref" : "#/components/schemas/categoryIdSchema"
+          },
+          "style" : "form",
+          "explode" : true
         }, {
           "name" : "userId",
           "in" : "path",
@@ -464,10 +568,11 @@
           "style" : "simple",
           "explode" : false,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
-          }
+          },
+          "description" : "Unique ID of the community user from which comments must be retrieved"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -494,15 +599,19 @@
     "/api/v1/communityTopics/{topicId}/comments/{commentId}/replies/{replyId}" : {
       "patch" : {
         "tags" : [ "CommunityComment" ],
-        "summary" : "Update community topic reply",
-        "description" : "This API helps update a published reply.",
+        "summary" : "Update Reply",
+        "description" : "Updates a published reply on a community topic comment.",
         "operationId" : "updateCommunityTopicReply",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/topicId"
+          "$ref" : "#/components/parameters/topicId",
+          "description" : "Unique ID of the topic containing the comment"
         }, {
-          "$ref" : "#/components/parameters/replyId"
+          "$ref" : "#/components/parameters/replyId",
+          "description" : "Unique ID of the reply to update"
         }, {
-          "$ref" : "#/components/parameters/commentId"
+          "$ref" : "#/components/parameters/commentId",
+          "description" : "Unique ID of the comment containing the reply"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -561,30 +670,74 @@
     "/api/v1/communityTopics/{topicId}/comments" : {
       "get" : {
         "tags" : [ "CommunityComment" ],
-        "summary" : "List community topic comments",
-        "description" : "This API lists a particular number of comments on a topic, based on the limit defined. ",
+        "summary" : "Get Comments",
+        "description" : "Retrieves a list of comments on a community topic, with pagination support.",
         "operationId" : "getAllCommunityTopicComments",
         "parameters" : [ {
           "name" : "latestCommentsFirst",
           "in" : "query",
-          "description" : "Key that defines the listing order of the comments. Setting @TRUE@ lists the latest comments first (descending order) and setting @FALSE@ lists the oldest comments first (ascending order).",
+          "description" : "Determines the listing order of comments. Possible values: • true = Latest comments first (descending order) • false = Oldest comments first (ascending order)",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "boolean", "null" ],
-            "description" : "Key that defines the listing order of the comments. Setting @TRUE@ lists the latest comments first (descending order) and setting @FALSE@ lists the oldest comments first (ascending order)."
+            "type" : [ "boolean" ],
+            "default" : "false"
           }
         }, {
-          "$ref" : "#/components/parameters/limit"
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of comments to list",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "minimum" : 1,
+            "default" : 10
+          }
         }, {
-          "$ref" : "#/components/parameters/from"
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number from which comments must be listed",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "default" : 1
+          }
         }, {
-          "$ref" : "#/components/parameters/startTime"
+          "name" : "startTime",
+          "in" : "query",
+          "description" : "Starting time of the time range in which the comments should have been created. The value must be expressed according to the GMT time zone",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null"
+          }
         }, {
-          "$ref" : "#/components/parameters/endTime"
+          "name" : "endTime",
+          "in" : "query",
+          "description" : "Ending time of the time range in which the comments should have been created. The value must be expressed according to the GMT time zone",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null"
+          }
         }, {
-          "$ref" : "#/components/parameters/topicId"
+          "$ref" : "#/components/parameters/topicId",
+          "description" : "Unique ID of the topic from which comments must be retrieved"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -608,15 +761,17 @@
         "security" : [ {
           "iam-oauth2-schema" : [ "Desk.forums.READ", "Desk.community.READ" ]
         } ],
-        "x-audience" : [ "external-public" ]
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
       },
       "post" : {
         "tags" : [ "CommunityComment" ],
-        "summary" : "Add community topic comment",
-        "description" : "This API helps add a comment to a forum topic.",
+        "summary" : "Create Comment",
+        "description" : "Adds a comment to a community topic.",
         "operationId" : "addCommunityTopicComment",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/topicId"
+          "$ref" : "#/components/parameters/topicId",
+          "description" : "Unique ID of the topic to which the comment must be added"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -628,7 +783,7 @@
             "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
           },
           "200" : {
-            "$ref" : "#/components/responses/singleComment"
+            "$ref" : "#/components/responses/singleCommentCreate"
           },
           "422" : {
             "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
@@ -643,24 +798,26 @@
         "security" : [ {
           "iam-oauth2-schema" : [ "Desk.forums.CREATE", "Desk.community.CREATE" ]
         } ],
-        "x-audience" : [ "external-public" ]
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
       }
     }
   },
   "components" : {
     "schemas" : {
       "creator" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "photoUrl" : {
             "type" : [ "string", "null" ],
             "maxLength" : 400,
             "minLength" : 0,
-            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+            "description" : "URL of the creator's profile photo"
           },
           "contactId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
@@ -668,50 +825,70 @@
             "type" : [ "string", "null" ],
             "maxLength" : 200,
             "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "Display name of the creator"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the creator"
           },
           "label" : {
-            "$ref" : "./Label.json#/components/schemas/labelMetaResponse"
+            "$ref" : "./Label.json#/components/schemas/labelMetaResponse",
+            "description" : "Badge label assigned to the creator"
           },
           "type" : {
             "type" : [ "string", "null" ],
             "enum" : [ "END_USER", "AGENT" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "description" : "Type of user"
           }
         },
-        "required" : [ "contactId", "id", "label", "name", "photoUrl", "type" ]
+        "required" : [ "contactId", "id", "label", "name", "photoUrl", "type" ],
+        "description" : "User who posted the comment"
+      },
+      "timestamp" : {
+        "type" : [ "string", "null" ],
+        "maxLength" : 100,
+        "minLength" : 0,
+        "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+      },
+      "id" : {
+        "type" : [ "string", "integer", "null" ],
+        "format" : "int64",
+        "pattern" : "([0-9]+)"
       },
       "getModertionComments" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "summary" : {
             "type" : [ "string", "null" ],
+            "description" : "Summary of the comment content",
             "maxLength" : 300,
             "minLength" : 0
           },
           "creator" : {
-            "$ref" : "./CommunityComment.json#/components/schemas/creator"
+            "$ref" : "#/components/schemas/creator",
+            "description" : "User who posted the comment"
           },
           "trashedBy" : {
-            "$ref" : "./CommunityComment.json#/components/schemas/creator"
+            "$ref" : "#/components/schemas/creator",
+            "description" : "User who trashed the comment (present only for trashed comments)"
+          },
+          "modifiedBy" : {
+            "$ref" : "#/components/schemas/creator",
+            "description" : "User who modified the comment (present only for modified comments)"
           },
           "subject" : {
             "type" : [ "string", "null" ],
+            "description" : "Title of the associated topic",
             "maxLength" : 100,
             "minLength" : 0
           },
           "topicType" : {
             "type" : [ "string", "null" ],
-            "enum" : [ "DISCUSSION", "ANNOUNCEMENT", "QUESTION", "IDEA", "PROBLEM" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "DISCUSSION", "ANNOUNCEMENT", "QUESTION", "IDEA", "PROBLEM" ]
           },
           "trashedTime" : {
             "type" : [ "string", "null" ],
@@ -720,7 +897,8 @@
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "topicId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
+            "description" : "Unique ID of the topic on which the comment was posted",
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
@@ -729,148 +907,156 @@
           },
           "createdTime" : {
             "type" : [ "string", "null" ],
+            "description" : "Time at which the comment was created (ISO 8601 format)",
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "topicPermalink" : {
             "type" : [ "string", "null" ],
+            "description" : "Permalink of the topic on which the comment was posted",
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "[a-zA-Z0-9%\\-._/?\\P{InBasicLatin}]*"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
+            "description" : "Unique ID of the comment",
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "categoryId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
+            "description" : "Unique ID of the community category containing the comment",
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "status" : {
             "type" : [ "string", "null" ],
-            "enum" : [ "AWAITINGAPPROVAL", "PUBLISHED", "TRASHED", "SPAM" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "description" : "Moderation status of the comment",
+            "enum" : [ "AWAITINGAPPROVAL", "PUBLISHED", "TRASHED", "SPAM" ]
           }
         },
         "required" : [ "categoryId", "createdTime", "creator", "id", "mentions", "status", "subject", "summary", "topicId", "topicPermalink", "topicType", "trashedBy", "trashedTime" ]
       },
       "getModerationCommentsData" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./CommunityComment.json#/components/schemas/getModertionComments"
+          "$ref" : "#/components/schemas/getModertionComments"
         }
       },
       "attachment" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "size" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Size of the attachment in bytes"
           },
           "name" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Name of the attachment file"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the attachment"
           },
           "href" : {
             "type" : [ "string", "null" ],
             "maxLength" : 200,
             "minLength" : 0,
-            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+            "description" : "URL to download the attachment content"
           }
         },
         "required" : [ "href", "id", "name", "size" ]
       },
       "attachments" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./CommunityComment.json#/components/schemas/attachment"
+          "$ref" : "#/components/schemas/attachment"
         }
       },
       "replyResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object" ],
         "additionalProperties" : false,
         "properties" : {
           "modifiedTime" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+            "$ref" : "#/components/schemas/timestamp",
+            "description" : "Time at which the reply was last modified (ISO 8601 format)"
           },
           "creator" : {
-            "$ref" : "./CommunityComment.json#/components/schemas/creator"
+            "$ref" : "#/components/schemas/creator",
+            "description" : "User who created the reply"
           },
           "attachments" : {
-            "$ref" : "./CommunityComment.json#/components/schemas/attachments"
+            "$ref" : "#/components/schemas/attachments",
+            "description" : "Files attached to the reply"
           },
           "mentions" : {
             "$ref" : "./Mentions.json#/components/schemas/mentionedObj"
           },
           "createdTime" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+            "$ref" : "#/components/schemas/timestamp",
+            "description" : "Time at which the reply was created (ISO 8601 format)"
           },
           "parentCommentId" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "$ref" : "#/components/schemas/id",
+            "description" : "Unique ID of the parent comment"
           },
           "modifiedBy" : {
-            "$ref" : "./CommunityComment.json#/components/schemas/creator"
+            "$ref" : "#/components/schemas/creator"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the reply"
           },
           "content" : {
             "type" : [ "string", "null" ],
             "maxLength" : 50000,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Body content of the reply"
           },
           "status" : {
             "type" : [ "string", "null" ],
             "enum" : [ "AWAITINGAPPROVAL", "PUBLISHED", "TRASHED", "SPAM" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "description" : "Publication status of the reply"
           }
         },
         "required" : [ "attachments", "content", "createdTime", "creator", "id", "mentions", "modifiedBy", "modifiedTime", "parentCommentId", "status" ]
       },
       "repliesResponseArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./CommunityComment.json#/components/schemas/replyResponse"
+          "$ref" : "#/components/schemas/replyResponse"
         }
       },
       "commentResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "modifiedTime" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+            "description" : "Time at which the comment was last modified (ISO 8601 format)"
           },
           "creator" : {
-            "$ref" : "./CommunityComment.json#/components/schemas/creator"
+            "$ref" : "#/components/schemas/creator",
+            "description" : "User who created the comment"
           },
           "attachments" : {
-            "$ref" : "./CommunityComment.json#/components/schemas/attachments"
+            "$ref" : "#/components/schemas/attachments",
+            "description" : "Files attached to the comment"
           },
           "mentions" : {
             "$ref" : "./Mentions.json#/components/schemas/mentionedObj"
@@ -879,125 +1065,292 @@
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+            "description" : "Time at which the comment was created (ISO 8601 format)"
           },
           "modifiedBy" : {
-            "$ref" : "./CommunityComment.json#/components/schemas/creator"
+            "$ref" : "#/components/schemas/creator"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the comment"
           },
           "content" : {
             "type" : [ "string", "null" ],
             "maxLength" : 50000,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Body content of the comment in HTML format"
           },
           "status" : {
             "type" : [ "string", "null" ],
             "enum" : [ "AWAITINGAPPROVAL", "PUBLISHED", "TRASHED", "SPAM" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "description" : "Publication status of the comment"
           },
           "topicType" : {
             "type" : [ "string", "null" ],
-            "enum" : [ "DISCUSSION", "ANNOUNCEMENT", "QUESTION", "IDEA", "PROBLEM" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "DISCUSSION", "ANNOUNCEMENT", "QUESTION", "IDEA", "PROBLEM" ]
           }
         },
         "required" : [ "attachments", "content", "createdTime", "creator", "id", "mentions", "modifiedBy", "modifiedTime", "status", "topicType" ]
       },
       "getUserComments" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "summary" : {
             "type" : [ "string", "null" ],
             "maxLength" : 300,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Summary of the comment content"
           },
           "topicId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the topic on which the comment was posted"
           },
           "creator" : {
-            "$ref" : "./CommunityComment.json#/components/schemas/creator"
+            "$ref" : "#/components/schemas/creator"
           },
           "subject" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Title of the associated topic"
           },
           "parentCommentId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the parent comment (present only for replies)"
           },
           "createdTime" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+            "description" : "Time at which the comment was created (ISO 8601 format)"
           },
           "topicPermalink" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "[a-zA-Z0-9%\\-._/?\\P{InBasicLatin}]*"
+            "pattern" : "[a-zA-Z0-9%\\-._/?\\P{InBasicLatin}]*",
+            "description" : "Permalink of the topic on which the comment was posted"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the comment"
           },
           "categoryId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the community category containing the comment"
           },
           "status" : {
             "type" : [ "string", "null" ],
             "enum" : [ "AWAITINGAPPROVAL", "PUBLISHED", "TRASHED", "SPAM" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "description" : "Publication status of the comment"
           },
           "topicType" : {
             "type" : [ "string", "null" ],
             "enum" : [ "DISCUSSION", "ANNOUNCEMENT", "QUESTION", "IDEA", "PROBLEM" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "description" : "Type of the associated topic"
           }
         },
         "required" : [ "categoryId", "createdTime", "creator", "id", "parentCommentId", "status", "subject", "summary", "topicId", "topicPermalink", "topicType" ]
       },
       "getUserCommentsData" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./CommunityComment.json#/components/schemas/getUserComments"
-        }
-      },
-      "singleComment" : {
-        "additionalProperties" : false,
-        "allOf" : [ {
-          "$ref" : "./CommunityComment.json#/components/schemas/commentResponse"
-        }, {
-          "type" : [ "null", "object" ],
-          "properties" : {
-            "replies" : {
-              "$ref" : "./CommunityComment.json#/components/schemas/repliesResponseArray"
-            }
-          },
-          "required" : [ "replies" ]
-        } ]
+          "$ref" : "#/components/schemas/getUserComments"
+        },
+        "description" : "List of comments posted by the user"
       },
       "commentData" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./CommunityComment.json#/components/schemas/singleComment"
+          "$ref" : "#/components/schemas/singleCommentRead"
         }
+      },
+      "commentCreatorRead" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "photoUrl" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 400,
+            "minLength" : 0,
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+            "description" : "URL of the creator's profile photo"
+          },
+          "contactId" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "Display name of the creator"
+          },
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the creator"
+          },
+          "label" : {
+            "$ref" : "./Label.json#/components/schemas/labelMetaResponse",
+            "description" : "Badge label assigned to the creator"
+          },
+          "type" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "END_USER", "AGENT" ],
+            "description" : "Type of user. Possible values: AGENT, END_USER"
+          }
+        },
+        "required" : [ "id", "label", "name", "photoUrl" ]
+      },
+      "commentResponseRead" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "modifiedTime" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+            "description" : "Time at which the comment was last modified (ISO 8601 format)"
+          },
+          "creator" : {
+            "$ref" : "#/components/schemas/commentCreatorRead",
+            "description" : "User who created the comment"
+          },
+          "attachments" : {
+            "$ref" : "#/components/schemas/attachments",
+            "description" : "Files attached to the comment"
+          },
+          "mentions" : {
+            "$ref" : "./Mentions.json#/components/schemas/mentionedObj"
+          },
+          "createdTime" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+            "description" : "Time at which the comment was created (ISO 8601 format)"
+          },
+          "modifiedBy" : {
+            "$ref" : "#/components/schemas/commentCreatorRead"
+          },
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the comment"
+          },
+          "content" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 50000,
+            "minLength" : 0,
+            "description" : "Body content of the comment in HTML format"
+          },
+          "status" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "AWAITINGAPPROVAL", "PUBLISHED", "TRASHED", "SPAM" ],
+            "description" : "Publication status of the comment"
+          },
+          "topicType" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "DISCUSSION", "ANNOUNCEMENT", "QUESTION", "IDEA", "PROBLEM" ]
+          }
+        },
+        "required" : [ "attachments", "content", "createdTime", "creator", "id", "mentions", "modifiedBy", "modifiedTime", "status", "topicType" ]
+      },
+      "commentResponseCreate" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "modifiedTime" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+            "description" : "Time at which the comment was last modified (ISO 8601 format)"
+          },
+          "creator" : {
+            "$ref" : "#/components/schemas/creator",
+            "description" : "User who created the comment"
+          },
+          "attachments" : {
+            "$ref" : "#/components/schemas/attachments",
+            "description" : "Files attached to the comment"
+          },
+          "mentions" : {
+            "$ref" : "./Mentions.json#/components/schemas/mentionedObj"
+          },
+          "createdTime" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+            "description" : "Time at which the comment was created (ISO 8601 format)"
+          },
+          "modifiedBy" : {
+            "$ref" : "#/components/schemas/creator"
+          },
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the comment"
+          },
+          "content" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 50000,
+            "minLength" : 0,
+            "description" : "Body content of the comment"
+          },
+          "status" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "AWAITINGAPPROVAL", "PUBLISHED", "TRASHED", "SPAM" ],
+            "description" : "Publication status of the comment"
+          },
+          "topicType" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "DISCUSSION", "ANNOUNCEMENT", "QUESTION", "IDEA", "PROBLEM" ]
+          }
+        },
+        "required" : [ "attachments", "content", "createdTime", "creator", "id", "mentions", "modifiedBy", "modifiedTime", "status", "topicType" ]
+      },
+      "singleCommentRead" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/commentResponseRead"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "replies" : {
+              "$ref" : "#/components/schemas/repliesResponseArray",
+              "description" : "Replies posted under the comment"
+            }
+          },
+          "required" : [ "replies" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "categoryIdSchema" : {
+        "type" : [ "string", "integer" ],
+        "format" : "int64",
+        "pattern" : "([0-9]+)"
       }
     },
     "responses" : {
@@ -1006,11 +1359,12 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./CommunityComment.json#/components/schemas/getModerationCommentsData"
+                  "$ref" : "#/components/schemas/getModerationCommentsData",
+                  "description" : "List of comments pending moderation"
                 }
               },
               "required" : [ "data" ]
@@ -1022,7 +1376,7 @@
                     "summary" : "Comment 1",
                     "topicPeramlink" : "zoho-desk-api",
                     "creator" : {
-                      "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015971/photo?orgId=123456",
+                      "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015971/photo?orgId=1234567890",
                       "name" : "user1",
                       "id" : "7000000015971",
                       "label" : {
@@ -1033,9 +1387,9 @@
                         },
                         "name" : "Admin",
                         "id" : "6000000158001",
-                        "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/6000000158231?orgId=14132"
+                        "logoUrl" : "https://desk.example.com/portal/api/publicImages/6000000158231?orgId=1234567890"
                       },
-                      "type" : "END_USER"
+                      "type" : [ "END_USER" ]
                     },
                     "topicId" : "4000000019013",
                     "trashedBy" : null,
@@ -1049,7 +1403,7 @@
                     "topicPeramlink" : "zoho-desk-api-features",
                     "modifiedTime" : 1539685739495,
                     "creator" : {
-                      "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015971/photo?orgId=123456",
+                      "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015971/photo?orgId=1234567890",
                       "name" : "user 1",
                       "id" : "7000000015971",
                       "label" : {
@@ -1060,9 +1414,9 @@
                         },
                         "name" : "Admin",
                         "id" : "6000000158001",
-                        "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/6000000158231?orgId=14132"
+                        "logoUrl" : "https://desk.example.com/portal/api/publicImages/6000000158231?orgId=1234567890"
                       },
-                      "type" : "END_USER"
+                      "type" : [ "END_USER" ]
                     },
                     "topicId" : "4000000019013",
                     "trashedBy" : null,
@@ -1083,11 +1437,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "count" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 }
@@ -1111,15 +1465,17 @@
             "schema" : {
               "additionalProperties" : false,
               "allOf" : [ {
-                "$ref" : "./CommunityComment.json#/components/schemas/commentResponse"
+                "$ref" : "#/components/schemas/commentResponse"
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "properties" : {
                   "replies" : {
-                    "$ref" : "./CommunityComment.json#/components/schemas/repliesResponseArray"
+                    "$ref" : "#/components/schemas/repliesResponseArray",
+                    "description" : "Replies posted under the comment"
                   }
                 },
-                "required" : [ "replies" ]
+                "required" : [ "replies" ],
+                "additionalProperties" : false
               } ]
             },
             "examples" : {
@@ -1127,7 +1483,7 @@
                 "value" : {
                   "modifiedTime" : 1539685260386,
                   "creator" : {
-                    "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015971/photo?orgId=123456",
+                    "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015971/photo?orgId=1234567890",
                     "name" : "user 2",
                     "id" : "7000000015971",
                     "label" : {
@@ -1138,15 +1494,15 @@
                       },
                       "name" : "Admin",
                       "id" : "6000000158001",
-                      "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/6000000158231?orgId=14132"
+                      "logoUrl" : "https://desk.example.com/portal/api/publicImages/6000000158231?orgId=1234567890"
                     },
-                    "type" : "AGENT"
+                    "type" : [ "AGENT" ]
                   },
                   "attachments" : [ {
                     "size" : "1166",
                     "name" : "download.png",
                     "id" : "4000000019027",
-                    "href" : "https://desk.zoho.com/api/v1/communityTopics/4000000019003/comments/4000000019029/attachments/4000000019027/content?orgId=123456"
+                    "href" : "https://desk.example.com/api/v1/communityTopics/4000000019003/comments/4000000019029/attachments/4000000019027/content?orgId=1234567890"
                   } ],
                   "replies" : [ ],
                   "createdTime" : 1539685260386,
@@ -1164,53 +1520,49 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "modifiedTime" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0,
-                  "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+                  "$ref" : "#/components/schemas/timestamp",
+                  "description" : "Time at which the reply was last modified (ISO 8601 format)"
                 },
                 "creator" : {
-                  "$ref" : "./CommunityComment.json#/components/schemas/creator"
+                  "$ref" : "#/components/schemas/creator",
+                  "description" : "User who created the reply"
                 },
                 "attachments" : {
-                  "$ref" : "./CommunityComment.json#/components/schemas/attachments"
+                  "$ref" : "#/components/schemas/attachments",
+                  "description" : "Files attached to the reply"
                 },
                 "mentions" : {
                   "$ref" : "./Mentions.json#/components/schemas/mentionedObj"
                 },
                 "createdTime" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0,
-                  "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+                  "$ref" : "#/components/schemas/timestamp",
+                  "description" : "Time at which the reply was created (ISO 8601 format)"
                 },
                 "parentCommentId" : {
-                  "type" : [ "string", "null", "integer" ],
-                  "format" : "int64",
-                  "pattern" : "([0-9]+)"
+                  "$ref" : "#/components/schemas/id",
+                  "description" : "Unique ID of the parent comment"
                 },
                 "modifiedBy" : {
-                  "$ref" : "./CommunityComment.json#/components/schemas/creator"
+                  "$ref" : "#/components/schemas/creator"
                 },
                 "id" : {
-                  "type" : [ "string", "null", "integer" ],
-                  "format" : "int64",
-                  "pattern" : "([0-9]+)"
+                  "$ref" : "#/components/schemas/id",
+                  "description" : "Unique ID of the reply"
                 },
                 "content" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "maxLength" : 50000,
-                  "minLength" : 0
+                  "minLength" : 0,
+                  "description" : "Body content of the reply"
                 },
                 "status" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "enum" : [ "AWAITINGAPPROVAL", "PUBLISHED", "TRASHED", "SPAM" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "description" : "Publication status of the reply"
                 }
               },
               "required" : [ "attachments", "content", "createdTime", "creator", "id", "mentions", "modifiedBy", "modifiedTime", "parentCommentId", "status" ]
@@ -1220,7 +1572,7 @@
                 "value" : {
                   "modifiedTime" : 1539685260386,
                   "creator" : {
-                    "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015971/photo?orgId=123456",
+                    "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015971/photo?orgId=1234567890",
                     "name" : "user 2",
                     "id" : "7000000015971",
                     "label" : {
@@ -1231,14 +1583,14 @@
                       },
                       "name" : "Admin",
                       "id" : "6000000158001",
-                      "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/6000000158231?orgId=14132"
+                      "logoUrl" : "https://desk.example.com/portal/api/publicImages/6000000158231?orgId=1234567890"
                     }
                   },
                   "attachments" : [ {
                     "size" : "1166",
                     "name" : "download.png",
                     "id" : "4000000019027",
-                    "href" : "https://desk.zoho.com/api/v1/communityTopics/4000000019003/replies/4000000019031/attachments/4000000019027/content?orgId=123456"
+                    "href" : "https://desk.example.com/api/v1/communityTopics/4000000019003/replies/4000000019031/attachments/4000000019027/content?orgId=1234567890"
                   } ],
                   "createdTime" : 1539685260386,
                   "parentCommentId" : "4000000019029",
@@ -1256,11 +1608,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./CommunityComment.json#/components/schemas/getUserCommentsData"
+                  "$ref" : "#/components/schemas/getUserCommentsData"
                 }
               },
               "required" : [ "data" ]
@@ -1272,7 +1624,7 @@
                     "summary" : "Comment 1",
                     "topicPeramlink" : "zoho-desk-api",
                     "creator" : {
-                      "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015971/photo?orgId=123456",
+                      "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015971/photo?orgId=1234567890",
                       "name" : "user2",
                       "id" : "7000000015972",
                       "label" : {
@@ -1283,9 +1635,9 @@
                         },
                         "name" : "Admin",
                         "id" : "6000000158001",
-                        "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/6000000158231?orgId=14132"
+                        "logoUrl" : "https://desk.example.com/portal/api/publicImages/6000000158231?orgId=1234567890"
                       },
-                      "type" : "AGENT"
+                      "type" : [ "AGENT" ]
                     },
                     "topicId" : "4000000019013",
                     "subject" : "Zoho Desk API",
@@ -1299,10 +1651,10 @@
                     "summary" : "Comment 2",
                     "topicPeramlink" : "zoho-desk-api-features",
                     "creator" : {
-                      "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015971/photo?orgId=123456",
+                      "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015971/photo?orgId=1234567890",
                       "name" : "user2",
                       "id" : "7000000015972",
-                      "type" : "AGENT"
+                      "type" : [ "AGENT" ]
                     },
                     "topicId" : "4000000019013",
                     "subject" : "Zoho Desk API Features",
@@ -1324,11 +1676,12 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./CommunityComment.json#/components/schemas/commentData"
+                  "$ref" : "#/components/schemas/commentData",
+                  "description" : "List of comment entries"
                 }
               },
               "required" : [ "data" ]
@@ -1339,7 +1692,7 @@
                   "data" : [ {
                     "modifiedTime" : 1539685755219,
                     "creator" : {
-                      "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015971/photo?orgId=123456",
+                      "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015971/photo?orgId=1234567890",
                       "name" : "user1",
                       "id" : "7000000015971",
                       "label" : {
@@ -1350,14 +1703,14 @@
                         },
                         "name" : "Admin",
                         "id" : "6000000158001",
-                        "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/6000000158231?orgId=14132"
+                        "logoUrl" : "https://desk.example.com/portal/api/publicImages/6000000158231?orgId=1234567890"
                       }
                     },
                     "attachments" : [ {
                       "size" : "1166",
                       "name" : "download (1).png",
                       "id" : "4000000019033",
-                      "href" : "https://desk.zoho.com/api/v1/topics/4000000019003/comments/4000000019013/attachments/4000000019033/content?orgId=123456"
+                      "href" : "https://desk.example.com/api/v1/topics/4000000019003/comments/4000000019013/attachments/4000000019033/content?orgId=1234567890"
                     } ],
                     "replies" : [ ],
                     "createdTime" : 1539682900077,
@@ -1367,7 +1720,7 @@
                   }, {
                     "modifiedTime" : 1539685739495,
                     "creator" : {
-                      "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015971/photo?orgId=123456",
+                      "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015971/photo?orgId=1234567890",
                       "name" : "user 1",
                       "id" : "7000000015971",
                       "label" : {
@@ -1378,14 +1731,14 @@
                         },
                         "name" : "Admin",
                         "id" : "6000000158001",
-                        "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/6000000158231?orgId=14132"
+                        "logoUrl" : "https://desk.example.com/portal/api/publicImages/6000000158231?orgId=1234567890"
                       }
                     },
                     "attachments" : [ ],
                     "replies" : [ {
                       "modifiedTime" : 1539685366893,
                       "creator" : {
-                        "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015971/photo?orgId=123456",
+                        "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015971/photo?orgId=1234567890",
                         "name" : "user 1",
                         "id" : "7000000015971",
                         "label" : {
@@ -1396,7 +1749,7 @@
                           },
                           "name" : "Admin",
                           "id" : "6000000158001",
-                          "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/6000000158231?orgId=14132"
+                          "logoUrl" : "https://desk.example.com/portal/api/publicImages/6000000158231?orgId=1234567890"
                         }
                       },
                       "attachments" : [ ],
@@ -1416,6 +1769,120 @@
             }
           }
         }
+      },
+      "singleCommentRead" : {
+        "description" : "singleCommentRead template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "additionalProperties" : false,
+              "allOf" : [ {
+                "$ref" : "#/components/schemas/commentResponseRead"
+              }, {
+                "type" : [ "object", "null" ],
+                "properties" : {
+                  "replies" : {
+                    "$ref" : "#/components/schemas/repliesResponseArray",
+                    "description" : "Replies posted under the comment"
+                  }
+                },
+                "required" : [ "replies" ],
+                "additionalProperties" : false
+              } ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "modifiedTime" : 1539685260386,
+                  "creator" : {
+                    "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015971/photo?orgId=1234567890",
+                    "name" : "user 2",
+                    "id" : "7000000015971",
+                    "label" : {
+                      "preferences" : {
+                        "shape" : "RECTANGLE",
+                        "bgColor" : "#23F123",
+                        "textColor" : "#2CA123"
+                      },
+                      "name" : "Admin",
+                      "id" : "6000000158001",
+                      "logoUrl" : "https://desk.example.com/portal/api/publicImages/6000000158231?orgId=1234567890"
+                    },
+                    "type" : [ "AGENT" ]
+                  },
+                  "attachments" : [ {
+                    "size" : "1166",
+                    "name" : "download.png",
+                    "id" : "4000000019027",
+                    "href" : "https://desk.example.com/api/v1/communityTopics/4000000019003/comments/4000000019029/attachments/4000000019027/content?orgId=1234567890"
+                  } ],
+                  "replies" : [ ],
+                  "createdTime" : 1539685260386,
+                  "id" : "4000000019029",
+                  "content" : "Comment 1",
+                  "status" : "PUBLISHED"
+                }
+              }
+            }
+          }
+        }
+      },
+      "singleCommentCreate" : {
+        "description" : "singleCommentCreate template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "additionalProperties" : false,
+              "allOf" : [ {
+                "$ref" : "#/components/schemas/commentResponseCreate"
+              }, {
+                "type" : [ "object", "null" ],
+                "properties" : {
+                  "replies" : {
+                    "$ref" : "#/components/schemas/repliesResponseArray",
+                    "description" : "Replies posted under the comment"
+                  }
+                },
+                "required" : [ "replies" ],
+                "additionalProperties" : false
+              } ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "modifiedTime" : 1539685260386,
+                  "creator" : {
+                    "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015971/photo?orgId=1234567890",
+                    "name" : "user 2",
+                    "id" : "7000000015971",
+                    "label" : {
+                      "preferences" : {
+                        "shape" : "RECTANGLE",
+                        "bgColor" : "#23F123",
+                        "textColor" : "#2CA123"
+                      },
+                      "name" : "Admin",
+                      "id" : "6000000158001",
+                      "logoUrl" : "https://desk.example.com/portal/api/publicImages/6000000158231?orgId=1234567890"
+                    },
+                    "type" : [ "AGENT" ]
+                  },
+                  "attachments" : [ {
+                    "size" : "1166",
+                    "name" : "download.png",
+                    "id" : "4000000019027",
+                    "href" : "https://desk.example.com/api/v1/communityTopics/4000000019003/comments/4000000019029/attachments/4000000019027/content?orgId=1234567890"
+                  } ],
+                  "replies" : [ ],
+                  "createdTime" : 1539685260386,
+                  "id" : "4000000019029",
+                  "content" : "Comment 1",
+                  "status" : "PUBLISHED"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "parameters" : {
@@ -1426,26 +1893,11 @@
         "style" : "simple",
         "explode" : false,
         "schema" : {
-          "type" : [ "string", "null", "integer" ],
+          "type" : [ "string", "integer" ],
           "format" : "int64",
           "pattern" : "([0-9]+)"
-        }
-      },
-      "limit" : {
-        "name" : "limit",
-        "in" : "query",
-        "description" : "Number of comments to list",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int32",
-          "description" : "Number of comments to list",
-          "maximum" : 100,
-          "minimum" : 1,
-          "pattern" : "([0-9]+)"
-        }
+        },
+        "description" : "Unique ID of the topic"
       },
       "replyId" : {
         "name" : "replyId",
@@ -1454,10 +1906,11 @@
         "style" : "simple",
         "explode" : false,
         "schema" : {
-          "type" : [ "string", "null", "integer" ],
+          "type" : [ "string", "integer" ],
           "format" : "int64",
           "pattern" : "([0-9]+)"
-        }
+        },
+        "description" : "Unique ID of the reply"
       },
       "commentId" : {
         "name" : "commentId",
@@ -1466,54 +1919,11 @@
         "style" : "simple",
         "explode" : false,
         "schema" : {
-          "type" : [ "string", "null", "integer" ],
+          "type" : [ "string", "integer" ],
           "format" : "int64",
           "pattern" : "([0-9]+)"
-        }
-      },
-      "from" : {
-        "name" : "from",
-        "in" : "query",
-        "description" : "Index number, starting from which the comments must be listed",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int32",
-          "description" : "Index number, starting from which the comments must be listed",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "startTime" : {
-        "name" : "startTime",
-        "in" : "query",
-        "description" : "Starting time of the time range in which the comments should have been created. The value must be expressed according to the GMT time zone.",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null" ],
-          "description" : "Starting time of the time range in which the comments should have been created. The value must be expressed according to the GMT time zone.",
-          "maxLength" : 100,
-          "minLength" : 0,
-          "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
-        }
-      },
-      "endTime" : {
-        "name" : "endTime",
-        "in" : "query",
-        "description" : "Ending time of the time range in which the comments should have been created. The value must be expressed according to the GMT time zone.",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null" ],
-          "description" : "Ending time of the time range in which the comments should have been created. The value must be expressed according to the GMT time zone.",
-          "maxLength" : 100,
-          "minLength" : 0,
-          "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
-        }
+        },
+        "description" : "Unique ID of the comment"
       },
       "categoryId" : {
         "name" : "categoryId",
@@ -1523,9 +1933,8 @@
         "style" : "form",
         "explode" : true,
         "schema" : {
-          "type" : [ "string", "null", "integer" ],
+          "type" : [ "string", "integer" ],
           "format" : "int64",
-          "description" : "ID of the community category from which the comments must be fetched",
           "pattern" : "([0-9]+)"
         }
       }
@@ -1535,19 +1944,20 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "reason" : {
-                  "type" : [ "string", "null" ],
-                  "description" : "Reason for marking the comment as spam",
+                  "type" : [ "string" ],
+                  "description" : "Reason for marking the comments as spam",
                   "maxLength" : 1000,
-                  "minLength" : 0
+                  "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
                 },
                 "commentIds" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
+                  "description" : "ID(s) of the comment(s) to mark as spam",
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
@@ -1560,7 +1970,7 @@
             "examples" : {
               "Valid requestBody Definitions" : {
                 "value" : {
-                  "reason" : "Reason for marking a topic's comment as spam",
+                  "reason" : "Reason for marking the comments as spam",
                   "commentIds" : [ "103417000000528003", "103417000000528006", "103417000000528008" ]
                 }
               }
@@ -1572,13 +1982,13 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "commentIds" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
@@ -1602,13 +2012,13 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "commentIds" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
@@ -1632,27 +2042,31 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "attachmentIds" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
+                  "description" : "ID(s) of the file(s) to attach to the comment",
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
                   "uniqueItems" : false
                 },
                 "content" : {
-                  "type" : [ "string", "null" ],
-                  "description" : "Content of the comment/reply",
-                  "maxLength" : 50000,
-                  "minLength" : 0
+                  "type" : [ "string" ],
+                  "description" : "Body content of the comment",
+                  "maxLength" : 50000
                 },
                 "notifyMentions" : {
-                  "type" : [ "boolean", "null" ],
-                  "description" : "whether to notify mentioned user while updateing content."
+                  "type" : [ "boolean" ],
+                  "description" : "Indicates whether mentioned users must be notified when content is updated. Possible values: • true = Notify mentioned users • false = Do not notify mentioned users"
+                },
+                "isBestComment" : {
+                  "type" : [ "boolean" ],
+                  "description" : "Indicates whether the comment must be marked as the best answer on the topic. A topic can have only one best comment. Possible values: • true = Mark as best comment • false = Remove best comment status"
                 }
               }
             },
@@ -1671,13 +2085,13 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "commentIds" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
@@ -1701,23 +2115,23 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "attachmentIds" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
+                  "description" : "ID(s) of the file(s) to attach to the reply",
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
                   "uniqueItems" : false
                 },
                 "content" : {
-                  "type" : [ "string", "null" ],
-                  "description" : "Content of the reply",
-                  "maxLength" : 50000,
-                  "minLength" : 0
+                  "type" : [ "string" ],
+                  "description" : "Body content of the reply",
+                  "maxLength" : 50000
                 }
               },
               "required" : [ "content" ]
@@ -1737,27 +2151,31 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "attachmentIds" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
+                  "description" : "ID(s) of the file(s) to attach to the reply",
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
                   "uniqueItems" : false
                 },
                 "content" : {
-                  "type" : [ "string", "null" ],
-                  "description" : "Content of the comment/reply",
-                  "maxLength" : 50000,
-                  "minLength" : 0
+                  "type" : [ "string" ],
+                  "description" : "Body content of the reply",
+                  "maxLength" : 50000
                 },
                 "notifyMentions" : {
-                  "type" : [ "boolean", "null" ],
-                  "description" : "whether to notify mentioned user while updateing content."
+                  "type" : [ "boolean" ],
+                  "description" : "Indicates whether mentioned users must be notified when content is updated. Possible values: • true = Notify mentioned users • false = Do not notify mentioned users"
+                },
+                "isBestComment" : {
+                  "type" : [ "boolean" ],
+                  "description" : "Indicates whether the reply must be marked as the best answer on the topic. A topic can have only one best comment. Possible values: • true = Mark as best comment • false = Remove best comment status"
                 }
               }
             },
@@ -1776,13 +2194,13 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "commentIds" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
@@ -1806,23 +2224,23 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "attachmentIds" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
-                  "uniqueItems" : false
+                  "uniqueItems" : false,
+                  "description" : "ID(s) of the file(s) to attach to the comment"
                 },
                 "content" : {
-                  "type" : [ "string", "null" ],
-                  "description" : "Content of the comment",
-                  "maxLength" : 50000,
-                  "minLength" : 0
+                  "type" : [ "string" ],
+                  "description" : "Body content of the comment",
+                  "maxLength" : 50000
                 }
               },
               "required" : [ "content" ]
@@ -1840,6 +2258,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

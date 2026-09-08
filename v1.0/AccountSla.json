@@ -11,17 +11,31 @@
         "summary" : "Associate or dissociate SLA from account",
         "description" : "This API associates or dissociates an SLA from an account.",
         "operationId" : "associateAndDisassociateSlaInAccount",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/accountId"
-        }, {
-          "name" : "slaId",
+          "name" : "accountId",
           "in" : "path",
+          "description" : "Unique ID of the account",
           "required" : true,
           "style" : "simple",
           "explode" : false,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
+            "maxLength" : 100,
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "slaId",
+          "in" : "path",
+          "description" : "Unique ID of the SLA",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "maxLength" : 100,
             "pattern" : "([0-9]+)"
           }
         }, {
@@ -39,7 +53,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.contacts.CREATE" ]
+          "iam-oauth2-schema" : [ "Desk.accounts.UPDATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -50,6 +64,7 @@
         "summary" : "List account SLAs",
         "description" : "This API lists a particular number of SLAs associated with an account, based on the limit defined.",
         "operationId" : "getSlasUnderAccount",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "departmentId",
           "in" : "query",
@@ -58,9 +73,9 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
-            "description" : "ID of the department from which the SLAs must be fetched. If you do not pass this parameter in the API request, SLAs from all permitted departments will be listed.",
+            "maxLength" : 100,
             "pattern" : "([0-9]+)"
           }
         }, {
@@ -71,9 +86,8 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "integer" ],
             "format" : "int32",
-            "description" : "Number of SLAs to list",
             "maximum" : 100,
             "minimum" : 1,
             "pattern" : "([0-9]+)"
@@ -86,28 +100,37 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "integer" ],
             "format" : "int32",
-            "description" : "Index number, starting from which the SLAs must be fetched",
             "minimum" : 0,
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "default" : 0
           }
         }, {
           "name" : "status",
           "in" : "query",
-          "description" : "Activation status of the SLAs. Values allowed are: @ACTIVE@ and @INACTIVE@",
+          "description" : "Activation status of the SLAs. Allowed values: ACTIVE, INACTIVE",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Activation status of the SLAs. Values allowed are: @ACTIVE@ and @INACTIVE@",
-            "enum" : [ "ACTIVE", "INACTIVE" ],
+            "type" : [ "string" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "ACTIVE", "INACTIVE" ]
           }
         }, {
-          "$ref" : "#/components/parameters/accountId"
+          "name" : "accountId",
+          "in" : "path",
+          "description" : "Unique ID of the account",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "maxLength" : 100,
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -129,17 +152,19 @@
   "components" : {
     "schemas" : {
       "department" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "name" : {
             "type" : [ "string", "null" ],
+            "description" : "Name of the department",
             "maxLength" : 200,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
+            "description" : "Unique ID of the department",
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
@@ -147,46 +172,49 @@
         "required" : [ "id", "name" ]
       },
       "slaListViewArray" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "name" : {
             "type" : [ "string", "null" ],
+            "description" : "Name of the SLA",
             "maxLength" : 100,
             "minLength" : 0
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
+            "description" : "Unique ID of the SLA",
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "department" : {
-            "$ref" : "./AccountSla.json#/components/schemas/department"
+            "$ref" : "#/components/schemas/department"
           },
           "isActive" : {
-            "type" : [ "boolean", "null" ]
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the SLA is active"
           }
         },
         "required" : [ "department", "id", "isActive", "name" ]
       },
       "slaData" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./AccountSla.json#/components/schemas/slaListViewArray"
+          "$ref" : "#/components/schemas/slaListViewArray"
         }
       }
     },
     "responses" : {
       "slaMetaInfoResponse" : {
-        "description" : "slaMetaInfoResponse template definitions",
+        "description" : "List of SLAs associated with the account",
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./AccountSla.json#/components/schemas/slaData"
+                  "$ref" : "#/components/schemas/slaData"
                 }
               },
               "required" : [ "data" ]
@@ -195,7 +223,7 @@
               "Valid responses Definitions" : {
                 "value" : {
                   "data" : [ {
-                    "slaName" : "Priority-based SLAs",
+                    "name" : "Priority-based SLAs",
                     "id" : "45794000000419372",
                     "isActive" : true,
                     "department" : {
@@ -203,7 +231,7 @@
                       "id" : "45794000000418059"
                     }
                   }, {
-                    "slaName" : "SLA",
+                    "name" : "SLA",
                     "id" : "45794000000570017",
                     "isActive" : true,
                     "department" : {
@@ -211,7 +239,7 @@
                       "id" : "45794000000006907"
                     }
                   }, {
-                    "slaName" : "Silver SLAs",
+                    "name" : "Silver SLAs",
                     "id" : "45794000000587464",
                     "isActive" : true,
                     "department" : {
@@ -226,30 +254,17 @@
         }
       }
     },
-    "parameters" : {
-      "accountId" : {
-        "name" : "accountId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      }
-    },
     "requestBodies" : {
       "updateSla" : {
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "associate" : {
-                  "type" : [ "boolean", "null" ]
+                  "type" : [ "boolean" ],
+                  "description" : "Indicates whether to associate or dissociate the SLA from the account"
                 }
               },
               "required" : [ "associate" ]
@@ -266,6 +281,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

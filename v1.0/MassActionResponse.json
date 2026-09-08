@@ -8,28 +8,32 @@
   "components" : {
     "schemas" : {
       "massActionResponse" : {
-        "type" : "object",
+        "type" : [ "object" ],
         "additionalProperties" : false,
         "properties" : {
           "success" : {
-            "type" : "boolean"
+            "description" : "Indicates whether the operation succeeded. Possible values: true, false",
+            "type" : [ "boolean" ]
           },
           "id" : {
+            "description" : "Unique ID of the entity",
             "type" : [ "string", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "errors" : {
+            "description" : "Error details if the operation failed; null if successful",
             "$ref" : "./MassActionError.json#/components/schemas/massActionErrorResponse"
           }
         },
         "required" : [ "errors", "id", "success" ]
       },
       "results" : {
-        "type" : "array",
+        "type" : [ "array" ],
         "items" : {
           "$ref" : "#/components/schemas/massActionResponse"
-        }
+        },
+        "description" : "List of bulk operation results"
       }
     },
     "responses" : {
@@ -38,11 +42,12 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : "object",
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "results" : {
-                  "$ref" : "#/components/schemas/results"
+                  "$ref" : "#/components/schemas/results",
+                  "description" : "List of bulk operation results"
                 }
               },
               "required" : [ "results" ]
@@ -70,6 +75,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

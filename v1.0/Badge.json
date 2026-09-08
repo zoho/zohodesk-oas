@@ -12,9 +12,34 @@
         "description" : "This API lists a particular number of default and custom badges, based on the limit defined.",
         "operationId" : "getBadges",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/limit"
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of badges to list",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 50,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)",
+            "default" : 10
+          }
         }, {
-          "$ref" : "#/components/parameters/from"
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number starting from which the badges must be listed",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "default" : 1
+          }
         }, {
           "name" : "type",
           "in" : "query",
@@ -23,11 +48,8 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Type of badge: default or custom",
-            "enum" : [ "custom", "default" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "type" : [ "string" ],
+            "enum" : [ "custom", "default" ]
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -53,9 +75,45 @@
         "description" : "This API lists user's default and custom badges, based on the limit defined.",
         "operationId" : "getUserBadges",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/limit"
+          "name" : "type",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "custom", "default" ]
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Type of badge: default or custom"
         }, {
-          "$ref" : "#/components/parameters/from"
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of badges to list",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 50,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)",
+            "default" : 50
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number starting from which the badges must be listed",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "default" : 1
+          }
         }, {
           "name" : "sortBy",
           "in" : "query",
@@ -64,11 +122,9 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Sort by the @createdTime@ attribute. The default sorting order is ascending. A @-@ prefix denotes descending order of sorting.",
+            "type" : [ "string" ],
             "enum" : [ "createdTime" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "pattern" : "-?(createdTime)"
           }
         }, {
           "name" : "startTime",
@@ -78,11 +134,9 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Start time should be in GMT time zone",
+            "type" : [ "string" ],
             "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null"
           }
         }, {
           "name" : "endTime",
@@ -92,14 +146,21 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "End time should be in GMT time zone",
+            "type" : [ "string" ],
             "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null"
           }
         }, {
-          "$ref" : "#/components/parameters/userId"
+          "name" : "userId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -121,7 +182,16 @@
         "description" : "This API adds specified badges to user.",
         "operationId" : "associateBadgesToUsers",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/userId"
+          "name" : "userId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -149,7 +219,16 @@
         "description" : "This API removes specified badges from the users.",
         "operationId" : "dissociateBadgesFromUsers",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/userId"
+          "name" : "userId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -174,7 +253,7 @@
   "components" : {
     "schemas" : {
       "badgesDetail" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "name" : {
@@ -191,7 +270,7 @@
             "minLength" : 0
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
@@ -205,9 +284,9 @@
         "required" : [ "description", "iconUrl", "id", "isCustom", "name" ]
       },
       "badgesArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./Badge.json#/components/schemas/badgesDetail"
+          "$ref" : "#/components/schemas/badgesDetail"
         }
       }
     },
@@ -217,9 +296,9 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "array" ],
+              "type" : [ "array", "null" ],
               "items" : {
-                "$ref" : "./Badge.json#/components/schemas/badgesDetail"
+                "$ref" : "#/components/schemas/badgesDetail"
               }
             },
             "examples" : {
@@ -242,11 +321,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./Badge.json#/components/schemas/badgesArray"
+                  "$ref" : "#/components/schemas/badgesArray"
                 }
               },
               "required" : [ "data" ]
@@ -266,62 +345,18 @@
         }
       }
     },
-    "parameters" : {
-      "limit" : {
-        "name" : "limit",
-        "in" : "query",
-        "description" : "Number of badges to list",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int32",
-          "description" : "Number of badges to list",
-          "maximum" : 100,
-          "minimum" : 1,
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "from" : {
-        "name" : "from",
-        "in" : "query",
-        "description" : "Index number starting from which the badges must be listed",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int32",
-          "description" : "Index number starting from which the badges must be listed",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "userId" : {
-        "name" : "userId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      }
-    },
     "requestBodies" : {
       "badgeIdsJSON" : {
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "badgeIds" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
@@ -345,13 +380,13 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "badgeIds" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
@@ -373,6 +408,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

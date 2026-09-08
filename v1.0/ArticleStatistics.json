@@ -1,0 +1,2058 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "ArticleStatistics",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/articleDashboard/statistics" : {
+      "get" : {
+        "tags" : [ "ArticleStatistics" ],
+        "summary" : "Get KB Article Statistics",
+        "description" : "Retrieves statistical data related to help articles in the knowledge base.",
+        "operationId" : "getArticleDashboardStatistics",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "rootCategoryIds",
+          "in" : "query",
+          "description" : "ID(s) of the knowledge base root categories to consider",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string", "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "maxItems" : 10,
+            "minItems" : 1,
+            "uniqueItems" : false
+          }
+        }, {
+          "name" : "statsType",
+          "in" : "query",
+          "description" : "Type of statistical data to fetch. Possible values: ARTICLES_REFERENCED, VOTED_PORTAL_USERS, CREATED_ARTICLES, MODIFIED_ARTICLE",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "array" ],
+            "maxLength" : 100,
+            "items" : {
+              "type" : "string",
+              "enum" : [ "ARTICLES_REFERENCED", "VOTED_PORTAL_USERS", "CREATED_ARTICLES", "MODIFIED_ARTICLES" ]
+            }
+          }
+        }, {
+          "name" : "departmentIds",
+          "in" : "query",
+          "description" : "ID(s) of the departments to consider",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string", "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "maxItems" : 10,
+            "minItems" : 1,
+            "uniqueItems" : false
+          }
+        }, {
+          "name" : "locale",
+          "in" : "query",
+          "description" : "Language to filter by",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "en", "ja", "zh", "es", "de", "fr", "tr", "ru", "pt", "it", "nl", "da", "sv", "pl", "ar", "he", "af", "cs", "fr-ca", "bg", "fi", "el", "hu", "id", "nb", "ro", "th", "uk", "vi", "ur", "hi", "te", "kn", "ta", "mr", "ko", "fa", "bn", "gu", "ms", "ml", "en-gb", "sk", "hr", "sl", "zh_TW", "zh-tw", "ca", "ka", "kk", "my", "km", "pt-br" ],
+            "pattern" : "[a-zA-Z]{2,4}([-_][a-zA-Z]{2})?"
+          }
+        }, {
+          "name" : "timeRange",
+          "in" : "query",
+          "description" : "Period to filter by. Possible values: LAST_24_HRS, LAST_7_DAYS, LAST_30_DAYS, LAST_365_DAYS, and yyyy-MM-ddThh:mm:ss.SSSZ,yyyy-MM-ddThh:mm:ss.SSSZ",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "LAST_24_HRS", "LAST_7_DAYS", "LAST_30_DAYS", "LAST_365_DAYS" ],
+            "pattern" : "LAST_24_HRS|LAST_7_DAYS|LAST_30_DAYS|LAST_365_DAYS|(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)),(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/kbDashboardStatisticsResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/articles/trends" : {
+      "get" : {
+        "tags" : [ "ArticleStatistics" ],
+        "summary" : "Get Knowledge Base Trend",
+        "description" : "Retrieves overall trend data for user actions recorded across the entire knowledge base.",
+        "operationId" : "getAllKBTrends",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "rootCategoryIds",
+          "in" : "query",
+          "description" : "ID(s) of the knowledge base root categories to consider",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string", "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "maxItems" : 10,
+            "minItems" : 1,
+            "uniqueItems" : false
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of trend-related records to list. The default value is 1000 and the maximum value allowed is 18000.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 18000,
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "default" : 10000
+          }
+        }, {
+          "name" : "action",
+          "in" : "query",
+          "description" : "User action whose trend-related records must be fetched. Values allowed are: !@LIKE,@! !@DISLIKE,@! !@VIEW,@! !@TICKET_USAGE,@! !@COMMENT,@! !@TEMPLATE_USAGE@! and !@FEEDBACK@!. If you do not pass a value, all actions are included.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : [ "string" ],
+              "enum" : [ "LIKE", "DISLIKE", "VIEW", "TICKET_USAGE", "COMMENT", "TEMPLATE_USAGE", "FEEDBACK" ]
+            }
+          }
+        }, {
+          "name" : "permission",
+          "in" : "query",
+          "description" : "User visibility permission . Possible Values: !@ALL,@! !@REGISTEREDUSERS@! and !@AGENTS@!.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "enum" : [ "ALL", "REGISTEREDUSERS", "AGENTS" ]
+            }
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number, starting from which the trend-related records must be fetched. The default value is 1.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "default" : 1
+          }
+        }, {
+          "name" : "departmentIds",
+          "in" : "query",
+          "description" : "ID(s) of the departments to consider",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string", "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "maxItems" : 10,
+            "minItems" : 1,
+            "uniqueItems" : false
+          }
+        }, {
+          "name" : "userType",
+          "in" : "query",
+          "description" : " Type of users. Values allowed are: AGENTS, REGISTERED_USERS, PUBLIC_USERS, END_USERS and ALL_USERS (default).",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "AGENTS", "REGISTERED_USERS", "PUBLIC_USERS", "ALL_USERS", "END_USERS" ],
+            "default" : "ALL_USERS"
+          }
+        }, {
+          "name" : "locale",
+          "in" : "query",
+          "description" : "Language to filter by",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "en", "ja", "zh", "es", "de", "fr", "tr", "ru", "pt", "it", "nl", "da", "sv", "pl", "ar", "he", "af", "cs", "fr-ca", "bg", "fi", "el", "hu", "id", "nb", "ro", "th", "uk", "vi", "ur", "hi", "te", "kn", "ta", "mr", "ko", "fa", "bn", "gu", "ms", "ml", "en-gb", "sk", "hr", "sl", "zh_TW", "zh-tw", "ca", "ka", "kk", "my", "km", "pt-br" ],
+            "pattern" : "[a-zA-Z]{2,4}([-_][a-zA-Z]{2})?"
+          }
+        }, {
+          "name" : "helpcenterIds",
+          "in" : "query",
+          "description" : "ID(s) of help centers to consider",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string", "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "maxItems" : 20,
+            "minItems" : 0,
+            "uniqueItems" : false
+          }
+        }, {
+          "name" : "timeRange",
+          "in" : "query",
+          "description" : "Period to filter by. Possible values: LAST_24_HRS, LAST_7_DAYS, LAST_30_DAYS, LAST_365_DAYS, and yyyy-MM-ddThh:mm:ss.SSSZ,yyyy-MM-ddThh:mm:ss.SSSZ",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "LAST_24_HRS", "LAST_7_DAYS", "LAST_30_DAYS", "LAST_365_DAYS" ],
+            "pattern" : "LAST_24_HRS|LAST_7_DAYS|LAST_30_DAYS|LAST_365_DAYS|(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)),(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null"
+          }
+        }, {
+          "name" : "actionSource",
+          "in" : "query",
+          "description" : "Channel in which the action was performed. Possible values: !@API,@! !@HELPCENTER,@! !@ASAP_WEB,@! !@ASAP_ANDROID,@! !@ASAP_IOS@! and !@AGENT_VIEW@!. If you do not pass a value, all sources are included.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "enum" : [ "API", "HELPCENTER", "ASAP_WEB", "ASAP_ANDROID", "ASAP_IOS", "AGENT_VIEW" ]
+            },
+            "maxItems" : 6,
+            "uniqueItems" : false
+          }
+        }, {
+          "name" : "status",
+          "in" : "query",
+          "description" : "Publishing status of the translation. Values allowed are: Draft, Published, Review, Expired and Unpublished.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "enum" : [ "Published", "Draft", "Review", "Expired", "Unpublished" ]
+            }
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/articleTrendResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/articles/{articleId}/insights/reset" : {
+      "post" : {
+        "tags" : [ "ArticleStatistics" ],
+        "summary" : "Reset Metrics of All Article Translations",
+        "description" : "Resets metrics on all translations of an article for the specified actions.",
+        "operationId" : "resetAllArticleTranslationsMetrics",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "articleId",
+          "description" : "Unique ID of the article",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/resetArticleMetrics_metricsResetPayload"
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/articles/{articleId}/trends" : {
+      "get" : {
+        "tags" : [ "ArticleStatistics" ],
+        "summary" : "Get Article Trend",
+        "description" : "Retrieves trend data for user actions recorded on an article and all of its translations.",
+        "operationId" : "getArticleTrends",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of trend-related records to list. The default value is 1000 and the maximum value allowed is 18000.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 18000,
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "default" : 10000
+          }
+        }, {
+          "name" : "action",
+          "in" : "query",
+          "description" : "User action whose trend-related records must be fetched. Values allowed are: !@LIKE,@! !@DISLIKE,@! !@VIEW,@! !@TICKET_USAGE,@! !@COMMENT,@! !@TEMPLATE_USAGE@! and !@FEEDBACK@!. If you do not pass a value, all actions are included.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : [ "string" ],
+              "enum" : [ "LIKE", "DISLIKE", "VIEW", "TICKET_USAGE", "COMMENT", "TEMPLATE_USAGE", "FEEDBACK" ]
+            }
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number, starting from which the trend-related records must be fetched. The default value is 1.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "default" : 1
+          }
+        }, {
+          "name" : "userType",
+          "in" : "query",
+          "description" : " Type of users. Values allowed are: AGENTS, REGISTERED_USERS, PUBLIC_USERS, END_USERS and ALL_USERS (default).",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "AGENTS", "REGISTERED_USERS", "PUBLIC_USERS", "ALL_USERS", "END_USERS" ],
+            "default" : "ALL_USERS"
+          }
+        }, {
+          "name" : "timeRange",
+          "in" : "query",
+          "description" : "Period to filter by. Possible values: LAST_24_HRS, LAST_7_DAYS, LAST_30_DAYS, LAST_365_DAYS, and yyyy-MM-ddThh:mm:ss.SSSZ,yyyy-MM-ddThh:mm:ss.SSSZ",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "LAST_24_HRS", "LAST_7_DAYS", "LAST_30_DAYS", "LAST_365_DAYS" ],
+            "pattern" : "LAST_24_HRS|LAST_7_DAYS|LAST_30_DAYS|LAST_365_DAYS|(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)),(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null"
+          }
+        }, {
+          "name" : "actionSource",
+          "in" : "query",
+          "description" : "Channel in which the action was performed. Possible values: !@API,@! !@HELPCENTER,@! !@ASAP_WEB,@! !@ASAP_ANDROID,@! !@ASAP_IOS@! and !@AGENT_VIEW@!. If you do not pass a value, all sources are included.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "enum" : [ "API", "HELPCENTER", "ASAP_WEB", "ASAP_ANDROID", "ASAP_IOS", "AGENT_VIEW" ]
+            },
+            "maxItems" : 6,
+            "uniqueItems" : false
+          }
+        }, {
+          "name" : "articleId",
+          "description" : "Unique ID of the article",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/articleTrendResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/articleDashboard/reports/generate" : {
+      "post" : {
+        "tags" : [ "ArticleStatistics" ],
+        "summary" : "Generate Top Articles Report",
+        "description" : "Generates a real-time report of help articles that received the most user actions.",
+        "operationId" : "generateTopArticleReport",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/reportGenerationPayload"
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/articleDashboard/reports" : {
+      "get" : {
+        "tags" : [ "ArticleStatistics" ],
+        "summary" : "Get Top Article Translations",
+        "description" : "Retrieves a ranked list of article translations based on user action counts.",
+        "operationId" : "getTopArticleTranslationsReport",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "includeActionCounts",
+          "in" : "query",
+          "description" : "Additional action counts to include in the response. Possible values: LIKE, DISLIKE, VIEW, TICKET_USAGE, COMMENT, FEEDBACK",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "enum" : [ "LIKE", "DISLIKE", "VIEW", "COMMENT", "TICKET_USAGE", "TEMPLATE_USAGE", "FEEDBACK" ]
+            },
+            "maxItems" : 5,
+            "uniqueItems" : false
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of translations to fetch. The default value is 10 and the maximum value allowed is 50.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 50,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "action",
+          "in" : "query",
+          "description" : "User action to rank by. Possible values: LIKE, DISLIKE, VIEW, TICKET_USAGE, COMMENT, FEEDBACK",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "LIKE", "DISLIKE", "VIEW", "TICKET_USAGE", "COMMENT", "FEEDBACK", "TEMPLATE_USAGE" ]
+          }
+        }, {
+          "name" : "rootCategoryIds",
+          "in" : "query",
+          "description" : "ID(s) of the knowledge base root categories to consider",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string", "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "maxItems" : 10,
+            "minItems" : 1,
+            "uniqueItems" : false
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number, starting from which the trend-related records must be fetched. The default value is 1.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "default" : 1
+          }
+        }, {
+          "name" : "departmentIds",
+          "in" : "query",
+          "description" : "ID(s) of the departments to consider",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string", "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "maxItems" : 10,
+            "minItems" : 1,
+            "uniqueItems" : false
+          }
+        }, {
+          "name" : "locale",
+          "in" : "query",
+          "description" : "Language to filter by",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "en", "ja", "zh", "es", "de", "fr", "tr", "ru", "pt", "it", "nl", "da", "sv", "pl", "ar", "he", "af", "cs", "fr-ca", "bg", "fi", "el", "hu", "id", "nb", "ro", "th", "uk", "vi", "ur", "hi", "te", "kn", "ta", "mr", "ko", "fa", "bn", "gu", "ms", "ml", "en-gb", "sk", "hr", "sl", "zh_TW", "zh-tw", "ca", "ka", "kk", "my", "km", "pt-br" ],
+            "pattern" : "[a-zA-Z]{2,4}([-_][a-zA-Z]{2})?"
+          }
+        }, {
+          "name" : "timeRange",
+          "in" : "query",
+          "description" : "Period to filter by. Possible values: LAST_24_HRS, LAST_7_DAYS, LAST_30_DAYS, LAST_365_DAYS, and yyyy-MM-ddThh:mm:ss.SSSZ,yyyy-MM-ddThh:mm:ss.SSSZ",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "LAST_24_HRS", "LAST_7_DAYS", "LAST_30_DAYS", "LAST_365_DAYS" ],
+            "pattern" : "LAST_24_HRS|LAST_7_DAYS|LAST_30_DAYS|LAST_365_DAYS|(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)),(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/topArticleReportResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/articleInsights/interactedUsers" : {
+      "get" : {
+        "tags" : [ "ArticleStatistics" ],
+        "summary" : "Get Article Translation Interacted Users by Action Source",
+        "description" : "Retrieves users who interacted with a translation, with extended filtering by action source.",
+        "operationId" : "getArticleTranslationInsightsInteractedUsers",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "articleId",
+          "in" : "query",
+          "description" : "Unique ID of the article to which interacted users need to be fetched",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "action",
+          "in" : "query",
+          "description" : "Action to filter by. Possible values: LIKE, DISLIKE, VIEW .Note: Default value is VIEW.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "LIKE", "DISLIKE", "VIEW" ]
+          }
+        }, {
+          "name" : "locale",
+          "in" : "query",
+          "description" : "Language code of the translation",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "en", "ja", "zh", "es", "de", "fr", "tr", "ru", "pt", "it", "nl", "da", "sv", "pl", "ar", "he", "af", "cs", "fr-ca", "bg", "fi", "el", "hu", "id", "nb", "ro", "th", "uk", "vi", "ur", "hi", "te", "kn", "ta", "mr", "ko", "fa", "bn", "gu", "ms", "ml", "en-gb", "sk", "hr", "sl", "zh_TW", "zh-tw", "ca", "ka", "kk", "my", "km", "pt-br" ],
+            "pattern" : "[a-zA-Z]{2,4}([-_][a-zA-Z]{2})?"
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of users to fetch. The default value is 100 and the maximum value allowed is 100.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 100,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "userType",
+          "in" : "query",
+          "description" : "Type of users. Possible values: AGENTS, REGISTERED_USERS, ALL_USERS (default)",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "AGENTS", "REGISTERED_USERS", "ALL_USERS" ]
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "description" : "Index number starting from which users must be fetched",
+          "schema" : {
+            "$ref" : "./Common.json#/components/schemas/fromQueryParamSchema"
+          }
+        }, {
+          "name" : "timeRange",
+          "in" : "query",
+          "description" : "Period to filter by. Possible values: LAST_24_HRS, LAST_7_DAYS, LAST_30_DAYS, LAST_365_DAYS, and yyyy-MM-ddThh:mm:ss.SSSZ,yyyy-MM-ddThh:mm:ss.SSSZ",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "LAST_24_HRS", "LAST_7_DAYS", "LAST_30_DAYS", "LAST_365_DAYS" ],
+            "pattern" : "LAST_24_HRS|LAST_7_DAYS|LAST_30_DAYS|LAST_365_DAYS|(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)),(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null"
+          }
+        }, {
+          "name" : "actionSource",
+          "in" : "query",
+          "description" : "Channel in which the action was performed. Possible values: !@API,@! !@HELPCENTER,@! !@ASAP_WEB,@! !@ASAP_ANDROID,@! !@ASAP_IOS@! and !@AGENT_VIEW@!. If you do not pass a value, all sources are included.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "enum" : [ "API", "HELPCENTER", "ASAP_WEB", "ASAP_ANDROID", "ASAP_IOS", "AGENT_VIEW" ]
+            },
+            "maxItems" : 6,
+            "uniqueItems" : false
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/interactedUsersResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/articles/{articleId}/translations/{locale}/interactedUsers" : {
+      "get" : {
+        "tags" : [ "ArticleStatistics" ],
+        "summary" : "Get Article Translation Interacted Users",
+        "description" : "Retrieves users who interacted with a specific article translation.",
+        "operationId" : "getArticleTranslationInteractedUsers",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "locale",
+          "description" : "Language code of the\ntranslation",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "en", "ja", "zh", "es", "de", "fr", "tr", "ru", "pt", "it", "nl", "da", "sv", "pl", "ar", "he", "af", "cs", "fr-ca", "bg", "fi", "el", "hu", "id", "nb", "ro", "th", "uk", "vi", "ur", "hi", "te", "kn", "ta", "mr", "ko", "fa", "bn", "gu", "ms", "ml", "en-gb", "sk", "hr", "sl", "zh_TW", "zh-tw", "ca", "ka", "kk", "my", "km", "pt-br" ],
+            "pattern" : "([a-zA-Z]{2,4}([-_][a-zA-Z]{2})?)"
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of users to fetch. The default value is 10 and the maximum value allowed is 100.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 100,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "action",
+          "in" : "query",
+          "description" : "Action to filter by.Possible values: LIKE,DISLIKE. Note: Default value is LIKE.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "LIKE", "DISLIKE" ]
+          }
+        }, {
+          "name" : "userType",
+          "in" : "query",
+          "description" : "Type of users.Possible values: AGENTS,REGISTERED_USERS,ALL_USERS (default)",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "AGENTS", "REGISTERED_USERS", "ALL_USERS" ]
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "description" : "Index number starting from which users must be fetched",
+          "schema" : {
+            "$ref" : "./Common.json#/components/schemas/fromQueryParamSchema"
+          }
+        }, {
+          "name" : "timeRange",
+          "in" : "query",
+          "description" : "Period to filter by. Possible values: LAST_24_HRS, LAST_7_DAYS, LAST_30_DAYS, LAST_365_DAYS, and yyyy-MM-ddThh:mm:ss.SSSZ,yyyy-MM-ddThh:mm:ss.SSSZ",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "LAST_24_HRS", "LAST_7_DAYS", "LAST_30_DAYS", "LAST_365_DAYS" ],
+            "pattern" : "LAST_24_HRS|LAST_7_DAYS|LAST_30_DAYS|LAST_365_DAYS|(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)),(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null"
+          }
+        }, {
+          "name" : "articleId",
+          "description" : "Unique ID of the article",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/interactedUsersResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/articleDashboard/counts" : {
+      "get" : {
+        "tags" : [ "ArticleStatistics" ],
+        "summary" : "Get Article Translation Action Counts",
+        "description" : "Retrieves aggregated action counts for a specific article translation based on specified filters.",
+        "operationId" : "getArticleTranslationCountActionStatistics",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "action",
+          "in" : "query",
+          "description" : "User action(s) to include. Multiple values can be separated by commas. Possible values:VIEW, LIKE, DISLIKE, COMMENT, FEEDBACK, TEMPLATE_USAGE and TICKET_USAGE. If you do not pass a value, all actions are included.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : [ "string" ],
+              "enum" : [ "LIKE", "DISLIKE", "VIEW", "COMMENT", "TICKET_USAGE", "TEMPLATE_USAGE", "FEEDBACK" ]
+            }
+          }
+        }, {
+          "name" : "rootCategoryIds",
+          "in" : "query",
+          "description" : "ID(s) of the knowledge base root categories to consider",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string", "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "maxItems" : 10,
+            "minItems" : 1,
+            "uniqueItems" : false
+          }
+        }, {
+          "name" : "departmentIds",
+          "in" : "query",
+          "description" : "ID(s) of the departments to consider",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string", "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "maxItems" : 10,
+            "minItems" : 1,
+            "uniqueItems" : false
+          }
+        }, {
+          "name" : "userType",
+          "in" : "query",
+          "description" : " Type of users. Values allowed are: AGENTS, REGISTERED_USERS, PUBLIC_USERS, END_USERS and ALL_USERS (default).",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "AGENTS", "REGISTERED_USERS", "PUBLIC_USERS", "ALL_USERS", "END_USERS" ],
+            "default" : "ALL_USERS"
+          }
+        }, {
+          "name" : "locale",
+          "in" : "query",
+          "description" : "Language to filter by",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "en", "ja", "zh", "es", "de", "fr", "tr", "ru", "pt", "it", "nl", "da", "sv", "pl", "ar", "he", "af", "cs", "fr-ca", "bg", "fi", "el", "hu", "id", "nb", "ro", "th", "uk", "vi", "ur", "hi", "te", "kn", "ta", "mr", "ko", "fa", "bn", "gu", "ms", "ml", "en-gb", "sk", "hr", "sl", "zh_TW", "zh-tw", "ca", "ka", "kk", "my", "km", "pt-br" ],
+            "pattern" : "[a-zA-Z]{2,4}([-_][a-zA-Z]{2})?"
+          }
+        }, {
+          "name" : "timeRange",
+          "in" : "query",
+          "description" : "Period to filter by. Possible values: LAST_24_HRS, LAST_7_DAYS, LAST_30_DAYS, LAST_365_DAYS, and yyyy-MM-ddThh:mm:ss.SSSZ,yyyy-MM-ddThh:mm:ss.SSSZ",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "LAST_24_HRS", "LAST_7_DAYS", "LAST_30_DAYS", "LAST_365_DAYS" ],
+            "pattern" : "LAST_24_HRS|LAST_7_DAYS|LAST_30_DAYS|LAST_365_DAYS|(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)),(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null"
+          }
+        }, {
+          "name" : "actionSource",
+          "in" : "query",
+          "description" : "Channel in which the action was performed. Possible values: !@API,@! !@HELPCENTER,@! !@ASAP_WEB,@! !@ASAP_ANDROID,@! !@ASAP_IOS@! and !@AGENT_VIEW@!. If you do not pass a value, all sources are included.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "enum" : [ "API", "HELPCENTER", "ASAP_WEB", "ASAP_ANDROID", "ASAP_IOS", "AGENT_VIEW" ]
+            },
+            "maxItems" : 6,
+            "uniqueItems" : false
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/articleStatisticsResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/articles/{articleId}/interactedUsers" : {
+      "get" : {
+        "tags" : [ "ArticleStatistics" ],
+        "summary" : "Get Article Interacted Users",
+        "description" : "Retrieves users who interacted with a specific article.",
+        "operationId" : "getArticleInteractedUsers",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of users to fetch. The default value is 10 and the maximum value allowed is 100.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 100,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "action",
+          "in" : "query",
+          "description" : "Action to filter by. Possible values: LIKE, DISLIKE .Note: Default value is LIKE.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "LIKE", "DISLIKE" ]
+          }
+        }, {
+          "name" : "userType",
+          "in" : "query",
+          "description" : "Type of users. Possible values: AGENTS, REGISTERED_USERS, ALL_USERS (default)",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "AGENTS", "REGISTERED_USERS", "ALL_USERS" ]
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "description" : "Index number starting from which users must be fetched",
+          "schema" : {
+            "$ref" : "./Common.json#/components/schemas/fromQueryParamSchema"
+          }
+        }, {
+          "name" : "timeRange",
+          "in" : "query",
+          "description" : "Period to filter by. Possible values: LAST_24_HRS, LAST_7_DAYS, LAST_30_DAYS, LAST_365_DAYS, and yyyy-MM-ddThh:mm:ss.SSSZ,yyyy-MM-ddThh:mm:ss.SSSZ",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "LAST_24_HRS", "LAST_7_DAYS", "LAST_30_DAYS", "LAST_365_DAYS" ],
+            "pattern" : "LAST_24_HRS|LAST_7_DAYS|LAST_30_DAYS|LAST_365_DAYS|(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)),(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null"
+          }
+        }, {
+          "name" : "articleId",
+          "description" : "Unique ID of the article",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/interactedUsersResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/articles/{articleId}/translations/{locale}/interactedUsers/count" : {
+      "get" : {
+        "tags" : [ "ArticleStatistics" ],
+        "summary" : "Get Article Translation Interacted Users Count",
+        "description" : "Retrieves the count of users who interacted with a specific article translation.",
+        "operationId" : "getArticleTranslationInteractedUsersCount",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "locale",
+          "description" : "Language code of the translation",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "en", "ja", "zh", "es", "de", "fr", "tr", "ru", "pt", "it", "nl", "da", "sv", "pl", "ar", "he", "af", "cs", "fr-ca", "bg", "fi", "el", "hu", "id", "nb", "ro", "th", "uk", "vi", "ur", "hi", "te", "kn", "ta", "mr", "ko", "fa", "bn", "gu", "ms", "ml", "en-gb", "sk", "hr", "sl", "zh_TW", "zh-tw", "ca", "ka", "kk", "my", "km", "pt-br" ],
+            "pattern" : "([a-zA-Z]{2,4}([-_][a-zA-Z]{2})?)"
+          }
+        }, {
+          "name" : "action",
+          "in" : "query",
+          "description" : "Action to filter by.Possible values: LIKE,DISLIKE .Note: Default value is LIKE.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "LIKE", "DISLIKE" ]
+          }
+        }, {
+          "name" : "userType",
+          "in" : "query",
+          "description" : "Type of users.Possible values: AGENTS,REGISTERED_USERS,ALL_USERS (default)",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "AGENTS", "REGISTERED_USERS", "ALL_USERS" ]
+          }
+        }, {
+          "name" : "timeRange",
+          "in" : "query",
+          "description" : "Period to filter by. Possible values: LAST_24_HRS, LAST_7_DAYS, LAST_30_DAYS, LAST_365_DAYS, and yyyy-MM-ddThh:mm:ss.SSSZ,yyyy-MM-ddThh:mm:ss.SSSZ",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "LAST_24_HRS", "LAST_7_DAYS", "LAST_30_DAYS", "LAST_365_DAYS" ],
+            "pattern" : "LAST_24_HRS|LAST_7_DAYS|LAST_30_DAYS|LAST_365_DAYS|(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)),(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null"
+          }
+        }, {
+          "name" : "articleId",
+          "description" : "Unique ID of the article",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/articleStatisticsResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "dashboardStatisticsData" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "count" : {
+            "description" : "Count value for the statistic",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "statsType" : {
+            "description" : "Type of statistic",
+            "type" : [ "string", "null" ],
+            "enum" : [ "ARTICLES_REFERENCED", "VOTED_PORTAL_USERS", "CREATED_ARTICLES", "MODIFIED_ARTICLES" ]
+          }
+        },
+        "required" : [ "count", "statsType" ]
+      },
+      "dashboardStatisticsDataArray" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/dashboardStatisticsData"
+        }
+      },
+      "trendResponse" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "eventTime" : {
+            "description" : "Time of the data point",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+          },
+          "count" : {
+            "description" : "Count Value",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "action" : {
+            "description" : "Action value",
+            "type" : [ "string", "null" ],
+            "enum" : [ "LIKE", "DISLIKE", "VIEW", "COMMENT", "TICKET_USAGE", "FEEDBACK" ]
+          }
+        },
+        "required" : [ "action", "count", "eventTime" ]
+      },
+      "trendList" : {
+        "description" : "List of trend data points",
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/trendResponse"
+        }
+      },
+      "actionArray" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "type" : [ "string", "null" ],
+          "enum" : [ "LIKE", "DISLIKE", "VIEW", "COMMENT", "TICKET_USAGE", "FEEDBACK", "TEMPLATE_USAGE" ]
+        }
+      },
+      "interactedUserMeta" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "photoURL" : {
+            "description" : "URL of the interacted user's profile photo",
+            "type" : [ "string", "null" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+          },
+          "firstName" : {
+            "description" : "First Name of the interacted user",
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "minLength" : 0
+          },
+          "lastName" : {
+            "description" : "Last Name of the interacted user",
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "minLength" : 0
+          },
+          "webUrl" : {
+            "description" : "Profile URL of the interacted user",
+            "type" : [ "string", "null" ],
+            "maxLength" : 255,
+            "minLength" : 3,
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+          },
+          "roleName" : {
+            "description" : "Role name of the interacted user",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "emailId" : {
+            "description" : "Email Address of the interacted user",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+          },
+          "id" : {
+            "description" : "Unique ID of the interacted user",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "type" : {
+            "description" : "Interacted User Type",
+            "type" : [ "string", "null" ],
+            "enum" : [ "END_USER", "AGENT", "TEAM", "TICKET", "ACTIVITY" ]
+          }
+        },
+        "required" : [ "emailId", "firstName", "id", "lastName", "photoURL", "roleName", "type", "webUrl" ]
+      },
+      "interactedUsersData" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "action" : {
+            "description" : "Action performed by the user",
+            "type" : [ "string", "null" ],
+            "enum" : [ "LIKE", "DISLIKE", "VIEW" ]
+          },
+          "user" : {
+            "description" : "Interacted User Details",
+            "$ref" : "#/components/schemas/interactedUserMeta"
+          }
+        },
+        "required" : [ "action", "user" ]
+      },
+      "interactedUsersDataArray" : {
+        "description" : "List of interacted user entries",
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/interactedUsersData"
+        }
+      },
+      "departmentIds" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "type" : [ "string", "integer", "null" ],
+          "format" : "int64",
+          "pattern" : "([0-9]+)"
+        }
+      },
+      "rootCategoryIds" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "type" : [ "string", "integer", "null" ],
+          "format" : "int64",
+          "pattern" : "([0-9]+)"
+        }
+      },
+      "timeBoundMetricsResponse" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "count" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "action" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "LIKE", "DISLIKE", "VIEW", "COMMENT", "TICKET_USAGE", "FEEDBACK", "TEMPLATE_USAGE" ]
+          }
+        },
+        "required" : [ "action", "count" ]
+      },
+      "timeBoundMetrics" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/timeBoundMetricsResponse"
+        }
+      },
+      "topArticleReportResponseData" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "modifiedTime" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+          },
+          "departmentId" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "modifierId" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "creatorId" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "ownerId" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "title" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 500,
+            "minLength" : 0
+          },
+          "locale" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "en", "ja", "zh", "es", "de", "fr", "tr", "ru", "pt", "it", "nl", "da", "sv", "pl", "ar", "he", "af", "cs", "fr-ca", "bg", "fi", "el", "hu", "id", "nb", "ro", "th", "uk", "vi", "ur", "hi", "te", "kn", "ta", "mr", "ko", "fa", "bn", "gu", "ms", "ml", "en-gb", "sk", "hr", "sl", "zh_TW", "zh-tw", "ca", "ka", "kk", "my", "km", "pt-br" ],
+            "pattern" : "([a-zA-Z]{2,4}([-_][a-zA-Z]{2})?)",
+            "description" : "Language of the translations."
+          },
+          "translationState" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "OUTDATED", "UP-TO-DATE", "AUTO-TRANSLATE INPROGRESS", "AUTO-TRANSLATE FAILED" ]
+          },
+          "isTrashed" : {
+            "type" : [ "boolean", "null" ]
+          },
+          "createdTime" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+          },
+          "modifiedBy" : {
+            "$ref" : "./ArticleTranslation.json#/components/schemas/modifiedBy"
+          },
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "articleNumber" : {
+            "$ref" : "./ArticleTranslation.json#/components/schemas/articleNumber"
+          },
+          "timeBoundMetrics" : {
+            "$ref" : "#/components/schemas/timeBoundMetrics"
+          },
+          "summary" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 500,
+            "minLength" : 0
+          },
+          "owner" : {
+            "$ref" : "./ArticleTranslation.json#/components/schemas/owner"
+          },
+          "latestVersionStatus" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "Published", "Draft", "Review", "Expired", "Unpublished", "Auto-translate Pending" ]
+          },
+          "author" : {
+            "$ref" : "./ArticleTranslation.json#/components/schemas/author"
+          },
+          "permission" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "ALL", "REGISTEREDUSERS", "AGENTS" ]
+          },
+          "authorId" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "rootCategoryId" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "sourceLocale" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "en", "ja", "zh", "es", "de", "fr", "tr", "ru", "pt", "it", "nl", "da", "sv", "pl", "ar", "he", "af", "cs", "fr-ca", "bg", "fi", "el", "hu", "id", "nb", "ro", "th", "uk", "vi", "ur", "hi", "te", "kn", "ta", "mr", "ko", "fa", "bn", "gu", "ms", "ml", "en-gb", "sk", "hr", "sl", "zh_TW", "zh-tw", "ca", "ka", "kk", "my", "km", "pt-br" ],
+            "pattern" : "([a-zA-Z]{2,4}([-_][a-zA-Z]{2})?)"
+          },
+          "translationId" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "latestVersion" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "createdBy" : {
+            "$ref" : "./ArticleTranslation.json#/components/schemas/createdBy"
+          },
+          "webUrl" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 500,
+            "minLength" : 0,
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+          },
+          "latestPublishedVersion" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "category" : {
+            "$ref" : "./ArticleTranslation.json#/components/schemas/category"
+          },
+          "permalink" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 300,
+            "minLength" : 0,
+            "pattern" : "[A-Za-z0-9%\\-+\\/=\\P{InBasicLatin}]+"
+          },
+          "categoryId" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "status" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "Published", "Draft", "Review", "Expired", "Unpublished", "Auto-translate Pending" ]
+          }
+        },
+        "required" : [ "author", "authorId", "category", "categoryId", "createdBy", "createdTime", "creatorId", "departmentId", "id", "isTrashed", "latestPublishedVersion", "latestVersion", "latestVersionStatus", "locale", "modifiedBy", "modifiedTime", "modifierId", "owner", "ownerId", "permalink", "permission", "rootCategoryId", "sourceLocale", "status", "summary", "timeBoundMetrics", "title", "translationId", "translationState", "webUrl", "articleNumber" ]
+      },
+      "topArticleReportResponseDataArray" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/topArticleReportResponseData"
+        }
+      },
+      "articleStatisticsCountData" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "count" : {
+            "description" : "Count value for the action",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "action" : {
+            "description" : "User action type",
+            "type" : [ "string", "null" ],
+            "enum" : [ "LIKE", "DISLIKE", "VIEW", "COMMENT", "TICKET_USAGE", "FEEDBACK", "TEMPLATE_USAGE" ]
+          }
+        },
+        "required" : [ "action", "count" ]
+      },
+      "articleStatisticsDataArray" : {
+        "type" : [ "array", "null" ],
+        "description" : "List of action count entries",
+        "items" : {
+          "$ref" : "#/components/schemas/articleStatisticsCountData"
+        }
+      }
+    },
+    "responses" : {
+      "kbDashboardStatisticsResponse" : {
+        "description" : "kbDashboardStatisticsResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "#/components/schemas/dashboardStatisticsDataArray"
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "data" : [ {
+                    "count" : "99",
+                    "statsType" : "ARTICLES_REFERENCED"
+                  }, {
+                    "count" : "75",
+                    "statsType" : "VOTED_PORTAL_USERS"
+                  }, {
+                    "count" : "108",
+                    "statsType" : "CREATED_ARTICLES"
+                  }, {
+                    "count" : "135",
+                    "statsType" : "MODIFIED_ARTICLES"
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "articleTrendResponse" : {
+        "description" : "articleTrendResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "fromTime" : {
+                  "description" : "Start time of the trend data",
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 100,
+                  "minLength" : 0,
+                  "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+                },
+                "plotUnitType" : {
+                  "description" : "Granularity of the trend data (e.g., hourly)",
+                  "type" : [ "string", "null" ],
+                  "enum" : [ "hourly" ]
+                },
+                "userType" : {
+                  "description" : "User type filter applied",
+                  "type" : [ "string", "null" ],
+                  "enum" : [ "AGENTS", "REGISTERED_USERS", "PUBLIC_USERS", "END_USERS", "ALL_USERS" ]
+                },
+                "trends" : {
+                  "$ref" : "#/components/schemas/trendList"
+                },
+                "toTime" : {
+                  "description" : "End time of the trend data",
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 100,
+                  "minLength" : 0,
+                  "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+                }
+              },
+              "required" : [ "fromTime", "plotUnitType", "toTime", "trends", "userType" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "fromTime" : 1589130000000,
+                  "plotUnitType" : "hourly",
+                  "userType" : "ALL_USERS",
+                  "trends" : [ {
+                    "eventTime" : 1589612548000,
+                    "count" : "12",
+                    "action" : "VIEW"
+                  }, {
+                    "eventTime" : 1589616416000,
+                    "count" : "80",
+                    "action" : "VIEW"
+                  }, {
+                    "eventTime" : 1589619809000,
+                    "count" : "64",
+                    "action" : "VIEW"
+                  }, {
+                    "eventTime" : 1589612541000,
+                    "count" : "10",
+                    "action" : "LIKE"
+                  }, {
+                    "eventTime" : 1589619754000,
+                    "count" : "50",
+                    "action" : "LIKE"
+                  } ],
+                  "toTime" : 1591809067000
+                }
+              }
+            }
+          }
+        }
+      },
+      "interactedUsersResponse" : {
+        "description" : "interactedUsersResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "#/components/schemas/interactedUsersDataArray"
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "data" : [ {
+                    "action" : "LIKE",
+                    "user" : {
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000000063/photo?orgId=1234567890",
+                      "firstName" : "Charlie",
+                      "lastName" : "Stankovic",
+                      "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Contacts/dv/3000000039220",
+                      "emailId" : "charlie@zylker.com",
+                      "id" : "4000000000063",
+                      "type" : [ "AGENT" ]
+                    }
+                  }, {
+                    "action" : "LIKE",
+                    "user" : {
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000000065/photo?orgId=1234567890",
+                      "firstName" : "Lisa",
+                      "lastName" : "Roseland",
+                      "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Contacts/dv/3000000039255",
+                      "emailId" : "lisa@zylker.com",
+                      "id" : "4000000000065",
+                      "type" : [ "REGISTERED_USERS" ]
+                    }
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "topArticleReportResponse" : {
+        "description" : "topArticleReportResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "#/components/schemas/topArticleReportResponseDataArray"
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "data" : [ {
+                    "modifiedTime" : 1588301001000,
+                    "departmentId" : "4000000038148",
+                    "creatorId" : "4000000016508",
+                    "modifierId" : "4000000016508",
+                    "ownerId" : "4000000016508",
+                    "title" : "Tom and jerry end game",
+                    "latestVersionModifierId" : "4000000000060",
+                    "locale" : "en",
+                    "translationState" : "UP-TO-DATE",
+                    "isTrashed" : false,
+                    "createdTime" : 1588300921000,
+                    "modifiedBy" : {
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000016508/photo?orgId=1234567890",
+                      "name" : "Charlie",
+                      "id" : "4000000016508",
+                      "status" : "ACTIVE",
+                      "zuid" : "1234567890"
+                    },
+                    "id" : "4000000081313",
+                    "articleNumber" : "102",
+                    "timeBoundMetrics" : [ {
+                      "count" : "809",
+                      "action" : "VIEW"
+                    }, {
+                      "count" : "478",
+                      "action" : "LIKE"
+                    }, {
+                      "count" : "56",
+                      "action" : "DISLIKE"
+                    }, {
+                      "count" : "336",
+                      "action" : "COMMENT"
+                    }, {
+                      "count" : "125",
+                      "action" : "TICKET_USAGE"
+                    }, {
+                      "count" : "15",
+                      "action" : "FEEDBACK"
+                    } ],
+                    "summary" : "Tom and jerry. Its mysterious story",
+                    "owner" : {
+                      "photoURL" : null,
+                      "name" : "Charlie",
+                      "id" : "4000000016508",
+                      "status" : "ACTIVE",
+                      "zuid" : "1234567890"
+                    },
+                    "latestVersionStatus" : "Published",
+                    "author" : {
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000016508/photo?orgId=1234567890",
+                      "name" : "Charlie",
+                      "id" : "4000000016508",
+                      "status" : "ACTIVE",
+                      "zuid" : "1234567890"
+                    },
+                    "permission" : "REGISTEREDUSERS",
+                    "authorId" : "4000000016508",
+                    "rootCategoryId" : "4000000081037",
+                    "sourceLocale" : "en",
+                    "translationId" : "4000000081315",
+                    "latestVersion" : "2.0",
+                    "createdBy" : {
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000016508/photo?orgId=1234567890",
+                      "name" : "Charlie",
+                      "id" : "4000000016508",
+                      "status" : "ACTIVE",
+                      "zuid" : "1234567890"
+                    },
+                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Solutions/dv/4000000081313/en",
+                    "latestPublishedVersion" : "2.0",
+                    "category" : {
+                      "name" : "Cartoon",
+                      "id" : "4000000081052",
+                      "locale" : "en"
+                    },
+                    "permalink" : "tom-jerry",
+                    "categoryId" : "4000000081052",
+                    "latestVersionModifiedBy" : {
+                      "photoURL" : null,
+                      "name" : "will smith",
+                      "id" : "4000000000060",
+                      "status" : "ACTIVE",
+                      "zuid" : "1234567890"
+                    },
+                    "status" : "Published"
+                  }, {
+                    "modifiedTime" : 1588300893000,
+                    "departmentId" : "4000000038148",
+                    "creatorId" : "4000000016508",
+                    "modifierId" : "4000000016508",
+                    "ownerId" : "4000000016508",
+                    "title" : "Scooby doo",
+                    "locale" : "en",
+                    "translationState" : "UP-TO-DATE",
+                    "isTrashed" : false,
+                    "createdTime" : 1588300855000,
+                    "modifiedBy" : {
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000016508/photo?orgId=1234567890",
+                      "name" : "Charlie",
+                      "id" : "4000000016508",
+                      "status" : "ACTIVE",
+                      "zuid" : "1234567890"
+                    },
+                    "id" : "4000000081268",
+                    "articleNumber" : "103",
+                    "timeBoundMetrics" : [ {
+                      "count" : "809",
+                      "action" : "VIEW"
+                    }, {
+                      "count" : "478",
+                      "action" : "LIKE"
+                    }, {
+                      "count" : "56",
+                      "action" : "DISLIKE"
+                    }, {
+                      "count" : "136",
+                      "action" : "COMMENT"
+                    }, {
+                      "count" : "125",
+                      "action" : "TICKET_USAGE"
+                    }, {
+                      "count" : "55",
+                      "action" : "FEEDBACK"
+                    } ],
+                    "summary" : "Scooby doo infinity",
+                    "owner" : {
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000016508/photo?orgId=1234567890",
+                      "name" : "Charlie",
+                      "id" : "4000000016508",
+                      "status" : "ACTIVE",
+                      "zuid" : "1234567890"
+                    },
+                    "latestVersionStatus" : "Published",
+                    "author" : {
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000016508/photo?orgId=1234567890",
+                      "name" : "Charlie",
+                      "id" : "4000000016508",
+                      "status" : "ACTIVE",
+                      "zuid" : "1234567890"
+                    },
+                    "permission" : "REGISTEREDUSERS",
+                    "authorId" : "4000000016508",
+                    "rootCategoryId" : "4000000081037",
+                    "sourceLocale" : "en",
+                    "translationId" : "4000000081270",
+                    "latestVersion" : "1.0",
+                    "createdBy" : {
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000016508/photo?orgId=1234567890",
+                      "name" : "Charlie",
+                      "id" : "4000000016508",
+                      "status" : "ACTIVE",
+                      "zuid" : "1234567890"
+                    },
+                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Solutions/dv/4000000081268/en",
+                    "latestPublishedVersion" : "1.0",
+                    "category" : {
+                      "name" : "Disney",
+                      "id" : "4000000081052",
+                      "locale" : "en"
+                    },
+                    "permalink" : "scooby-doo",
+                    "categoryId" : "4000000081052",
+                    "status" : "Published"
+                  }, {
+                    "modifiedTime" : 1588310888000,
+                    "departmentId" : "4000000038148",
+                    "creatorId" : "4000000016508",
+                    "modifierId" : "4000000016508",
+                    "ownerId" : "4000000016508",
+                    "title" : "Yanni and music",
+                    "locale" : "en",
+                    "translationState" : "UP-TO-DATE",
+                    "isTrashed" : false,
+                    "createdTime" : 1588310873000,
+                    "modifiedBy" : {
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000016508/photo?orgId=1234567890",
+                      "name" : "Charlie",
+                      "id" : "4000000016508",
+                      "status" : "ACTIVE",
+                      "zuid" : "1234567890"
+                    },
+                    "id" : "4000000088001",
+                    "articleNumber" : "104",
+                    "timeBoundMetrics" : [ {
+                      "count" : "809",
+                      "action" : "VIEW"
+                    }, {
+                      "count" : "478",
+                      "action" : "LIKE"
+                    }, {
+                      "count" : "56",
+                      "action" : "DISLIKE"
+                    }, {
+                      "count" : "86",
+                      "action" : "COMMENT"
+                    }, {
+                      "count" : "125",
+                      "action" : "TICKET_USAGE"
+                    }, {
+                      "count" : "5",
+                      "action" : "FEEDBACK"
+                    } ],
+                    "summary" : "Yanni and notsolgia exploration",
+                    "owner" : {
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000016508/photo?orgId=1234567890",
+                      "name" : "Charlie",
+                      "id" : "4000000016508",
+                      "status" : "ACTIVE",
+                      "zuid" : "1234567890"
+                    },
+                    "latestVersionStatus" : "Published",
+                    "author" : {
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000016508/photo?orgId=1234567890",
+                      "name" : "Charlie",
+                      "id" : "4000000016508",
+                      "status" : "ACTIVE",
+                      "zuid" : "1234567890"
+                    },
+                    "permission" : "REGISTEREDUSERS",
+                    "authorId" : "4000000016508",
+                    "rootCategoryId" : "4000000081037",
+                    "sourceLocale" : "en",
+                    "translationId" : "4000000088003",
+                    "latestVersion" : "1.0",
+                    "createdBy" : {
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000016508/photo?orgId=1234567890",
+                      "name" : "Charlie",
+                      "id" : "4000000016508",
+                      "status" : "ACTIVE",
+                      "zuid" : "1234567890"
+                    },
+                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Solutions/dv/4000000088001/en",
+                    "latestPublishedVersion" : "1.0",
+                    "category" : {
+                      "name" : "Music",
+                      "id" : "4000000081052",
+                      "locale" : "en"
+                    },
+                    "permalink" : "yanni-nostalgia",
+                    "categoryId" : "4000000081052",
+                    "status" : "Published"
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "articleStatisticsResponse" : {
+        "description" : "articleStatisticsResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "#/components/schemas/articleStatisticsDataArray"
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "data" : [ {
+                    "count" : "478",
+                    "action" : "LIKE"
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "requestBodies" : {
+      "resetArticleMetrics_metricsResetPayload" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "action" : {
+                  "description" : "User actions whose metrics must be reset. Possible values: LIKE, DISLIKE, VIEW, TICKET_USAGE, COMMENT, FEEDBACK",
+                  "$ref" : "#/components/schemas/actionArray"
+                }
+              },
+              "required" : [ "action" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "action" : [ "VIEW" ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "reportGenerationPayload" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "rootCategoryIds" : {
+                  "$ref" : "#/components/schemas/rootCategoryIds"
+                },
+                "action" : {
+                  "type" : [ "string" ],
+                  "description" : "User action that must be considered for the report. Values allowed are: LIKE, DISLIKE, VIEW, TICKET_USAGE, COMMENT, and FEEDBACK.",
+                  "enum" : [ "LIKE", "DISLIKE", "VIEW", "COMMENT", "TICKET_USAGE", "FEEDBACK", "TEMPLATE_USAGE" ]
+                },
+                "departmentIds" : {
+                  "$ref" : "#/components/schemas/departmentIds"
+                },
+                "locale" : {
+                  "type" : [ "string" ],
+                  "description" : "Language of the help articles",
+                  "enum" : [ "en", "ja", "zh", "es", "de", "fr", "tr", "ru", "pt", "it", "nl", "da", "sv", "pl", "ar", "he", "af", "cs", "fr-ca", "bg", "fi", "el", "hu", "id", "nb", "ro", "th", "uk", "vi", "ur", "hi", "te", "kn", "ta", "mr", "ko", "fa", "bn", "gu", "ms", "ml", "en-gb", "sk", "hr", "sl", "zh_TW", "zh-tw", "ca", "ka", "kk", "my", "km", "pt-br" ],
+                  "pattern" : "[a-zA-Z]{2,4}([-_][a-zA-Z]{2})?"
+                },
+                "timeRange" : {
+                  "type" : [ "string" ],
+                  "description" : "Period in which the user actions were performed. Values allowed are: LAST_24_HRS, LAST_7_DAYS (default value), LAST_30_DAYS, and LAST_365_DAYS.",
+                  "enum" : [ "LAST_24_HRS", "LAST_7_DAYS", "LAST_30_DAYS", "LAST_365_DAYS" ]
+                }
+              },
+              "required" : [ "action", "locale", "timeRange", "rootCategoryIds" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "action" : "FEEDBACK",
+                  "departmentIds" : [ "1000000013248" ],
+                  "locale" : "en",
+                  "timeRange" : "LAST_365_DAYS"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "ArticleStatistics"
+}

@@ -8,9 +8,10 @@
     "/api/v1/communityAttachments" : {
       "post" : {
         "tags" : [ "CommunityAttachment" ],
-        "summary" : "Add community attachment",
-        "description" : "This API uploads files to the storage space allocated for the community module.",
-        "operationId" : "addCommunityAttachment",
+        "summary" : "Upload Attachment",
+        "description" : "Uploads a file to the storage space allocated for the community module.",
+        "operationId" : "uploadCommunityAttachment",
+        "x-mcp-ready" : false,
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -18,14 +19,16 @@
           "content" : {
             "multipart/form-data" : {
               "schema" : {
-                "type" : "object",
+                "type" : [ "object" ],
                 "properties" : {
                   "file" : {
-                    "type" : "string",
-                    "format" : "binary"
+                    "type" : [ "string" ],
+                    "format" : "binary",
+                    "description" : "File to upload"
                   }
                 },
-                "required" : [ "file" ]
+                "required" : [ "file" ],
+                "additionalProperties" : false
               }
             }
           }
@@ -56,9 +59,10 @@
     "/api/v1/communityAttachments/{id}/content" : {
       "get" : {
         "tags" : [ "CommunityAttachment" ],
-        "summary" : "Get unassociated attachment",
-        "description" : "Unassociated attachments are those attachments uploaded to a community topic or comment that is not yet published or saved as a draft. This API fetches an unassociated attachment from the user community.",
+        "summary" : "Get Unassociated Attachment",
+        "description" : "Retrieves an unassociated attachment from the user community. Unassociated attachments are files uploaded to a community topic or comment that is not yet published or saved as a draft.",
         "operationId" : "getUnassociatedCommunityAttachment",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -66,10 +70,11 @@
           "style" : "simple",
           "explode" : false,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
-          }
+          },
+          "description" : "Unique ID of the unassociated attachment to retrieve"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -95,38 +100,46 @@
     }
   },
   "components" : {
+    "schemas" : {
+      "addAttachmentResponse" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "size" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Size of the uploaded attachment in bytes"
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "description" : "Name of the uploaded attachment file"
+          },
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the uploaded attachment"
+          },
+          "href" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+          }
+        },
+        "required" : [ "href", "id", "name", "size" ]
+      }
+    },
     "responses" : {
       "addAttachment" : {
         "description" : "addAttachment template definitions",
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
-              "additionalProperties" : false,
-              "properties" : {
-                "size" : {
-                  "type" : [ "string", "null", "integer" ],
-                  "format" : "int64",
-                  "pattern" : "([0-9]+)"
-                },
-                "name" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                },
-                "id" : {
-                  "type" : [ "string", "null", "integer" ],
-                  "format" : "int64",
-                  "pattern" : "([0-9]+)"
-                },
-                "href" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 200,
-                  "minLength" : 0,
-                  "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
-                }
-              },
-              "required" : [ "href", "id", "name", "size" ]
+              "$ref" : "#/components/schemas/addAttachmentResponse"
             },
             "examples" : {
               "Valid responses Definitions" : {
@@ -142,6 +155,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

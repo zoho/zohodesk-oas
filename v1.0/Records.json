@@ -4,11 +4,377 @@
     "title" : "Records",
     "version" : "1.0.0"
   },
-  "paths" : { },
+  "paths" : {
+    "/api/v1/{moduleApiName}" : {
+      "post" : {
+        "tags" : [ "Records" ],
+        "summary" : "Create Record",
+        "description" : "Creates a new record in the specified custom module using field values obtained from the Organization Field API.Prerequisites: Before creating a record, follow this sequence: 1. Call the Organization Field API to retrieve the required field information for the custom module. 2. From the response, extract the API names of the fields to be populated. 3. Pass the extracted field API names and their corresponding values in the request payload.",
+        "operationId" : "createRecord",
+        "parameters" : [ {
+          "$ref" : "./NewRecords.json#/components/parameters/moduleApiName",
+          "description" : "API name of the custom module in which the records are to be created. Must be a custom module only. Custom module API names begin with the prefix cm_ (for example, cm_doctors). Note: To retrieve the list of available custom modules and their API names, call the Get Modules API."
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "./NewRecords.json#/components/requestBodies/createRecordPayload"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "./NewRecords.json#/components/responses/createRecordOldResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.custommodule.CREATE" ]
+        } ],
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
+      },
+      "get" : {
+        "tags" : [ "Records" ],
+        "summary" : "Get Records",
+        "description" : "Retrieves a list of records from a custom module, with pagination support.",
+        "operationId" : "getRecords",
+        "parameters" : [ {
+          "$ref" : "./NewRecords.json#/components/parameters/moduleApiName",
+          "description" : "API name of the custom module from which the records are to be retrieved. Must be a custom module only. Custom module API names begin with the prefix cm_ (for example, cm_doctors). Note: To retrieve the list of available custom modules and their API names, call the Get Modules API."
+        }, {
+          "name" : "viewId",
+          "in" : "query",
+          "description" : "ID of the view from which records must be fetched",
+          "required" : false,
+          "style" : "form",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number from which the records must be fetched.",
+          "required" : false,
+          "style" : "form",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int32",
+            "default" : 0,
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of records to fetch.",
+          "required" : false,
+          "style" : "form",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int32",
+            "minimum" : 1,
+            "maximum" : 50,
+            "default" : 50,
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "description" : "Sorts records by the specified attribute. Possible values: createdTime, modifiedTime. Note: Sort order is ascending by default. Prefix the value with - for descending order, for example, -createdTime.",
+          "required" : false,
+          "style" : "form",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "enum" : [ "createdTime", "modifiedTime", "-createdTime", "-modifiedTime" ],
+            "pattern" : "([-]?(createdTime|modifiedTime))"
+          }
+        }, {
+          "name" : "fields",
+          "in" : "query",
+          "description" : "Returns values for the specified standard or custom fields. Note: All field types except multi-line text fields are supported. Standard non-editable fields are also supported. Maximum of 30 fields is supported as comma-separated values.",
+          "required" : false,
+          "style" : "form",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "./NewRecords.json#/components/responses/listRecordsOldResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.custommodule.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
+      }
+    },
+    "/api/v1/{moduleApiName}/{recordId}" : {
+      "get" : {
+        "tags" : [ "Records" ],
+        "summary" : "Get Record",
+        "description" : "Retrieves the details of a specific record from a custom module using entityId.",
+        "operationId" : "getRecord",
+        "parameters" : [ {
+          "$ref" : "./NewRecords.json#/components/parameters/moduleApiName"
+        }, {
+          "$ref" : "./NewRecords.json#/components/parameters/recordId"
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "./NewRecords.json#/components/responses/recordOldResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.custommodule.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
+      },
+      "patch" : {
+        "tags" : [ "Records" ],
+        "summary" : "Update Record",
+        "description" : "Updates an existing record in the specified custom module using field values obtained from the Organization Field API.Prerequisites: Before updating a record, follow this sequence: 1. Call the Organization Field API to retrieve the required field information for the custom module. 2. From the response, extract the API names of the fields to be updated. 3. Pass the extracted field API names and their corresponding values in the request payload.",
+        "operationId" : "updateRecord",
+        "parameters" : [ {
+          "$ref" : "./NewRecords.json#/components/parameters/moduleApiName",
+          "description" : "API name of the custom module in which the record is to be updated. Must be a custom module only. Custom module API names begin with the prefix cm_ (for example, cm_doctors). Note: To retrieve the list of available custom modules and their API names, call the Get Modules API."
+        }, {
+          "$ref" : "./NewRecords.json#/components/parameters/recordId",
+          "description" : "ID of the record to update"
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "./NewRecords.json#/components/requestBodies/editRecordPayload"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "./NewRecords.json#/components/responses/createRecordOldResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.custommodule.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
+      },
+      "delete" : {
+        "tags" : [ "Records" ],
+        "summary" : "Delete Record",
+        "description" : "Deletes a specific record from a module. Note: If the module supports a Recycle Bin, the record is moved to the Recycle Bin and can be restored within 60 days. If the module does not support a Recycle Bin, the record is permanently deleted and cannot be recovered.",
+        "operationId" : "deleteRecord",
+        "parameters" : [ {
+          "$ref" : "./NewRecords.json#/components/parameters/moduleApiName",
+          "description" : "API name of the custom module from which the record is to be deleted. Must be a custom module only. Custom module API names begin with the prefix cm_ (for example, cm_doctors). Note: To retrieve the list of available custom modules and their API names, call the Get Modules API."
+        }, {
+          "$ref" : "./NewRecords.json#/components/parameters/recordId",
+          "description" : "ID of the record to delete"
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.custommodule.DELETE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/{moduleApiName}/moveToTrash" : {
+      "post" : {
+        "tags" : [ "Records" ],
+        "summary" : "Move Records to Recycle Bin",
+        "description" : "Moves the specified records of a custom module to the Recycle Bin. Note: Deleted records remain in the Recycle Bin for 60 days, during which they can be restored. After this period, they are permanently deleted.",
+        "operationId" : "moveRecordsToTrash",
+        "parameters" : [ {
+          "$ref" : "./NewRecords.json#/components/parameters/moduleApiName",
+          "description" : "API name of the custom module from which the records must be moved to the Recycle Bin. Must be a custom module only. Custom module API names begin with the prefix cm_ (for example, cm_doctors). Note: To retrieve the list of available custom modules and their API names, call the Get Modules API."
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "./NewRecords.json#/components/requestBodies/recordIdsPayload"
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          },
+          "200" : {
+            "$ref" : "./NewRecords.json#/components/responses/moveToTrashResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.custommodule.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/{moduleApiName}/count" : {
+      "get" : {
+        "tags" : [ "Records" ],
+        "summary" : "Get Record Count",
+        "description" : "Retrieves the total number of records in a specified view of a custom module.",
+        "operationId" : "getRecordCount",
+        "parameters" : [ {
+          "$ref" : "./NewRecords.json#/components/parameters/moduleApiName",
+          "description" : "API name of the custom module from which the record count must be fetched. Must be a custom module only. Custom module API names begin with the prefix cm_ (for example, cm_doctors). Note: To retrieve the list of available custom modules and their API names, call the Get Modules API."
+        }, {
+          "name" : "viewId",
+          "in" : "query",
+          "description" : "ID of the view from which the record count must be fetched",
+          "required" : true,
+          "style" : "form",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "./TicketCount.json#/components/responses/ticketsCountResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/unprocessableEntityErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.custommodule.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
+      }
+    },
+    "/api/v1/{moduleApiName}/updateMany" : {
+      "post" : {
+        "tags" : [ "Records" ],
+        "summary" : "Update Field in Multiple Records",
+        "description" : "Updates a single field value across multiple records in a custom module simultaneously.",
+        "operationId" : "updateManyRecords",
+        "parameters" : [ {
+          "$ref" : "./NewRecords.json#/components/parameters/moduleApiName",
+          "description" : "API name of the custom module in which the records are to be updated. Must be a custom module only. Custom module API names begin with the prefix cm_ (for example, cm_doctors). Note: To retrieve the list of available custom modules and their API names, call the Get Modules API."
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "./NewRecords.json#/components/requestBodies/updateManyPayload"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "./MassActionResponse.json#/components/responses/massActionListResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          },
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.custommodule.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
+      }
+    }
+  },
   "components" : {
     "schemas" : {
       "agentData" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "photoURL" : {
@@ -28,63 +394,40 @@
             "minLength" : 0
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
         },
         "required" : [ "firstName", "id", "lastName", "photoURL" ]
       },
-      "layoutData" : {
-        "type" : [ "null", "object" ],
-        "additionalProperties" : false,
-        "description" : "",
-        "properties" : {
-          "id" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
-            "description" : "",
-            "pattern" : "([0-9]+)"
-          },
-          "layoutName" : {
-            "type" : [ "string", "null" ],
-            "description" : "",
-            "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
-          }
-        },
-        "required" : [ "id", "layoutName" ]
-      },
       "departmentData" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "departmentName" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "maxLength" : 200,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "description" : "",
             "pattern" : "([0-9]+)"
           }
         },
         "required" : [ "departmentName", "id" ]
       },
       "recordResponseWithAdditionalData" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "layout" : {
-            "$ref" : "./Records.json#/components/schemas/layoutData"
+            "$ref" : "#/components/schemas/layoutDataResponse"
           },
           "owner" : {
-            "$ref" : "./Records.json#/components/schemas/agentData"
+            "$ref" : "#/components/schemas/agentData"
           },
           "modifiedTime" : {
             "type" : [ "string", "null" ],
@@ -93,7 +436,7 @@
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "cf" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
             "additionalProperties" : false,
             "patternProperties" : {
               "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
@@ -105,7 +448,7 @@
             }
           },
           "createdBy" : {
-            "$ref" : "./Records.json#/components/schemas/agentData"
+            "$ref" : "#/components/schemas/agentData"
           },
           "createdTime" : {
             "type" : [ "string", "null" ],
@@ -117,15 +460,15 @@
             "type" : [ "boolean", "null" ]
           },
           "modifiedBy" : {
-            "$ref" : "./Records.json#/components/schemas/agentData"
+            "$ref" : "#/components/schemas/agentData"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "department" : {
-            "$ref" : "./Records.json#/components/schemas/departmentData"
+            "$ref" : "#/components/schemas/departmentData"
           },
           "lastActivityTime" : {
             "type" : [ "string", "null" ],
@@ -137,23 +480,47 @@
         "required" : [ "cf", "createdBy", "createdTime", "department", "id", "isPresence", "lastActivityTime", "layout", "modifiedBy", "modifiedTime", "owner" ]
       },
       "arrayOfrecordResponseWithAdditionalData" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./Records.json#/components/schemas/recordResponseWithAdditionalData"
+          "$ref" : "#/components/schemas/recordResponseWithAdditionalData"
         }
       },
       "listRecordResponseWithAdditionalData" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "data" : {
-            "$ref" : "./Records.json#/components/schemas/arrayOfrecordResponseWithAdditionalData"
+            "$ref" : "#/components/schemas/arrayOfrecordResponseWithAdditionalData"
           }
         },
         "required" : [ "data" ]
+      },
+      "layoutDataResponse" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "layoutName" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          }
+        },
+        "required" : [ "id", "layoutName" ]
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

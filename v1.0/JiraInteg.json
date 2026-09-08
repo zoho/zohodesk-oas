@@ -1,0 +1,211 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "JiraInteg",
+    "description" : "Jira, developed by Atlassian, is one of the leading bug-tracking tools in the industry. Jira's integration with Zoho Desk helps in instantly filing issues in Jira right from a customer support ticket in Desk. These APIs pertain to the integration between these tools.",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/jiraIssue/{issueId}/tickets" : {
+      "get" : {
+        "tags" : [ "JiraInteg" ],
+        "summary" : "Get Linked Tickets",
+        "description" : "Retrieves support tickets associated with the specified Jira issue.",
+        "operationId" : "getTicketsForJiraBugId",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "issueId",
+          "in" : "path",
+          "required" : true,
+          "description" : "Unique ID of the Jira issue.",
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "required" : false,
+          "description" : "Index number starting from which the tickets must be fetched.",
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "default" : 1,
+            "minimum" : 1
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "required" : false,
+          "description" : "Number of tickets to return in the response. Accepted range is 1 to 100.",
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "default" : 100,
+            "minimum" : 1,
+            "maximum" : 100
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/jiraTicketResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.tickets.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "agentJson" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "firstName" : {
+            "description" : "First name of the assignee.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "lastName" : {
+            "description" : "Last name of the assignee.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        }
+      },
+      "jiraTicketJson" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "id" : {
+            "description" : "Unique ID of the ticket.",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "ticketNumber" : {
+            "description" : "Index or serial number of the ticket.",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "subject" : {
+            "description" : "Subject of the ticket.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 1000,
+            "minLength" : 0
+          },
+          "status" : {
+            "description" : "Status of the ticket.",
+            "type" : [ "string", "null" ],
+            "x-dynamic-enum" : true
+          },
+          "priority" : {
+            "description" : "Priority of the ticket.",
+            "type" : [ "string", "null" ],
+            "x-dynamic-enum" : true
+          },
+          "dueDate" : {
+            "description" : "Due date of the ticket.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+          },
+          "commentCount" : {
+            "description" : "Number of comments on the ticket.",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "assignee" : {
+            "description" : "Details of the agent assigned to the ticket.",
+            "$ref" : "#/components/schemas/agentJson"
+          }
+        },
+        "required" : [ "id", "ticketNumber", "subject", "status", "dueDate", "commentCount" ]
+      },
+      "jiraTicketJsonArr" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/jiraTicketJson"
+        }
+      }
+    },
+    "responses" : {
+      "jiraTicketResponse" : {
+        "description" : "List of ticket entries associated with the specified Jira issue.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "#/components/schemas/jiraTicketJsonArr"
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "data" : [ {
+                    "id" : "104202000003153007",
+                    "ticketNumber" : "123",
+                    "subject" : "Sudden delay in order processing. High priority.",
+                    "status" : "Open",
+                    "priority" : "High",
+                    "dueDate" : "2024-06-21T12:36:16.000Z",
+                    "commentCount" : "5",
+                    "assignee" : {
+                      "firstName" : "John",
+                      "lastName" : "Doe"
+                    }
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "JiraInteg"
+}

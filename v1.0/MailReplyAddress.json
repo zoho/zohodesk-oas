@@ -8,18 +8,19 @@
     "/api/v1/mailReplyAddress/{mailReplyAddressId}/sendVerification" : {
       "post" : {
         "tags" : [ "MailReplyAddress" ],
-        "summary" : "Send Verification Mail",
-        "description" : "This API sends a verification link to the MailReplyAddress configured in your help desk portal.",
+        "summary" : "Send verification mail",
+        "description" : "This API sends a verification link to the From address configured in your help desk portal.",
         "operationId" : "sendVerificationEmail",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "mailReplyAddressId",
           "in" : "path",
           "required" : true,
           "style" : "simple",
           "explode" : false,
+          "description" : "Unique ID of the From address",
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
+            "type" : "string",
             "pattern" : "([0-9]+)"
           }
         }, {
@@ -39,58 +40,57 @@
     "/api/v1/mailReplyAddress" : {
       "get" : {
         "tags" : [ "MailReplyAddress" ],
-        "summary" : "List MailReplyAddresses",
-        "description" : "This API lists the mailReplyAddresses configured in your help desk portal.",
+        "summary" : "List From addresses",
+        "description" : "This API lists the From addresses configured in your help desk portal.",
         "operationId" : "getReplyMailAddresses",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "departmentId",
           "in" : "query",
-          "description" : "ID of the Department from which the addresses need to be queried.",
+          "description" : "ID of the department from which the addresses need to be queried. To fetch the addresses from all departments, use 'allDepartment' as the value.",
           "required" : true,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
-            "description" : "ID of the Department from which the addresses need to be queried.",
-            "pattern" : "([0-9]+)"
-          }
-        }, {
-          "name" : "limit",
-          "in" : "query",
-          "description" : "Number of mail addresses to fetch",
-          "required" : false,
-          "style" : "form",
-          "explode" : true,
-          "schema" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int32",
-            "description" : "Number of mail addresses to fetch",
-            "pattern" : "([0-9]+)"
-          }
-        }, {
-          "name" : "from",
-          "in" : "query",
-          "description" : "Index number, starting from which the mail addresses must be fetched",
-          "required" : false,
-          "style" : "form",
-          "explode" : true,
-          "schema" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int32",
-            "description" : "Index number, starting from which the mail addresses must be fetched",
-            "pattern" : "([0-9]+)"
+            "type" : "string",
+            "pattern" : "allDepartment|[0-9]+"
           }
         }, {
           "name" : "isActive",
           "in" : "query",
-          "description" : "Key that returns if the mailReplyAddress is active or not",
+          "description" : "Used to filter the mail addresses based on whether they are active or not",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "boolean", "null" ],
-            "description" : "Key that returns if the mailReplyAddress is active or not"
+            "type" : [ "boolean" ]
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Starting index for fetching the mail addresses. The default value is 1",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "default" : 1,
+            "type" : "integer",
+            "format" : "int32",
+            "minimum" : 1
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Maximum number of mail addresses to fetch. The default value is 50 and the maximum allowed value is 100.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer",
+            "default" : 50,
+            "format" : "int32",
+            "minimum" : 1,
+            "maximum" : 100
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -110,66 +110,218 @@
           "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.basic.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
+      },
+      "post" : {
+        "tags" : [ "MailReplyAddress" ],
+        "summary" : "Add a new From address",
+        "description" : "This API adds a new From address to the specified department.",
+        "operationId" : "addFromAddress",
+        "x-mcp-ready" : true,
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/addFromAddressJSON"
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/fromAddressResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.CREATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/mailReplyAddress/{mailReplyAddressId}" : {
+      "get" : {
+        "tags" : [ "MailReplyAddress" ],
+        "summary" : "Fetch a single From address",
+        "description" : "Retrieves details of a specific From address",
+        "operationId" : "getFromAddress",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "mailReplyAddressId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "description" : "Unique ID of the From address",
+          "schema" : {
+            "type" : "string",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/fromAddressResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.basic.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      },
+      "patch" : {
+        "tags" : [ "MailReplyAddress" ],
+        "summary" : "Update existing From address",
+        "description" : "This API updates an existing From address with the specified data",
+        "operationId" : "updateFromAddress",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "mailReplyAddressId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "description" : "Unique ID of the From address",
+          "schema" : {
+            "type" : "string",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/updateFromAddressJSON"
+        },
+        "responses" : {
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/fromAddressResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      },
+      "delete" : {
+        "tags" : [ "MailReplyAddress" ],
+        "summary" : "Delete a From address",
+        "description" : "This API deletes a From address from your help desk",
+        "operationId" : "deleteMailReplyAddress",
+        "parameters" : [ {
+          "name" : "mailReplyAddressId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "description" : "Unique ID of the From address",
+          "schema" : {
+            "type" : "string",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.DELETE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
       }
     }
   },
   "components" : {
     "schemas" : {
       "smtpDetails" : {
-        "type" : [ "null", "object" ],
+        "type" : "object",
+        "nullable" : true,
         "additionalProperties" : false,
         "properties" : {
           "port" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int32",
-            "pattern" : "([0-9]+)"
+            "type" : "string",
+            "description" : "SMTP port number",
+            "enum" : [ "25", "465", "587" ]
           },
           "host" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
+            "description" : "SMTP server hostname",
             "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+            "minLength" : 3,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
           },
           "userName" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
+            "description" : "SMTP authentication username",
             "maxLength" : 100,
-            "minLength" : 0
+            "minLength" : 1
           },
           "connectionType" : {
-            "type" : [ "string", "null" ],
-            "enum" : [ "PLAIN", "SSL", "TLS" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "type" : "string",
+            "description" : "SMTP connection type: PLAIN, SSL, or TLS",
+            "enum" : [ "PLAIN", "SSL", "TLS" ]
           }
-        }
+        },
+        "required" : [ "host", "port", "userName", "connectionType" ]
+      },
+      "smtpPassword" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "properties" : {
+          "password" : {
+            "type" : "string",
+            "description" : "SMTP authentication password",
+            "minLength" : 1,
+            "maxLength" : 30
+          }
+        },
+        "required" : [ "password" ]
+      },
+      "smtpDetailsInRequest" : {
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/smtpDetails"
+        }, {
+          "$ref" : "#/components/schemas/smtpPassword"
+        } ]
       },
       "author" : {
-        "type" : [ "null", "object" ],
+        "type" : "object",
+        "nullable" : true,
         "additionalProperties" : false,
         "properties" : {
           "photoURL" : {
-            "type" : [ "string", "null" ],
+            "description" : "URL of the photo",
+            "type" : "string",
+            "nullable" : true,
             "maxLength" : 200,
             "minLength" : 0,
             "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
           },
           "firstName" : {
-            "type" : [ "string", "null" ],
+            "description" : "First name",
+            "type" : "string",
+            "nullable" : true,
             "maxLength" : 50,
             "minLength" : 0
           },
           "lastName" : {
-            "type" : [ "string", "null" ],
+            "description" : "Last name",
+            "type" : "string",
             "maxLength" : 50,
             "minLength" : 0
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
+            "description" : "Unique ID",
+            "type" : "string",
             "pattern" : "([0-9]+)"
           },
           "email" : {
-            "type" : [ "string", "null" ],
+            "description" : "Email address",
+            "type" : "string",
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
@@ -177,77 +329,193 @@
         },
         "required" : [ "email", "firstName", "id", "lastName", "photoURL" ]
       },
-      "secondListViewJson" : {
-        "type" : [ "null", "object" ],
+      "fromAddressCreate" : {
+        "type" : "object",
         "additionalProperties" : false,
         "properties" : {
-          "modifiedTime" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
-          },
           "address" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
+            "description" : "Email address for the From address",
             "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
-          },
-          "isSmtpEnabled" : {
-            "type" : [ "boolean", "null" ]
-          },
-          "isVerified" : {
-            "type" : [ "boolean", "null" ],
-            "description" : "Key that returns if the mailReplyAddress is verified or not"
+            "format" : "email",
+            "pattern" : "^(?=.{1,64}@.{4,255}$)[A-Za-z0-9]+([._+&!*'-][A-Za-z0-9]+)*@([A-Za-z0-9]+(-[A-Za-z0-9]+)*\\.)+[A-Za-z]{2,}$",
+            "x-unique" : true
           },
           "displayName" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
+            "description" : "Display name for the from address",
+            "maxLength" : 100,
+            "pattern" : "^[\\P{InBasicLatin}A-Za-z0-9\\[\\]()._\\- \\|']+$"
+          },
+          "departmentId" : {
+            "type" : "string",
+            "pattern" : "([0-9]+)",
+            "description" : "ID of the department to which this From address should be added."
+          },
+          "serviceProviderType" : {
+            "type" : "string",
+            "description" : "Service provider type: ZohoSMTP, CustomSMTP, Outlook, Office, or Google",
+            "enum" : [ "ZohoSMTP", "CustomSMTP", "Outlook", "Office", "Google" ]
+          },
+          "smtpDetails" : {
+            "$ref" : "#/components/schemas/smtpDetailsInRequest",
+            "description" : "SMTP configuration details for custom SMTP provider"
+          },
+          "isDepartmentDefault" : {
+            "type" : "boolean",
+            "description" : "true when this from address is set as the default reply address for the department. A department can have only one default from address at a time."
+          },
+          "isSmtpEnabled" : {
+            "type" : "boolean",
+            "description" : "deprecated parameter. Use serviceProviderType instead. true when serviceProviderType is CustomSMTP, false otherwise."
+          }
+        },
+        "required" : [ "address", "departmentId", "displayName" ],
+        "if" : {
+          "required" : [ "serviceProviderType" ],
+          "properties" : {
+            "serviceProviderType" : {
+              "const" : "CustomSMTP",
+              "description" : "Service provider type constant for conditional validation"
+            }
+          }
+        },
+        "then" : {
+          "required" : [ "smtpDetails" ]
+        }
+      },
+      "fromAddressUpdate" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "properties" : {
+          "displayName" : {
+            "type" : "string",
+            "description" : "Display name for the from address",
             "maxLength" : 100,
             "minLength" : 0
           },
           "departmentId" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
-            "description" : "ID of the Department from which the addresses need to be queried.",
+            "type" : "string",
+            "description" : "ID of the Department to which this From address belongs",
             "pattern" : "([0-9]+)"
           },
-          "isActive" : {
-            "type" : [ "boolean", "null" ],
-            "description" : "Key that returns if the mailReplyAddress is active or not"
+          "serviceProviderType" : {
+            "type" : "string",
+            "description" : "Service provider type: ZohoSMTP, CustomSMTP, Outlook, Office, or Google",
+            "enum" : [ "ZohoSMTP", "CustomSMTP", "Outlook", "Office", "Google" ]
           },
           "smtpDetails" : {
-            "$ref" : "#/components/schemas/smtpDetails"
+            "$ref" : "#/components/schemas/smtpDetailsInRequest",
+            "description" : "SMTP configuration details for custom SMTP provider"
           },
-          "createdBy" : {
-            "$ref" : "#/components/schemas/author"
+          "isDepartmentDefault" : {
+            "type" : "boolean",
+            "description" : "true when this from address is set as the default reply address for the department. A department can have only one default From address at a time."
+          },
+          "isActive" : {
+            "type" : "boolean",
+            "description" : "Indicates whether the from address is active"
+          },
+          "isSmtpEnabled" : {
+            "type" : "boolean",
+            "description" : "deprecated parameter. Use serviceProviderType instead. true when serviceProviderType is CustomSMTP, false otherwise."
+          }
+        },
+        "if" : {
+          "required" : [ "serviceProviderType" ],
+          "properties" : {
+            "serviceProviderType" : {
+              "const" : "CustomSMTP",
+              "description" : "Service provider type constant for conditional validation"
+            }
+          }
+        },
+        "then" : {
+          "required" : [ "smtpDetails" ]
+        }
+      },
+      "fromAddressDetails" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "Unique identifier for the From address",
+            "pattern" : "([0-9]+)"
+          },
+          "address" : {
+            "type" : "string",
+            "description" : "Email address for the From address",
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "^(?=.{1,64}@.{4,255}$)[A-Za-z0-9]+([._+&!*'-][A-Za-z0-9]+)*@([A-Za-z0-9]+(-[A-Za-z0-9]+)*\\.)+[A-Za-z]{2,}$"
+          },
+          "displayName" : {
+            "type" : "string",
+            "description" : "Display name for the From address",
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "departmentId" : {
+            "type" : "string",
+            "description" : "ID of the department to which the From address belongs",
+            "pattern" : "([0-9]+)"
+          },
+          "serviceProviderType" : {
+            "type" : "string",
+            "description" : "Service provider type: ZohoSMTP, CustomSMTP, Outlook, Office, or Google",
+            "enum" : [ "ZohoSMTP", "CustomSMTP", "Outlook", "Office", "Google" ]
+          },
+          "isVerified" : {
+            "type" : "boolean",
+            "description" : "Key that returns if the From address is verified or not"
+          },
+          "isActive" : {
+            "type" : "boolean",
+            "description" : "Key that returns if the From address is active or not"
           },
           "createdTime" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
+            "description" : "Timestamp when the From address was created, in ISO 8601 format (UTC)",
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+          },
+          "createdBy" : {
+            "$ref" : "#/components/schemas/author",
+            "description" : "User who created the From address"
+          },
+          "modifiedTime" : {
+            "type" : "string",
+            "description" : "Timestamp when the From address was last modified, in ISO 8601 format (UTC)",
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "modifiedBy" : {
-            "$ref" : "#/components/schemas/author"
+            "$ref" : "#/components/schemas/author",
+            "description" : "User who last modified the From address"
           },
-          "id" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
+          "smtpDetails" : {
+            "$ref" : "#/components/schemas/smtpDetails",
+            "description" : "SMTP configuration details for custom SMTP provider"
           },
-          "serviceProviderType" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "ZohoSMTP|CustomSMTP|Outlook|Office"
+          "url" : {
+            "type" : "string",
+            "description" : "OAuth provider URL for Outlook, Office, or Google providers",
+            "pattern" : "^([a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)+)(:[0-9]+)?(\\/[^\\s]*)?$"
+          },
+          "isDepartmentDefault" : {
+            "type" : "boolean",
+            "description" : "true when this from address is set as the default From address for the department"
           }
         },
-        "required" : [ "address", "createdBy", "createdTime", "departmentId", "displayName", "id", "isActive", "isVerified", "modifiedBy", "modifiedTime", "serviceProviderType", "smtpDetails" ]
+        "required" : [ "id", "address", "displayName", "departmentId", "serviceProviderType", "isDepartmentDefault", "isActive", "isVerified", "createdBy", "createdTime", "modifiedBy", "modifiedTime" ]
       },
       "data" : {
-        "type" : [ "null", "array" ],
+        "type" : "array",
         "items" : {
-          "$ref" : "#/components/schemas/secondListViewJson"
+          "$ref" : "#/components/schemas/fromAddressDetails"
         }
       }
     },
@@ -257,11 +525,12 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : "object",
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "#/components/schemas/data"
+                  "$ref" : "#/components/schemas/data",
+                  "description" : "Array of From address objects"
                 }
               },
               "required" : [ "data" ]
@@ -270,7 +539,7 @@
               "Valid responses Definitions" : {
                 "value" : {
                   "data" : [ {
-                    "modifiedTime" : 1673006126000,
+                    "modifiedTime" : "2023-01-06T12:34:56Z",
                     "address" : "support@zylker.com",
                     "isVerified" : true,
                     "isSmtpEnabled" : true,
@@ -284,29 +553,30 @@
                       "connectionType" : "SSL"
                     },
                     "createdBy" : {
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000028043/photo?orgId=11171343",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000028043/photo?orgId=1234567890",
                       "firstName" : "Sam",
                       "lastName" : "Steve",
                       "id" : "4000000028043",
                       "email" : "steve@zylker.com"
                     },
-                    "createdTime" : 1672998926000,
+                    "createdTime" : "2023-01-06T12:34:56Z",
                     "modifiedBy" : {
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000028043/photo?orgId=11171343",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000028043/photo?orgId=1234567890",
                       "firstName" : "Sam",
                       "lastName" : "Steve",
                       "id" : "4000000028043",
                       "email" : "steve@zylker.com"
                     },
                     "id" : "4000000025003",
-                    "serviceProviderType" : "CustomSMTP"
+                    "serviceProviderType" : "CustomSMTP",
+                    "isDepartmentDefault" : true
                   }, {
-                    "modifiedTime" : 1673006126000,
+                    "modifiedTime" : "2023-01-06T12:34:56Z",
                     "address" : "market@zylker.com",
                     "isVerified" : true,
                     "isSmtpEnabled" : false,
                     "createdBy" : {
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000028043/photo?orgId=11171343",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000028043/photo?orgId=1234567890",
                       "firstName" : "Sam",
                       "lastName" : "Steve",
                       "id" : "4000000028043",
@@ -314,9 +584,9 @@
                     },
                     "displayName" : "Marketing",
                     "departmentId" : "4000000007043",
-                    "createdTime" : 1672998926000,
+                    "createdTime" : "2023-01-06T12:34:56Z",
                     "modifiedBy" : {
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000028043/photo?orgId=11171343",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000028043/photo?orgId=1234567890",
                       "firstName" : "Sam",
                       "lastName" : "Steve",
                       "id" : "4000000028043",
@@ -324,9 +594,10 @@
                     },
                     "id" : "4000000026001",
                     "isActive" : false,
-                    "serviceProviderType" : "ZohoSMTP"
+                    "serviceProviderType" : "ZohoSMTP",
+                    "isDepartmentDefault" : false
                   }, {
-                    "modifiedTime" : 1673006126000,
+                    "modifiedTime" : "2023-01-06T12:34:56Z",
                     "address" : "techsupport@zylker.com",
                     "isVerified" : true,
                     "isSmtpEnabled" : true,
@@ -340,23 +611,79 @@
                       "connectionType" : "SSL"
                     },
                     "createdBy" : {
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000028043/photo?orgId=11171343",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000028043/photo?orgId=1234567890",
                       "firstName" : "Sam",
                       "lastName" : "Steve",
                       "id" : "4000000028043",
                       "email" : "steve@zylker.com"
                     },
-                    "createdTime" : 1672998926000,
+                    "createdTime" : "2023-01-06T12:34:56Z",
                     "modifiedBy" : {
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000028043/photo?orgId=11171343",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000028043/photo?orgId=1234567890",
                       "firstName" : "Sam",
                       "lastName" : "Steve",
                       "id" : "4000000028043",
                       "email" : "steve@zylker.com"
                     },
                     "id" : "4000000028003",
-                    "serviceProviderType" : "CustomSMTP"
+                    "serviceProviderType" : "CustomSMTP",
+                    "isDepartmentDefault" : false
                   } ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "fromAddressResponse" : {
+        "description" : "From address response template definition",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "#/components/schemas/fromAddressDetails",
+                  "description" : "Details of the from address"
+                }
+              }
+            },
+            "examples" : {
+              "Valid response" : {
+                "value" : {
+                  "data" : {
+                    "departmentId" : "84322000000006907",
+                    "displayName" : "Support",
+                    "createdTime" : "2026-03-10T11:08:31.000Z",
+                    "modifiedTime" : "2026-06-11T12:52:50.000Z",
+                    "serviceProviderType" : "CustomSMTP",
+                    "smtpDetails" : {
+                      "userName" : "zylker.support@zylker.com",
+                      "host" : "smtp.zoho.com",
+                      "port" : "587",
+                      "connectionType" : "TLS"
+                    },
+                    "isDepartmentDefault" : true,
+                    "createdBy" : {
+                      "id" : "84322000000277001",
+                      "email" : "alex@zylker.com",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/84322000000277001/photo?orgId=1234567890",
+                      "firstName" : "Alex",
+                      "lastName" : "Jones"
+                    },
+                    "modifiedBy" : {
+                      "id" : "84322000000210760",
+                      "email" : "kevin@zylker.com",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/84322000000210760/photo?orgId=1234567890",
+                      "firstName" : "Kevin",
+                      "lastName" : "Stone"
+                    },
+                    "address" : "zylker.support@zylker.com",
+                    "isVerified" : true,
+                    "id" : "84322000010082001",
+                    "isActive" : true
+                  }
                 }
               }
             }
@@ -364,7 +691,33 @@
         }
       }
     },
+    "requestBodies" : {
+      "addFromAddressJSON" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/fromAddressCreate"
+            }
+          }
+        }
+      },
+      "updateFromAddressJSON" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/fromAddressUpdate"
+            }
+          }
+        }
+      }
+    },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

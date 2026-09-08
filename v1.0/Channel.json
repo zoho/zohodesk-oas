@@ -14,20 +14,26 @@
         "parameters" : [ {
           "name" : "height",
           "in" : "query",
-          "description" : "",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "integer" ],
             "format" : "int32",
-            "description" : "",
-            "maximum" : 500,
-            "minimum" : 10,
             "pattern" : "([0-9]+)"
           }
         }, {
-          "$ref" : "#/components/parameters/channelCode"
+          "name" : "channelCode",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "([a-zA-Z0-9_\\-]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -40,6 +46,56 @@
           "iam-oauth2-schema" : [ "Desk.basic.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
+      },
+      "post" : {
+        "tags" : [ "Channel" ],
+        "summary" : "Update Channel logo",
+        "description" : "This API updates the logo for the given channel. Logo of SYSTEM channels cannot be updated.",
+        "operationId" : "uploadChannelPhoto",
+        "parameters" : [ {
+          "name" : "channelCode",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "([a-zA-Z0-9_\\-]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "multipart/form-data" : {
+              "schema" : {
+                "type" : [ "object" ],
+                "properties" : {
+                  "photo" : {
+                    "type" : [ "string" ],
+                    "format" : "binary"
+                  }
+                },
+                "required" : [ "photo" ],
+                "additionalProperties" : false
+              }
+            }
+          }
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "200" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.basic.CREATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
       }
     },
     "/api/v1/channels/{channelCode}" : {
@@ -49,7 +105,17 @@
         "description" : "This API gets fetches details of a given channel.",
         "operationId" : "getChannelByCode",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/channelCode"
+          "name" : "channelCode",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "([a-zA-Z0-9_\\-]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -88,7 +154,7 @@
   "components" : {
     "schemas" : {
       "replyConfig" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "updateRecords" : {
@@ -98,12 +164,10 @@
             "type" : [ "boolean", "null" ]
           },
           "contentTypes" : {
-            "type" : [ "null", "array" ],
+            "type" : [ "array", "null" ],
             "items" : {
               "type" : [ "string", "null" ],
-              "enum" : [ "text/plain", "text/html" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "enum" : [ "text/plain", "text/html" ]
             },
             "maxItems" : 2,
             "uniqueItems" : true
@@ -115,7 +179,7 @@
         "required" : [ "acceptsAttachments", "contentTypes", "includeQuotedMessage", "updateRecords" ]
       },
       "getChannelResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "photoURL" : {
@@ -136,7 +200,7 @@
             "minLength" : 0
           },
           "departmentId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
@@ -146,7 +210,7 @@
             "minLength" : 0
           },
           "externalId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
@@ -156,13 +220,11 @@
             "minLength" : 0
           },
           "replyConfig" : {
-            "$ref" : "./Channel.json#/components/schemas/replyConfig"
+            "$ref" : "#/components/schemas/replyConfig"
           },
           "type" : {
             "type" : [ "string", "null" ],
-            "enum" : [ "SYSTEM", "INTEGRATION", "INSTANT_MESSAGE" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "SYSTEM", "INTEGRATION", "INSTANT_MESSAGE" ]
           },
           "acceptsReplies" : {
             "type" : [ "boolean", "null" ]
@@ -171,9 +233,9 @@
         "required" : [ "acceptsReplies", "appName", "code", "departmentId", "externalId", "mappedIntegration", "name", "photoURL", "replyConfig", "type" ]
       },
       "getChannelsArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./Channel.json#/components/schemas/getChannelResponse"
+          "$ref" : "#/components/schemas/getChannelResponse"
         }
       }
     },
@@ -183,7 +245,7 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "photoURL" : {
@@ -204,7 +266,7 @@
                   "minLength" : 0
                 },
                 "departmentId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
@@ -214,7 +276,7 @@
                   "minLength" : 0
                 },
                 "externalId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
@@ -224,13 +286,11 @@
                   "minLength" : 0
                 },
                 "replyConfig" : {
-                  "$ref" : "./Channel.json#/components/schemas/replyConfig"
+                  "$ref" : "#/components/schemas/replyConfig"
                 },
                 "type" : {
                   "type" : [ "string", "null" ],
-                  "enum" : [ "SYSTEM", "INTEGRATION", "INSTANT_MESSAGE" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "enum" : [ "SYSTEM", "INTEGRATION", "INSTANT_MESSAGE" ]
                 },
                 "acceptsReplies" : {
                   "type" : [ "boolean", "null" ]
@@ -241,7 +301,7 @@
             "examples" : {
               "Valid responses Definitions" : {
                 "value" : {
-                  "photoURL" : "https://desk.zoho.com/api/v1/channels/sales_whatsapp_account/photo?orgId=60856948",
+                  "photoURL" : "https://desk.example.com/api/v1/channels/sales_whatsapp_account/photo?orgId=1234567890",
                   "code" : "SALES_WHATSAPP_ACCOUNT",
                   "appName" : "Sales Whatsapp Account",
                   "departmentId" : "76389000000006907",
@@ -253,7 +313,7 @@
                     "contentTypes" : [ "text/plain" ],
                     "includeQuotedMessage" : false
                   },
-                  "type" : "INSTANT_MESSAGE",
+                  "type" : [ "INSTANT_MESSAGE" ],
                   "acceptsReplies" : true
                 }
               }
@@ -266,11 +326,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./Channel.json#/components/schemas/getChannelsArray"
+                  "$ref" : "#/components/schemas/getChannelsArray"
                 }
               },
               "required" : [ "data" ]
@@ -279,7 +339,7 @@
               "Valid responses Definitions" : {
                 "value" : {
                   "data" : [ {
-                    "photoURL" : "https://desk.zoho.com/api/v1/channels/sales_whatsapp_account/photo?orgId=60856948",
+                    "photoURL" : "https://desk.example.com/api/v1/channels/sales_whatsapp_account/photo?orgId=1234567890",
                     "code" : "SALES_WHATSAPP_ACCOUNT",
                     "appName" : "Sales Whatsapp Account",
                     "departmentId" : "76389000000006907",
@@ -292,10 +352,10 @@
                       "contentTypes" : [ "text/plain" ],
                       "includeQuotedMessage" : false
                     },
-                    "type" : "INSTANT_MESSAGE",
+                    "type" : [ "INSTANT_MESSAGE" ],
                     "acceptsReplies" : true
                   }, {
-                    "photoURL" : "https://desk.zoho.com/api/v1/channels/youtubecat/photo?orgId=647164567",
+                    "photoURL" : "https://desk.example.com/api/v1/channels/youtubecat/photo?orgId=1234567890",
                     "code" : "YOUTUBECAT",
                     "appName" : "Youtube Cat",
                     "departmentId" : "188422000009189044",
@@ -308,7 +368,7 @@
                       "contentTypes" : [ "text/plain" ],
                       "includeQuotedMessage" : false
                     },
-                    "type" : "INTEGRATION",
+                    "type" : [ "INTEGRATION" ],
                     "acceptsReplies" : true
                   }, {
                     "photoURL" : null,
@@ -324,7 +384,7 @@
                       "contentTypes" : [ "text/plain", "text/html" ],
                       "includeQuotedMessage" : true
                     },
-                    "type" : "SYSTEM",
+                    "type" : [ "SYSTEM" ],
                     "acceptsReplies" : true
                   }, {
                     "photoURL" : null,
@@ -340,7 +400,7 @@
                       "contentTypes" : [ "text/plain" ],
                       "includeQuotedMessage" : false
                     },
-                    "type" : "SYSTEM",
+                    "type" : [ "SYSTEM" ],
                     "acceptsReplies" : true
                   }, {
                     "photoURL" : null,
@@ -356,7 +416,7 @@
                       "contentTypes" : [ "text/plain" ],
                       "includeQuotedMessage" : false
                     },
-                    "type" : "SYSTEM",
+                    "type" : [ "SYSTEM" ],
                     "acceptsReplies" : true
                   }, {
                     "photoURL" : null,
@@ -372,7 +432,7 @@
                       "contentTypes" : [ "text/plain" ],
                       "includeQuotedMessage" : false
                     },
-                    "type" : "SYSTEM",
+                    "type" : [ "SYSTEM" ],
                     "acceptsReplies" : true
                   }, {
                     "photoURL" : null,
@@ -388,7 +448,7 @@
                       "contentTypes" : [ "text/plain" ],
                       "includeQuotedMessage" : false
                     },
-                    "type" : "SYSTEM",
+                    "type" : [ "SYSTEM" ],
                     "acceptsReplies" : true
                   }, {
                     "photoURL" : null,
@@ -404,7 +464,7 @@
                       "contentTypes" : [ "text/plain" ],
                       "includeQuotedMessage" : false
                     },
-                    "type" : "SYSTEM",
+                    "type" : [ "SYSTEM" ],
                     "acceptsReplies" : true
                   }, {
                     "photoURL" : null,
@@ -420,7 +480,7 @@
                       "contentTypes" : [ "text/plain" ],
                       "includeQuotedMessage" : false
                     },
-                    "type" : "SYSTEM",
+                    "type" : [ "SYSTEM" ],
                     "acceptsReplies" : true
                   }, {
                     "photoURL" : null,
@@ -431,7 +491,7 @@
                     "externalId" : null,
                     "mappedIntegration" : null,
                     "replyConfig" : null,
-                    "type" : "SYSTEM",
+                    "type" : [ "SYSTEM" ],
                     "acceptsReplies" : false
                   }, {
                     "photoURL" : null,
@@ -442,7 +502,7 @@
                     "externalId" : null,
                     "mappedIntegration" : null,
                     "replyConfig" : null,
-                    "type" : "SYSTEM",
+                    "type" : [ "SYSTEM" ],
                     "acceptsReplies" : false
                   }, {
                     "photoURL" : null,
@@ -453,7 +513,7 @@
                     "externalId" : null,
                     "mappedIntegration" : null,
                     "replyConfig" : null,
-                    "type" : "SYSTEM",
+                    "type" : [ "SYSTEM" ],
                     "acceptsReplies" : false
                   }, {
                     "photoURL" : null,
@@ -469,7 +529,7 @@
                       "contentTypes" : [ "text/plain", "text/html" ],
                       "includeQuotedMessage" : true
                     },
-                    "type" : "SYSTEM",
+                    "type" : [ "SYSTEM" ],
                     "acceptsReplies" : true
                   }, {
                     "photoURL" : null,
@@ -480,7 +540,7 @@
                     "externalId" : null,
                     "mappedIntegration" : null,
                     "replyConfig" : null,
-                    "type" : "SYSTEM",
+                    "type" : [ "SYSTEM" ],
                     "acceptsReplies" : false
                   }, {
                     "photoURL" : null,
@@ -491,7 +551,7 @@
                     "externalId" : null,
                     "mappedIntegration" : null,
                     "replyConfig" : null,
-                    "type" : "SYSTEM",
+                    "type" : [ "SYSTEM" ],
                     "acceptsReplies" : false
                   }, {
                     "photoURL" : null,
@@ -502,7 +562,7 @@
                     "externalId" : null,
                     "mappedIntegration" : null,
                     "replyConfig" : null,
-                    "type" : "SYSTEM",
+                    "type" : [ "SYSTEM" ],
                     "acceptsReplies" : false
                   }, {
                     "photoURL" : null,
@@ -513,7 +573,7 @@
                     "externalId" : null,
                     "mappedIntegration" : null,
                     "replyConfig" : null,
-                    "type" : "SYSTEM",
+                    "type" : [ "SYSTEM" ],
                     "acceptsReplies" : false
                   }, {
                     "photoURL" : null,
@@ -524,7 +584,7 @@
                     "externalId" : null,
                     "mappedIntegration" : null,
                     "replyConfig" : null,
-                    "type" : "SYSTEM",
+                    "type" : [ "SYSTEM" ],
                     "acceptsReplies" : false
                   } ]
                 }
@@ -534,24 +594,16 @@
         }
       }
     },
-    "parameters" : {
-      "channelCode" : {
-        "name" : "channelCode",
-        "in" : "path",
-        "description" : "",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null" ],
-          "description" : "",
-          "maxLength" : 100,
-          "minLength" : 0,
-          "pattern" : "([a-zA-Z0-9_\\-]+)"
-        }
-      }
-    },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "jwt-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/jwt-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

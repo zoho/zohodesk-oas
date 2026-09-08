@@ -1,0 +1,1262 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Blueprint",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/blueprints/criteriaFields" : {
+      "get" : {
+        "tags" : [ "Blueprint" ],
+        "summary" : "Get Blueprint Criteria Fields",
+        "description" : "Retrieves the fields allowed in blueprint and transition criteria for the specified module and layout. Use this before building blueprint or transition criteria rules. Available pre-defined values include @${EMPTY}@, @${NOTEMPTY}@, @${OPEN}@, @${CLOSED}@, and @${CURRENTTIME}@. Available field types are @Text@, @Date@, @DateTime@, @Boolean@, and @Arithmetic@.",
+        "operationId" : "getBlueprintsCriteriaFields",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "module",
+          "in" : "query",
+          "description" : "Module for which criteria fields must be retrieved. Required. Currently supported value: @tickets@.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "maxLength" : 100,
+            "minLength" : 0,
+            "description" : "Module for which criteria fields must be retrieved. Required. Currently supported value: @tickets@.",
+            "enum" : [ "tickets" ]
+          }
+        }, {
+          "name" : "layoutId",
+          "in" : "query",
+          "description" : "Unique ID of the layout for which criteria fields must be retrieved. Required.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the layout for which criteria fields must be retrieved. Required."
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/getBlueprintsCriteriaFieldsResponse"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/unprocessableEntityErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.automations.READ", "Desk.settings.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/blueprints/fieldsToConfigure" : {
+      "get" : {
+        "tags" : [ "Blueprint" ],
+        "summary" : "Get Configurable Blueprint Fields",
+        "description" : "Retrieves the field details that can be configured in blueprints for the specified layout and module. Use this before creating or editing a blueprint to discover which ticket fields can be mapped to the blueprint workflow.",
+        "operationId" : "getBlueprintFieldsToConfigure",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "layoutId",
+          "in" : "query",
+          "description" : "Unique ID of the layout for which fields must be retrieved. Required.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the layout for which fields must be retrieved. Required."
+          }
+        }, {
+          "name" : "module",
+          "in" : "query",
+          "description" : "Module for which fields must be retrieved. Required. Currently supported value: @tickets@.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "maxLength" : 100,
+            "minLength" : 0,
+            "description" : "Module for which fields must be retrieved. Required. Currently supported value: @tickets@.",
+            "enum" : [ "tickets" ]
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/getBlueprintFieldsToConfigureResponse"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/unprocessableEntityErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.automations.READ", "Desk.settings.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    }
+  },
+  "components" : {
+    "responses" : {
+      "getBlueprintsCriteriaFieldsResponse" : {
+        "description" : "Returns groups of fields available for blueprint and transition criteria, including supported conditions and values for each field.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "null", "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "criteriaFields" : {
+                  "description" : "Groups of fields available for building blueprint or transition criteria rules. Type: array of objects. Required in response.",
+                  "type" : [ "null", "array" ],
+                  "items" : {
+                    "type" : [ "null", "object" ],
+                    "additionalProperties" : false,
+                    "properties" : {
+                      "displayLabel" : {
+                        "type" : [ "string", "null" ],
+                        "maxLength" : 250,
+                        "minLength" : 0,
+                        "description" : "Human-readable label of the field group shown in the UI. Type: string, max 250 characters. Required. Example: \"Tickets\"."
+                      },
+                      "name" : {
+                        "type" : [ "string", "null" ],
+                        "maxLength" : 250,
+                        "minLength" : 0,
+                        "description" : "API name of the field group used in criteria expressions. Type: string, max 250 characters. Required. Example: \"tickets\"."
+                      },
+                      "fieldDetails" : {
+                        "type" : [ "null", "array" ],
+                        "items" : {
+                          "type" : [ "null", "object" ],
+                          "additionalProperties" : false,
+                          "properties" : {
+                            "availableConditions" : {
+                              "type" : [ "null", "array" ],
+                              "items" : {
+                                "type" : [ "null", "object" ],
+                                "additionalProperties" : false,
+                                "properties" : {
+                                  "condition" : {
+                                    "type" : [ "string", "null" ],
+                                    "maxLength" : 250,
+                                    "minLength" : 0,
+                                    "description" : "Machine-readable condition identifier. Type: string, max 250 characters. Required. Example: \"is\"."
+                                  },
+                                  "i18NCondition" : {
+                                    "type" : [ "string", "null" ],
+                                    "maxLength" : 250,
+                                    "minLength" : 0,
+                                    "description" : "Localized display label for the condition. Type: string, max 250 characters. Required. Example: \"is\"."
+                                  },
+                                  "value" : {
+                                    "type" : [ "null", "array" ],
+                                    "items" : { },
+                                    "description" : "Allowed value placeholders or literals for this condition. Type: array of strings or nested arrays. Required. Examples: [\"${CUSTOM}\"], [\"${EMPTY}\"]."
+                                  }
+                                },
+                                "required" : [ "condition", "i18NCondition", "value" ]
+                              },
+                              "description" : "Conditions supported for this field in criteria rules. Type: array of objects. Required in each fieldDetails entry."
+                            },
+                            "fieldLabel" : {
+                              "type" : [ "string", "null" ],
+                              "maxLength" : 250,
+                              "minLength" : 0,
+                              "description" : "Display label of the criteria field. Type: string, max 250 characters. Required. Example: \"Account Name\"."
+                            },
+                            "i18NLabel" : {
+                              "type" : [ "string", "null" ],
+                              "maxLength" : 250,
+                              "minLength" : 0,
+                              "description" : "Internationalized display label of the criteria field. Type: string, max 250 characters. Required. Example: \"Account Name\"."
+                            },
+                            "type" : {
+                              "type" : [ "string", "null" ],
+                              "maxLength" : 250,
+                              "minLength" : 0,
+                              "description" : "Data type of the field used to determine valid criteria operators. Type: string, max 250 characters. Required. Examples: lookup, Text, Date, Boolean."
+                            }
+                          },
+                          "required" : [ "availableConditions", "fieldLabel", "i18NLabel", "type" ]
+                        },
+                        "description" : "List of individual fields within the group, each with supported conditions and values. Type: array of objects. Required."
+                      }
+                    },
+                    "required" : [ "displayLabel", "fieldDetails", "name" ]
+                  }
+                }
+              },
+              "required" : [ "criteriaFields" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "criteriaFields" : [ {
+                    "displayLabel" : "Tickets",
+                    "name" : "tickets",
+                    "fieldDetails" : [ {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Account Name",
+                      "i18NLabel" : "Account Name",
+                      "type" : "lookup"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Contact Name",
+                      "i18NLabel" : "Contact Name",
+                      "type" : "lookup"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Email",
+                      "i18NLabel" : "Email",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Phone",
+                      "i18NLabel" : "Phone",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Subject",
+                      "i18NLabel" : "Subject",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Description",
+                      "i18NLabel" : "Description",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is OPEN",
+                        "i18NCondition" : "is OPEN",
+                        "value" : [ "${OPEN}" ]
+                      }, {
+                        "condition" : "is ON HOLD",
+                        "i18NCondition" : "is ON HOLD",
+                        "value" : [ "${ONHOLD}" ]
+                      }, {
+                        "condition" : "is CLOSED",
+                        "i18NCondition" : "is CLOSED",
+                        "value" : [ "${CLOSED}" ]
+                      }, {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
+                        "value" : [ "${CUSTOM}" ]
+                      } ],
+                      "fieldLabel" : "Status",
+                      "i18NLabel" : "Status",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Product Name",
+                      "i18NLabel" : "Product Name",
+                      "type" : "lookup"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Case Owner",
+                      "i18NLabel" : "Ticket Owner",
+                      "type" : "user"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      } ],
+                      "fieldLabel" : "Created By",
+                      "i18NLabel" : "Created By",
+                      "type" : "user"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      } ],
+                      "fieldLabel" : "Modified By",
+                      "i18NLabel" : "Modified By",
+                      "type" : "user"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CURRENTTIME}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CURRENTTIME}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is after",
+                        "i18NCondition" : "is after",
+                        "value" : [ "${CURRENTTIME}", "${DUEDATE}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is before",
+                        "i18NCondition" : "is before",
+                        "value" : [ "${CURRENTTIME}", "${DUEDATE}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "between",
+                        "i18NCondition" : "between",
+                        "value" : [ [ "${CURRENTTIME}", "${CUSTOM}" ], [ "${CURRENTTIME}", "${CUSTOM}" ] ]
+                      }, {
+                        "condition" : "not between",
+                        "i18NCondition" : "not between",
+                        "value" : [ [ "${CURRENTTIME}", "${CUSTOM}" ], [ "${CURRENTTIME}", "${CUSTOM}" ] ]
+                      } ],
+                      "fieldLabel" : "Created Time",
+                      "i18NLabel" : "Created Time",
+                      "type" : "dateTime"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CURRENTTIME}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CURRENTTIME}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is after",
+                        "i18NCondition" : "is after",
+                        "value" : [ "${CURRENTTIME}", "${DUEDATE}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is before",
+                        "i18NCondition" : "is before",
+                        "value" : [ "${CURRENTTIME}", "${DUEDATE}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "between",
+                        "i18NCondition" : "between",
+                        "value" : [ [ "${CURRENTTIME}", "${CUSTOM}" ], [ "${CURRENTTIME}", "${CUSTOM}" ] ]
+                      }, {
+                        "condition" : "not between",
+                        "i18NCondition" : "not between",
+                        "value" : [ [ "${CURRENTTIME}", "${CUSTOM}" ], [ "${CURRENTTIME}", "${CUSTOM}" ] ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Case Closed Time",
+                      "i18NLabel" : "Ticket Closed Time",
+                      "type" : "dateTime"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CURRENTTIME}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CURRENTTIME}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is after",
+                        "i18NCondition" : "is after",
+                        "value" : [ "${CURRENTTIME}", "${DUEDATE}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is before",
+                        "i18NCondition" : "is before",
+                        "value" : [ "${CURRENTTIME}", "${DUEDATE}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "between",
+                        "i18NCondition" : "between",
+                        "value" : [ [ "${CURRENTTIME}", "${CUSTOM}" ], [ "${CURRENTTIME}", "${CUSTOM}" ] ]
+                      }, {
+                        "condition" : "not between",
+                        "i18NCondition" : "not between",
+                        "value" : [ [ "${CURRENTTIME}", "${CUSTOM}" ], [ "${CURRENTTIME}", "${CUSTOM}" ] ]
+                      } ],
+                      "fieldLabel" : "Modified Time",
+                      "i18NLabel" : "Modified Time",
+                      "type" : "dateTime"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "=",
+                        "i18NCondition" : "=",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "<>",
+                        "i18NCondition" : "<>",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "<",
+                        "i18NCondition" : "<",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "<=",
+                        "i18NCondition" : "<=",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : ">",
+                        "i18NCondition" : ">",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : ">=",
+                        "i18NCondition" : ">=",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Request Id",
+                      "i18NLabel" : "Ticket Id",
+                      "type" : "integer"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "To Address",
+                      "i18NLabel" : "To Address",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "=",
+                        "i18NCondition" : "=",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "<>",
+                        "i18NCondition" : "<>",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "<",
+                        "i18NCondition" : "<",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "<=",
+                        "i18NCondition" : "<=",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : ">",
+                        "i18NCondition" : ">",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : ">=",
+                        "i18NCondition" : ">=",
+                        "value" : [ "${CUSTOM}" ]
+                      } ],
+                      "fieldLabel" : "Number of Threads",
+                      "i18NLabel" : "Number of Threads",
+                      "type" : "integer"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "=",
+                        "i18NCondition" : "=",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "<>",
+                        "i18NCondition" : "<>",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "<",
+                        "i18NCondition" : "<",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "<=",
+                        "i18NCondition" : "<=",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : ">",
+                        "i18NCondition" : ">",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : ">=",
+                        "i18NCondition" : ">=",
+                        "value" : [ "${CUSTOM}" ]
+                      } ],
+                      "fieldLabel" : "Number of Comments",
+                      "i18NLabel" : "Number of Comments",
+                      "type" : "integer"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "Good", "Bad", "Okay" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "Good", "Bad", "Okay" ]
+                      }, {
+                        "condition" : "is received",
+                        "i18NCondition" : "is received"
+                      }, {
+                        "condition" : "is not received",
+                        "i18NCondition" : "is not received"
+                      }, {
+                        "condition" : "link provided",
+                        "i18NCondition" : "link provided"
+                      }, {
+                        "condition" : "link not provided",
+                        "i18NCondition" : "link not provided"
+                      } ],
+                      "fieldLabel" : "Happiness Rating",
+                      "i18NLabel" : "Happiness Rating",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "has agents",
+                        "i18NCondition" : "has agents",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Team",
+                      "i18NLabel" : "Team",
+                      "type" : "team"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CURRENTTIME}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CURRENTTIME}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is after",
+                        "i18NCondition" : "is after",
+                        "value" : [ "${CURRENTTIME}", "${DUEDATE}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is before",
+                        "i18NCondition" : "is before",
+                        "value" : [ "${CURRENTTIME}", "${DUEDATE}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "between",
+                        "i18NCondition" : "between",
+                        "value" : [ [ "${CURRENTTIME}", "${CUSTOM}" ], [ "${CURRENTTIME}", "${CUSTOM}" ] ]
+                      }, {
+                        "condition" : "not between",
+                        "i18NCondition" : "not between",
+                        "value" : [ [ "${CURRENTTIME}", "${CUSTOM}" ], [ "${CURRENTTIME}", "${CUSTOM}" ] ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Case On Hold Time",
+                      "i18NLabel" : "Ticket On Hold Time",
+                      "type" : "dateTime"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CURRENTTIME}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CURRENTTIME}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is after",
+                        "i18NCondition" : "is after",
+                        "value" : [ "${CURRENTTIME}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is before",
+                        "i18NCondition" : "is before",
+                        "value" : [ "${CURRENTTIME}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "between",
+                        "i18NCondition" : "between",
+                        "value" : [ [ "${CURRENTTIME}", "${CUSTOM}" ], [ "${CURRENTTIME}", "${CUSTOM}" ] ]
+                      }, {
+                        "condition" : "not between",
+                        "i18NCondition" : "not between",
+                        "value" : [ [ "${CURRENTTIME}", "${CUSTOM}" ], [ "${CURRENTTIME}", "${CUSTOM}" ] ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Due Date",
+                      "i18NLabel" : "Due Date",
+                      "type" : "dateTime"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Priority",
+                      "i18NLabel" : "Priority",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Mode",
+                      "i18NLabel" : "Channel",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "true", "false" ]
+                      } ],
+                      "fieldLabel" : "Is Overdue",
+                      "i18NLabel" : "Is Overdue",
+                      "type" : "boolean"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "true", "false" ]
+                      } ],
+                      "fieldLabel" : "Is Escalated",
+                      "i18NLabel" : "Is Escalated",
+                      "type" : "boolean"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Classification",
+                      "i18NLabel" : "Classifications",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Resolution",
+                      "i18NLabel" : "Resolution",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is Less Than",
+                        "i18NCondition" : "is Less Than",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is Greater Than",
+                        "i18NCondition" : "is Greater Than",
+                        "value" : [ "${CUSTOM}" ]
+                      } ],
+                      "fieldLabel" : "Time to Respond",
+                      "i18NLabel" : "Time to Respond",
+                      "type" : "integer"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "true", "false" ]
+                      } ],
+                      "fieldLabel" : "Is Response Overdue",
+                      "i18NLabel" : "Is Response Overdue",
+                      "type" : "boolean"
+                    } ]
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "getBlueprintFieldsToConfigureResponse" : {
+        "description" : "Returns a list of ticket fields that can be configured in blueprints for the specified layout, including display labels, field types, and allowed values.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "properties" : {
+                "fields" : {
+                  "description" : "List of ticket fields that can be configured in blueprints for the specified layout. Type: array of objects. Required in response.",
+                  "type" : [ "null", "array" ],
+                  "items" : {
+                    "type" : [ "null", "object" ],
+                    "additionalProperties" : false,
+                    "properties" : {
+                      "displayLabel" : {
+                        "type" : [ "string", "null" ],
+                        "maxLength" : 250,
+                        "minLength" : 0
+                      },
+                      "isCustomField" : {
+                        "type" : [ "boolean", "null" ]
+                      },
+                      "name" : {
+                        "type" : [ "string", "null" ],
+                        "maxLength" : 250,
+                        "minLength" : 0
+                      },
+                      "id" : {
+                        "type" : [ "string", "null", "integer" ],
+                        "format" : "int64",
+                        "pattern" : "([0-9]+)"
+                      },
+                      "type" : {
+                        "type" : [ "string", "null" ],
+                        "maxLength" : 250,
+                        "minLength" : 0
+                      },
+                      "maxLength" : {
+                        "type" : [ "string", "null", "integer" ],
+                        "format" : "int64",
+                        "pattern" : "([0-9]+)"
+                      },
+                      "apiName" : {
+                        "type" : [ "string" ]
+                      },
+                      "isEncryptedField" : {
+                        "type" : [ "boolean" ]
+                      },
+                      "i18NLabel" : {
+                        "type" : [ "string", "null" ],
+                        "maxLength" : 250,
+                        "minLength" : 0
+                      },
+                      "allowedValues" : {
+                        "type" : [ "null", "array" ],
+                        "items" : {
+                          "type" : [ "string", "null" ],
+                          "maxLength" : 250,
+                          "minLength" : 0
+                        }
+                      },
+                      "sortBy" : {
+                        "type" : [ "null", "string" ]
+                      },
+                      "isMandatory" : {
+                        "type" : [ "boolean", "null" ]
+                      },
+                      "defaultValue" : {
+                        "type" : [ "string", "null" ],
+                        "maxLength" : 250,
+                        "minLength" : 0
+                      },
+                      "restoreOnReplyValues" : {
+                        "type" : [ "null", "array" ],
+                        "items" : {
+                          "type" : [ "string", "null" ],
+                          "maxLength" : 250,
+                          "minLength" : 0
+                        }
+                      }
+                    },
+                    "required" : [ "displayLabel", "id", "isCustomField", "maxLength", "name", "type" ]
+                  }
+                }
+              },
+              "required" : [ "fields" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "fields" : [ {
+                    "displayLabel" : "Department",
+                    "isCustomField" : false,
+                    "name" : "departmentId",
+                    "id" : "4000000000353",
+                    "type" : "LookUp",
+                    "maxLength" : 50
+                  }, {
+                    "displayLabel" : "Contact Name",
+                    "isCustomField" : false,
+                    "name" : "contactId",
+                    "id" : "4000000000357",
+                    "type" : "LookUp",
+                    "maxLength" : 300
+                  }, {
+                    "displayLabel" : "Account Name",
+                    "isCustomField" : false,
+                    "name" : "accountId",
+                    "id" : "4000000000355",
+                    "type" : "LookUp",
+                    "maxLength" : 300
+                  }, {
+                    "displayLabel" : "Email",
+                    "isCustomField" : false,
+                    "name" : "email",
+                    "id" : "4000000000359",
+                    "type" : "Email",
+                    "maxLength" : 120
+                  }, {
+                    "displayLabel" : "Phone",
+                    "isCustomField" : false,
+                    "name" : "phone",
+                    "id" : "4000000000361",
+                    "type" : "Phone",
+                    "maxLength" : 120
+                  }, {
+                    "displayLabel" : "Sub Category",
+                    "isCustomField" : false,
+                    "defaultValue" : "Sub General",
+                    "name" : "subCategory",
+                    "id" : "4000000000423",
+                    "type" : "Picklist",
+                    "maxLength" : 120
+                  }, {
+                    "displayLabel" : "Category",
+                    "allowedValues" : [ "General", "Defects" ],
+                    "isCustomField" : false,
+                    "defaultValue" : "General",
+                    "name" : "category",
+                    "id" : "4000000000421",
+                    "type" : "Picklist",
+                    "maxLength" : 120
+                  }, {
+                    "displayLabel" : "Subject",
+                    "isCustomField" : false,
+                    "name" : "subject",
+                    "id" : "4000000000363",
+                    "type" : "Text",
+                    "maxLength" : 255
+                  }, {
+                    "displayLabel" : "Description",
+                    "isCustomField" : false,
+                    "name" : "description",
+                    "id" : "4000000000365",
+                    "type" : "Textarea",
+                    "maxLength" : 1000000
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "Blueprint"
+}

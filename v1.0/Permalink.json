@@ -8,22 +8,21 @@
     "/api/v1/communityTopics/permalink/availability" : {
       "get" : {
         "tags" : [ "Permalink" ],
-        "summary" : "Check Permalink Availability",
-        "description" : "API to check whether the given permalink is available",
-        "operationId" : "checkPermalinkAvailability",
+        "summary" : "Check Topic Permalink Availability",
+        "description" : "Checks whether the specified permalink is available for use.",
+        "operationId" : "checkCommunityTopicPermalinkAvailability",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "permalink",
           "in" : "query",
-          "description" : "Permalink for which the availablilty need to be checked",
+          "description" : "Permalink for which availability must be checked",
           "required" : true,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Permalink for which the availablilty need to be checked",
-            "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "[a-z0-9\\/%\\-\\P{IsBasicLatin}]+"
+            "type" : [ "string" ],
+            "maxLength" : 3000,
+            "pattern" : "[a-zA-Z0-9%\\-._/?\\P{InBasicLatin}]+"
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -52,10 +51,12 @@
       "get" : {
         "tags" : [ "Permalink" ],
         "summary" : "Get Topic Permalinks",
-        "description" : "API to get all permalinks of a topic",
+        "description" : "Retrieves all permalinks of a community topic.",
         "operationId" : "getTopicPermalinks",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/topicId"
+          "$ref" : "#/components/parameters/topicId",
+          "description" : "Unique ID of the topic from which permalinks must be retrieved"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -84,10 +85,12 @@
       "patch" : {
         "tags" : [ "Permalink" ],
         "summary" : "Update Topic Permalinks",
-        "description" : "API to update all permalinks of a topic",
+        "description" : "Updates the permalinks of a community topic.",
         "operationId" : "updateTopicPermalinks",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/topicId"
+          "$ref" : "#/components/parameters/topicId",
+          "description" : "Unique ID of the topic for which permalinks must be updated"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -99,7 +102,7 @@
             "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
           },
           "200" : {
-            "$ref" : "#/components/responses/topicPermalinkList"
+            "$ref" : "#/components/responses/updateTopicPermalinkList"
           },
           "422" : {
             "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
@@ -121,7 +124,7 @@
   "components" : {
     "schemas" : {
       "topicPermalink" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "modifiedTime" : {
@@ -131,21 +134,23 @@
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "isPrimary" : {
-            "type" : [ "boolean", "null" ]
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the permalink is the primary permalink"
           },
           "permalink" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "[a-z0-9\\/%\\-\\P{InBasicLatin}]+"
+            "pattern" : "[a-z0-9\\/%\\-\\P{InBasicLatin}]+",
+            "description" : "Permalink value"
           }
         },
         "required" : [ "isPrimary", "modifiedTime", "permalink" ]
       },
       "topicPermalinkJsonArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./Permalink.json#/components/schemas/topicPermalink"
+          "$ref" : "#/components/schemas/topicPermalink"
         }
       }
     },
@@ -155,11 +160,12 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "available" : {
-                  "type" : [ "boolean", "null" ]
+                  "type" : [ "boolean", "null" ],
+                  "description" : "Indicates whether the permalink is available"
                 }
               },
               "required" : [ "available" ]
@@ -179,11 +185,49 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./Permalink.json#/components/schemas/topicPermalinkJsonArray"
+                  "$ref" : "#/components/schemas/topicPermalinkJsonArray",
+                  "description" : "List of permalink entries for the topic"
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "data" : [ {
+                    "isPrimary" : "true",
+                    "permalink" : "community-topic-permalink-primary"
+                  }, {
+                    "isPrimary" : "false",
+                    "permalink" : "community-topic-permalink-secondary-1"
+                  }, {
+                    "isPrimary" : "false",
+                    "permalink" : "community-topic-permalink-secondary-2"
+                  }, {
+                    "isPrimary" : "false",
+                    "permalink" : "community-topic-permalink-secondary-3"
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "updateTopicPermalinkList" : {
+        "description" : "updateTopicPermalinkList template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "#/components/schemas/topicPermalinkJsonArray",
+                  "description" : "List of updated permalink entries for the topic"
                 }
               },
               "required" : [ "data" ]
@@ -219,7 +263,7 @@
         "style" : "simple",
         "explode" : false,
         "schema" : {
-          "type" : [ "string", "null", "integer" ],
+          "type" : [ "string", "integer" ],
           "format" : "int64",
           "pattern" : "([0-9]+)"
         }
@@ -230,25 +274,28 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "primaryPermalink" : {
-                  "type" : [ "string", "null" ],
-                  "description" : "holds the primary permalink of a topic",
-                  "maxLength" : 100,
-                  "minLength" : 0,
-                  "pattern" : "[a-z0-9\\/%\\-\\P{InBasicLatin}]+"
+                  "type" : [ "string" ],
+                  "description" : "Primary permalink of the topic",
+                  "maxLength" : 3000,
+                  "minLength" : 1,
+                  "pattern" : "[a-zA-Z0-9%\\-._/?\\P{InBasicLatin}]+",
+                  "x-unique" : true
                 },
                 "secondaryPermalink" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null" ],
+                    "type" : [ "string" ],
                     "maxLength" : 100,
                     "minLength" : 0,
-                    "pattern" : "[a-z0-9\\/%\\-\\P{InBasicLatin}]+"
+                    "pattern" : "[a-z0-9\\/%\\-\\P{InBasicLatin}]+",
+                    "x-unique" : true
                   },
-                  "uniqueItems" : false
+                  "uniqueItems" : false,
+                  "description" : "Secondary permalink(s) of the topic"
                 }
               },
               "required" : [ "primaryPermalink" ]
@@ -266,6 +313,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

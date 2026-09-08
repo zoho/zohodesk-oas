@@ -1,0 +1,241 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "ActorsAPI",
+    "version" : "1.0.0",
+    "description" : "Actors represent entities that perform actions in Zoho Desk, such as agents or end users."
+  },
+  "paths" : {
+    "/api/v1/actors" : {
+      "get" : {
+        "tags" : [ "ActorsAPI" ],
+        "summary" : "Get Actors",
+        "description" : "Retrieves details of actors by actor IDs.",
+        "operationId" : "getActorByIds",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "actorIds",
+          "in" : "query",
+          "description" : "ID(s) of the actors. Provide multiple IDs as a comma-separated list. Maximum number of IDs allowed is 50.",
+          "required" : true,
+          "style" : "form",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "maxItems" : 50,
+            "items" : {
+              "type" : [ "string", "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "uniqueItems" : false
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidOauthErrorResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/authorsResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/actors/{actorId}" : {
+      "get" : {
+        "tags" : [ "ActorsAPI" ],
+        "summary" : "Get Actor",
+        "description" : "Retrieves details of an actor by actor ID.",
+        "operationId" : "getActor",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "actorId",
+          "in" : "path",
+          "description" : "Unique ID of the actor",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/authorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "authorResponse" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "firstName" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "minLength" : 0
+          },
+          "lastName" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "minLength" : 0
+          },
+          "photoURL" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+          },
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "type" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "END_USER", "AGENT" ]
+          }
+        },
+        "required" : [ "firstName", "id", "lastName", "photoURL", "type" ]
+      },
+      "actorResponseArray" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/authorResponse"
+        }
+      }
+    },
+    "responses" : {
+      "authorsResponse" : {
+        "description" : "authorsResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "#/components/schemas/actorResponseArray"
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "data" : [ {
+                    "photoURL" : "https://desk.example.com/api/v1/agents/1892000000056007/photo?orgId=1234567890",
+                    "firstName" : "Steve",
+                    "lastName" : "Watson",
+                    "id" : "1892000000056007",
+                    "type" : "AGENT"
+                  }, {
+                    "photoURL" : "https://desk.example.com/api/v1/agents/1892000000042001/photo?orgId=1234567890",
+                    "firstName" : "",
+                    "lastName" : "jade",
+                    "id" : "1892000000042001",
+                    "type" : "AGENT"
+                  }, {
+                    "photoURL" : "https://desk.example.com/api/v1/contacts/1892000000042569/photo?orgId=1234567890",
+                    "firstName" : "",
+                    "lastName" : "case",
+                    "id" : "1892000000888059",
+                    "type" : "END_USER"
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "authorResponse" : {
+        "description" : "authorResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "firstName" : {
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 50,
+                  "minLength" : 0
+                },
+                "lastName" : {
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 50,
+                  "minLength" : 0
+                },
+                "photoURL" : {
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 100,
+                  "minLength" : 0,
+                  "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+                },
+                "id" : {
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "type" : {
+                  "type" : [ "string", "null" ],
+                  "enum" : [ "END_USER", "AGENT" ]
+                }
+              },
+              "required" : [ "firstName", "id", "lastName", "photoURL", "type" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "photoURL" : "https://desk.example.com/api/v1/agents/1892000000042001/photo?orgId=1234567890",
+                  "firstName" : "Steve",
+                  "lastName" : "Watson",
+                  "id" : "1892000000042001",
+                  "type" : "AGENT"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "ActorsAPI"
+}

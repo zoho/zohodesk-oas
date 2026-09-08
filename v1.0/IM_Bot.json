@@ -1,0 +1,490 @@
+{
+  "openapi" : "3.1.0",
+  "x-mcp-group" : [ "IM Bot" ],
+  "info" : {
+    "title" : "IM_Bot",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/im/bots/{id}" : {
+      "get" : {
+        "tags" : [ "IM_Bot" ],
+        "operationId" : "getIMBot",
+        "summary" : "Get IM Bot",
+        "description" : "Retrieves the details of a specific IM bot. The response always includes creator and preference. preference may be null when no preference is configured.",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "Unique ID of the IM bot.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/getIMBot"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.InstantMessages.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/im/bots" : {
+      "get" : {
+        "tags" : [ "IM_Bot" ],
+        "operationId" : "getIMBotsList",
+        "summary" : "Get IM Bots",
+        "description" : "Retrieves a list of IM bots configured for the org, with pagination support. Pass include=creator to include creator details in each list item.",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "Unique ID of the department to filter bots by.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "maxLength" : 100
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of bots to fetch. Default is 50. Maximum is 50.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "default" : 50,
+            "maximum" : 50
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number from which bots should be fetched.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "default" : 0
+          }
+        }, {
+          "name" : "type",
+          "in" : "query",
+          "description" : "Filters bots by type. Possible values: gc, zia.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "gc", "zia" ],
+            "maxLength" : 100
+          }
+        }, {
+          "name" : "statuses",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "enum" : [ "enabled", "disabled", "deleted" ]
+            },
+            "maxItems" : 3
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Filters bots by status. Possible values: enabled, disabled, deleted."
+        }, {
+          "name" : "name",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+",
+            "x-regex-name" : "cleartextampersand",
+            "maxLength" : 100
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Filters bots by name."
+        }, {
+          "name" : "include",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "enum" : [ "creator" ]
+            },
+            "maxItems" : 1
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Additional information to include in the response. Possible values: creator. When creator is included, each list item contains creator details."
+        }, {
+          "name" : "channels",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "description" : "IM channel integration type to filter by.",
+              "enum" : [ "web", "whatsapp", "ios", "android", "telegram", "facebook_messenger", "instagram", "line", "wecom", "wechat" ]
+            },
+            "maxItems" : 15
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Filters bots by IM channel integration type. Possible values: web, whatsapp, ios, android, telegram, facebook_messenger, instagram, line, wecom, wechat."
+        }, {
+          "name" : "isChannelAssociated",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "boolean" ]
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Filters bots by their channel association status. When true, includes only bots with an associated channel. When false, includes only bots without an associated channel."
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/getIMBotsList"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.InstantMessages.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "imBotCreator" : {
+        "type" : [ "object", "null" ],
+        "description" : "Details of the user who created the bot.",
+        "additionalProperties" : false,
+        "properties" : {
+          "lastName" : {
+            "type" : [ "string", "null" ],
+            "description" : "Last name of the creator.",
+            "maxLength" : 50,
+            "minLength" : 0
+          },
+          "agent" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the creator is an agent. When true, the creator is an agent. When false, the creator is not an agent."
+          },
+          "displayName" : {
+            "type" : [ "string", "null" ],
+            "description" : "Display name of the creator.",
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "externalId" : {
+            "type" : [ "string", "null" ],
+            "description" : "External ID of the creator.",
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "emailId" : {
+            "type" : [ "string", "null" ],
+            "description" : "Email ID of the creator.",
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+          },
+          "type" : {
+            "type" : [ "string", "null" ],
+            "description" : "Type of the creator in the organization. Possible values: AGENT, END_USER, CONTACT, CONNECTION, NON_DESK_USER, SYSTEM_USER.",
+            "enum" : [ "AGENT", "END_USER", "CONTACT", "CONNECTION", "NON_DESK_USER", "SYSTEM_USER" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "zuid" : {
+            "type" : [ "string", "null", "integer" ],
+            "description" : "Zoho user ID of the creator.",
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "photoURL" : {
+            "type" : [ "string", "null" ],
+            "description" : "URL of the creator's profile photo.",
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+          },
+          "firstName" : {
+            "type" : [ "string", "null" ],
+            "description" : "First name of the creator.",
+            "maxLength" : 50,
+            "minLength" : 0
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "description" : "Full name of the creator.",
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "roleName" : {
+            "type" : [ "string", "null" ],
+            "description" : "Role name of the creator.",
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "id" : {
+            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the creator.",
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "email" : {
+            "type" : [ "string", "null" ],
+            "description" : "Email address of the creator.",
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+          }
+        },
+        "required" : [ "agent", "displayName", "email", "emailId", "externalId", "firstName", "id", "lastName", "name", "photoURL", "roleName", "type", "zuid" ]
+      },
+      "getIMBotPreference" : {
+        "type" : [ "object", "null" ],
+        "description" : "Preference settings that control bot behavior, such as automatically closing idle sessions.",
+        "additionalProperties" : false,
+        "properties" : {
+          "modifiedTime" : {
+            "type" : [ "string", "null" ],
+            "description" : "Time when the bot preference was last modified.",
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+          },
+          "autoCloseInterval" : {
+            "type" : [ "string", "null" ],
+            "description" : "Idle time in minutes after which the session is automatically closed.",
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "[0-9]+"
+          },
+          "modifiedBy" : {
+            "type" : [ "string", "null" ],
+            "description" : "ID of the user who last modified the bot preference.",
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "[0-9]+"
+          },
+          "botId" : {
+            "type" : [ "string", "integer", "null" ],
+            "description" : "ID of the bot the preference belongs to.",
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "description" : "Unique ID of the bot preference.",
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "autoClose" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the conversation is closed automatically after the idle time."
+          }
+        },
+        "required" : [ "autoClose", "autoCloseInterval", "botId", "id", "modifiedBy", "modifiedTime" ]
+      },
+      "getIMBot_listView" : {
+        "type" : [ "object", "null" ],
+        "description" : "Details of an IM bot configured for the organization.",
+        "additionalProperties" : false,
+        "properties" : {
+          "deskBotId" : {
+            "type" : [ "string", "integer", "null" ],
+            "description" : "Unique ID of the associated Desk bot.",
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "associatedChannels" : {
+            "type" : [ "array", "null" ],
+            "description" : "IDs of the IM channels associated with the bot.",
+            "items" : {
+              "type" : [ "string", "integer", "null" ],
+              "description" : "Unique ID of an associated IM channel.",
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "uniqueItems" : false
+          },
+          "createdBy" : {
+            "type" : [ "string", "null" ],
+            "description" : "Unique ID of the user who created the bot.",
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "[0-9]+"
+          },
+          "departmentId" : {
+            "type" : [ "string", "integer", "null" ],
+            "description" : "Unique ID of the department the bot belongs to.",
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "description" : "Name of the bot.",
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "createdTime" : {
+            "type" : [ "string", "null" ],
+            "description" : "Time when the bot was created.",
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+          },
+          "description" : {
+            "type" : [ "string", "null" ],
+            "description" : "Description of the bot.",
+            "maxLength" : 200,
+            "minLength" : 0
+          },
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "description" : "IM bot ID.",
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "type" : {
+            "type" : [ "string", "null" ],
+            "description" : "Type of the bot. Possible values: gc, zia.",
+            "enum" : [ "zia", "gc" ]
+          },
+          "status" : {
+            "type" : [ "string", "null" ],
+            "description" : "Status of the bot. Possible values: enabled, disabled, deleted.",
+            "enum" : [ "enabled", "disabled", "deleted" ]
+          }
+        },
+        "required" : [ "associatedChannels", "createdBy", "createdTime", "departmentId", "description", "deskBotId", "id", "name", "status", "type" ]
+      },
+      "listOfIMBots" : {
+        "type" : [ "array", "null" ],
+        "description" : "List of IM bot entries returned for the current page.",
+        "items" : {
+          "$ref" : "#/components/schemas/getIMBot_listView"
+        }
+      }
+    },
+    "responses" : {
+      "getIMBot" : {
+        "description" : "Details of the requested IM bot. Always includes creator and preference. preference may be null when no preference is configured.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "additionalProperties" : false,
+              "allOf" : [ {
+                "$ref" : "#/components/schemas/getIMBot_listView"
+              }, {
+                "type" : [ "object", "null" ],
+                "properties" : {
+                  "creator" : {
+                    "$ref" : "#/components/schemas/imBotCreator"
+                  },
+                  "preference" : {
+                    "description" : "Preference settings that control bot behavior, such as automatically closing idle sessions.",
+                    "$ref" : "#/components/schemas/getIMBotPreference"
+                  }
+                },
+                "required" : [ "creator", "preference" ],
+                "additionalProperties" : false
+              } ]
+            },
+            "examples" : {
+              "GetIMBot_200" : {
+                "$ref" : "./examples/IM_Bot.json#/components/examples/GetIMBot_200"
+              }
+            }
+          }
+        }
+      },
+      "getIMBotsList" : {
+        "description" : "Paginated list of IM bots configured for the org.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "description" : "List of IM bot entries returned for the current page.",
+                  "$ref" : "#/components/schemas/listOfIMBots"
+                },
+                "hasMore" : {
+                  "type" : [ "boolean", "null" ],
+                  "description" : "Indicates whether more records are available beyond the current page. When true, more records are available. When false, no more records are available."
+                }
+              },
+              "required" : [ "data", "hasMore" ]
+            },
+            "examples" : {
+              "GetIMBotsList_200" : {
+                "$ref" : "./examples/IM_Bot.json#/components/examples/GetIMBotsList_200"
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "IM_Bot"
+}

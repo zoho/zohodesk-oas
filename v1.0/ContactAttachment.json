@@ -8,39 +8,36 @@
     "/api/v1/contacts/{contactId}/attachments" : {
       "get" : {
         "tags" : [ "ContactAttachment" ],
-        "summary" : "List Contact Attachments",
-        "description" : "This API lists the files attached to a contact.",
+        "summary" : "Get Contact Attachments",
+        "description" : "Retrieves the files attached to the specified contact, with pagination support.",
         "operationId" : "getContactAttachments",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
-          "description" : "",
+          "description" : "Additional information to include in the response. Accepted values: creator",
           "required" : false,
-          "style" : "simple",
-          "explode" : true,
+          "style" : "form",
+          "explode" : false,
           "schema" : {
-            "type" : [ "null", "array" ],
-            "description" : "",
+            "type" : [ "array" ],
             "items" : {
-              "type" : [ "string", "null" ],
-              "description" : "",
-              "enum" : [ "creator" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "type" : [ "string" ],
+              "description" : "Accepted values: creator",
+              "enum" : [ "creator" ]
             },
             "uniqueItems" : false
           }
         }, {
           "name" : "limit",
           "in" : "query",
-          "description" : "",
+          "description" : "Number of attachments to fetch",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "integer" ],
             "format" : "int32",
-            "description" : "",
             "maximum" : 100,
             "minimum" : 1,
             "pattern" : "([0-9]+)"
@@ -48,33 +45,41 @@
         }, {
           "name" : "from",
           "in" : "query",
-          "description" : "",
+          "description" : "Index number from which attachments must be fetched",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "integer" ],
             "format" : "int32",
-            "description" : "",
-            "minimum" : 0,
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "default" : 0
           }
         }, {
           "name" : "sortBy",
           "in" : "query",
-          "description" : "",
+          "description" : "Sorts attachments by the createdTime attribute. Accepted values: createdTime. Prefix with - for descending order.",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "",
+            "type" : [ "string" ],
             "enum" : [ "createdTime" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "pattern" : "-?(createdTime)"
           }
         }, {
-          "$ref" : "#/components/parameters/contactId"
+          "name" : "contactId",
+          "in" : "path",
+          "description" : "Unique ID of the contact",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -87,36 +92,33 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.contacts.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.contacts.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
       },
       "post" : {
         "tags" : [ "ContactAttachment" ],
         "summary" : "Create Contact Attachment",
-        "description" : "This API attaches a file to a contact.",
+        "description" : "Creates an attachment for the specified contact.",
         "operationId" : "createContactAttachment",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/contactId"
+          "name" : "contactId",
+          "in" : "path",
+          "description" : "Unique ID of the contact",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "requestBody" : {
-          "content" : {
-            "multipart/form-data" : {
-              "schema" : {
-                "type" : "object",
-                "properties" : {
-                  "file" : {
-                    "type" : "string",
-                    "format" : "binary",
-                    "description" : ""
-                  }
-                },
-                "required" : [ "file" ]
-              }
-            }
-          }
+          "$ref" : "#/components/requestBodies/createContactAttachmentRequest"
         },
         "responses" : {
           "422" : {
@@ -135,13 +137,33 @@
     "/api/v1/contacts/{contactId}/attachments/{attachmentId}" : {
       "delete" : {
         "tags" : [ "ContactAttachment" ],
-        "summary" : "Delete Contact attachment",
-        "description" : "This API removes an attachment from a contact.",
+        "summary" : "Delete Contact Attachment",
+        "description" : "Deletes an attachment from a contact.",
         "operationId" : "deleteContactAttachment",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/contactId"
+          "name" : "contactId",
+          "in" : "path",
+          "description" : "Unique ID of the contact",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/attachmentId"
+          "name" : "attachmentId",
+          "in" : "path",
+          "description" : "Unique ID of the attachment",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -163,50 +185,54 @@
   "components" : {
     "schemas" : {
       "attachmentResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "previewurl" : {
             "type" : [ "string", "null" ],
-            "description" : "",
+            "description" : "URL to preview the attachment",
             "maxLength" : 16000000,
             "minLength" : 0,
             "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
           },
           "size" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
+            "description" : "Size of the attachment",
             "format" : "int64",
-            "description" : "",
             "pattern" : "([0-9]+)"
           },
           "creatorId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
+            "description" : "Unique ID of the user who attached the file",
             "format" : "int64",
-            "description" : "",
             "pattern" : "([0-9]+)"
           },
           "name" : {
             "type" : [ "string", "null" ],
-            "description" : "",
+            "description" : "Name of the attachment",
             "maxLength" : 100,
             "minLength" : 0
           },
           "createdTime" : {
             "type" : [ "string", "null" ],
-            "description" : "",
+            "description" : "Timestamp when this record was created (epoch milliseconds)",
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
+            "description" : "Unique ID of the attachment",
             "format" : "int64",
-            "description" : "",
             "pattern" : "([0-9]+)"
+          },
+          "isPublic" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Whether the attachment is public"
           },
           "href" : {
             "type" : [ "string", "null" ],
-            "description" : "",
+            "description" : "URL to access the attachment content",
             "maxLength" : 16000000,
             "minLength" : 0,
             "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
@@ -215,9 +241,9 @@
         "required" : [ "createdTime", "creatorId", "href", "id", "name", "previewurl", "size" ]
       },
       "data" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./ContactAttachment.json#/components/schemas/attachmentResponse"
+          "$ref" : "#/components/schemas/attachmentResponse"
         }
       }
     },
@@ -228,48 +254,91 @@
           "application/json" : {
             "schema" : {
               "allOf" : [ {
-                "type" : "object",
+                "type" : [ "object" ],
                 "properties" : {
                   "data" : {
-                    "type" : "array",
+                    "description" : "List of attachment entries for the contact",
+                    "type" : [ "array" ],
                     "items" : {
-                      "type" : "object",
+                      "type" : [ "object" ],
                       "properties" : {
+                        "id" : {
+                          "type" : [ "string", "integer", "null" ],
+                          "description" : "Unique ID of the attachment",
+                          "format" : "int64",
+                          "pattern" : "([0-9]+)"
+                        },
+                        "creatorId" : {
+                          "type" : [ "string", "integer", "null" ],
+                          "description" : "Unique ID of the user who attached the file",
+                          "format" : "int64",
+                          "pattern" : "([0-9]+)"
+                        },
+                        "name" : {
+                          "type" : [ "string", "null" ],
+                          "description" : "Name of the attachment",
+                          "maxLength" : 100,
+                          "minLength" : 0
+                        },
+                        "size" : {
+                          "type" : [ "string", "integer", "null" ],
+                          "description" : "Size of the attachment",
+                          "format" : "int64",
+                          "pattern" : "([0-9]+)"
+                        },
+                        "createdTime" : {
+                          "type" : [ "string", "null" ],
+                          "description" : "Timestamp when this record was created (epoch milliseconds)",
+                          "maxLength" : 100,
+                          "minLength" : 0,
+                          "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+                        },
+                        "isPublic" : {
+                          "type" : [ "boolean", "null" ],
+                          "description" : "Whether the attachment is public"
+                        },
+                        "href" : {
+                          "type" : [ "string", "null" ],
+                          "description" : "URL to access the attachment content",
+                          "maxLength" : 16000000,
+                          "minLength" : 0,
+                          "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+                        },
                         "creator" : {
-                          "type" : [ "null", "object" ],
+                          "type" : [ "object", "null" ],
+                          "description" : "Details of the user who attached the file",
                           "additionalProperties" : false,
-                          "description" : "",
                           "maxProperties" : 5,
                           "minProperties" : 5,
                           "properties" : {
                             "firstName" : {
                               "type" : [ "string", "null" ],
-                              "description" : "",
+                              "description" : "First name of the creator",
                               "maxLength" : 40,
                               "minLength" : 0
                             },
                             "lastName" : {
                               "type" : [ "string", "null" ],
-                              "description" : "",
+                              "description" : "Last name of the creator",
                               "maxLength" : 200,
                               "minLength" : 0
                             },
                             "photoURL" : {
                               "type" : [ "string", "null" ],
-                              "description" : "",
+                              "description" : "URL of the creator's profile photo",
                               "maxLength" : 100,
                               "minLength" : 0,
                               "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
                             },
                             "id" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "type" : [ "string", "integer", "null" ],
+                              "description" : "Unique ID of the creator",
                               "format" : "int64",
-                              "description" : "",
                               "pattern" : "([0-9]+)"
                             },
                             "email" : {
                               "type" : [ "string", "null" ],
-                              "description" : "",
+                              "description" : "Email address of the creator",
                               "maxLength" : 255,
                               "minLength" : 0,
                               "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'\\&\\~]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
@@ -277,16 +346,19 @@
                           },
                           "required" : [ "email", "firstName", "id", "lastName", "photoURL" ]
                         }
-                      }
+                      },
+                      "additionalProperties" : false
                     }
                   }
-                }
+                },
+                "additionalProperties" : false
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "data" : {
-                    "$ref" : "./ContactAttachment.json#/components/schemas/data"
+                    "description" : "List of attachment entries for the contact",
+                    "$ref" : "#/components/schemas/data"
                   }
                 },
                 "required" : [ "data" ]
@@ -305,50 +377,54 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "previewurl" : {
                   "type" : [ "string", "null" ],
-                  "description" : "",
+                  "description" : "URL to preview the attachment",
                   "maxLength" : 16000000,
                   "minLength" : 0,
                   "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
                 },
                 "size" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
+                  "description" : "Size of the attachment",
                   "format" : "int64",
-                  "description" : "",
                   "pattern" : "([0-9]+)"
                 },
                 "creatorId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
+                  "description" : "Unique ID of the user who attached the file",
                   "format" : "int64",
-                  "description" : "",
                   "pattern" : "([0-9]+)"
                 },
                 "name" : {
                   "type" : [ "string", "null" ],
-                  "description" : "",
+                  "description" : "Name of the attachment",
                   "maxLength" : 100,
                   "minLength" : 0
                 },
                 "createdTime" : {
                   "type" : [ "string", "null" ],
-                  "description" : "",
+                  "description" : "Timestamp when this record was created (epoch milliseconds)",
                   "maxLength" : 100,
                   "minLength" : 0,
                   "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
                 },
                 "id" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
+                  "description" : "Unique ID of the attachment",
                   "format" : "int64",
-                  "description" : "",
                   "pattern" : "([0-9]+)"
+                },
+                "isPublic" : {
+                  "type" : [ "boolean", "null" ],
+                  "description" : "Whether the attachment is public"
                 },
                 "href" : {
                   "type" : [ "string", "null" ],
-                  "description" : "",
+                  "description" : "URL to access the attachment content",
                   "maxLength" : 16000000,
                   "minLength" : 0,
                   "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
@@ -365,37 +441,39 @@
         }
       }
     },
-    "parameters" : {
-      "contactId" : {
-        "name" : "contactId",
-        "in" : "path",
-        "description" : "",
+    "requestBodies" : {
+      "createContactAttachmentRequest" : {
         "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "description" : "",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "attachmentId" : {
-        "name" : "attachmentId",
-        "in" : "path",
-        "description" : "",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "description" : "",
-          "pattern" : "([0-9]+)"
+        "content" : {
+          "multipart/form-data" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "properties" : {
+                "file" : {
+                  "description" : "File to attach to the contact",
+                  "type" : [ "string" ],
+                  "format" : "binary"
+                }
+              },
+              "required" : [ "file" ],
+              "additionalProperties" : false
+            },
+            "examples" : {
+              "Valid request Definitions" : {
+                "value" : { }
+              }
+            }
+          }
         }
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

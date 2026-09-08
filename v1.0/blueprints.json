@@ -9,12 +9,33 @@
       "get" : {
         "tags" : [ "blueprints" ],
         "summary" : "List all blueprints in a department",
-        "description" : "To get all blueprints in a specific department",
+        "description" : "Retrieves a list of blueprints for the specified module.",
         "operationId" : "getBluePrints",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/departmentId"
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "Department for which the blueprints are listed",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/module"
+          "name" : "module",
+          "in" : "query",
+          "description" : "module of the blueprints to be listed",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "tickets" ],
+            "pattern" : "tickets"
+          }
         }, {
           "name" : "status",
           "in" : "query",
@@ -23,11 +44,8 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "To get blueprints by status, allowed values are @ACTIVE@ ,@INACTIVE@ and @DRAFT@",
+            "type" : [ "string" ],
             "enum" : [ "ACTIVE", "INACTIVE", "DRAFT" ],
-            "maxLength" : 100,
-            "minLength" : 0,
             "pattern" : "ACTIVE|INACTIVE|DRAFT"
           }
         }, {
@@ -45,15 +63,16 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.automations.READ", "Desk.settings.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
       },
       "post" : {
         "tags" : [ "blueprints" ],
         "summary" : "Create Blueprint",
-        "description" : "To create a blueprint",
+        "description" : "Creates a new blueprint with the specified states, transitions, connections, and chart configuration.",
         "operationId" : "createBlueprint",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -69,7 +88,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.CREATE" ]
+          "iam-oauth2-schema" : [ "Desk.automations.CREATE", "Desk.settings.CREATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -78,12 +97,33 @@
       "post" : {
         "tags" : [ "blueprints" ],
         "summary" : "Reorder blueprints",
-        "description" : "To reorder blueprints in a specific department",
+        "description" : "Reorders blueprints in the specified department for a given module.",
         "operationId" : "reorderBlueprints",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/departmentId"
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "Department for which the blueprints are listed",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/module"
+          "name" : "module",
+          "in" : "query",
+          "description" : "module of the blueprints to be listed",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "tickets" ],
+            "pattern" : "tickets"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -99,7 +139,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.automations.UPDATE", "Desk.settings.UPDATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -110,26 +150,34 @@
         "summary" : "Get Applied Blueprint details of ticket for a user",
         "description" : "To get the applied blueprint details of a ticket",
         "operationId" : "getAppliedBlueprintDetailsForTicket",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
-          "description" : "Meta information related to the transition owners. Values allowed are: @transitionOwnerAgents@, @transitionOwnerTeams@, @transitionOwnerDept@ to include agents,teams,department under owners. You can pass multiple values by separating them with commas in the API request.",
+          "description" : "Meta information related to the transition owners. Values allowed are: transitionOwnerAgents, transitionOwnerTeams, transitionOwnerDept to include agents, teams, department under owners. You can pass multiple values by separating them with commas in the API request.",
           "required" : false,
-          "style" : "simple",
+          "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "null", "array" ],
-            "description" : "Meta information related to the transition owners. Values allowed are: @transitionOwnerAgents@, @transitionOwnerTeams@, @transitionOwnerDept@ to include agents,teams,department under owners. You can pass multiple values by separating them with commas in the API request.",
+            "type" : [ "array" ],
             "items" : {
-              "type" : [ "string", "null" ],
-              "enum" : [ "transitionOwnerAgents", "transitionOwnerTeams", "transitionOwnerDept" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "type" : [ "string" ],
+              "enum" : [ "transitionOwnerAgents", "transitionOwnerTeams", "transitionOwnerDept" ]
             },
             "uniqueItems" : false
           }
         }, {
-          "$ref" : "#/components/parameters/ticket_id"
+          "name" : "ticket_id",
+          "description" : "Unique ID of the ticket.",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -154,10 +202,22 @@
       "get" : {
         "tags" : [ "blueprints" ],
         "summary" : "Get Blueprint Details",
-        "description" : "To get a specific blueprint details",
+        "description" : "Retrieves the details of a specific blueprint including its states, transitions, connections, and chart configuration.",
         "operationId" : "getBlueprint",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/blueprint_id"
+          "name" : "blueprint_id",
+          "description" : "Unique ID of the blueprint.",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "minimum" : 1,
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -170,17 +230,28 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.automations.READ", "Desk.settings.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
       },
       "delete" : {
         "tags" : [ "blueprints" ],
         "summary" : "Delete Blueprint",
-        "description" : "To delete a specific blueprint",
+        "description" : "Deletes a specific blueprint permanently.",
         "operationId" : "deleteBlueprint",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/blueprint_id"
+          "name" : "blueprint_id",
+          "description" : "Unique ID of the blueprint.",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "minimum" : 1,
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -193,17 +264,29 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.DELETE" ]
+          "iam-oauth2-schema" : [ "Desk.automations.DELETE", "Desk.settings.DELETE" ]
         } ],
         "x-audience" : [ "external-public" ]
       },
       "patch" : {
         "tags" : [ "blueprints" ],
         "summary" : "Update a blueprint",
-        "description" : "To update an existing blueprint",
+        "description" : "Updates an existing blueprint with the specified configuration changes.",
         "operationId" : "updateBlueprint",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/blueprint_id"
+          "name" : "blueprint_id",
+          "description" : "Unique ID of the blueprint.",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "minimum" : 1,
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -219,7 +302,44 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.automations.UPDATE", "Desk.settings.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/blueprints/{blueprint_id}/checkIfAppliedForEntity" : {
+      "get" : {
+        "tags" : [ "blueprints" ],
+        "summary" : "Check Blueprint Applied for Entity",
+        "description" : "Checks whether a blueprint is associated with or applied to any entity (record). Use this before deleting or deactivating a blueprint to confirm it is not currently in use on tickets or other records.",
+        "operationId" : "checkIfAppliedToEntity",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "blueprint_id",
+          "description" : "Unique ID of the blueprint.",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "minimum" : 1,
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/checkIfAppliedToEntityResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.automations.READ", "Desk.settings.READ" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -228,10 +348,22 @@
       "post" : {
         "tags" : [ "blueprints" ],
         "summary" : "Revoke Blueprint from Blueprint Level",
-        "description" : "To revoke all entities from a particular blueprint",
+        "description" : "Revokes the specified blueprint from all records it is currently applied to, removing it from the active execution flow.",
         "operationId" : "revokeBlueprintForAllEntities",
+        "x-mcp-ready" : false,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/blueprint_id"
+          "name" : "blueprint_id",
+          "description" : "Unique ID of the blueprint.",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "minimum" : 1,
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -244,7 +376,35 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.automations.UPDATE", "Desk.settings.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/blueprints/revokeMany" : {
+      "post" : {
+        "tags" : [ "blueprints" ],
+        "summary" : "Revoke Blueprint from Multiple Tickets",
+        "description" : "Revokes the blueprint from multiple tickets simultaneously. Use this to bulk-remove blueprint enforcement from records. Pass up to 50 ticket IDs in the request body; IDs for which revocation failed are returned in failureIds.",
+        "operationId" : "revokeMany",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/revokeManyRequest",
+          "required" : true
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/revokeManyResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.tickets.UPDATE" ]
         } ],
         "x-audience" : [ "external-public" ]
       }
@@ -256,7 +416,17 @@
         "description" : "To revoke blueprint from an entity",
         "operationId" : "revokeBlueprintForATicket",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/ticket_id"
+          "name" : "ticket_id",
+          "description" : "Unique ID of the ticket.",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -278,17 +448,19 @@
   "components" : {
     "schemas" : {
       "layoutObject" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "name" : {
-            "type" : [ "string", "null" ],
+            "description" : "Name of the layout mapped to the blueprint",
+            "type" : "string",
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the layout mapped to the blueprint",
+            "type" : [ "string", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
@@ -296,111 +468,128 @@
         "required" : [ "id", "name" ]
       },
       "getAllBluePrintsByDepartmentObject" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "modifiedTime" : {
+            "description" : "Time when the blueprint was last modified",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])([ ])([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,1}))"
           },
           "orderNumber" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Display order of the blueprint",
+            "type" : [ "string", "integer" ],
             "format" : "int32",
             "minimum" : 1,
             "pattern" : "([0-9]+)"
           },
           "createdUserZUID" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "ZUID of the user who created the blueprint",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           },
           "departmentId" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the department to which the blueprint belongs",
+            "type" : [ "string", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "module" : {
-            "type" : [ "string", "null" ],
+            "description" : "Module to which the blueprint is associated",
+            "type" : "string",
             "enum" : [ "tickets" ],
-            "maxLength" : 100,
-            "minLength" : 0,
             "pattern" : "tickets"
           },
           "isDraft" : {
+            "description" : "Indicates whether the blueprint is in draft state. Possible values: @true@ - blueprint is a draft, @false@ - blueprint is published",
             "type" : [ "boolean", "null" ]
           },
           "active" : {
+            "description" : "Indicates whether the blueprint is active. Possible values: @true@ - blueprint is active, @false@ - blueprint is inactive",
             "type" : [ "boolean", "null" ]
           },
           "description" : {
+            "description" : "Description of the blueprint",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+|^$"
           },
           "modifiedUserZUID" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "ZUID of the user who last modified the blueprint",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           },
           "transitions" : {
+            "description" : "List of transitions defined in the blueprint",
             "$ref" : "./blueprintTransitions.json#/components/schemas/transitionArrayWithPrimaryDetails"
           },
           "type" : {
+            "description" : "Type of blueprint. Possible values: @NON_CONTINUOUS@, @CONTINUOUS@",
             "type" : [ "string", "null" ],
             "enum" : [ "NON_CONTINUOUS", "CONTINUOUS" ],
-            "maxLength" : 100,
-            "minLength" : 0,
             "pattern" : "NON_CONTINUOUS|CONTINUOUS"
           },
           "layoutId" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the layout mapped to the blueprint",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "states" : {
+            "description" : "List of states defined in the blueprint",
             "$ref" : "./blueprintStates.json#/components/schemas/stateArrayWithPrimaryDetails"
           },
           "layout" : {
-            "$ref" : "./blueprints.json#/components/schemas/layoutObject"
+            "description" : "Layout mapped to the blueprint",
+            "$ref" : "#/components/schemas/layoutObject"
           },
           "i18nFieldLabel" : {
+            "description" : "Internationalized label of the field mapped to the blueprint",
             "type" : [ "string", "null" ],
             "maxLength" : 200,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "fieldLabel" : {
+            "description" : "Display label of the field mapped to the blueprint",
             "type" : [ "string", "null" ],
             "maxLength" : 200,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "name" : {
+            "description" : "Name of the blueprint",
             "type" : [ "string", "null" ],
             "maxLength" : 60,
             "minLength" : 1,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "createdTime" : {
+            "description" : "Time when the blueprint was created",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])([ ])([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,1}))"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the blueprint",
+            "type" : [ "string", "integer" ],
             "format" : "int64",
             "minimum" : 1,
             "pattern" : "([0-9]+)"
           },
           "isDefaultBlueprint" : {
+            "description" : "Indicates whether the blueprint is the default blueprint. Possible values: @true@ - blueprint is the default, @false@ - blueprint is not the default",
             "type" : [ "boolean", "null" ]
           },
           "fieldId" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the field mapped to the blueprint",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
@@ -408,15 +597,15 @@
         "required" : [ "active", "createdTime", "createdUserZUID", "departmentId", "description", "fieldId", "fieldLabel", "i18nFieldLabel", "id", "isDefaultBlueprint", "isDraft", "layout", "layoutId", "modifiedTime", "modifiedUserZUID", "module", "name", "orderNumber", "states", "transitions", "type" ]
       },
       "data" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./blueprints.json#/components/schemas/getAllBluePrintsByDepartmentObject"
+          "$ref" : "#/components/schemas/getAllBluePrintsByDepartmentObject"
         }
       },
       "blueprintIdsArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array" ],
         "items" : {
-          "type" : [ "string", "null", "integer" ],
+          "type" : [ "string", "integer" ],
           "format" : "int64",
           "minimum" : 1,
           "pattern" : "([0-9]+)"
@@ -429,11 +618,12 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./blueprints.json#/components/schemas/data"
+                  "description" : "List of blueprint entries for the specified module",
+                  "$ref" : "#/components/schemas/data"
                 }
               },
               "required" : [ "data" ]
@@ -442,13 +632,12 @@
               "Valid responses Definitions" : {
                 "value" : {
                   "data" : [ {
-                    "modifiedTime" : 1525421277000,
+                    "modifiedTime" : "2018-05-04 08:07:57.0",
                     "orderNumber" : "3",
                     "createdUserZUID" : "5263696",
                     "departmentId" : "1000000010712",
                     "module" : "tickets",
                     "isDraft" : false,
-                    "description" : "",
                     "modifiedUserZUID" : "5263696",
                     "active" : true,
                     "type" : "NON_CONTINUOUS",
@@ -467,7 +656,7 @@
                     "i18nFieldLabel" : "Status",
                     "fieldLabel" : "Status",
                     "name" : "Automate QA process",
-                    "createdTime" : 1525268370000,
+                    "createdTime" : "2018-05-02 13:39:30.0",
                     "id" : "1000000309097",
                     "connections" : [ {
                       "fromState" : {
@@ -485,13 +674,12 @@
                     } ],
                     "fieldId" : "1000000000506"
                   }, {
-                    "modifiedTime" : 1524549208000,
+                    "modifiedTime" : "2018-04-24 05:53:28.0",
                     "orderNumber" : "4",
                     "createdUserZUID" : "5263696",
                     "departmentId" : "1000000010712",
                     "module" : "tickets",
                     "isDraft" : true,
-                    "description" : "",
                     "modifiedUserZUID" : "5263696",
                     "active" : true,
                     "type" : "NON_CONTINUOUS",
@@ -522,57 +710,16 @@
                     "i18nFieldLabel" : "Status",
                     "fieldLabel" : "Status",
                     "name" : "AUtomate HR process",
-                    "createdTime" : 1523375034000,
+                    "createdTime" : "2018-04-10 15:43:54.0",
                     "id" : "1000000232187",
-                    "connections" : [ {
-                      "fromState" : {
-                        "name" : "On Hold",
-                        "id" : "1000000232191"
-                      },
-                      "toState" : {
-                        "name" : "Escalated",
-                        "id" : "1000000232195"
-                      },
-                      "transitions" : [ {
-                        "name" : "before",
-                        "id" : "1000000232199"
-                      } ]
-                    }, {
-                      "fromState" : {
-                        "name" : "Open",
-                        "id" : "1000000232193"
-                      },
-                      "toState" : {
-                        "name" : "On Hold",
-                        "id" : "1000000232191"
-                      },
-                      "transitions" : [ {
-                        "name" : "after",
-                        "id" : "1000000232197"
-                      } ]
-                    }, {
-                      "fromState" : {
-                        "name" : "Escalated",
-                        "id" : "1000000232195"
-                      },
-                      "toState" : {
-                        "name" : "Closed",
-                        "id" : "1000000232189"
-                      },
-                      "transitions" : [ {
-                        "name" : "during",
-                        "id" : "1000000232201"
-                      } ]
-                    } ],
                     "fieldId" : "1000000000506"
                   }, {
-                    "modifiedTime" : 1522762448000,
+                    "modifiedTime" : "2018-04-03 13:34:08.0",
                     "orderNumber" : "5",
                     "createdUserZUID" : "5263696",
                     "departmentId" : "1000000010712",
                     "module" : "tickets",
                     "isDraft" : false,
-                    "description" : "",
                     "modifiedUserZUID" : "5263696",
                     "active" : true,
                     "type" : "NON_CONTINUOUS",
@@ -597,44 +744,16 @@
                     "i18nFieldLabel" : "Status",
                     "fieldLabel" : "Status",
                     "name" : "Shipping process",
-                    "createdTime" : 1522240151000,
+                    "createdTime" : "2018-03-28 12:29:11.0",
                     "id" : "1000000173001",
-                    "connections" : [ {
-                      "fromState" : {
-                        "name" : "Open",
-                        "id" : "1000000173005"
-                      },
-                      "toState" : {
-                        "name" : "On Hold",
-                        "id" : "1000000173007"
-                      },
-                      "transitions" : [ {
-                        "name" : "to onhold",
-                        "id" : "1000000173011"
-                      } ]
-                    }, {
-                      "fromState" : {
-                        "name" : "On Hold",
-                        "id" : "1000000173007"
-                      },
-                      "toState" : {
-                        "name" : "Closed",
-                        "id" : "1000000173003"
-                      },
-                      "transitions" : [ {
-                        "name" : "To close",
-                        "id" : "1000000173009"
-                      } ]
-                    } ],
                     "fieldId" : "1000000000506"
                   }, {
-                    "modifiedTime" : 1525353504000,
+                    "modifiedTime" : "2018-05-03 13:18:24.0",
                     "orderNumber" : "5",
                     "createdUserZUID" : "5263696",
                     "departmentId" : "1000000010712",
                     "module" : "tickets",
                     "isDraft" : false,
-                    "description" : "",
                     "modifiedUserZUID" : "5263696",
                     "active" : true,
                     "type" : "NON_CONTINUOUS",
@@ -653,22 +772,8 @@
                     "i18nFieldLabel" : "Status",
                     "fieldLabel" : "Status",
                     "name" : "Ticket Support process",
-                    "createdTime" : 1525353504000,
+                    "createdTime" : "2018-05-03 13:18:24.0",
                     "id" : "1000000313275",
-                    "connections" : [ {
-                      "fromState" : {
-                        "name" : "Approval 2 approved",
-                        "id" : "1000000313279"
-                      },
-                      "toState" : {
-                        "name" : "Approval 2",
-                        "id" : "1000000313277"
-                      },
-                      "transitions" : [ {
-                        "name" : "t1",
-                        "id" : "1000000313281"
-                      } ]
-                    } ],
                     "fieldId" : "1000000000506"
                   } ]
                 }
@@ -682,7 +787,7 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "isContinuousBlueprint" : {
@@ -698,7 +803,7 @@
                   "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                 },
                 "id" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "minimum" : 1,
                   "pattern" : "([0-9]+)"
@@ -723,7 +828,7 @@
                   "state" : {
                     "dueDate" : 1519764540000,
                     "id" : "1000000087003",
-                    "type" : "START"
+                    "type" : [ "START" ]
                   },
                   "transitions" : [ {
                     "fromState" : "Open",
@@ -750,7 +855,7 @@
                       },
                       "teamIds" : [ "1000000012435" ],
                       "agents" : [ {
-                        "photoURL" : "https://desk.zoho.com/api/v1/agent/1000000012635/photo",
+                        "photoURL" : "https://desk.example.com/api/v1/agent/1000000012635/photo",
                         "firstName" : "Lucas",
                         "lastName" : "Carol",
                         "id" : "1000000012635",
@@ -781,115 +886,132 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "orderNumber" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Display order of the blueprint",
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int32",
                   "minimum" : 1,
                   "pattern" : "([0-9]+)"
                 },
                 "criteria" : {
+                  "description" : "Criteria conditions that determine when the blueprint is applied",
                   "$ref" : "./blueprintCriteria.json#/components/schemas/criteriaObjectForResponse"
                 },
                 "departmentId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Unique ID of the department to which the blueprint belongs",
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "module" : {
-                  "type" : [ "string", "null" ],
+                  "description" : "Module to which the blueprint is associated",
+                  "type" : "string",
                   "enum" : [ "tickets" ],
-                  "maxLength" : 100,
-                  "minLength" : 0,
                   "pattern" : "tickets"
                 },
                 "description" : {
+                  "description" : "Description of the blueprint",
                   "type" : [ "string", "null" ],
                   "maxLength" : 100,
                   "minLength" : 0,
                   "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+|^$"
                 },
                 "dynamicTransOwnerType" : {
+                  "description" : "Dynamic transition owner assignment setting. Allows support administrators to assign transition owners within a record dynamically, either from the current department or by sharing the record with other departments whose agents complete the transition. Possible values: @ACTIVE@ - dynamic transition owner assignment is enabled, @INACTIVE@ - dynamic transition owner assignment is disabled",
                   "type" : [ "string", "null" ],
                   "enum" : [ "ACTIVE", "INACTIVE" ],
-                  "maxLength" : 100,
-                  "minLength" : 0,
                   "pattern" : "ACTIVE|INACTIVE"
                 },
                 "active" : {
+                  "description" : "Indicates whether the blueprint is active. Possible values: @true@ - blueprint is active, @false@ - blueprint is inactive",
                   "type" : [ "boolean", "null" ]
                 },
                 "type" : {
+                  "description" : "Type of blueprint. Possible values: @NON_CONTINUOUS@, @CONTINUOUS@",
                   "type" : [ "string", "null" ],
                   "enum" : [ "NON_CONTINUOUS", "CONTINUOUS" ],
-                  "maxLength" : 100,
-                  "minLength" : 0,
                   "pattern" : "NON_CONTINUOUS|CONTINUOUS"
                 },
                 "transitions" : {
+                  "description" : "List of transitions defined in the blueprint",
                   "$ref" : "./blueprintTransitions.json#/components/schemas/transitionsArrayForResponse"
                 },
                 "layoutId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Unique ID of the layout mapped to the blueprint",
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "states" : {
+                  "description" : "List of states defined in the blueprint",
                   "$ref" : "./blueprintStates.json#/components/schemas/statesArrayForResponse"
                 },
                 "layout" : {
-                  "$ref" : "./blueprints.json#/components/schemas/layoutObject"
+                  "description" : "Layout mapped to the blueprint",
+                  "$ref" : "#/components/schemas/layoutObject"
                 },
                 "chartData" : {
+                  "description" : "Chart rendering data for the blueprint visual layout",
                   "$ref" : "./blueprintChartData.json#/components/schemas/chartDataObjectForResponse"
                 },
                 "strictModeConfig" : {
+                  "description" : "Strict mode configuration for the blueprint",
                   "$ref" : "./blueprintStrictModeConfig.json#/components/schemas/strictModeConfigObject"
                 },
                 "createdBy" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Unique ID of the user who created the blueprint",
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "draft" : {
+                  "description" : "Indicates whether the blueprint is in draft state. Possible values: @true@ - blueprint is a draft, @false@ - blueprint is published",
                   "type" : [ "boolean", "null" ]
                 },
                 "name" : {
+                  "description" : "Name of the blueprint",
                   "type" : [ "string", "null" ],
                   "maxLength" : 60,
                   "minLength" : 1,
                   "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                 },
                 "modifiedBy" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Unique ID of the user who last modified the blueprint",
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "id" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Unique ID of the blueprint",
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "minimum" : 1,
                   "pattern" : "([0-9]+)"
                 },
                 "modifiedTimeInMillis" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Time in milliseconds when the blueprint was last modified",
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "minimum" : 1,
                   "pattern" : "([0-9]+)"
                 },
                 "createdTimeInMillis" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Time in milliseconds when the blueprint was created",
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "minimum" : 1,
                   "pattern" : "([0-9]+)"
                 },
                 "connections" : {
+                  "description" : "List of connections between states via transitions",
                   "$ref" : "./blueprintConnections.json#/components/schemas/connectionsArrayForResponse"
                 },
                 "fieldId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Unique ID of the field mapped to the blueprint",
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 }
@@ -909,7 +1031,7 @@
                     "pattern" : "(1)"
                   },
                   "departmentId" : "4000000007235",
-                  "module" : "Cases",
+                  "module" : "tickets",
                   "description" : "Automates Private Threading Handling",
                   "type" : "NON_CONTINUOUS",
                   "transitions" : [ {
@@ -1026,17 +1148,17 @@
                     "businessHrId" : 4000000007355,
                     "name" : "Open",
                     "id" : 4000000007723,
-                    "type" : "START"
+                    "type" : [ "START" ]
                   }, {
                     "timeInMins" : 30,
                     "name" : "Escalated",
                     "id" : 4000000007721,
-                    "type" : "INTERMEDIATE"
+                    "type" : [ "INTERMEDIATE" ]
                   }, {
                     "timeInMins" : 30,
                     "name" : "Closed",
                     "id" : 4000000007722,
-                    "type" : "END"
+                    "type" : [ "END" ]
                   } ],
                   "chartData" : {
                     "canvasPosition" : {
@@ -1122,15 +1244,41 @@
           }
         }
       },
+      "checkIfAppliedToEntityResponse" : {
+        "description" : "Indicates whether the blueprint is associated with or applied to any entity.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "hasAppliedToEntity" : {
+                  "description" : "Indicates whether the blueprint is currently associated with or applied to at least one record (ticket). Type: boolean. Required in response. Use before delete or deactivate operations. Possible values: true = in use, false = not applied. Example: true.",
+                  "type" : [ "boolean", "null" ]
+                }
+              },
+              "required" : [ "hasAppliedToEntity" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "hasAppliedToEntity" : "true/false"
+                }
+              }
+            }
+          }
+        }
+      },
       "revokeBlueprintObject" : {
         "description" : "revokeBlueprintObject template definitions",
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "message" : {
+                  "description" : "Status message for the revoke operation.",
                   "type" : [ "string", "null" ],
                   "maxLength" : 200,
                   "minLength" : 1,
@@ -1149,242 +1297,309 @@
           }
         }
       },
+      "revokeManyResponse" : {
+        "description" : "Returns the list of record IDs for which the bulk blueprint revoke operation failed.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "failureIds" : {
+                  "description" : "Ticket IDs for which the bulk revoke operation failed. Type: array of integers or numeric strings (int64). Required in response. Empty array means all revocations succeeded. Example: [].",
+                  "type" : [ "array", "null" ],
+                  "items" : {
+                    "type" : [ "string", "integer", "null" ],
+                    "format" : "int64",
+                    "pattern" : "([0-9]+)"
+                  },
+                  "maxItems" : 50,
+                  "uniqueItems" : false
+                }
+              },
+              "required" : [ "failureIds" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "failureIds" : [ ]
+                }
+              }
+            }
+          }
+        }
+      },
       "getBlueprintDetailsResponse" : {
         "description" : "getBlueprintDetailsResponse template definitions",
         "content" : {
           "application/json" : {
             "schema" : {
               "oneOf" : [ {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "orderNumber" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "Display order of the blueprint",
+                    "type" : [ "string", "integer" ],
                     "format" : "int32",
                     "minimum" : 1,
                     "pattern" : "([0-9]+)"
                   },
                   "criteria" : {
+                    "description" : "Criteria conditions that determine when the blueprint is applied",
                     "$ref" : "./blueprintCriteria.json#/components/schemas/criteriaObjectForResponse"
                   },
                   "departmentId" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "Unique ID of the department to which the blueprint belongs",
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
                   "module" : {
-                    "type" : [ "string", "null" ],
+                    "description" : "Module to which the blueprint is associated",
+                    "type" : "string",
                     "enum" : [ "tickets" ],
-                    "maxLength" : 100,
-                    "minLength" : 0,
                     "pattern" : "tickets"
                   },
                   "description" : {
+                    "description" : "Description of the blueprint",
                     "type" : [ "string", "null" ],
                     "maxLength" : 100,
                     "minLength" : 0,
                     "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+|^$"
                   },
                   "dynamicTransOwnerType" : {
+                    "description" : "Dynamic transition owner assignment setting. Allows support administrators to assign transition owners within a record dynamically, either from the current department or by sharing the record with other departments whose agents complete the transition. Possible values: @ACTIVE@ - dynamic transition owner assignment is enabled, @INACTIVE@ - dynamic transition owner assignment is disabled",
                     "type" : [ "string", "null" ],
                     "enum" : [ "ACTIVE", "INACTIVE" ],
-                    "maxLength" : 100,
-                    "minLength" : 0,
                     "pattern" : "ACTIVE|INACTIVE"
                   },
                   "active" : {
+                    "description" : "Indicates whether the blueprint is active. Possible values: @true@ - blueprint is active, @false@ - blueprint is inactive",
                     "type" : [ "boolean", "null" ]
                   },
                   "type" : {
+                    "description" : "Type of blueprint. Possible values: @NON_CONTINUOUS@, @CONTINUOUS@",
                     "type" : [ "string", "null" ],
                     "enum" : [ "NON_CONTINUOUS", "CONTINUOUS" ],
-                    "maxLength" : 100,
-                    "minLength" : 0,
                     "pattern" : "NON_CONTINUOUS|CONTINUOUS"
                   },
                   "transitions" : {
+                    "description" : "List of transitions defined in the blueprint",
                     "$ref" : "./blueprintTransitions.json#/components/schemas/transitionsArrayForResponse"
                   },
                   "layoutId" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "Unique ID of the layout mapped to the blueprint",
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
                   "states" : {
+                    "description" : "List of states defined in the blueprint",
                     "$ref" : "./blueprintStates.json#/components/schemas/statesArrayForResponse"
                   },
                   "layout" : {
-                    "$ref" : "./blueprints.json#/components/schemas/layoutObject"
+                    "description" : "Layout mapped to the blueprint",
+                    "$ref" : "#/components/schemas/layoutObject"
                   },
                   "chartData" : {
+                    "description" : "Chart rendering data for the blueprint visual layout",
                     "$ref" : "./blueprintChartData.json#/components/schemas/chartDataObjectForResponse"
                   },
                   "strictModeConfig" : {
+                    "description" : "Strict mode configuration for the blueprint",
                     "$ref" : "./blueprintStrictModeConfig.json#/components/schemas/strictModeConfigObject"
                   },
                   "createdBy" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "Unique ID of the user who created the blueprint",
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
                   "draft" : {
+                    "description" : "Indicates whether the blueprint is in draft state. Possible values: @true@ - blueprint is a draft, @false@ - blueprint is published",
                     "type" : [ "boolean", "null" ]
                   },
                   "name" : {
+                    "description" : "Name of the blueprint",
                     "type" : [ "string", "null" ],
                     "maxLength" : 60,
                     "minLength" : 1,
                     "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                   },
                   "modifiedBy" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "Unique ID of the user who last modified the blueprint",
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
                   "id" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "Unique ID of the blueprint",
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "minimum" : 1,
                     "pattern" : "([0-9]+)"
                   },
                   "modifiedTimeInMillis" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "Time in milliseconds when the blueprint was last modified",
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "minimum" : 1,
                     "pattern" : "([0-9]+)"
                   },
                   "createdTimeInMillis" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "Time in milliseconds when the blueprint was created",
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "minimum" : 1,
                     "pattern" : "([0-9]+)"
                   },
                   "connections" : {
+                    "description" : "List of connections between states via transitions",
                     "$ref" : "./blueprintConnections.json#/components/schemas/connectionsArrayForResponse"
                   },
                   "fieldId" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "Unique ID of the field mapped to the blueprint",
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   }
                 },
                 "required" : [ "active", "chartData", "connections", "createdBy", "createdTimeInMillis", "criteria", "departmentId", "description", "draft", "dynamicTransOwnerType", "fieldId", "id", "layout", "layoutId", "modifiedBy", "modifiedTimeInMillis", "module", "name", "orderNumber", "states", "strictModeConfig", "transitions", "type" ]
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "orderNumber" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "Display order of the blueprint",
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int32",
                     "minimum" : 1,
                     "pattern" : "([0-9]+)"
                   },
                   "criteria" : {
+                    "description" : "Criteria conditions that determine when the blueprint is applied",
                     "$ref" : "./blueprintCriteria.json#/components/schemas/criteriaObjectForResponse"
                   },
                   "departmentId" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "Unique ID of the department to which the blueprint belongs",
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
                   "module" : {
+                    "description" : "Module to which the blueprint is associated",
                     "type" : [ "string", "null" ],
                     "enum" : [ "tickets" ],
-                    "maxLength" : 100,
-                    "minLength" : 0,
                     "pattern" : "tickets"
                   },
                   "description" : {
+                    "description" : "Description of the blueprint",
                     "type" : [ "string", "null" ],
                     "maxLength" : 100,
                     "minLength" : 0,
                     "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+|^$"
                   },
                   "dynamicTransOwnerType" : {
+                    "description" : "Dynamic transition owner assignment setting. Allows support administrators to assign transition owners within a record dynamically, either from the current department or by sharing the record with other departments whose agents complete the transition. Possible values: @ACTIVE@ - dynamic transition owner assignment is enabled, @INACTIVE@ - dynamic transition owner assignment is disabled",
                     "type" : [ "string", "null" ],
                     "enum" : [ "ACTIVE", "INACTIVE" ],
-                    "maxLength" : 100,
-                    "minLength" : 0,
                     "pattern" : "ACTIVE|INACTIVE"
                   },
                   "active" : {
+                    "description" : "Indicates whether the blueprint is active. Possible values: @true@ - blueprint is active, @false@ - blueprint is inactive",
                     "type" : [ "boolean", "null" ]
                   },
                   "draftAt" : {
+                    "description" : "Time at which the blueprint draft was saved",
                     "type" : [ "string", "null" ],
                     "maxLength" : 100,
                     "minLength" : 0,
                     "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
                   },
                   "type" : {
+                    "description" : "Type of blueprint. Possible values: @NON_CONTINUOUS@, @CONTINUOUS@",
                     "type" : [ "string", "null" ],
                     "enum" : [ "NON_CONTINUOUS", "CONTINUOUS" ],
-                    "maxLength" : 100,
-                    "minLength" : 0,
                     "pattern" : "NON_CONTINUOUS|CONTINUOUS"
                   },
                   "transitions" : {
+                    "description" : "List of transitions defined in the blueprint",
                     "$ref" : "./blueprintTransitions.json#/components/schemas/transitionsArrayForResponse"
                   },
                   "layoutId" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "Unique ID of the layout mapped to the blueprint",
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
                   "states" : {
+                    "description" : "List of states defined in the blueprint",
                     "$ref" : "./blueprintStates.json#/components/schemas/statesArrayForResponse"
                   },
                   "layout" : {
-                    "$ref" : "./blueprints.json#/components/schemas/layoutObject"
+                    "description" : "Layout mapped to the blueprint",
+                    "$ref" : "#/components/schemas/layoutObject"
                   },
                   "chartData" : {
+                    "description" : "Chart rendering data for the blueprint visual layout",
                     "$ref" : "./blueprintChartData.json#/components/schemas/chartDataObjectForResponse"
                   },
                   "strictModeConfig" : {
+                    "description" : "Strict mode configuration for the blueprint",
                     "$ref" : "./blueprintStrictModeConfig.json#/components/schemas/strictModeConfigObject"
                   },
                   "createdBy" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "Unique ID of the user who created the blueprint",
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
                   "draft" : {
+                    "description" : "Indicates whether the blueprint is in draft state. Possible values: @true@ - blueprint is a draft, @false@ - blueprint is published",
                     "type" : [ "boolean", "null" ]
                   },
                   "name" : {
+                    "description" : "Name of the blueprint",
                     "type" : [ "string", "null" ],
                     "maxLength" : 60,
                     "minLength" : 1,
                     "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                   },
                   "modifiedBy" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "Unique ID of the user who last modified the blueprint",
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
                   "id" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "Unique ID of the blueprint",
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "minimum" : 1,
                     "pattern" : "([0-9]+)"
                   },
                   "modifiedTimeInMillis" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "Time in milliseconds when the blueprint was last modified",
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "minimum" : 1,
                     "pattern" : "([0-9]+)"
                   },
                   "createdTimeInMillis" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "Time in milliseconds when the blueprint was created",
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "minimum" : 1,
                     "pattern" : "([0-9]+)"
                   },
                   "connections" : {
+                    "description" : "List of connections between states via transitions",
                     "$ref" : "./blueprintConnections.json#/components/schemas/connectionsArrayForResponse"
                   },
                   "fieldId" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "description" : "Unique ID of the field mapped to the blueprint",
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   }
@@ -1405,8 +1620,8 @@
                     "pattern" : "(1)"
                   },
                   "departmentId" : "4000000007235",
-                  "module" : "Cases",
-                  "isDraft" : false,
+                  "module" : "tickets",
+                  "draft" : false,
                   "description" : "Automates Private Threading Handling",
                   "type" : "NON_CONTINUOUS",
                   "transitions" : [ {
@@ -1619,17 +1834,17 @@
                     "businessHrId" : 4000000007355,
                     "name" : "Open",
                     "id" : 4000000007723,
-                    "type" : "START"
+                    "type" : [ "START" ]
                   }, {
                     "timeInMins" : 30,
                     "name" : "Escalated",
                     "id" : 4000000007723,
-                    "type" : "INTERMEDIATE"
+                    "type" : [ "INTERMEDIATE" ]
                   }, {
                     "timeInMins" : 30,
                     "name" : "Closed",
                     "id" : 4000000007723,
-                    "type" : "END"
+                    "type" : [ "END" ]
                   } ],
                   "chartData" : {
                     "canvasPosition" : {
@@ -1722,80 +1937,26 @@
         }
       }
     },
-    "parameters" : {
-      "departmentId" : {
-        "name" : "departmentId",
-        "in" : "query",
-        "description" : "Department for which the blueprints are listed",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "description" : "Department for which the blueprints are listed",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "module" : {
-        "name" : "module",
-        "in" : "query",
-        "description" : "module of the blueprints to be listed",
-        "required" : true,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null" ],
-          "description" : "module of the blueprints to be listed",
-          "enum" : [ "tickets" ],
-          "maxLength" : 100,
-          "minLength" : 0,
-          "pattern" : "tickets"
-        }
-      },
-      "ticket_id" : {
-        "name" : "ticket_id",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "blueprint_id" : {
-        "name" : "blueprint_id",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "minimum" : 1,
-          "pattern" : "([0-9]+)"
-        }
-      }
-    },
     "requestBodies" : {
       "blueprintIdsObject" : {
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "ids" : {
-                  "$ref" : "./blueprints.json#/components/schemas/blueprintIdsArray"
+                  "description" : "Blueprint IDs in the required display order",
+                  "$ref" : "#/components/schemas/blueprintIdsArray"
                 }
               },
               "required" : [ "ids" ]
             },
             "examples" : {
               "Valid requestBody Definitions" : {
-                "value" : [ "4000000019017", "4000000019019", "4000000019023", "4000000019021" ]
+                "value" : {
+                  "ids" : [ "4000000019017", "4000000019019", "4000000019023", "4000000019021" ]
+                }
               }
             }
           }
@@ -1805,117 +1966,84 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
-                "orderNumber" : {
-                  "type" : [ "string", "null", "integer" ],
-                  "format" : "int32",
-                  "minimum" : 1,
-                  "pattern" : "([0-9]+)"
-                },
                 "criteria" : {
-                  "$ref" : "./blueprintCriteria.json#/components/schemas/criteriaObjectForResponse"
+                  "description" : "Criteria conditions that determine when the blueprint is applied",
+                  "$ref" : "./blueprintCriteria.json#/components/schemas/criteriaObject"
                 },
                 "departmentId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Unique ID of the department to which the blueprint belongs",
+                  "type" : [ "string", "integer" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "module" : {
-                  "type" : [ "string", "null" ],
+                  "description" : "Module to which the blueprint is associated",
+                  "type" : [ "string" ],
                   "enum" : [ "tickets" ],
-                  "maxLength" : 100,
-                  "minLength" : 0,
                   "pattern" : "tickets"
                 },
                 "description" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0,
+                  "description" : "Description of the blueprint",
+                  "type" : [ "string" ],
+                  "maxLength" : 1000,
                   "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+|^$"
                 },
                 "dynamicTransOwnerType" : {
-                  "type" : [ "string", "null" ],
+                  "description" : "Dynamic transition owner assignment setting. Allows support administrators to assign transition owners within a record dynamically, either from the current department or by sharing the record with other departments whose agents complete the transition. Possible values: @ACTIVE@ - dynamic transition owner assignment is enabled, @INACTIVE@ - dynamic transition owner assignment is disabled",
+                  "type" : [ "string" ],
                   "enum" : [ "ACTIVE", "INACTIVE" ],
-                  "maxLength" : 100,
-                  "minLength" : 0,
                   "pattern" : "ACTIVE|INACTIVE"
                 },
-                "active" : {
-                  "type" : [ "boolean", "null" ]
-                },
                 "type" : {
-                  "type" : [ "string", "null" ],
+                  "description" : "Type of blueprint. Possible values: @NON_CONTINUOUS@, @CONTINUOUS@",
+                  "type" : [ "string" ],
                   "enum" : [ "NON_CONTINUOUS", "CONTINUOUS" ],
-                  "maxLength" : 100,
-                  "minLength" : 0,
                   "pattern" : "NON_CONTINUOUS|CONTINUOUS"
                 },
                 "transitions" : {
-                  "$ref" : "./blueprintTransitions.json#/components/schemas/transitionsArrayForResponse"
+                  "description" : "List of transitions defined in the blueprint",
+                  "$ref" : "./blueprintTransitions.json#/components/schemas/transitionsArray"
                 },
                 "layoutId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Unique ID of the layout mapped to the blueprint",
+                  "type" : [ "string", "integer" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "states" : {
-                  "$ref" : "./blueprintStates.json#/components/schemas/statesArrayForResponse"
-                },
-                "layout" : {
-                  "$ref" : "./blueprints.json#/components/schemas/layoutObject"
+                  "description" : "List of states defined in the blueprint",
+                  "$ref" : "./blueprintStates.json#/components/schemas/statesArray"
                 },
                 "chartData" : {
-                  "$ref" : "./blueprintChartData.json#/components/schemas/chartDataObjectForResponse"
+                  "description" : "Chart rendering data for the blueprint visual layout",
+                  "$ref" : "./blueprintChartData.json#/components/schemas/chartDataObject"
                 },
                 "strictModeConfig" : {
+                  "description" : "Strict mode configuration for the blueprint",
                   "$ref" : "./blueprintStrictModeConfig.json#/components/schemas/strictModeConfigObject"
                 },
-                "createdBy" : {
-                  "type" : [ "string", "null", "integer" ],
-                  "format" : "int64",
-                  "pattern" : "([0-9]+)"
-                },
-                "draft" : {
-                  "type" : [ "boolean", "null" ]
-                },
                 "name" : {
-                  "type" : [ "string", "null" ],
+                  "description" : "Name of the blueprint",
+                  "type" : [ "string" ],
                   "maxLength" : 60,
-                  "minLength" : 1,
                   "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                 },
-                "modifiedBy" : {
-                  "type" : [ "string", "null", "integer" ],
-                  "format" : "int64",
-                  "pattern" : "([0-9]+)"
-                },
-                "id" : {
-                  "type" : [ "string", "null", "integer" ],
-                  "format" : "int64",
-                  "minimum" : 1,
-                  "pattern" : "([0-9]+)"
-                },
-                "modifiedTimeInMillis" : {
-                  "type" : [ "string", "null", "integer" ],
-                  "format" : "int64",
-                  "minimum" : 1,
-                  "pattern" : "([0-9]+)"
-                },
-                "createdTimeInMillis" : {
-                  "type" : [ "string", "null", "integer" ],
-                  "format" : "int64",
-                  "minimum" : 1,
-                  "pattern" : "([0-9]+)"
-                },
                 "connections" : {
-                  "$ref" : "./blueprintConnections.json#/components/schemas/connectionsArrayForResponse"
+                  "description" : "List of connections between states via transitions",
+                  "$ref" : "./blueprintConnections.json#/components/schemas/connectionsArray"
                 },
                 "fieldId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Unique ID of the field mapped to the blueprint",
+                  "type" : [ "string", "integer" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
+                },
+                "active" : {
+                  "description" : "Indicates whether the blueprint is active. Possible values: @true@ - blueprint is active, @false@ - blueprint is inactive",
+                  "type" : [ "boolean" ]
                 }
               }
             },
@@ -1933,74 +2061,84 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "criteria" : {
+                  "description" : "Criteria conditions that determine when the blueprint is applied",
                   "$ref" : "./blueprintCriteria.json#/components/schemas/criteriaObject"
                 },
                 "departmentId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Unique ID of the department to which the blueprint belongs",
+                  "type" : [ "string", "integer" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "module" : {
-                  "type" : [ "string", "null" ],
+                  "description" : "Module to which the blueprint is associated",
+                  "type" : [ "string" ],
                   "enum" : [ "tickets" ],
-                  "maxLength" : 100,
-                  "minLength" : 0,
                   "pattern" : "tickets"
                 },
                 "description" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0,
+                  "description" : "Description of the blueprint",
+                  "type" : [ "string" ],
+                  "maxLength" : 1000,
                   "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+|^$"
                 },
                 "dynamicTransOwnerType" : {
-                  "type" : [ "string", "null" ],
+                  "description" : "Dynamic transition owner assignment setting. Allows support administrators to assign transition owners within a record dynamically, either from the current department or by sharing the record with other departments whose agents complete the transition. Possible values: @ACTIVE@ - dynamic transition owner assignment is enabled, @INACTIVE@ - dynamic transition owner assignment is disabled",
+                  "type" : [ "string" ],
                   "enum" : [ "ACTIVE", "INACTIVE" ],
-                  "maxLength" : 100,
-                  "minLength" : 0,
                   "pattern" : "ACTIVE|INACTIVE"
                 },
                 "type" : {
-                  "type" : [ "string", "null" ],
+                  "description" : "Type of blueprint. Possible values: @NON_CONTINUOUS@, @CONTINUOUS@",
+                  "type" : [ "string" ],
                   "enum" : [ "NON_CONTINUOUS", "CONTINUOUS" ],
-                  "maxLength" : 100,
-                  "minLength" : 0,
                   "pattern" : "NON_CONTINUOUS|CONTINUOUS"
                 },
                 "transitions" : {
+                  "description" : "List of transitions defined in the blueprint",
                   "$ref" : "./blueprintTransitions.json#/components/schemas/transitionsArray"
                 },
                 "layoutId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Unique ID of the layout mapped to the blueprint",
+                  "type" : [ "string", "integer" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "states" : {
+                  "description" : "List of states defined in the blueprint",
                   "$ref" : "./blueprintStates.json#/components/schemas/statesArray"
                 },
                 "chartData" : {
+                  "description" : "Chart rendering data for the blueprint visual layout",
                   "$ref" : "./blueprintChartData.json#/components/schemas/chartDataObject"
                 },
                 "strictModeConfig" : {
+                  "description" : "Strict mode configuration for the blueprint",
                   "$ref" : "./blueprintStrictModeConfig.json#/components/schemas/strictModeConfigObject"
                 },
                 "name" : {
-                  "type" : [ "string", "null" ],
+                  "description" : "Name of the blueprint",
+                  "type" : [ "string" ],
                   "maxLength" : 60,
-                  "minLength" : 1,
                   "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                 },
                 "connections" : {
+                  "description" : "List of connections between states via transitions",
                   "$ref" : "./blueprintConnections.json#/components/schemas/connectionsArray"
                 },
                 "fieldId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Unique ID of the field mapped to the blueprint",
+                  "type" : [ "string", "integer" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
+                },
+                "active" : {
+                  "description" : "Indicates whether the blueprint is active. Possible values: @true@ - blueprint is active, @false@ - blueprint is inactive",
+                  "type" : [ "boolean" ]
                 }
               },
               "required" : [ "chartData", "connections", "departmentId", "fieldId", "layoutId", "module", "name", "states", "transitions", "type" ]
@@ -2063,7 +2201,7 @@
                     "pattern" : "(1)"
                   },
                   "departmentId" : "4000000007235",
-                  "module" : "Cases",
+                  "module" : "tickets",
                   "name" : "Private Threading Handling",
                   "description" : "Automates Private Threading Handling",
                   "type" : "NON_CONTINUOUS",
@@ -2221,13 +2359,25 @@
                   } ],
                   "layoutId" : 4000000007723,
                   "connections" : [ {
-                    "fromState" : "Open",
-                    "toState" : "Escalated",
-                    "transition" : [ "Common Handling" ]
+                    "fromState" : {
+                      "name" : "Open"
+                    },
+                    "toState" : {
+                      "name" : "Escalated"
+                    },
+                    "transitions" : [ {
+                      "name" : "Common Handling"
+                    } ]
                   }, {
-                    "fromState" : "Escalated",
-                    "toState" : "Closed",
-                    "transition" : [ "Common Handling" ]
+                    "fromState" : {
+                      "name" : "Escalated"
+                    },
+                    "toState" : {
+                      "name" : "Closed"
+                    },
+                    "transitions" : [ {
+                      "name" : "Common Handling"
+                    } ]
                   } ],
                   "fieldId" : 4000000000377,
                   "states" : [ {
@@ -2259,9 +2409,46 @@
             }
           }
         }
+      },
+      "revokeManyRequest" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "ids" : {
+                  "description" : "List of ticket record IDs from which the blueprint must be revoked. Type: array of integers or numeric strings (int64). Required. Maximum 50 IDs per request. Example: [\"1892000000093303\", \"1892000000085009\"].",
+                  "type" : [ "array" ],
+                  "items" : {
+                    "type" : [ "string", "integer" ],
+                    "format" : "int64",
+                    "pattern" : "([0-9]+)"
+                  },
+                  "maxItems" : 50,
+                  "uniqueItems" : false
+                }
+              },
+              "required" : [ "ids" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "ids" : [ "1892000000093303", "1892000000085009", "1892000000050003" ]
+                }
+              }
+            }
+          }
+        }
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

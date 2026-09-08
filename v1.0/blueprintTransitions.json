@@ -9,14 +9,57 @@
       "get" : {
         "tags" : [ "blueprintTransitions" ],
         "summary" : "View a specific attachment added to a transition draft",
-        "description" : "Get attachment of a transition draft",
+        "description" : "Downloads the file content of a specific attachment added to a transition draft.",
         "operationId" : "viewTemporaryTransitionDraftAttachment",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/attachment_id"
+          "name" : "inline",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "boolean" ]
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Whether the display is to be inline"
         }, {
-          "$ref" : "#/components/parameters/ticket_id"
+          "name" : "attachment_id",
+          "description" : "Unique ID of the attachment.",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/transition_id"
+          "name" : "ticket_id",
+          "in" : "path",
+          "description" : "Unique numeric identifier of the ticket.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "int64",
+            "maxLength" : 100,
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "transition_id",
+          "in" : "path",
+          "description" : "Unique numeric identifier of the blueprint transition to be performed.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "int64",
+            "maxLength" : 100,
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -25,21 +68,56 @@
             "$ref" : "./Common.json#/components/responses/fileResponse"
           }
         },
-        "x-audience" : [ "external-public" ]
+        "x-audience" : [ "external-public" ],
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.tickets.READ" ]
+        } ]
       }
     },
     "/api/v1/tickets/{ticket_id}/transitions/{transition_id}/attachments/{attachment_id}" : {
       "delete" : {
         "tags" : [ "blueprintTransitions" ],
         "summary" : "Delete attachment of a transition draft",
-        "description" : "Delete a specific attachment added to a transition draft.",
+        "description" : "Deletes a specific attachment added to a transition draft.",
         "operationId" : "deleteTransitionDraftTemporaryAttachment",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/attachment_id"
+          "name" : "attachment_id",
+          "description" : "Unique ID of the attachment.",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/ticket_id"
+          "name" : "ticket_id",
+          "in" : "path",
+          "description" : "Unique numeric identifier of the ticket.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "int64",
+            "maxLength" : 100,
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/transition_id"
+          "name" : "transition_id",
+          "in" : "path",
+          "description" : "Unique numeric identifier of the blueprint transition to be performed.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "int64",
+            "maxLength" : 100,
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -53,22 +131,255 @@
         } ],
         "x-audience" : [ "external-public" ]
       }
+    },
+    "/api/v1/tickets/{ticket_id}/transitions/{transition_id}/form" : {
+      "get" : {
+        "tags" : [ "blueprintTransitions" ],
+        "summary" : "Get transition form details",
+        "description" : "Retrieves the during-transition form details and available actions for a given transition on a ticket.",
+        "operationId" : "getDuringTransitionForm",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "ticket_id",
+          "in" : "path",
+          "description" : "Unique numeric identifier of the ticket.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "int64",
+            "maxLength" : 100,
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "transition_id",
+          "in" : "path",
+          "description" : "Unique numeric identifier of the blueprint transition to be performed.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "int64",
+            "maxLength" : 100,
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Transition form details retrieved successfully",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/transitionFormResponse"
+                },
+                "examples" : {
+                  "Valid responses Definitions" : {
+                    "value" : {
+                      "transitionId" : "4000000152217",
+                      "draftDetails" : {
+                        "draftBy" : {
+                          "name" : "Sandeep Ghemire",
+                          "id" : "8000000000053"
+                        },
+                        "draftAt" : "2020-11-13 16:05:31.0"
+                      },
+                      "formActions" : [ {
+                        "actionType" : "FIELD_UPDATE",
+                        "isMandatory" : true,
+                        "draftContent" : {
+                          "FIELD_UPDATE" : {
+                            "status" : "Open_july"
+                          }
+                        },
+                        "fieldDetails" : {
+                          "displayLabel" : "Status",
+                          "allowedValues" : [ "Open", "Open_july", "On Hold", "Escalated", "Closed1", "Closed", "newDeptClosed" ],
+                          "isCustomField" : false,
+                          "defaultValue" : "Open",
+                          "isSystemMandatory" : true,
+                          "type" : "Picklist",
+                          "name" : "status",
+                          "id" : "4000000000367",
+                          "isRemovable" : false,
+                          "maxLength" : 120,
+                          "isMandatory" : true
+                        }
+                      }, {
+                        "actionType" : "MESSAGE",
+                        "content" : "Post your reply here"
+                      }, {
+                        "actionType" : "REPLY",
+                        "draftContent" : {
+                          "REPLY" : {
+                            "fromEmailAddress" : "BlueprintBranchDept<blueprintbranchdept@zylker.com>",
+                            "to" : "carol@zylker.com",
+                            "cc" : "blueprintbranchdept@zylker.com",
+                            "bcc" : "",
+                            "channel" : "EMAIL",
+                            "content" : "Hello buddy",
+                            "isPrivate" : false
+                          }
+                        },
+                        "isMandatory" : true
+                      }, {
+                        "actionType" : "COMMENT",
+                        "draftContent" : {
+                          "COMMENT" : {
+                            "isPublicComment" : false,
+                            "content" : "Comment is to test transition Draft",
+                            "uploads" : [ 1000000096035 ]
+                          }
+                        },
+                        "isMandatory" : false
+                      }, {
+                        "actionType" : "RESOLUTION",
+                        "draftContent" : {
+                          "RESOLUTION" : {
+                            "toNotifyContactForResolution" : true,
+                            "content" : "This ticket has to be solved"
+                          }
+                        },
+                        "isMandatory" : true
+                      }, {
+                        "actionType" : "APPROVAL",
+                        "draftContent" : {
+                          "APPROVAL" : {
+                            "subject" : "Hello Approvers",
+                            "description" : "Hello Approvers, do approve it",
+                            "approvers" : [ {
+                              "approverId" : 8000000000053,
+                              "approverName" : "Sandeep Ghemire"
+                            } ]
+                          }
+                        },
+                        "isMandatory" : true
+                      }, {
+                        "actionType" : "BUG",
+                        "isMandatory" : false
+                      }, {
+                        "actionType" : "ATTACHMENT",
+                        "draftContent" : {
+                          "ATTACHMENT" : {
+                            "uploads" : [ {
+                              "id" : "38512000003341108",
+                              "isPublic" : false
+                            } ]
+                          }
+                        },
+                        "isMandatory" : true
+                      } ],
+                      "isContinuousTransition" : true,
+                      "isContinuousBlueprint" : false,
+                      "isTransDraftEnabledForPortal" : true,
+                      "continuousTransitions" : [ {
+                        "transitionId" : "4000000152219",
+                        "transtionName" : "Close"
+                      }, {
+                        "transitionId" : "4000000152221",
+                        "transtionName" : "Solve"
+                      } ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.tickets.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/tickets/{ticket_id}/transitions/{transition_id}/perform" : {
+      "post" : {
+        "tags" : [ "blueprintTransitions" ],
+        "summary" : "Perform a blueprint transition on a ticket",
+        "description" : "Execute a blueprint transition on the specified ticket. Supply form-action payloads for approval, resolution, attachment, reply, comment, sharing, and field-update actions as required by the transition configuration. Only the action categories required by the transition need to be included.",
+        "operationId" : "performBlueprintTransition",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "ticket_id",
+          "in" : "path",
+          "description" : "Unique numeric identifier of the ticket.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "int64",
+            "maxLength" : 100,
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "transition_id",
+          "in" : "path",
+          "description" : "Unique numeric identifier of the blueprint transition to be performed.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "int64",
+            "maxLength" : 100,
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "description" : "Form-action payloads for the transition. Provide only the action categories required by the transition configuration. Can be empty for transitions with no configured actions.",
+          "required" : false,
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/performTransitionRequest"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Blueprint transition performed successfully on the ticket.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/performTransitionResponseObject"
+                }
+              }
+            }
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.tickets.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
     }
   },
   "components" : {
     "schemas" : {
       "transitionObjectWithPrimaryDetails" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "name" : {
+            "description" : "Name of the transition",
             "type" : [ "string", "null" ],
             "maxLength" : 30,
             "minLength" : 1,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the transition",
+            "type" : [ "string", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
@@ -76,35 +387,37 @@
         "required" : [ "id", "name" ]
       },
       "transitionArrayWithPrimaryDetails" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./blueprintTransitions.json#/components/schemas/transitionObjectWithPrimaryDetails"
+          "$ref" : "#/components/schemas/transitionObjectWithPrimaryDetails"
         }
       },
       "teamsArrayForGetAppliedBlueprintDetails" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
           "$ref" : "./Team.json#/components/schemas/teamsObjectForGetAppliedBlueprintDetails"
         }
       },
       "agentsArrayForGetAppliedBlueprintDetails" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
           "$ref" : "./Agent.json#/components/schemas/agentsObjectForGetAppliedBlueprintDetails"
         }
       },
       "ownersObjectForGetAppliedBlueprintDetails" : {
-        "type" : [ "null", "object" ],
+        "description" : "Owners (agents or teams) of a transition for a given department, along with the sharing level the department has on the ticket.",
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "agentIds" : {
             "$ref" : "./blueprintStates.json#/components/schemas/agentIdsArray"
           },
           "teams" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/teamsArrayForGetAppliedBlueprintDetails"
+            "$ref" : "#/components/schemas/teamsArrayForGetAppliedBlueprintDetails"
           },
           "departmentId" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Identifier of the department these owners belong to.",
+            "type" : [ "string", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
@@ -115,159 +428,177 @@
             "$ref" : "./blueprintStates.json#/components/schemas/teamIdsArray"
           },
           "agents" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/agentsArrayForGetAppliedBlueprintDetails"
+            "$ref" : "#/components/schemas/agentsArrayForGetAppliedBlueprintDetails"
           },
           "deptSharingType" : {
+            "description" : "Sharing level the department has on the ticket. Accepted values: NO_SHARING (department has no access), READ_ONLY (read access only), READ_WRITE (read and write access), RESTRICTED_ACCESS (custom restricted access).",
             "type" : [ "string", "null" ],
             "enum" : [ "NO_SHARING", "READ_ONLY", "READ_WRITE", "RESTRICTED_ACCESS" ],
-            "maxLength" : 100,
-            "minLength" : 1,
             "pattern" : "NO_SHARING|READ_ONLY|READ_WRITE|RESTRICTED_ACCESS"
           }
         },
-        "required" : [ "agentIds", "agents", "department", "departmentId", "deptSharingType", "teamIds", "teams" ]
+        "required" : [ "agentIds", "departmentId", "deptSharingType", "teamIds" ]
       },
       "ownersArrayForGetAppliedBlueprintDetails" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./blueprintTransitions.json#/components/schemas/ownersObjectForGetAppliedBlueprintDetails"
+          "$ref" : "#/components/schemas/ownersObjectForGetAppliedBlueprintDetails"
         }
       },
       "transitionsObjectForGetAppliedBlueprintDetails" : {
-        "type" : [ "null", "object" ],
+        "description" : "Details of a transition available on the ticket for the blueprint currently applied.",
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "fromState" : {
+            "description" : "Name of the source state from which this transition begins.",
             "type" : [ "string", "null" ],
             "maxLength" : 120,
             "minLength" : 1,
             "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
           },
           "toState" : {
+            "description" : "Name of the target state to which the ticket moves once this transition is performed.",
             "type" : [ "string", "null" ],
             "maxLength" : 120,
             "minLength" : 1,
             "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
           },
           "isAutoTransition" : {
+            "description" : "True when the transition is executed automatically once its criteria are satisfied; false when an agent has to perform it.",
             "type" : [ "boolean", "null" ]
           },
           "criteria" : {
             "$ref" : "./blueprintCriteria.json#/components/schemas/criteriaObjectForTransitionResponse"
           },
           "name" : {
+            "description" : "Display name of the transition.",
             "type" : [ "string", "null" ],
             "maxLength" : 30,
             "minLength" : 1,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "owners" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/ownersArrayForGetAppliedBlueprintDetails"
+            "$ref" : "#/components/schemas/ownersArrayForGetAppliedBlueprintDetails"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique identifier of the transition.",
+            "type" : [ "string", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "canUserPerformTransition" : {
+            "description" : "True when the current authenticated user is permitted to perform this transition based on ownership and access rules.",
             "type" : [ "boolean", "null" ]
           },
           "isCriteriaSatisfied" : {
+            "description" : "True when all conditions required by the transition criteria are currently met for the ticket.",
             "type" : [ "boolean", "null" ]
           }
         },
-        "required" : [ "canUserPerformTransition", "criteria", "fromState", "id", "isAutoTransition", "isCriteriaSatisfied", "name", "owners", "toState" ]
+        "required" : [ "canUserPerformTransition", "fromState", "id", "isAutoTransition", "isCriteriaSatisfied", "name", "owners", "toState" ]
       },
       "transitionsArrayForGetAppliedBlueprintDetails" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./blueprintTransitions.json#/components/schemas/transitionsObjectForGetAppliedBlueprintDetails"
+          "$ref" : "#/components/schemas/transitionsObjectForGetAppliedBlueprintDetails"
         }
       },
       "ownersObject" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "agentIds" : {
+            "description" : "Agent IDs configured for the transition",
             "$ref" : "./blueprintStates.json#/components/schemas/agentIdsArray"
           },
           "otherRecpts" : {
+            "description" : "Other recipients configured for the transition",
             "$ref" : "./blueprintStates.json#/components/schemas/otherRecptsArray"
           },
           "teamIds" : {
+            "description" : "Team IDs configured for the transition",
             "$ref" : "./blueprintStates.json#/components/schemas/teamIdsArray"
           }
         },
         "required" : [ "agentIds", "otherRecpts", "teamIds" ]
       },
       "accessorsObject" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "agentIds" : {
+            "description" : "Agent IDs configured for the transition",
             "$ref" : "./blueprintStates.json#/components/schemas/agentIdsArray"
           },
           "teamIds" : {
+            "description" : "Team IDs configured for the transition",
             "$ref" : "./blueprintStates.json#/components/schemas/teamIdsArray"
           }
         },
         "required" : [ "agentIds", "teamIds" ]
       },
       "sharedDeptAccessorsObject" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "accessors" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/accessorsObject"
+            "description" : "Accessors with whom the transition is shared",
+            "$ref" : "#/components/schemas/accessorsObject"
           },
           "departmentId" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the department configured as transition owner",
+            "type" : [ "string", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "sharingType" : {
+            "description" : "Sharing type for the shared department",
             "type" : [ "string", "null" ],
             "enum" : [ "READ_WRITE", "READ_ONLY", "RESTRICTED_ACCESS" ],
-            "maxLength" : 100,
-            "minLength" : 1,
             "pattern" : "READ_WRITE|READ_ONLY|RESTRICTED_ACCESS"
           }
         },
         "required" : [ "accessors", "departmentId", "sharingType" ]
       },
       "sharedDeptAccessorsArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./blueprintTransitions.json#/components/schemas/sharedDeptAccessorsObject"
+          "$ref" : "#/components/schemas/sharedDeptAccessorsObject"
         }
       },
       "accessorsBeforeTransitionObjectForResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "actionId" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the action",
+            "type" : [ "string", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "owners" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/ownersObject"
+            "description" : "Owners configured for the transition",
+            "$ref" : "#/components/schemas/ownersObject"
           },
           "sharedDeptAccessors" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/sharedDeptAccessorsArray"
+            "description" : "Departments with which the transition is shared",
+            "$ref" : "#/components/schemas/sharedDeptAccessorsArray"
           }
         },
         "required" : [ "actionId", "owners", "sharedDeptAccessors" ]
       },
       "criteriaDetailsObjectForResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "criteria" : {
+            "description" : "Criteria configured for the before-transition",
             "$ref" : "./blueprintCriteria.json#/components/schemas/criteriaObjectForTransitionResponse"
           },
           "actionId" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the action",
+            "type" : [ "string", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
@@ -275,36 +606,40 @@
         "required" : [ "actionId", "criteria" ]
       },
       "beforeObjectForResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "accessors" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/accessorsBeforeTransitionObjectForResponse"
+            "description" : "Accessors with whom the transition is shared",
+            "$ref" : "#/components/schemas/accessorsBeforeTransitionObjectForResponse"
           },
           "criteriaDetails" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/criteriaDetailsObjectForResponse"
+            "description" : "Criteria configuration for the before-transition",
+            "$ref" : "#/components/schemas/criteriaDetailsObjectForResponse"
           }
         }
       },
       "commonStatesArray" : {
-        "type" : [ "null", "array" ],
+        "type" : "array",
         "items" : {
-          "type" : [ "string", "null" ],
+          "type" : "string",
           "maxLength" : 100,
           "minLength" : 0,
           "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
         }
       },
       "messageObjectForResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "actionId" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the action",
+            "type" : [ "string", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "message" : {
+            "description" : "Message configured for the action",
             "type" : [ "string", "null" ],
             "maxLength" : 255,
             "minLength" : 0
@@ -313,18 +648,21 @@
         "required" : [ "actionId", "message" ]
       },
       "fieldUpdatesObject" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "criteria" : {
+            "description" : "Criteria that govern the field update",
             "$ref" : "./blueprintCriteria.json#/components/schemas/criteriaObject"
           },
           "fieldId" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the field to update",
+            "type" : [ "string", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "errorMsg" : {
+            "description" : "Validation error message",
             "type" : [ "string", "null" ],
             "maxLength" : 255,
             "minLength" : 0,
@@ -334,279 +672,309 @@
         "required" : [ "errorMsg", "fieldId" ]
       },
       "fieldUpdatesObjectsObjForResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "fieldUpdates" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/fieldUpdatesObject"
+            "description" : "Field update details configured for the action",
+            "$ref" : "#/components/schemas/fieldUpdatesObject"
           },
           "actionId" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the action",
+            "type" : [ "string", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "isMandatory" : {
+            "description" : "Indicates whether the action is mandatory. Possible values: @true@ - action is mandatory, @false@ - action is optional",
             "type" : [ "boolean", "null" ]
           }
         },
         "required" : [ "actionId", "fieldUpdates", "isMandatory" ]
       },
       "otherActionsObjectForResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "otherActions" : {
+            "description" : "Other actions configured for the transition",
             "type" : [ "string", "null" ],
             "enum" : [ "REPLY", "BUG", "COMMENT", "RESOLUTION", "APPROVAL", "ATTACHMENT", "SHARING", "FIELD_UPDATE" ],
-            "maxLength" : 100,
-            "minLength" : 0,
             "pattern" : "REPLY|BUG|COMMENT|RESOLUTION|APPROVAL|ATTACHMENT|SHARING|FIELD_UPDATE"
           },
           "actionId" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the action",
+            "type" : [ "string", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "isMandatory" : {
+            "description" : "Indicates whether the action is mandatory. Possible values: @true@ - action is mandatory, @false@ - action is optional",
             "type" : [ "boolean", "null" ]
           }
         },
         "required" : [ "actionId", "isMandatory", "otherActions" ]
       },
       "duringArrayForResponse" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
           "oneOf" : [ {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/messageObjectForResponse"
+            "$ref" : "#/components/schemas/messageObjectForResponse"
           }, {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/fieldUpdatesObjectsObjForResponse"
+            "$ref" : "#/components/schemas/fieldUpdatesObjectsObjForResponse"
           }, {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/otherActionsObjectForResponse"
+            "$ref" : "#/components/schemas/otherActionsObjectForResponse"
           } ]
         }
       },
       "alertIds" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "type" : [ "string", "null", "integer" ],
+          "type" : [ "string", "null" ],
           "format" : "int64",
           "pattern" : "([0-9]+)"
         }
       },
       "alertObjectForResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "actionId" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the action",
+            "type" : [ "string", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "ids" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/alertIds"
+            "description" : "Unique IDs of the alerts configured for the action",
+            "$ref" : "#/components/schemas/alertIds"
           }
         },
         "required" : [ "actionId", "ids" ]
       },
       "taskIds" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "type" : [ "string", "null", "integer" ],
+          "type" : [ "string", "null" ],
           "format" : "int64",
           "pattern" : "([0-9]+)"
         }
       },
       "taskObjectForResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "actionId" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the action",
+            "type" : [ "string", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "ids" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/taskIds"
+            "description" : "Unique IDs of the tasks configured for the action",
+            "$ref" : "#/components/schemas/taskIds"
           }
         },
         "required" : [ "actionId", "ids" ]
       },
       "fieldUpdateIds" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "type" : [ "string", "null", "integer" ],
+          "type" : [ "string", "null" ],
           "format" : "int64",
           "pattern" : "([0-9]+)"
         }
       },
       "fieldUpdateObjectForResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "actionId" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the action",
+            "type" : [ "string", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "ids" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/fieldUpdateIds"
+            "description" : "Unique IDs of the field updates configured for the action",
+            "$ref" : "#/components/schemas/fieldUpdateIds"
           }
         },
         "required" : [ "actionId", "ids" ]
       },
       "customFunctionIds" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "type" : [ "string", "null", "integer" ],
+          "type" : [ "string", "null" ],
           "format" : "int64",
           "pattern" : "([0-9]+)"
         }
       },
       "customFunctionObjectForResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "actionId" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the action",
+            "type" : [ "string", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "ids" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/customFunctionIds"
+            "description" : "Unique IDs of the custom functions configured for the action",
+            "$ref" : "#/components/schemas/customFunctionIds"
           }
         },
         "required" : [ "actionId", "ids" ]
       },
       "afterObjectForResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "fieldUpdate" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/fieldUpdateObjectForResponse"
+            "description" : "Field update actions configured after the transition",
+            "$ref" : "#/components/schemas/fieldUpdateObjectForResponse"
           },
           "task" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/taskObjectForResponse"
+            "description" : "Task actions configured after the transition",
+            "$ref" : "#/components/schemas/taskObjectForResponse"
           },
           "customFunction" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/customFunctionObjectForResponse"
+            "description" : "Custom function actions configured after the transition",
+            "$ref" : "#/components/schemas/customFunctionObjectForResponse"
           },
           "alert" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/alertObjectForResponse"
+            "description" : "Alert actions configured after the transition",
+            "$ref" : "#/components/schemas/alertObjectForResponse"
           }
         }
       },
       "autoTransitionActionsObject" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "feedback" : {
+            "description" : "Feedback configured for the automatic transition",
             "type" : [ "string", "null" ],
             "enum" : [ "SURVEY_ALL", "SURVEY_GOOD", "SURVEY_AVG", "SURVEY_BAD" ],
-            "maxLength" : 100,
-            "minLength" : 1,
             "pattern" : "SURVEY_ALL|SURVEY_GOOD|SURVEY_AVG|SURVEY_BAD"
           },
           "reply" : {
+            "description" : "Reply configured for the automatic transition",
             "type" : [ "string", "null" ],
             "enum" : [ "REPLY_ALL", "REPLY_PRIVATE", "REPLY_PUBLIC" ],
-            "maxLength" : 100,
-            "minLength" : 1,
             "pattern" : "REPLY_ALL|REPLY_PRIVATE|REPLY_PUBLIC"
           }
         }
       },
       "transitionsObjectForResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "isAutoTransition" : {
+            "description" : "Indicates whether the transition is automatic. Possible values: @true@ - transition is automatic, @false@ - transition is manual",
             "type" : [ "boolean", "null" ]
           },
           "before" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/beforeObjectForResponse"
+            "description" : "Before-transition configuration including accessors and criteria",
+            "$ref" : "#/components/schemas/beforeObjectForResponse"
           },
           "name" : {
+            "description" : "Name of the transition",
             "type" : [ "string", "null" ],
             "maxLength" : 30,
             "minLength" : 1,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "description" : {
+            "description" : "Description of the transition",
             "type" : [ "string", "null" ],
             "maxLength" : 1000,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])*"
           },
           "commonStates" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/commonStatesArray"
+            "description" : "States that share the common transition",
+            "$ref" : "#/components/schemas/commonStatesArray"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the transition",
+            "type" : [ "string", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "during" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/duringArrayForResponse"
+            "description" : "During-transition actions configured for the transition",
+            "$ref" : "#/components/schemas/duringArrayForResponse"
           },
           "after" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/afterObjectForResponse"
+            "description" : "After-transition actions configured for the transition",
+            "$ref" : "#/components/schemas/afterObjectForResponse"
           },
           "autoTransitionActions" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/autoTransitionActionsObject"
+            "description" : "Automatic transition action settings",
+            "$ref" : "#/components/schemas/autoTransitionActionsObject"
           },
           "isCommonTransition" : {
+            "description" : "Indicates whether the transition is a common transition. Possible values: @true@ - common transition shared across states, @false@ - specific transition between two states",
             "type" : [ "boolean", "null" ]
           }
         },
         "required" : [ "after", "autoTransitionActions", "before", "commonStates", "description", "during", "id", "isAutoTransition", "isCommonTransition", "name" ]
       },
       "transitionsArrayForResponse" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./blueprintTransitions.json#/components/schemas/transitionsObjectForResponse"
+          "$ref" : "#/components/schemas/transitionsObjectForResponse"
         }
       },
       "criteriaDetailsObject" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "criteria" : {
+            "description" : "Criteria configured for the before-transition",
             "$ref" : "./blueprintCriteria.json#/components/schemas/criteriaObject"
           }
         },
         "required" : [ "criteria" ]
       },
       "accessorsBeforeTransitionObject" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "owners" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/ownersObject"
+            "description" : "Owners configured for the transition",
+            "$ref" : "#/components/schemas/ownersObject"
           },
           "sharedDeptAccessors" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/sharedDeptAccessorsArray"
+            "description" : "Departments with which the transition is shared",
+            "$ref" : "#/components/schemas/sharedDeptAccessorsArray"
           }
         },
         "required" : [ "owners", "sharedDeptAccessors" ]
       },
       "beforeObject" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "accessors" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/accessorsBeforeTransitionObject"
+            "description" : "Accessors with whom the transition is shared",
+            "$ref" : "#/components/schemas/accessorsBeforeTransitionObject"
           },
           "criteriaDetails" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/criteriaDetailsObject"
+            "description" : "Criteria configuration for the before-transition",
+            "$ref" : "#/components/schemas/criteriaDetailsObject"
           }
         },
         "required" : [ "accessors", "criteriaDetails" ]
       },
       "messageObject" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "message" : {
+            "description" : "Message configured for the action",
             "type" : [ "string", "null" ],
             "maxLength" : 255,
             "minLength" : 0
@@ -615,211 +983,942 @@
         "required" : [ "message" ]
       },
       "fieldUpdatesObjectsObj" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "fieldUpdates" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/fieldUpdatesObject"
+            "description" : "Field update details configured for the action",
+            "$ref" : "#/components/schemas/fieldUpdatesObject"
           },
           "isMandatory" : {
+            "description" : "Indicates whether the action is mandatory. Possible values: @true@ - action is mandatory, @false@ - action is optional",
             "type" : [ "boolean", "null" ]
           }
         },
         "required" : [ "fieldUpdates", "isMandatory" ]
       },
       "otherActionsObject" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "otherActions" : {
+            "description" : "Other actions configured for the transition",
             "type" : [ "string", "null" ],
             "enum" : [ "REPLY", "BUG", "COMMENT", "RESOLUTION", "APPROVAL", "ATTACHMENT", "SHARING", "FIELD_UPDATE" ],
-            "maxLength" : 100,
-            "minLength" : 0,
             "pattern" : "REPLY|BUG|COMMENT|RESOLUTION|APPROVAL|ATTACHMENT|SHARING|FIELD_UPDATE"
           },
           "isMandatory" : {
+            "description" : "Indicates whether the action is mandatory. Possible values: @true@ - action is mandatory, @false@ - action is optional",
             "type" : [ "boolean", "null" ]
           }
         },
         "required" : [ "isMandatory", "otherActions" ]
       },
       "duringArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
           "oneOf" : [ {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/messageObject"
+            "$ref" : "#/components/schemas/messageObject"
           }, {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/fieldUpdatesObjectsObj"
+            "$ref" : "#/components/schemas/fieldUpdatesObjectsObj"
           }, {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/otherActionsObject"
+            "$ref" : "#/components/schemas/otherActionsObject"
           } ]
         }
       },
       "alertObject" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "ids" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/alertIds"
+            "description" : "Unique IDs of the alerts configured for the action",
+            "$ref" : "#/components/schemas/alertIds"
           }
         },
         "required" : [ "ids" ]
       },
       "taskObject" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "ids" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/taskIds"
+            "description" : "Unique IDs of the tasks configured for the action",
+            "$ref" : "#/components/schemas/taskIds"
           }
         },
         "required" : [ "ids" ]
       },
       "fieldUpdateObject" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "ids" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/fieldUpdateIds"
+            "description" : "Unique IDs of the field updates configured for the action",
+            "$ref" : "#/components/schemas/fieldUpdateIds"
           }
         },
         "required" : [ "ids" ]
       },
       "customFunctionObject" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "ids" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/customFunctionIds"
+            "description" : "Unique IDs of the custom functions configured for the action",
+            "$ref" : "#/components/schemas/customFunctionIds"
           }
         },
         "required" : [ "ids" ]
       },
       "afterObject" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "fieldUpdate" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/fieldUpdateObject"
+            "description" : "Field update actions configured after the transition",
+            "$ref" : "#/components/schemas/fieldUpdateObject"
           },
           "task" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/taskObject"
+            "description" : "Task actions configured after the transition",
+            "$ref" : "#/components/schemas/taskObject"
           },
           "customFunction" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/customFunctionObject"
+            "description" : "Custom function actions configured after the transition",
+            "$ref" : "#/components/schemas/customFunctionObject"
           },
           "alert" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/alertObject"
+            "description" : "Alert actions configured after the transition",
+            "$ref" : "#/components/schemas/alertObject"
           }
         },
         "required" : [ "alert", "customFunction", "fieldUpdate", "task" ]
       },
       "transitionsObject" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "isAutoTransition" : {
+            "description" : "Indicates whether the transition is automatic. Possible values: @true@ - transition is automatic, @false@ - transition is manual",
             "type" : [ "boolean", "null" ]
           },
           "before" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/beforeObject"
+            "description" : "Before-transition configuration including accessors and criteria",
+            "$ref" : "#/components/schemas/beforeObject"
           },
           "name" : {
+            "description" : "Name of the transition",
             "type" : [ "string", "null" ],
             "maxLength" : 30,
             "minLength" : 1,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "description" : {
+            "description" : "Description of the transition",
             "type" : [ "string", "null" ],
             "maxLength" : 1000,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "commonStates" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/commonStatesArray"
+            "description" : "States that share the common transition",
+            "$ref" : "#/components/schemas/commonStatesArray"
           },
           "during" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/duringArray"
+            "description" : "During-transition actions configured for the transition",
+            "$ref" : "#/components/schemas/duringArray"
           },
           "after" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/afterObject"
+            "description" : "After-transition actions configured for the transition",
+            "$ref" : "#/components/schemas/afterObject"
           },
           "autoTransitionActions" : {
-            "$ref" : "./blueprintTransitions.json#/components/schemas/autoTransitionActionsObject"
+            "description" : "Automatic transition action settings",
+            "$ref" : "#/components/schemas/autoTransitionActionsObject"
           },
           "isCommonTransition" : {
+            "description" : "Indicates whether the transition is a common transition. Possible values: @true@ - common transition shared across states, @false@ - specific transition between two states",
             "type" : [ "boolean", "null" ]
           }
         },
         "required" : [ "after", "autoTransitionActions", "before", "commonStates", "description", "during", "isAutoTransition", "isCommonTransition", "name" ]
       },
       "transitionsArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./blueprintTransitions.json#/components/schemas/transitionsObject"
+          "$ref" : "#/components/schemas/transitionsObject"
         }
       },
       "transitionObjectWithName" : {
-        "type" : [ "null", "object" ],
+        "type" : "object",
         "additionalProperties" : false,
         "properties" : {
           "name" : {
-            "type" : [ "string", "null" ],
+            "description" : "Name of the transition",
+            "type" : "string",
             "maxLength" : 30,
             "minLength" : 1,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           }
         },
         "required" : [ "name" ]
-      }
-    },
-    "parameters" : {
-      "attachment_id" : {
-        "name" : "attachment_id",
-        "in" : "path",
-        "description" : "",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
+      },
+      "transitionFormResponse" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "formActions" : {
+            "description" : "Actions available in the transition form",
+            "$ref" : "#/components/schemas/formActionsArray"
+          },
+          "transitionId" : {
+            "description" : "Unique ID of the transition",
+            "type" : [ "string", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "continuousTransitions" : {
+            "description" : "Continuous transitions available from the current transition",
+            "$ref" : "#/components/schemas/continuousTransitionsArray"
+          },
+          "isContinuousTransition" : {
+            "description" : "Indicates whether the transition is continuous. Possible values: @true@ - transition is continuous, @false@ - transition is not continuous",
+            "type" : [ "boolean", "null" ]
+          },
+          "isContinuousBlueprint" : {
+            "description" : "Indicates whether the blueprint is continuous. Possible values: @true@ - blueprint is continuous, @false@ - blueprint is non-continuous",
+            "type" : [ "boolean", "null" ]
+          },
+          "isTransDraftEnabledForPortal" : {
+            "description" : "Indicates whether transition drafts are enabled for the portal. Possible values: @true@ - drafts are enabled for the portal, @false@ - drafts are not enabled for the portal",
+            "type" : [ "boolean", "null" ]
+          },
+          "draftDetails" : {
+            "description" : "Draft details for the transition form",
+            "$ref" : "#/components/schemas/draftDetailsObject"
+          }
+        },
+        "required" : [ "formActions" ]
+      },
+      "formActionsArray" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "oneOf" : [ {
+            "$ref" : "#/components/schemas/fieldUpdateFormAction"
+          }, {
+            "$ref" : "#/components/schemas/messageFormAction"
+          }, {
+            "$ref" : "#/components/schemas/replyFormAction"
+          }, {
+            "$ref" : "#/components/schemas/commentFormAction"
+          }, {
+            "$ref" : "#/components/schemas/resolutionFormAction"
+          }, {
+            "$ref" : "#/components/schemas/approvalFormAction"
+          }, {
+            "$ref" : "#/components/schemas/bugFormAction"
+          }, {
+            "$ref" : "#/components/schemas/attachmentFormAction"
+          }, {
+            "$ref" : "#/components/schemas/sharingFormAction"
+          } ]
+        }
+      },
+      "fieldUpdateFormAction" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "actionType" : {
+            "description" : "Type of the form action. Possible values: @FIELD_UPDATE@, @MESSAGE@, @REPLY@, @COMMENT@, @RESOLUTION@, @APPROVAL@, @BUG@, @ATTACHMENT@, @SHARING@",
+            "type" : [ "string" ],
+            "enum" : [ "FIELD_UPDATE" ]
+          },
+          "draftContent" : {
+            "description" : "Draft content saved for the action",
+            "type" : [ "object" ],
+            "additionalProperties" : false,
+            "properties" : {
+              "FIELD_UPDATE" : {
+                "description" : "Drafted field update values for the action",
+                "type" : [ "object" ],
+                "additionalProperties" : true,
+                "example" : {
+                  "status" : "Open_july"
+                }
+              }
+            },
+            "required" : [ "FIELD_UPDATE" ]
+          },
+          "fieldDetails" : {
+            "description" : "Field details for field update actions",
+            "$ref" : "#/components/schemas/fieldDetailsObject"
+          },
+          "isMandatory" : {
+            "description" : "Indicates whether the action is mandatory. Possible values: @true@ - action is mandatory, @false@ - action is optional",
+            "type" : [ "boolean", "null" ]
+          },
+          "errorMsg" : {
+            "description" : "Validation error message",
+            "type" : [ "string", "null" ],
+            "maxLength" : 1000,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "actionType", "isMandatory" ]
+      },
+      "messageFormAction" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "actionType" : {
+            "description" : "Type of the form action. Possible values: @FIELD_UPDATE@, @MESSAGE@, @REPLY@, @COMMENT@, @RESOLUTION@, @APPROVAL@, @BUG@, @ATTACHMENT@, @SHARING@",
+            "type" : [ "string" ],
+            "enum" : [ "MESSAGE" ]
+          },
+          "content" : {
+            "description" : "Content configured for the message action",
+            "type" : [ "string", "null" ],
+            "maxLength" : 1000,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "actionType", "content" ]
+      },
+      "replyFormAction" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "actionType" : {
+            "description" : "Type of the form action. Possible values: @FIELD_UPDATE@, @MESSAGE@, @REPLY@, @COMMENT@, @RESOLUTION@, @APPROVAL@, @BUG@, @ATTACHMENT@, @SHARING@",
+            "type" : [ "string" ],
+            "enum" : [ "REPLY" ]
+          },
+          "draftContent" : {
+            "description" : "Draft content saved for the action",
+            "type" : [ "object" ],
+            "additionalProperties" : false,
+            "properties" : {
+              "REPLY" : {
+                "description" : "Drafted reply content details for the action",
+                "$ref" : "#/components/schemas/replyDraftObject"
+              }
+            },
+            "required" : [ "REPLY" ]
+          },
+          "isMandatory" : {
+            "description" : "Indicates whether the action is mandatory. Possible values: @true@ - action is mandatory, @false@ - action is optional",
+            "type" : [ "boolean", "null" ]
+          }
+        },
+        "required" : [ "actionType", "isMandatory" ]
+      },
+      "commentFormAction" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "actionType" : {
+            "description" : "Type of the form action. Possible values: @FIELD_UPDATE@, @MESSAGE@, @REPLY@, @COMMENT@, @RESOLUTION@, @APPROVAL@, @BUG@, @ATTACHMENT@, @SHARING@",
+            "type" : [ "string" ],
+            "enum" : [ "COMMENT" ]
+          },
+          "draftContent" : {
+            "description" : "Draft content saved for the action",
+            "type" : [ "object" ],
+            "additionalProperties" : false,
+            "properties" : {
+              "COMMENT" : {
+                "description" : "Drafted comment details for the action",
+                "$ref" : "#/components/schemas/commentDraftObject"
+              }
+            },
+            "required" : [ "COMMENT" ]
+          },
+          "isMandatory" : {
+            "description" : "Indicates whether the action is mandatory. Possible values: @true@ - action is mandatory, @false@ - action is optional",
+            "type" : [ "boolean", "null" ]
+          }
+        },
+        "required" : [ "actionType", "isMandatory" ]
+      },
+      "resolutionFormAction" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "actionType" : {
+            "description" : "Type of the form action. Possible values: @FIELD_UPDATE@, @MESSAGE@, @REPLY@, @COMMENT@, @RESOLUTION@, @APPROVAL@, @BUG@, @ATTACHMENT@, @SHARING@",
+            "type" : [ "string" ],
+            "enum" : [ "RESOLUTION" ]
+          },
+          "draftContent" : {
+            "description" : "Draft content saved for the action",
+            "type" : [ "object" ],
+            "additionalProperties" : false,
+            "properties" : {
+              "RESOLUTION" : {
+                "description" : "Drafted resolution details for the action",
+                "$ref" : "#/components/schemas/resolutionDraftObject"
+              }
+            },
+            "required" : [ "RESOLUTION" ]
+          },
+          "isMandatory" : {
+            "description" : "Indicates whether the action is mandatory. Possible values: @true@ - action is mandatory, @false@ - action is optional",
+            "type" : [ "boolean", "null" ]
+          }
+        },
+        "required" : [ "actionType", "isMandatory" ]
+      },
+      "approvalFormAction" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "actionType" : {
+            "description" : "Type of the form action. Possible values: @FIELD_UPDATE@, @MESSAGE@, @REPLY@, @COMMENT@, @RESOLUTION@, @APPROVAL@, @BUG@, @ATTACHMENT@, @SHARING@",
+            "type" : [ "string" ],
+            "enum" : [ "APPROVAL" ]
+          },
+          "draftContent" : {
+            "description" : "Draft content saved for the action",
+            "type" : [ "object" ],
+            "additionalProperties" : false,
+            "properties" : {
+              "APPROVAL" : {
+                "description" : "Drafted approval details for the action",
+                "$ref" : "#/components/schemas/approvalDraftObject"
+              }
+            },
+            "required" : [ "APPROVAL" ]
+          },
+          "isMandatory" : {
+            "description" : "Indicates whether the action is mandatory. Possible values: @true@ - action is mandatory, @false@ - action is optional",
+            "type" : [ "boolean", "null" ]
+          }
+        },
+        "required" : [ "actionType", "isMandatory" ]
+      },
+      "bugFormAction" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "actionType" : {
+            "description" : "Type of the form action. Possible values: @FIELD_UPDATE@, @MESSAGE@, @REPLY@, @COMMENT@, @RESOLUTION@, @APPROVAL@, @BUG@, @ATTACHMENT@, @SHARING@",
+            "type" : [ "string" ],
+            "enum" : [ "BUG" ]
+          },
+          "isMandatory" : {
+            "description" : "Indicates whether the action is mandatory. Possible values: @true@ - action is mandatory, @false@ - action is optional",
+            "type" : [ "boolean", "null" ]
+          }
+        },
+        "required" : [ "actionType", "isMandatory" ]
+      },
+      "attachmentFormAction" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "actionType" : {
+            "description" : "Type of the form action. Possible values: @FIELD_UPDATE@, @MESSAGE@, @REPLY@, @COMMENT@, @RESOLUTION@, @APPROVAL@, @BUG@, @ATTACHMENT@, @SHARING@",
+            "type" : [ "string" ],
+            "enum" : [ "ATTACHMENT" ]
+          },
+          "draftContent" : {
+            "description" : "Draft content saved for the action",
+            "type" : [ "object" ],
+            "additionalProperties" : false,
+            "properties" : {
+              "ATTACHMENT" : {
+                "description" : "Drafted attachment details for the action",
+                "$ref" : "#/components/schemas/attachmentDraftObject"
+              }
+            },
+            "required" : [ "ATTACHMENT" ]
+          },
+          "isMandatory" : {
+            "description" : "Indicates whether the action is mandatory. Possible values: @true@ - action is mandatory, @false@ - action is optional",
+            "type" : [ "boolean", "null" ]
+          }
+        },
+        "required" : [ "actionType", "isMandatory" ]
+      },
+      "sharingFormAction" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "actionType" : {
+            "description" : "Type of the form action. Possible values: @SHARING@",
+            "type" : [ "string" ],
+            "enum" : [ "SHARING" ]
+          },
+          "draftContent" : {
+            "description" : "Draft content saved for the action",
+            "type" : [ "object" ],
+            "additionalProperties" : false,
+            "properties" : {
+              "SHARING" : {
+                "description" : "Drafted sharing details for the action",
+                "type" : [ "object" ],
+                "additionalProperties" : true
+              }
+            },
+            "required" : [ "SHARING" ]
+          },
+          "isMandatory" : {
+            "description" : "Indicates whether the action is mandatory. Possible values: @true@ - action is mandatory, @false@ - action is optional",
+            "type" : [ "boolean", "null" ]
+          }
+        },
+        "required" : [ "actionType", "isMandatory" ]
+      },
+      "replyDraftObject" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "cc" : {
+            "description" : "CC recipients of the reply",
+            "type" : [ "string", "null" ],
+            "maxLength" : 2000,
+            "minLength" : 0
+          },
+          "inReplyToThreadId" : {
+            "description" : "Unique ID of the thread to which the reply is sent",
+            "type" : [ "string", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "bcc" : {
+            "description" : "BCC recipients of the reply",
+            "type" : [ "string", "null" ],
+            "maxLength" : 2000,
+            "minLength" : 0
+          },
+          "attachments" : {
+            "description" : "Attachments included in the reply",
+            "$ref" : "#/components/schemas/attachmentDetailsArray"
+          },
+          "channel" : {
+            "description" : "Channel through which the reply is sent",
+            "type" : [ "string", "null" ],
+            "enum" : [ "EMAIL", "PHONE", "CHAT", "WEB" ],
+            "pattern" : "EMAIL|PHONE|CHAT|WEB"
+          },
+          "to" : {
+            "description" : "To recipients of the reply",
+            "type" : [ "string", "null" ],
+            "maxLength" : 2000,
+            "minLength" : 0
+          },
+          "isPrivate" : {
+            "description" : "Indicates whether the reply is private. Possible values: @true@ - reply is private, @false@ - reply is public",
+            "type" : [ "boolean", "null" ]
+          },
+          "fromEmailAddress" : {
+            "description" : "From email address of the reply",
+            "type" : [ "string", "null" ],
+            "maxLength" : 500,
+            "minLength" : 0
+          },
+          "contentType" : {
+            "description" : "Content type of the reply",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "content" : {
+            "description" : "Content of the reply",
+            "type" : [ "string", "null" ]
+          }
+        }
+      },
+      "commentDraftObject" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "isPublicComment" : {
+            "description" : "Indicates whether the comment is public. Possible values: @true@ - comment is public, @false@ - comment is private",
+            "type" : [ "boolean", "null" ]
+          },
+          "content" : {
+            "description" : "Content of the comment",
+            "type" : [ "string", "null" ]
+          },
+          "uploads" : {
+            "description" : "Uploads attached to the comment",
+            "$ref" : "#/components/schemas/uploadIdsArray"
+          }
+        }
+      },
+      "resolutionDraftObject" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "toNotifyContactForResolution" : {
+            "description" : "Indicates whether the contact must be notified about the resolution. Possible values: @true@ - notify the contact, @false@ - do not notify the contact",
+            "type" : [ "boolean", "null" ]
+          },
+          "content" : {
+            "description" : "Content of the resolution",
+            "type" : [ "string", "null" ]
+          }
+        }
+      },
+      "approvalDraftObject" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "subject" : {
+            "description" : "Subject of the approval",
+            "type" : [ "string", "null" ],
+            "maxLength" : 255,
+            "minLength" : 0
+          },
+          "description" : {
+            "description" : "Description of the approval",
+            "type" : [ "string", "null" ]
+          },
+          "approvers" : {
+            "description" : "Approvers configured for the approval",
+            "$ref" : "#/components/schemas/approversDetailsArray"
+          }
+        }
+      },
+      "attachmentDraftObject" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "uploads" : {
+            "description" : "Uploads attached as attachments",
+            "$ref" : "#/components/schemas/uploadDetailsArray"
+          }
+        }
+      },
+      "fieldDetailsObject" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "displayLabel" : {
+            "description" : "Display label of the field",
+            "type" : [ "string", "null" ],
+            "maxLength" : 255,
+            "minLength" : 0
+          },
+          "apiName" : {
+            "description" : "API name of the field",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "i18NLabel" : {
+            "description" : "Internationalized label of the field",
+            "type" : [ "string", "null" ],
+            "maxLength" : 255,
+            "minLength" : 0
+          },
+          "isEncryptedField" : {
+            "description" : "Indicates whether the field is encrypted. Possible values: @true@ - field is encrypted, @false@ - field is not encrypted",
+            "type" : [ "boolean", "null" ]
+          },
+          "allowedValues" : {
+            "description" : "Allowed values for the field",
+            "type" : [ "array", "null" ],
+            "items" : {
+              "type" : [ "string", "null" ]
+            }
+          },
+          "isCustomField" : {
+            "description" : "Indicates whether the field is a custom field. Possible values: @true@ - field is custom, @false@ - field is standard",
+            "type" : [ "boolean", "null" ]
+          },
+          "defaultValue" : {
+            "description" : "Default value of the field",
+            "type" : [ "string", "null" ]
+          },
+          "isSystemMandatory" : {
+            "description" : "Indicates whether the field is system-mandatory. Possible values: @true@ - field is system-mandatory, @false@ - field is not system-mandatory",
+            "type" : [ "boolean", "null" ]
+          },
+          "type" : {
+            "description" : "Data type of the field",
+            "type" : [ "string", "null" ],
+            "enum" : [ "Picklist", "Text", "Number", "Date", "DateTime", "Boolean", "Email", "URL", "Phone", "Textarea", "Decimal", "Currency", "Percent", "Checkbox", "Multiselect", "LookUp" ]
+          },
+          "restoreOnReplyValues" : {
+            "description" : "Values restored on reply",
+            "type" : [ "array", "null" ],
+            "items" : {
+              "type" : [ "string", "null" ]
+            }
+          },
+          "name" : {
+            "description" : "API name of the field",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "sortBy" : {
+            "description" : "Sort behavior of the field",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "id" : {
+            "description" : "Unique ID of the field",
+            "type" : [ "string", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "isRemovable" : {
+            "description" : "Indicates whether the field can be removed. Possible values: @true@ - field can be removed, @false@ - field cannot be removed",
+            "type" : [ "boolean", "null" ]
+          },
+          "maxLength" : {
+            "description" : "Maximum length supported by the field",
+            "type" : [ "integer", "null" ],
+            "format" : "int32"
+          },
+          "isMandatory" : {
+            "description" : "Indicates whether the action is mandatory. Possible values: @true@ - action is mandatory, @false@ - action is optional",
+            "type" : [ "boolean", "null" ]
+          }
+        }
+      },
+      "attachmentDetailsArray" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/attachmentDetailsObject"
+        }
+      },
+      "attachmentDetailsObject" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "size" : {
+            "description" : "Size of the attachment",
+            "type" : [ "string", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "name" : {
+            "description" : "Name of the attachment",
+            "type" : [ "string", "null" ],
+            "maxLength" : 255,
+            "minLength" : 0
+          },
+          "fileId" : {
+            "description" : "Unique ID of the attachment file",
+            "type" : [ "string", "null" ],
+            "maxLength" : 255,
+            "minLength" : 0
+          }
+        }
+      },
+      "uploadIdsArray" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "type" : [ "string", "null" ],
           "format" : "int64",
-          "description" : "",
           "pattern" : "([0-9]+)"
         }
       },
-      "ticket_id" : {
-        "name" : "ticket_id",
-        "in" : "path",
-        "description" : "",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "description" : "",
-          "pattern" : "([0-9]+)"
+      "uploadDetailsArray" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/uploadDetailsObject"
         }
       },
-      "transition_id" : {
-        "name" : "transition_id",
-        "in" : "path",
-        "description" : "",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "description" : "",
-          "pattern" : "([0-9]+)"
+      "uploadDetailsObject" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "isPublic" : {
+            "description" : "Indicates whether the upload is public. Possible values: @true@ - upload is public, @false@ - upload is private",
+            "type" : [ "boolean", "null" ]
+          },
+          "id" : {
+            "description" : "Unique ID of the upload",
+            "type" : [ "string", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }
+      },
+      "approversDetailsArray" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/approverDetailsObject"
+        }
+      },
+      "approverDetailsObject" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "approverId" : {
+            "description" : "Unique ID of the approver",
+            "type" : [ "string", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "approverName" : {
+            "description" : "Name of the approver",
+            "type" : [ "string", "null" ],
+            "maxLength" : 255,
+            "minLength" : 0
+          }
+        }
+      },
+      "continuousTransitionsArray" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/continuousTransitionObject"
+        }
+      },
+      "continuousTransitionObject" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "transitionId" : {
+            "description" : "Unique ID of the transition",
+            "type" : [ "string", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "transtionName" : {
+            "description" : "Name of the continuous transition",
+            "type" : [ "string", "null" ],
+            "maxLength" : 30,
+            "minLength" : 1,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          }
+        }
+      },
+      "draftDetailsObject" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "draftBy" : {
+            "description" : "User who saved the transition draft",
+            "$ref" : "#/components/schemas/draftByObject"
+          },
+          "draftAt" : {
+            "description" : "Time at which the draft was saved",
+            "type" : [ "string", "null" ],
+            "format" : "date-time"
+          }
+        }
+      },
+      "draftByObject" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "name" : {
+            "description" : "Name of the user who saved the draft",
+            "type" : [ "string", "null" ],
+            "maxLength" : 255,
+            "minLength" : 0
+          },
+          "id" : {
+            "description" : "Unique ID of the user who saved the draft",
+            "type" : [ "string", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }
+      },
+      "sharingDepartmentEntry" : {
+        "description" : "A single department-sharing entry used inside the SHARING action of a blueprint transition.",
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "departmentId" : {
+            "description" : "Identifier of the department the ticket is being shared with.",
+            "type" : [ "string", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "sharingType" : {
+            "description" : "Access level granted to the department. Accepted values: READ_ONLY (read-only access), READ_WRITE (read and write access), RESTRICTED_ACCESS (custom restricted access).",
+            "type" : [ "string", "null" ],
+            "enum" : [ "READ_ONLY", "READ_WRITE", "RESTRICTED_ACCESS" ],
+            "pattern" : "READ_ONLY|READ_WRITE|RESTRICTED_ACCESS"
+          }
+        },
+        "required" : [ "departmentId", "sharingType" ]
+      },
+      "sharingActionObject" : {
+        "description" : "Payload for the SHARING action of a blueprint transition. Lists every department the ticket should be shared with and the corresponding access level.",
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "departments" : {
+            "description" : "Departments to share the ticket with as part of this transition.",
+            "type" : [ "array", "null" ],
+            "items" : {
+              "$ref" : "#/components/schemas/sharingDepartmentEntry"
+            }
+          }
+        }
+      },
+      "fieldUpdateActionObject" : {
+        "description" : "Payload for the FIELD_UPDATE action of a blueprint transition. Keys are ticket field API names (for example priority, status, classification, or custom field API names) and values are the new values to be applied. Values can be string, number, boolean, array, or null depending on the field type.",
+        "type" : [ "object", "null" ],
+        "additionalProperties" : {
+          "type" : [ "string", "number", "boolean", "array", "null" ],
+          "items" : {
+            "type" : [ "string" ]
+          }
+        }
+      },
+      "performTransitionRequest" : {
+        "description" : "Request payload for performing a blueprint transition. Each property corresponds to a transition form-action category and is required only when the blueprint configuration mandates that action for the transition. The body can be empty for transitions with no configured actions.",
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "APPROVAL" : {
+            "$ref" : "#/components/schemas/approvalDraftObject"
+          },
+          "RESOLUTION" : {
+            "$ref" : "#/components/schemas/resolutionDraftObject"
+          },
+          "ATTACHMENT" : {
+            "$ref" : "#/components/schemas/attachmentDraftObject"
+          },
+          "REPLY" : {
+            "$ref" : "#/components/schemas/replyDraftObject"
+          },
+          "COMMENT" : {
+            "$ref" : "#/components/schemas/commentDraftObject"
+          },
+          "SHARING" : {
+            "$ref" : "#/components/schemas/sharingActionObject"
+          },
+          "FIELD_UPDATE" : {
+            "$ref" : "#/components/schemas/fieldUpdateActionObject"
+          }
+        }
+      },
+      "performTransitionResponseObject" : {
+        "description" : "Response returned after a blueprint transition is performed. Reports any department change resulting from the transition.",
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "departmentChanged" : {
+            "description" : "Indicates whether the ticket department changed as a result of performing the transition.",
+            "type" : [ "boolean", "null" ]
+          },
+          "newDepartmentId" : {
+            "description" : "Identifier of the new department if the transition moved the ticket to a different department.",
+            "type" : [ "string", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

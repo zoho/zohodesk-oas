@@ -8,8 +8,8 @@
     "/api/v1/dataSharingRules" : {
       "get" : {
         "tags" : [ "SharingRule" ],
-        "summary" : "Get data sharing rules",
-        "description" : "This API fetches the different data sharing rules configured in your help desk portal.",
+        "summary" : "Get Data Sharing Rules",
+        "description" : "Retrieves the data sharing rules configured in the help desk portal.<p><b>Note:</b> These rules control user permissions to view or edit resources across modules in Zoho Desk.</p>",
         "operationId" : "getDataSharingRules",
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -20,14 +20,15 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.permissions.READ", "Desk.settings.READ" ]
         } ],
-        "x-audience" : [ "external-public" ]
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
       },
       "patch" : {
         "tags" : [ "SharingRule" ],
-        "summary" : "Update data sharing rules",
-        "description" : "This API updates the data sharing rules configured in your help desk portal.",
+        "summary" : "Update Data Sharing Rules",
+        "description" : "Updates the data sharing rules configured in the help desk portal.<p><b>Note:</b> These rules control user permissions to view or edit resources across modules in Zoho Desk.</p>",
         "operationId" : "updateDataSharingRules",
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -41,72 +42,116 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.permissions.UPDATE", "Desk.settings.UPDATE" ]
         } ],
-        "x-audience" : [ "external-public" ]
+        "x-audience" : [ "external-public" ],
+        "x-mcp-ready" : true
       }
     }
   },
   "components" : {
+    "schemas" : {
+      "sharingRuleResponseSchema" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "tickets" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "public", "private", "public read only" ],
+            "description" : "Data sharing rule related to tickets"
+          },
+          "calls" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "public", "private", "public read only" ],
+            "description" : "Data sharing rule related to calls"
+          },
+          "accounts" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "public", "private", "public read only" ],
+            "description" : "Data sharing rule related to accounts"
+          },
+          "contracts" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "public", "private", "public read only" ],
+            "description" : "Data sharing rule related to SLA contracts"
+          },
+          "contacts" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "public", "private", "public read only" ],
+            "description" : "Data sharing rule related to contacts"
+          },
+          "tasks" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "public", "private", "public read only" ],
+            "description" : "Data sharing rule related to tasks"
+          },
+          "events" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "public", "private", "public read only" ],
+            "description" : "Data sharing rule related to events"
+          },
+          "products" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "public", "private", "public read only" ],
+            "description" : "Data sharing rule related to products"
+          }
+        },
+        "required" : [ "accounts", "calls", "contacts", "contracts", "events", "products", "tasks", "tickets" ]
+      },
+      "sharingRuleRequestSchema" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "tickets" : {
+            "type" : [ "string" ],
+            "enum" : [ "public", "private", "public read only" ],
+            "description" : "Data sharing rule related to tickets"
+          },
+          "calls" : {
+            "type" : [ "string" ],
+            "enum" : [ "public", "private", "public read only" ],
+            "description" : "Data sharing rule related to calls"
+          },
+          "accounts" : {
+            "type" : [ "string" ],
+            "enum" : [ "public", "private", "public read only" ],
+            "description" : "Data sharing rule related to accounts"
+          },
+          "contracts" : {
+            "type" : [ "string" ],
+            "enum" : [ "public", "private", "public read only" ],
+            "description" : "Data sharing rule related to SLA contracts"
+          },
+          "contacts" : {
+            "type" : [ "string" ],
+            "enum" : [ "public", "private", "public read only" ],
+            "description" : "Data sharing rule related to contacts"
+          },
+          "tasks" : {
+            "type" : [ "string" ],
+            "enum" : [ "public", "private", "public read only" ],
+            "description" : "Data sharing rule related to tasks"
+          },
+          "events" : {
+            "type" : [ "string" ],
+            "enum" : [ "public", "private", "public read only" ],
+            "description" : "Data sharing rule related to events"
+          },
+          "products" : {
+            "type" : [ "string" ],
+            "enum" : [ "public", "private", "public read only" ],
+            "description" : "Data sharing rule related to products"
+          }
+        }
+      }
+    },
     "responses" : {
       "sharingRuleResponse" : {
         "description" : "sharingRuleResponse template definitions",
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
-              "additionalProperties" : false,
-              "properties" : {
-                "tickets" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "public", "private", "public read only" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                },
-                "calls" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "public", "private", "public read only" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                },
-                "accounts" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "public", "private", "public read only" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                },
-                "contracts" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "public", "private", "public read only" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                },
-                "contacts" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "public", "private", "public read only" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                },
-                "tasks" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "public", "private", "public read only" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                },
-                "events" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "public", "private", "public read only" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                },
-                "products" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "public", "private", "public read only" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                }
-              },
-              "required" : [ "accounts", "calls", "contacts", "contracts", "events", "products", "tasks", "tickets" ]
+              "$ref" : "#/components/schemas/sharingRuleResponseSchema"
             },
             "examples" : {
               "Valid responses Definitions" : {
@@ -131,58 +176,7 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
-              "additionalProperties" : false,
-              "properties" : {
-                "tickets" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "public", "private", "public read only" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                },
-                "calls" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "public", "private", "public read only" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                },
-                "accounts" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "public", "private", "public read only" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                },
-                "contracts" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "public", "private", "public read only" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                },
-                "contacts" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "public", "private", "public read only" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                },
-                "tasks" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "public", "private", "public read only" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                },
-                "events" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "public", "private", "public read only" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                },
-                "products" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "public", "private", "public read only" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                }
-              }
+              "$ref" : "#/components/schemas/sharingRuleRequestSchema"
             },
             "examples" : {
               "Valid requestBody Definitions" : {
@@ -203,6 +197,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

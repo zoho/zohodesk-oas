@@ -12,6 +12,21 @@
         "description" : "This API lists the files attached to a task.",
         "operationId" : "getTaskAttachments",
         "parameters" : [ {
+          "name" : "taskId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : ""
+          },
+          "description" : ""
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        }, {
           "name" : "include",
           "in" : "query",
           "description" : "",
@@ -73,10 +88,6 @@
             "maxLength" : 100,
             "minLength" : 0
           }
-        }, {
-          "$ref" : "#/components/parameters/taskId"
-        }, {
-          "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
           "204" : {
@@ -87,6 +98,8 @@
           }
         },
         "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.activities.tasks.READ", "Desk.tasks.READ" ]
+        }, {
           "iam-oauth2-schema" : [ "Desk.tasks.UPDATE" ]
         } ],
         "x-audience" : [ "external-public" ]
@@ -97,7 +110,18 @@
         "description" : "This API attaches a file to a task",
         "operationId" : "createTaskAttachment",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/taskId"
+          "name" : "taskId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : ""
+          },
+          "description" : ""
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -105,15 +129,16 @@
           "content" : {
             "multipart/form-data" : {
               "schema" : {
-                "type" : "object",
+                "type" : [ "object" ],
                 "properties" : {
                   "file" : {
-                    "type" : "string",
+                    "type" : [ "string" ],
                     "format" : "binary",
                     "description" : ""
                   }
                 },
-                "required" : [ "file" ]
+                "required" : [ "file" ],
+                "additionalProperties" : false
               }
             }
           }
@@ -127,6 +152,8 @@
           }
         },
         "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.activities.tasks.UPDATE", "Desk.tasks.UPDATE" ]
+        }, {
           "iam-oauth2-schema" : [ "Desk.tasks.UPDATE" ]
         } ],
         "x-audience" : [ "external-public" ]
@@ -138,6 +165,57 @@
         "summary" : "Delete Task attachment",
         "description" : "This API removes an attachment from a task.",
         "operationId" : "deleteTaskAttachment",
+        "parameters" : [ {
+          "name" : "taskId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : ""
+          },
+          "description" : ""
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        }, {
+          "name" : "attachmentId",
+          "in" : "path",
+          "description" : "",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "null", "integer" ],
+            "format" : "int64",
+            "description" : "",
+            "pattern" : "([0-9]+)"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.activities.tasks.UPDATE", "Desk.tasks.UPDATE" ]
+        }, {
+          "iam-oauth2-schema" : [ "Desk.tasks.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/tasks/{taskId}/attachments/{attachmentId}/content" : {
+      "get" : {
+        "tags" : [ "TaskAttachment" ],
+        "summary" : "Delete Task attachment",
+        "description" : "This API removes an attachment from a task.",
+        "operationId" : "viewTaskAttachment",
         "parameters" : [ {
           "name" : "attachmentId",
           "in" : "path",
@@ -152,16 +230,24 @@
             "pattern" : "([0-9]+)"
           }
         }, {
-          "$ref" : "#/components/parameters/taskId"
+          "name" : "taskId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : ""
+          },
+          "description" : ""
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
           "200" : {
-            "$ref" : "./Common.json#/components/responses/emptyResponse"
-          },
-          "403" : {
-            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+            "$ref" : "#/components/responses/attachmentResponse"
           }
         },
         "security" : [ {
@@ -174,61 +260,61 @@
   "components" : {
     "schemas" : {
       "attachmentResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "previewurl" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "maxLength" : 16000000,
             "minLength" : 0,
-            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+            "description" : ""
           },
           "size" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "description" : "",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : ""
           },
           "creatorId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "description" : "",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : ""
           },
           "name" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "maxLength" : 100,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : ""
           },
           "createdTime" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+            "description" : ""
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "description" : "",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : ""
           },
           "href" : {
             "type" : [ "string", "null" ],
-            "description" : "",
             "maxLength" : 16000000,
             "minLength" : 0,
-            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+            "description" : ""
           }
         },
         "required" : [ "createdTime", "creatorId", "href", "id", "name", "previewurl", "size" ]
       },
       "data" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./TaskAttachment.json#/components/schemas/attachmentResponse"
+          "$ref" : "#/components/schemas/attachmentResponse"
         }
       }
     },
@@ -239,6 +325,65 @@
           "application/json" : {
             "schema" : {
               "allOf" : [ {
+                "type" : [ "object" ],
+                "properties" : {
+                  "data" : {
+                    "type" : [ "array" ],
+                    "items" : {
+                      "type" : [ "object" ],
+                      "properties" : {
+                        "creator" : {
+                          "type" : [ "object", "null" ],
+                          "additionalProperties" : false,
+                          "maxProperties" : 5,
+                          "minProperties" : 5,
+                          "properties" : {
+                            "firstName" : {
+                              "type" : [ "string", "null" ],
+                              "maxLength" : 40,
+                              "minLength" : 0
+                            },
+                            "lastName" : {
+                              "type" : [ "string", "null" ],
+                              "maxLength" : 200,
+                              "minLength" : 0
+                            },
+                            "photoURL" : {
+                              "type" : [ "string", "null" ],
+                              "maxLength" : 100,
+                              "minLength" : 0,
+                              "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+                            },
+                            "id" : {
+                              "type" : [ "string", "integer", "null" ],
+                              "format" : "int64",
+                              "pattern" : "([0-9]+)"
+                            },
+                            "email" : {
+                              "type" : [ "string", "null" ],
+                              "maxLength" : 255,
+                              "minLength" : 0,
+                              "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'\\&\\~]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+                            }
+                          },
+                          "required" : [ "email", "firstName", "id", "lastName", "photoURL" ]
+                        }
+                      },
+                      "additionalProperties" : false
+                    }
+                  }
+                },
+                "additionalProperties" : false
+              }, {
+                "type" : [ "object", "null" ],
+                "additionalProperties" : false,
+                "properties" : {
+                  "data" : {
+                    "$ref" : "#/components/schemas/data"
+                  }
+                },
+                "required" : [ "data" ]
+              }, {
                 "type" : "object",
                 "properties" : {
                   "data" : {
@@ -316,53 +461,53 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "previewurl" : {
                   "type" : [ "string", "null" ],
-                  "description" : "",
                   "maxLength" : 16000000,
                   "minLength" : 0,
-                  "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+                  "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+                  "description" : ""
                 },
                 "size" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
-                  "description" : "",
-                  "pattern" : "([0-9]+)"
+                  "pattern" : "([0-9]+)",
+                  "description" : ""
                 },
                 "creatorId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
-                  "description" : "",
-                  "pattern" : "([0-9]+)"
+                  "pattern" : "([0-9]+)",
+                  "description" : ""
                 },
                 "name" : {
                   "type" : [ "string", "null" ],
-                  "description" : "",
                   "maxLength" : 100,
-                  "minLength" : 0
+                  "minLength" : 0,
+                  "description" : ""
                 },
                 "createdTime" : {
                   "type" : [ "string", "null" ],
-                  "description" : "",
                   "maxLength" : 100,
                   "minLength" : 0,
-                  "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+                  "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+                  "description" : ""
                 },
                 "id" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
-                  "description" : "",
-                  "pattern" : "([0-9]+)"
+                  "pattern" : "([0-9]+)",
+                  "description" : ""
                 },
                 "href" : {
                   "type" : [ "string", "null" ],
-                  "description" : "",
                   "maxLength" : 16000000,
                   "minLength" : 0,
-                  "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+                  "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+                  "description" : ""
                 }
               },
               "required" : [ "createdTime", "creatorId", "href", "id", "name", "previewurl", "size" ]
@@ -372,27 +517,23 @@
                 "value" : { }
               }
             }
+          },
+          "image/jpeg" : {
+            "schema" : {
+              "type" : "string",
+              "format" : "binary"
+            }
           }
         }
       }
     },
-    "parameters" : {
-      "taskId" : {
-        "name" : "taskId",
-        "in" : "path",
-        "description" : "",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "description" : "",
-          "pattern" : "([0-9]+)"
-        }
-      }
-    },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

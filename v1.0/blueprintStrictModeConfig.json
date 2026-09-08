@@ -8,16 +8,15 @@
   "components" : {
     "schemas" : {
       "actionsArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
           "type" : [ "string", "null" ],
           "enum" : [ "REPLY", "BUG", "COMMENT", "RESOLUTION", "APPROVAL", "ATTACHMENT", "SHARING" ],
-          "minLength" : 0,
           "pattern" : "REPLY|BUG|COMMENT|RESOLUTION|APPROVAL|ATTACHMENT|SHARING"
         }
       },
       "fieldsArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
           "type" : [ "string", "null" ],
           "maxLength" : 100,
@@ -26,55 +25,60 @@
         }
       },
       "strictModeConfigObjectForGetAppliedBlueprintDetails" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "strictModeType" : {
             "type" : [ "string", "null" ],
             "enum" : [ "FULL_RESTRICTION", "SELECTIVE_RESTRICTION", "SELECTIVE_EXCLUSION" ],
-            "maxLength" : 100,
-            "minLength" : 1,
             "pattern" : "FULL_RESTRICTION|SELECTIVE_RESTRICTION|SELECTIVE_EXCLUSION"
           },
           "fields" : {
-            "$ref" : "./blueprintStrictModeConfig.json#/components/schemas/fieldsArray"
+            "$ref" : "#/components/schemas/fieldsArray"
           },
           "actions" : {
-            "$ref" : "./blueprintStrictModeConfig.json#/components/schemas/actionsArray"
+            "$ref" : "#/components/schemas/actionsArray"
           }
         },
-        "required" : [ "actions", "fields", "strictModeType" ]
+        "required" : [ ]
       },
       "fieldIdsArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "type" : [ "string", "null", "integer" ],
+          "type" : [ "string", "integer", "null" ],
           "format" : "int64",
           "pattern" : "([0-9]+)"
         }
       },
       "strictModeConfigObject" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "strictModeType" : {
-            "type" : [ "string", "null" ],
+            "description" : "Strict mode type. Possible values: @full restricted@, @selective restricted@, @selective exclusion@",
+            "type" : "string",
             "enum" : [ "FULL_RESTRICTION", "SELECTIVE_RESTRICTION", "SELECTIVE_EXCLUSION" ],
-            "maxLength" : 100,
-            "minLength" : 1,
             "pattern" : "FULL_RESTRICTION|SELECTIVE_RESTRICTION|SELECTIVE_EXCLUSION"
           },
           "actions" : {
-            "$ref" : "./blueprintStrictModeConfig.json#/components/schemas/actionsArray"
+            "description" : "Actions to exclude from strict mode",
+            "$ref" : "#/components/schemas/actionsArray"
           },
           "fieldIds" : {
-            "$ref" : "./blueprintStrictModeConfig.json#/components/schemas/fieldIdsArray"
+            "description" : "Field IDs to exclude from strict mode",
+            "$ref" : "#/components/schemas/fieldIdsArray"
           }
         },
         "required" : [ "actions", "fieldIds", "strictModeType" ]
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

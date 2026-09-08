@@ -9,14 +9,15 @@
       "get" : {
         "tags" : [ "AgentPresence" ],
         "summary" : "Get Agent Availability Configuration",
-        "description" : "This API fetches the agent availability setting configured in your help desk portal. ",
-        "operationId" : "getConfig",
+        "description" : "A limit can be set to determine how long an agent can remain inactive before their availability automatically changes to offline. Inactivity is defined when there is no interaction with the application, keystrokes or mouse movements. If no activity is detected within the specified time, the system automatically marks the agent offline. This API fetches the agent availability setting configured in your help desk portal",
+        "operationId" : "getAgentAvailabilityConfig",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
           "200" : {
-            "$ref" : "#/components/responses/getConfig"
+            "$ref" : "#/components/responses/getAgentAvailabilityConfig"
           }
         },
         "security" : [ {
@@ -27,13 +28,14 @@
       "post" : {
         "tags" : [ "AgentPresence" ],
         "summary" : "Update Agent Availability Configuration",
-        "description" : "This API updates the agent availability setting configured in your help desk portal.",
-        "operationId" : "updateConfig",
+        "description" : "A limit can be set to determine how long an agent can remain inactive before their availability automatically changes to offline. Inactivity is defined when there is no interaction with the application, keystrokes or mouse movements. If no activity is detected within the specified time, the system automatically marks the agent offline. This API updates the agent availability setting configured in your help desk portal",
+        "operationId" : "updateAgentAvailabilityConfig",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/getConfig"
+          "$ref" : "#/components/requestBodies/updateAgentAvailabilityConfig"
         },
         "responses" : {
           "204" : {
@@ -52,27 +54,47 @@
         "summary" : "Get Offline Agents",
         "description" : "This API lists the agents who are currently offline in a particular department.",
         "operationId" : "getOfflineAgents",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
-          "description" : "Key that includes additional, channel-specific information. Values allowed are: mailStatus, phoneStatus, phoneMode, chatStatus, and presenceStatus",
+          "description" : "Comma-separated list of additional channel-specific fields to include in the response. Allowed values: chatStatus, mailStatus, phoneStatus, presenceStatus, phoneMode. Example single value: \"mailStatus\". Example multiple values: \"chatStatus,mailStatus,phoneStatus\".",
           "required" : false,
-          "style" : "simple",
-          "explode" : true,
+          "style" : "form",
+          "explode" : false,
           "schema" : {
-            "type" : [ "null", "array" ],
-            "description" : "Key that includes additional, channel-specific information. Values allowed are: @mailStatus@, @phoneStatus@, @phoneMode@, @chatStatus@, and @presenceStatus@.",
-            "items" : {
-              "type" : "string",
-              "enum" : [ "chatStatus", "mailStatus", "phoneStatus", "presenceStatus", "phoneMode" ]
-            },
-            "maxItems" : 5,
-            "uniqueItems" : true
+            "type" : [ "string" ],
+            "description" : "Comma-separated list of channel-specific fields to include. Allowed values: chatStatus, mailStatus, phoneStatus, presenceStatus, phoneMode.",
+            "pattern" : "^(chatStatus|mailStatus|phoneStatus|presenceStatus|phoneMode)(,(chatStatus|mailStatus|phoneStatus|presenceStatus|phoneMode))*$",
+            "example" : "chatStatus,mailStatus,phoneStatus"
           }
         }, {
-          "$ref" : "#/components/parameters/departmentId"
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "ID of the department from which the availability details should be fetched. To include all accessible departments, pass the value of this key as @-1@.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/limit"
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of agents to list. The default value is 20 and the maximum value allowed is 6000.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "maximum" : 6000,
+            "default" : 20
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -96,27 +118,47 @@
         "summary" : "Get Current Availability",
         "description" : "This API lists the current availability of agents in a particular department.",
         "operationId" : "getCurrentAvailability",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
-          "description" : "Key that includes additional, channel-specific information. Values allowed are: mailStatus, phoneStatus, phoneMode, chatStatus, and presenceStatus",
+          "description" : "Comma-separated list of additional channel-specific fields to include in the response. Allowed values: chatStatus, mailStatus, phoneStatus, presenceStatus, phoneMode. Example single value: \"mailStatus\". Example multiple values: \"chatStatus,mailStatus,phoneStatus\".",
           "required" : false,
-          "style" : "simple",
-          "explode" : true,
+          "style" : "form",
+          "explode" : false,
           "schema" : {
-            "type" : "array",
-            "description" : "Key that includes additional, channel-specific information. Values allowed are: @mailStatus@, @phoneStatus@, @phoneMode@, @chatStatus@, and @presenceStatus@.",
-            "items" : {
-              "type" : "string",
-              "enum" : [ "chatStatus", "mailStatus", "phoneStatus", "presenceStatus", "phoneMode" ]
-            },
-            "maxItems" : 5,
-            "uniqueItems" : true
+            "type" : [ "string" ],
+            "description" : "Comma-separated list of channel-specific fields to include. Allowed values: chatStatus, mailStatus, phoneStatus, presenceStatus, phoneMode.",
+            "pattern" : "^(chatStatus|mailStatus|phoneStatus|presenceStatus|phoneMode)(,(chatStatus|mailStatus|phoneStatus|presenceStatus|phoneMode))*$",
+            "example" : "chatStatus,mailStatus,phoneStatus"
           }
         }, {
-          "$ref" : "#/components/parameters/departmentId"
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "ID of the department from which the availability details should be fetched. To include all accessible departments, pass the value of this key as @-1@.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/limit"
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of agents to list. The default and the maximum value allowed is 50.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "maximum" : 50,
+            "default" : 50
+          }
         }, {
           "name" : "from",
           "in" : "query",
@@ -125,10 +167,12 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "integer" ],
             "format" : "int32",
-            "description" : "Index number, starting from which the agents must be fetched. The default value is 0 and the maximum value allowed is 5999.",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "minimum" : 0,
+            "maximum" : 5999,
+            "default" : 0
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -153,27 +197,47 @@
         "summary" : "Get Online Agents",
         "description" : "This API lists the agents who are currently online in a particular department.",
         "operationId" : "getOnlineAgents",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
-          "description" : "Key that includes additional, channel-specific information. Values allowed are: mailStatus, phoneStatus, phoneMode, chatStatus, and presenceStatus",
+          "description" : "Comma-separated list of additional channel-specific fields to include in the response. Allowed values: chatStatus, mailStatus, phoneStatus, presenceStatus, phoneMode. Example single value: \"mailStatus\". Example multiple values: \"chatStatus,mailStatus,phoneStatus\".",
           "required" : false,
-          "style" : "simple",
-          "explode" : true,
+          "style" : "form",
+          "explode" : false,
           "schema" : {
-            "type" : "array",
-            "description" : "Key that includes additional, channel-specific information. Values allowed are: @mailStatus@, @phoneStatus@, @phoneMode@, @chatStatus@, and @presenceStatus@.",
-            "items" : {
-              "type" : "string",
-              "enum" : [ "chatStatus", "mailStatus", "phoneStatus", "presenceStatus", "phoneMode" ]
-            },
-            "maxItems" : 5,
-            "uniqueItems" : true
+            "type" : [ "string" ],
+            "description" : "Comma-separated list of channel-specific fields to include. Allowed values: chatStatus, mailStatus, phoneStatus, presenceStatus, phoneMode.",
+            "pattern" : "^(chatStatus|mailStatus|phoneStatus|presenceStatus|phoneMode)(,(chatStatus|mailStatus|phoneStatus|presenceStatus|phoneMode))*$",
+            "example" : "chatStatus,mailStatus,phoneStatus"
           }
         }, {
-          "$ref" : "#/components/parameters/departmentId"
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "ID of the department from which the availability details should be fetched. To include all accessible departments, pass the value of this key as @-1@.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/limit"
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of agents to list. The default value is 20 and the maximum value allowed is 6000.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "maximum" : 6000,
+            "default" : 20
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -195,27 +259,25 @@
   "components" : {
     "schemas" : {
       "presenceObject" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "agentId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "status" : {
             "type" : [ "string", "null" ],
-            "enum" : [ "ONLINE", "OFFLINE" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "ONLINE", "OFFLINE" ]
           }
         },
         "required" : [ "agentId", "status" ]
       },
       "data" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./AgentPresence.json#/components/schemas/presenceObject"
+          "$ref" : "#/components/schemas/presenceObject"
         }
       }
     },
@@ -226,59 +288,51 @@
           "application/json" : {
             "schema" : {
               "allOf" : [ {
-                "type" : "object",
+                "type" : [ "object" ],
                 "properties" : {
                   "data" : {
-                    "type" : "array",
+                    "type" : [ "array" ],
                     "items" : {
-                      "type" : "object",
+                      "type" : [ "object" ],
                       "properties" : {
                         "chatStatus" : {
                           "type" : [ "string", "null" ],
-                          "enum" : [ "ONLINE", "OFFLINE" ],
-                          "maxLength" : 100,
-                          "minLength" : 0
+                          "enum" : [ "ONLINE", "OFFLINE" ]
                         },
                         "phoneMode" : {
                           "type" : [ "string", "null" ],
-                          "enum" : [ "PHONE", "WEB", null ],
-                          "maxLength" : 100,
-                          "minLength" : 0
+                          "enum" : [ "PHONE", "WEB", null ]
                         },
                         "phoneStatus" : {
                           "type" : [ "string", "null" ],
-                          "enum" : [ "ONLINE", "OFFLINE", "BUSY" ],
-                          "maxLength" : 100,
-                          "minLength" : 0
+                          "enum" : [ "ONLINE", "OFFLINE", "BUSY" ]
                         },
                         "mailStatus" : {
                           "type" : [ "string", "null" ],
-                          "enum" : [ "ONLINE", "OFFLINE" ],
-                          "maxLength" : 100,
-                          "minLength" : 0
+                          "enum" : [ "ONLINE", "OFFLINE" ]
                         },
                         "presenceStatus" : {
                           "type" : [ "string", "null" ],
-                          "enum" : [ "ONLINE", "OFFLINE" ],
-                          "maxLength" : 100,
-                          "minLength" : 0
+                          "enum" : [ "ONLINE", "OFFLINE" ]
                         }
-                      }
+                      },
+                      "additionalProperties" : false
                     }
                   }
-                }
+                },
+                "additionalProperties" : false
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "data" : {
-                    "$ref" : "./AgentPresence.json#/components/schemas/data"
+                    "$ref" : "#/components/schemas/data"
                   },
                   "hasMore" : {
                     "type" : [ "boolean", "null" ]
                   },
                   "totalAgentsCount" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int32",
                     "pattern" : "([0-9]+)"
                   }
@@ -314,16 +368,16 @@
           }
         }
       },
-      "getConfig" : {
-        "description" : "getConfig template definitions",
+      "getAgentAvailabilityConfig" : {
+        "description" : "getAgentAvailabilityConfig template definitions",
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "agentIdleTime" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int32",
                   "maximum" : 360,
                   "minimum" : 1,
@@ -347,53 +401,24 @@
         }
       }
     },
-    "parameters" : {
-      "departmentId" : {
-        "name" : "departmentId",
-        "in" : "query",
-        "description" : "ID of the department from which the availability details should be fetched. To include all accessible departments, pass the value of this key as @-1@.",
-        "required" : true,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "description" : "ID of the department from which the availability details should be fetched. To include all accessible departments, pass the value of this key as @-1@.",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "limit" : {
-        "name" : "limit",
-        "in" : "query",
-        "description" : "Number of agents to list. The default value is 20 and the maximum value allowed is 6000.",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int32",
-          "description" : "Number of agents to list. The default value is 20 and the maximum value allowed is 6000.",
-          "pattern" : "([0-9]+)"
-        }
-      }
-    },
     "requestBodies" : {
-      "getConfig" : {
+      "updateAgentAvailabilityConfig" : {
+        "required" : true,
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "agentIdleTime" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer" ],
                   "format" : "int32",
                   "maximum" : 360,
                   "minimum" : 1,
                   "pattern" : "([0-9]+)"
                 },
                 "treatIdleAgentsAsOffline" : {
-                  "type" : [ "boolean", "null" ]
+                  "type" : [ "boolean" ]
                 }
               }
             },
@@ -410,6 +435,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

@@ -1,0 +1,163 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "KBTranslationMassActionResponse",
+    "version" : "1.0.0"
+  },
+  "paths" : { },
+  "components" : {
+    "schemas" : {
+      "kbTranslationLocaleResult" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "locale" : {
+            "type" : [ "string" ],
+            "description" : "Locale code",
+            "enum" : [ "en", "ja", "zh", "es", "de", "fr", "tr", "ru", "pt", "it", "nl", "da", "sv", "pl", "ar", "he", "af", "cs", "fr-ca", "bg", "fi", "el", "hu", "id", "nb", "ro", "th", "uk", "vi", "ur", "hi", "te", "kn", "ta", "mr", "ko", "fa", "bn", "gu", "ms", "ml", "en-gb", "sk", "hr", "sl", "zh_TW", "zh-tw", "ca", "ka", "kk", "my", "km", "pt-br" ],
+            "pattern" : "([a-zA-Z]{2,4}([-_][a-zA-Z]{2})?)"
+          },
+          "isSuccess" : {
+            "type" : [ "boolean", "string" ],
+            "description" : "Indicates whether the restart operation succeeded. Possible values: true = succeeded, false = failed."
+          },
+          "errors" : {
+            "type" : [ "object", "null" ],
+            "additionalProperties" : false,
+            "description" : "Error details if the operation failed",
+            "properties" : {
+              "errorCode" : {
+                "type" : [ "string" ],
+                "description" : "Error code indicating the type of failure",
+                "enum" : [ "INVALID_ENTITY", "FORBIDDEN_ENTITY", "UNPROCESSABLE_ENTITY", "UNAUTHORIZED", "FORBIDDEN", "INVALID_DATA" ]
+              },
+              "httpCode" : {
+                "type" : [ "string", "integer" ],
+                "description" : "HTTP status code",
+                "enum" : [ "401", "403", "422", 401, 403, 422 ]
+              }
+            },
+            "required" : [ "errorCode", "httpCode" ]
+          }
+        },
+        "required" : [ "locale", "isSuccess" ]
+      },
+      "kbTranslationArticleResult" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "id" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "description" : "Unique ID of the article",
+            "pattern" : "([0-9]+)"
+          },
+          "locales" : {
+            "type" : [ "array" ],
+            "description" : "Results for each locale",
+            "items" : {
+              "$ref" : "#/components/schemas/kbTranslationLocaleResult"
+            },
+            "minItems" : 1
+          }
+        },
+        "required" : [ "id", "locales" ]
+      },
+      "kbTranslationResponseData" : {
+        "type" : [ "array" ],
+        "description" : "Array of article KB translation results",
+        "items" : {
+          "$ref" : "#/components/schemas/kbTranslationArticleResult"
+        }
+      }
+    },
+    "responses" : {
+      "kbTranslationMassActionResponse" : {
+        "description" : "KB translation mass action response containing results for each article and locale",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "#/components/schemas/kbTranslationResponseData",
+                  "description" : "List of results for each article"
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "Successful KB translation for all locales" : {
+                "value" : {
+                  "data" : [ {
+                    "id" : "10000000220345",
+                    "locales" : [ {
+                      "locale" : "fr",
+                      "isSuccess" : true
+                    }, {
+                      "locale" : "de",
+                      "isSuccess" : true
+                    } ]
+                  }, {
+                    "id" : "1200000022015",
+                    "locales" : [ {
+                      "locale" : "fr",
+                      "isSuccess" : true
+                    }, {
+                      "locale" : "de",
+                      "isSuccess" : true
+                    } ]
+                  } ]
+                }
+              },
+              "Mixed results with some failures" : {
+                "value" : {
+                  "data" : [ {
+                    "id" : "10000000220345",
+                    "locales" : [ {
+                      "locale" : "fr",
+                      "isSuccess" : true
+                    }, {
+                      "locale" : "de",
+                      "isSuccess" : true
+                    } ]
+                  }, {
+                    "id" : "1200000022015",
+                    "locales" : [ {
+                      "locale" : "fr",
+                      "isSuccess" : "false",
+                      "errors" : {
+                        "errorCode" : "INVALID_ENTITY",
+                        "httpCode" : 422
+                      }
+                    }, {
+                      "locale" : "de",
+                      "isSuccess" : "false",
+                      "errors" : {
+                        "errorCode" : "FORBIDDEN_ENTITY",
+                        "httpCode" : 422
+                      }
+                    } ]
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "KBTranslationMassActionResponse"
+}

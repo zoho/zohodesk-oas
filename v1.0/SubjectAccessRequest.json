@@ -11,6 +11,7 @@
         "summary" : "Export all subject data from Zoho Desk",
         "description" : "This API exports data related to the subject, from your Zoho Desk portal.",
         "operationId" : "sarExportAll",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -38,21 +39,20 @@
       "get" : {
         "tags" : [ "SubjectAccessRequest" ],
         "summary" : "Get fields and conditions",
-        "description" : "This API fetchs possible fileds list and conditions",
+        "description" : "This API fetches the available filter fields and their supported conditions for the specified module.",
         "operationId" : "getFieldsAndConditions",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "module",
           "in" : "query",
-          "description" : "Name of the modules from which the resources must be fetched. Values allowed are @tickets@ and @contacts@. If you want to fetch resources from both modules, pass the value @allEntities@.",
+          "description" : "Name of the modules from which the resources must be fetched. Values allowed are tickets and contacts. If you want to fetch resources from both modules, pass the value allEntities.",
           "required" : true,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Name of the modules from which the resources must be fetched. Values allowed are @tickets@ and @contacts@. If you want to fetch resources from both modules, pass the value @allEntities@.",
-            "enum" : [ "tickets" ],
+            "type" : [ "string" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "allEntities", "tickets", "contacts" ]
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -80,26 +80,34 @@
         "summary" : "Get subject access request",
         "description" : "This API fetches the details of a particular SAR.",
         "operationId" : "getSubjectAccessRequest",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
-          "description" : "Additional information related to the request. Values allowed are: @createdBy@ and @modifiedBy@. You can pass multiple values by separating them using commas in the API request.",
+          "description" : "Additional information related to the request. Values allowed are: createdBy and modifiedBy. You can pass multiple values by separating them using commas in the API request.",
           "required" : false,
-          "style" : "simple",
-          "explode" : true,
+          "style" : "form",
+          "explode" : false,
           "schema" : {
-            "type" : [ "null", "array" ],
-            "description" : "Additional information related to the request. Values allowed are: @createdBy@ and @modifiedBy@. You can pass multiple values by separating them using commas in the API request.",
+            "type" : [ "array" ],
             "items" : {
-              "type" : [ "string", "null" ],
-              "enum" : [ "createdBy", "modifiedBy" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "type" : [ "string" ],
+              "enum" : [ "createdBy", "modifiedBy" ]
             },
             "uniqueItems" : true
           }
         }, {
-          "$ref" : "#/components/parameters/sarId"
+          "name" : "sarId",
+          "in" : "path",
+          "description" : "Unique ID of the subject access request",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -155,35 +163,32 @@
         "summary" : "List subject access requests",
         "description" : "This API lists a particular number of subject access requests, based on the limit specified.",
         "operationId" : "getSubjectAccessRequestList",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "duration",
           "in" : "query",
-          "description" : "Period in which the requests were made. Values allowed are: @TODAY@, @LAST_24_HOURS@, @LAST_7_DAYS@, @LAST_30_DAYS@, @CURRENT_WEEK@, and @CURRENT_MONTH@. ",
+          "description" : "Period in which the requests were made. Values allowed are: TODAY, LAST_24_HOURS, LAST_7_DAYS, LAST_30_DAYS, CURRENT_WEEK, and CURRENT_MONTH.",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Period in which the requests were made. Values allowed are: @TODAY@, @LAST_24_HOURS@, @LAST_7_DAYS@, @LAST_30_DAYS@, @CURRENT_WEEK@, and @CURRENT_MONTH@. ",
-            "enum" : [ "TODAY", "LAST_24_HOURS", "LAST_7_DAYS", "LAST_30_DAYS", "CURRENT_WEEK", "CURRENT_MONTH" ],
+            "type" : [ "string" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "TODAY", "LAST_24_HOURS", "LAST_7_DAYS", "LAST_30_DAYS", "CURRENT_WEEK", "CURRENT_MONTH" ],
+            "pattern" : "(TODAY|LAST_24_HOURS|LAST_(7|30)_DAYS|CURRENT_(WEEK|MONTH))"
           }
         }, {
           "name" : "include",
           "in" : "query",
-          "description" : "Additional information related to the requests. Values allowed are: @createdBy@ and @modifiedBy@. You can pass multiple values by separating them using commas in the API request.",
+          "description" : "Additional information related to the requests. Values allowed are: createdBy and modifiedBy. You can pass multiple values by separating them using commas in the API request.",
           "required" : false,
-          "style" : "simple",
-          "explode" : true,
+          "style" : "form",
+          "explode" : false,
           "schema" : {
-            "type" : [ "null", "array" ],
-            "description" : "Additional information related to the requests. Values allowed are: @createdBy@ and @modifiedBy@. You can pass multiple values by separating them using commas in the API request.",
+            "type" : [ "array" ],
             "items" : {
-              "type" : [ "string", "null" ],
-              "enum" : [ "createdBy", "modifiedBy" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "type" : [ "string" ],
+              "enum" : [ "createdBy", "modifiedBy" ]
             },
             "uniqueItems" : true
           }
@@ -195,24 +200,23 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Email ID of the contact who made the request.",
-            "maxLength" : 150,
-            "minLength" : 0,
-            "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "pattern" : "email"
           }
         }, {
           "name" : "limit",
           "in" : "query",
-          "description" : "Number of requests to list. The default value is @10@ and the maximum value supported is @100@.",
+          "description" : "Number of requests to list. The default value is 10 and the maximum value supported is 100.",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "integer" ],
             "format" : "int32",
-            "description" : "Number of requests to list. The default value is @10@ and the maximum value supported is @100@.",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "maximum" : 100
           }
         }, {
           "name" : "from",
@@ -222,29 +226,65 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "integer" ],
             "format" : "int32",
-            "description" : "Index number, starting from which the requests must be fetched.",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "minimum" : 1
           }
         }, {
           "name" : "status",
           "in" : "query",
-          "description" : "Processing status of the request. Values allowed are: @INITIATED@, @INPROGRESS@, @COMPLETED@, @CANCELED@, @EXPORTED@, @PARTIALLY_COMPLETED@, @PARTIALLY_EXPORTED@ and @FAILED@. You can pass multiple values by separating them using commas in the API request.",
+          "description" : "Processing status of the request. Values allowed are: INITIATED, INPROGRESS, COMPLETED, CANCELED, EXPORTED, PARTIALLY_COMPLETED, PARTIALLY_EXPORTED and FAILED. You can pass multiple values by separating them using commas in the API request.",
           "required" : false,
-          "style" : "simple",
-          "explode" : true,
+          "style" : "form",
+          "explode" : false,
           "schema" : {
-            "type" : [ "null", "array" ],
-            "description" : "Processing status of the request. Values allowed are: @INITIATED@, @INPROGRESS@, @COMPLETED@, @CANCELED@, @EXPORTED@, @PARTIALLY_COMPLETED@, @PARTIALLY_EXPORTED@ and @FAILED@. You can pass multiple values by separating them using commas in the API request.",
+            "type" : [ "array" ],
             "items" : {
-              "type" : [ "string", "null" ],
-              "enum" : [ "FAILED", "INITIATED", "INPROGRESS", "COMPLETED", "CANCELED", "EXPORTED", "PARTIALLY_COMPLETED", "PARTIALLY_EXPORTED" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "type" : [ "string" ],
+              "enum" : [ "FAILED", "INITIATED", "INPROGRESS", "COMPLETED", "CANCELED", "EXPORTED", "PARTIALLY_COMPLETED", "PARTIALLY_EXPORTED" ]
             },
             "uniqueItems" : true
           }
+        }, {
+          "name" : "startTime",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Starting time of the time range in which the requests should have been created. The time should be in the UTC time zone and expressed in a timestamp."
+        }, {
+          "name" : "endTime",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Ending time of the time range in which the requests should have been created. The time should be in the UTC time zone and expressed in a timestamp."
+        }, {
+          "name" : "requestType",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "enum" : [ "ACCESS_REQUEST", "ERASURE_REQUEST" ]
+            },
+            "maxItems" : 2
+          },
+          "style" : "form",
+          "explode" : false,
+          "description" : "Filter by type of the request. Values allowed are: ACCESS_REQUEST, ERASURE_REQUEST. You can pass multiple values by separating them using commas in the API request."
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -271,6 +311,7 @@
         "summary" : "Export specific resources",
         "description" : "This API exports specific resources related to a subject access request.",
         "operationId" : "sarExport",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -299,7 +340,8 @@
         "tags" : [ "SubjectAccessRequest" ],
         "summary" : "Get count of resources related to request",
         "description" : "This API returns the number of resources related to a subject access request.",
-        "operationId" : "getCount",
+        "operationId" : "getSubjectAccessRequestCount",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -356,79 +398,74 @@
   "components" : {
     "schemas" : {
       "availableCondition" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "condition" : {
+            "description" : "Condition identifier used in filter expressions",
             "type" : [ "string", "null" ],
             "maxLength" : 1000,
             "minLength" : 0
           },
           "i18NCondition" : {
+            "description" : "Localized display label of the condition",
             "type" : [ "string", "null" ],
             "maxLength" : 1000,
             "minLength" : 0
           },
           "value" : {
-            "type" : [ "null", "array" ],
-            "items" : {
-              "oneOf" : [ {
-                "type" : [ "string", "null" ],
-                "maxLength" : 100,
-                "minLength" : 0
-              }, {
-                "type" : [ "null", "array" ],
-                "items" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
-                },
-                "uniqueItems" : false
-              } ]
-            },
+            "description" : "Placeholder values associated with the condition",
+            "type" : [ "array", "null" ],
+            "items" : { },
             "uniqueItems" : false
           }
         },
         "required" : [ "condition", "i18NCondition", "value" ]
       },
       "availableConditionArray" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./SubjectAccessRequest.json#/components/schemas/availableCondition"
+          "$ref" : "#/components/schemas/availableCondition"
         }
       },
       "fieldDetail" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "availableConditions" : {
-            "$ref" : "./SubjectAccessRequest.json#/components/schemas/availableConditionArray"
+            "description" : "List of filter conditions supported for the field",
+            "$ref" : "#/components/schemas/availableConditionArray"
           },
           "apiName" : {
+            "description" : "API name of the field",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "fieldLabel" : {
+            "description" : "Display label of the field",
             "type" : [ "string", "null" ],
             "maxLength" : 120,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "i18NLabel" : {
+            "description" : "Localized display label of the field",
             "type" : [ "string", "null" ],
             "maxLength" : 120,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "type" : {
+            "description" : "Data type of the field",
             "type" : [ "string", "null" ],
             "maxLength" : 120,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "columnName" : {
+            "description" : "Column name of the field",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
@@ -438,86 +475,93 @@
         "required" : [ "apiName", "availableConditions", "columnName", "fieldLabel", "i18NLabel", "type" ]
       },
       "fieldDetails" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./SubjectAccessRequest.json#/components/schemas/fieldDetail"
+          "$ref" : "#/components/schemas/fieldDetail"
         }
       },
       "subjectAccessRequestListKeys" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "modifiedTime" : {
+            "description" : "Timestamp when this record was last modified (epoch milliseconds)",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "contactEmailId" : {
+            "description" : "Email address of the contact who made the request",
             "type" : [ "string", "null" ],
             "maxLength" : 255,
             "minLength" : 0,
             "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
           },
           "modifiedById" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the agent who last modified the request",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "requestType" : {
+            "description" : "Accepted values: ACCESS_REQUEST, ERASURE_REQUEST",
             "type" : [ "string", "null" ],
-            "enum" : [ "ACCESS_REQUEST", "ERASURE_REQUEST" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "ACCESS_REQUEST", "ERASURE_REQUEST" ]
           },
           "referenceTicketNumber" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Ticket number linked to the request",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           },
           "downloadURL" : {
+            "description" : "URL to download the exported subject data",
             "type" : [ "string", "null" ],
             "maxLength" : 1000,
             "minLength" : 0
           },
           "sarNumber" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique number assigned to the subject access request",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           },
           "createdTime" : {
+            "description" : "Timestamp when this record was created (epoch milliseconds)",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the subject access request",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "createdById" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the agent who created the request",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "status" : {
+            "description" : "Accepted values: INITIATED, INPROGRESS, COMPLETED, CANCELED, EXPORTED, PARTIALLY_COMPLETED, PARTIALLY_EXPORTED, FAILED",
             "type" : [ "string", "null" ],
-            "enum" : [ "FAILED", "INITIATED", "INPROGRESS", "COMPLETED", "CANCELED", "EXPORTED", "PARTIALLY_COMPLETED", "PARTIALLY_EXPORTED" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "FAILED", "INITIATED", "INPROGRESS", "COMPLETED", "CANCELED", "EXPORTED", "PARTIALLY_COMPLETED", "PARTIALLY_EXPORTED" ]
           }
         },
         "required" : [ "contactEmailId", "createdById", "createdTime", "downloadURL", "id", "modifiedById", "modifiedTime", "referenceTicketNumber", "requestType", "sarNumber", "status" ]
       },
       "data" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./SubjectAccessRequest.json#/components/schemas/subjectAccessRequestListKeys"
+          "$ref" : "#/components/schemas/subjectAccessRequestListKeys"
         }
       },
       "ids" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array" ],
         "items" : {
-          "type" : [ "string", "null", "integer" ],
+          "type" : [ "string", "integer" ],
           "format" : "int64",
           "pattern" : "([0-9]+)"
         }
@@ -529,94 +573,100 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "modifiedTime" : {
+                  "description" : "Timestamp when this record was last modified (epoch milliseconds)",
                   "type" : [ "string", "null" ],
                   "maxLength" : 100,
                   "minLength" : 0
                 },
                 "contactEmailId" : {
+                  "description" : "Email address of the contact whose data is being exported",
                   "type" : [ "string", "null" ],
                   "maxLength" : 255,
                   "minLength" : 0,
                   "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
                 },
                 "callBackUrl" : {
+                  "description" : "Callback URL provided for export completion notification",
                   "type" : [ "string", "null" ],
                   "maxLength" : 2000,
                   "minLength" : 0,
                   "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
                 },
                 "requestType" : {
+                  "description" : "Accepted values: ACCESS_REQUEST, ERASURE_REQUEST",
                   "type" : [ "string", "null" ],
-                  "enum" : [ "ACCESS_REQUEST", "ERASURE_REQUEST" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "enum" : [ "ACCESS_REQUEST", "ERASURE_REQUEST" ]
                 },
                 "recordType" : {
+                  "description" : "Accepted values: ALL, SPECIFIC",
                   "type" : [ "string", "null" ],
-                  "enum" : [ "ALL", "SPECIFIC" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "enum" : [ "ALL", "SPECIFIC" ]
                 },
                 "query" : {
-                  "type" : [ "null", "object" ],
+                  "description" : "Criteria used to filter records for the request",
+                  "type" : [ "object", "null" ],
                   "additionalProperties" : false
                 },
                 "module" : {
+                  "description" : "Accepted values: allEntities, contacts, tickets",
                   "type" : [ "string", "null" ],
-                  "enum" : [ "allEntities", "contacts", "tickets" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "enum" : [ "allEntities", "contacts", "tickets" ]
                 },
                 "downloadURL" : {
+                  "description" : "URL to download the exported subject data",
                   "type" : [ "string", "null" ],
                   "maxLength" : 1000,
                   "minLength" : 0
                 },
                 "type" : {
+                  "description" : "Accepted values: ALL, SPECIFIC",
                   "type" : [ "string", "null" ],
-                  "enum" : [ "ALL", "SPECIFIC" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "enum" : [ "ALL", "SPECIFIC" ]
                 },
                 "modifiedById" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Unique ID of the agent who last modified the request",
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "referenceTicketNumber" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Ticket number linked to the request",
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int32",
                   "pattern" : "([0-9]+)"
                 },
                 "sarNumber" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Unique number assigned to the subject access request",
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int32",
                   "pattern" : "([0-9]+)"
                 },
                 "createdTime" : {
+                  "description" : "Timestamp when this record was created (epoch milliseconds)",
                   "type" : [ "string", "null" ],
                   "maxLength" : 100,
                   "minLength" : 0
                 },
                 "id" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Unique ID of the subject access request",
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "createdById" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Unique ID of the agent who created the request",
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "status" : {
+                  "description" : "Accepted values: INITIATED, INPROGRESS, COMPLETED, CANCELED, EXPORTED, PARTIALLY_COMPLETED, PARTIALLY_EXPORTED, FAILED",
                   "type" : [ "string", "null" ],
-                  "enum" : [ "FAILED", "INITIATED", "INPROGRESS", "COMPLETED", "CANCELED", "EXPORTED", "PARTIALLY_COMPLETED", "PARTIALLY_EXPORTED" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "enum" : [ "FAILED", "INITIATED", "INPROGRESS", "COMPLETED", "CANCELED", "EXPORTED", "PARTIALLY_COMPLETED", "PARTIALLY_EXPORTED" ]
                 }
               },
               "required" : [ "callBackUrl", "contactEmailId", "createdById", "createdTime", "downloadURL", "id", "modifiedById", "modifiedTime", "module", "query", "recordType", "referenceTicketNumber", "requestType", "sarNumber", "status", "type" ]
@@ -649,23 +699,24 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "displayLabel" : {
+                  "description" : "Display label of the module",
                   "type" : [ "string", "null" ],
                   "maxLength" : 120,
                   "minLength" : 0,
                   "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                 },
                 "name" : {
+                  "description" : "Accepted values: tickets, contacts, AllEntities",
                   "type" : [ "string", "null" ],
-                  "enum" : [ "tickets" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "enum" : [ "tickets", "contacts", "AllEntities" ]
                 },
                 "fieldDetails" : {
-                  "$ref" : "./SubjectAccessRequest.json#/components/schemas/fieldDetails"
+                  "description" : "List of available filter fields and their conditions",
+                  "$ref" : "#/components/schemas/fieldDetails"
                 }
               },
               "required" : [ "displayLabel", "fieldDetails", "name" ]
@@ -699,7 +750,7 @@
                     } ],
                     "fieldLabel" : "Phone",
                     "i18NLabel" : "Phone",
-                    "type" : "text"
+                    "type" : [ "text" ]
                   }, {
                     "availableConditions" : [ {
                       "condition" : "is",
@@ -728,7 +779,7 @@
                     } ],
                     "fieldLabel" : "Created Time",
                     "i18NLabel" : "Created Time",
-                    "type" : "dateTime"
+                    "type" : [ "dateTime" ]
                   }, {
                     "availableConditions" : [ {
                       "condition" : "is",
@@ -757,7 +808,7 @@
                     } ],
                     "fieldLabel" : "Modified Time",
                     "i18NLabel" : "Modified Time",
-                    "type" : "dateTime"
+                    "type" : [ "dateTime" ]
                   } ]
                 }
               }
@@ -771,36 +822,42 @@
           "application/json" : {
             "schema" : {
               "allOf" : [ {
-                "type" : "object",
+                "type" : [ "object" ],
                 "properties" : {
                   "createdBy" : {
-                    "type" : [ "null", "object" ],
+                    "description" : "Details of the agent who created the request",
+                    "type" : [ "object", "null" ],
                     "additionalProperties" : false,
                     "maxProperties" : 5,
                     "minProperties" : 5,
                     "properties" : {
                       "photoURL" : {
+                        "description" : "URL of the creator's profile photo",
                         "type" : [ "string", "null" ],
                         "maxLength" : 200,
                         "minLength" : 0,
                         "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
                       },
                       "firstName" : {
+                        "description" : "First name of the creator",
                         "type" : [ "string", "null" ],
                         "maxLength" : 50,
                         "minLength" : 0
                       },
                       "lastName" : {
+                        "description" : "Last name of the creator",
                         "type" : [ "string", "null" ],
                         "maxLength" : 50,
                         "minLength" : 0
                       },
                       "id" : {
-                        "type" : [ "string", "null", "integer" ],
+                        "description" : "Unique ID of the creator",
+                        "type" : [ "string", "integer", "null" ],
                         "format" : "int64",
                         "pattern" : "([0-9]+)"
                       },
                       "email" : {
+                        "description" : "Email address of the creator",
                         "type" : [ "string", "null" ],
                         "maxLength" : 100,
                         "minLength" : 0,
@@ -810,33 +867,39 @@
                     "required" : [ "email", "firstName", "id", "lastName", "photoURL" ]
                   },
                   "modifiedBy" : {
-                    "type" : [ "null", "object" ],
+                    "description" : "Details of the agent who last modified the request",
+                    "type" : [ "object", "null" ],
                     "additionalProperties" : false,
                     "maxProperties" : 5,
                     "minProperties" : 5,
                     "properties" : {
                       "photoURL" : {
+                        "description" : "URL of the modifier's profile photo",
                         "type" : [ "string", "null" ],
                         "maxLength" : 200,
                         "minLength" : 0,
                         "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
                       },
                       "firstName" : {
+                        "description" : "First name of the modifier",
                         "type" : [ "string", "null" ],
                         "maxLength" : 50,
                         "minLength" : 0
                       },
                       "lastName" : {
+                        "description" : "Last name of the modifier",
                         "type" : [ "string", "null" ],
                         "maxLength" : 50,
                         "minLength" : 0
                       },
                       "id" : {
-                        "type" : [ "string", "null", "integer" ],
+                        "description" : "Unique ID of the modifier",
+                        "type" : [ "string", "integer", "null" ],
                         "format" : "int64",
                         "pattern" : "([0-9]+)"
                       },
                       "email" : {
+                        "description" : "Email address of the modifier",
                         "type" : [ "string", "null" ],
                         "maxLength" : 100,
                         "minLength" : 0,
@@ -845,105 +908,111 @@
                     },
                     "required" : [ "email", "firstName", "id", "lastName", "photoURL" ]
                   }
-                }
+                },
+                "additionalProperties" : false
               }, {
                 "oneOf" : [ {
-                  "type" : [ "null", "object" ],
+                  "type" : [ "object", "null" ],
                   "additionalProperties" : false,
                   "properties" : {
                     "modifiedTime" : {
+                      "description" : "Timestamp when this record was last modified (epoch milliseconds)",
                       "type" : [ "string", "null" ],
                       "maxLength" : 100,
                       "minLength" : 0
                     },
                     "contactEmailId" : {
+                      "description" : "Email address of the contact who made the request",
                       "type" : [ "string", "null" ],
                       "maxLength" : 255,
                       "minLength" : 0,
                       "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
                     },
                     "requestType" : {
+                      "description" : "Accepted values: ACCESS_REQUEST, ERASURE_REQUEST",
                       "type" : [ "string", "null" ],
-                      "enum" : [ "ACCESS_REQUEST", "ERASURE_REQUEST" ],
-                      "maxLength" : 100,
-                      "minLength" : 0
+                      "enum" : [ "ACCESS_REQUEST", "ERASURE_REQUEST" ]
                     },
                     "recordType" : {
+                      "description" : "Accepted values: ALL, SPECIFIC",
                       "type" : [ "string", "null" ],
-                      "enum" : [ "ALL", "SPECIFIC" ],
-                      "maxLength" : 100,
-                      "minLength" : 0
+                      "enum" : [ "ALL", "SPECIFIC" ]
                     },
                     "query" : {
-                      "type" : [ "null", "object" ],
+                      "description" : "Criteria used to filter records for the request",
+                      "type" : [ "object", "null" ],
                       "additionalProperties" : false
                     },
                     "module" : {
+                      "description" : "Accepted values: allEntities, contacts, tickets",
                       "type" : [ "string", "null" ],
-                      "enum" : [ "allEntities", "contacts", "tickets" ],
-                      "maxLength" : 100,
-                      "minLength" : 0
+                      "enum" : [ "allEntities", "contacts", "tickets" ]
                     },
                     "downloadURL" : {
+                      "description" : "URL to download the exported subject data",
                       "type" : [ "string", "null" ],
                       "maxLength" : 1000,
                       "minLength" : 0
                     },
                     "type" : {
+                      "description" : "Accepted values: ALL, SPECIFIC",
                       "type" : [ "string", "null" ],
-                      "enum" : [ "ALL", "SPECIFIC" ],
-                      "maxLength" : 100,
-                      "minLength" : 0
+                      "enum" : [ "ALL", "SPECIFIC" ]
                     },
                     "modifiedById" : {
-                      "type" : [ "string", "null", "integer" ],
+                      "description" : "Unique ID of the agent who last modified the request",
+                      "type" : [ "string", "integer", "null" ],
                       "format" : "int64",
                       "pattern" : "([0-9]+)"
                     },
                     "referenceTicketNumber" : {
-                      "type" : [ "string", "null", "integer" ],
+                      "description" : "Ticket number linked to the request",
+                      "type" : [ "string", "integer", "null" ],
                       "format" : "int32",
                       "pattern" : "([0-9]+)"
                     },
                     "sarNumber" : {
-                      "type" : [ "string", "null", "integer" ],
+                      "description" : "Unique number assigned to the subject access request",
+                      "type" : [ "string", "integer", "null" ],
                       "format" : "int32",
                       "pattern" : "([0-9]+)"
                     },
                     "createdTime" : {
+                      "description" : "Timestamp when this record was created (epoch milliseconds)",
                       "type" : [ "string", "null" ],
                       "maxLength" : 100,
                       "minLength" : 0
                     },
                     "id" : {
-                      "type" : [ "string", "null", "integer" ],
+                      "description" : "Unique ID of the subject access request",
+                      "type" : [ "string", "integer", "null" ],
                       "format" : "int64",
                       "pattern" : "([0-9]+)"
                     },
                     "createdById" : {
-                      "type" : [ "string", "null", "integer" ],
+                      "description" : "Unique ID of the agent who created the request",
+                      "type" : [ "string", "integer", "null" ],
                       "format" : "int64",
                       "pattern" : "([0-9]+)"
                     },
                     "status" : {
+                      "description" : "Accepted values: INITIATED, INPROGRESS, COMPLETED, CANCELED, EXPORTED, PARTIALLY_COMPLETED, PARTIALLY_EXPORTED, FAILED",
                       "type" : [ "string", "null" ],
-                      "enum" : [ "FAILED", "INITIATED", "INPROGRESS", "COMPLETED", "CANCELED", "EXPORTED", "PARTIALLY_COMPLETED", "PARTIALLY_EXPORTED" ],
-                      "maxLength" : 100,
-                      "minLength" : 0
+                      "enum" : [ "FAILED", "INITIATED", "INPROGRESS", "COMPLETED", "CANCELED", "EXPORTED", "PARTIALLY_COMPLETED", "PARTIALLY_EXPORTED" ]
                     }
                   },
                   "required" : [ "contactEmailId", "createdById", "createdTime", "downloadURL", "id", "modifiedById", "modifiedTime", "module", "query", "recordType", "referenceTicketNumber", "requestType", "sarNumber", "status", "type" ]
                 }, {
-                  "type" : [ "null", "object" ],
+                  "type" : [ "object", "null" ],
                   "additionalProperties" : false,
                   "properties" : {
                     "errorCode" : {
+                      "description" : "Error code indicating the type of error",
                       "type" : [ "string", "null" ],
-                      "enum" : [ "URL_NOT_FOUND", "UNAUTHORIZED", "INVALID_OAUTH", "SCOPE_MISMATCH", "FORBIDDEN", "LICENSE_ACCESS_LIMITED", "METHOD_NOT_ALLOWED", "RESOURCE_SIZE_EXCEEDED", "UNSUPPORTED_MEDIA_TYPE", "INVALID_DATA", "UNPROCESSABLE_ENTITY", "ONLY_LIVECHAT_USER", "INTEGRATION_ADMIN_ERROR", "THRESHOLD_EXCEEDED", "INTERNAL_SERVER_ERROR", "EMPTY_PAYLOAD" ],
-                      "maxLength" : 100,
-                      "minLength" : 0
+                      "enum" : [ "URL_NOT_FOUND", "UNAUTHORIZED", "INVALID_OAUTH", "SCOPE_MISMATCH", "FORBIDDEN", "LICENSE_ACCESS_LIMITED", "METHOD_NOT_ALLOWED", "RESOURCE_SIZE_EXCEEDED", "UNSUPPORTED_MEDIA_TYPE", "INVALID_DATA", "UNPROCESSABLE_ENTITY", "ONLY_LIVECHAT_USER", "INTEGRATION_ADMIN_ERROR", "THRESHOLD_EXCEEDED", "INTERNAL_SERVER_ERROR", "EMPTY_PAYLOAD" ]
                     },
                     "message" : {
+                      "description" : "Human-readable description of the error",
                       "type" : [ "string", "null" ],
                       "maxLength" : 255,
                       "minLength" : 0
@@ -972,7 +1041,7 @@
                           "displayKey" : "${CURRENTTIME}",
                           "key" : "${CURRENTTIME}"
                         } ],
-                        "type" : "primitive"
+                        "type" : [ "primitive" ]
                       }
                     } ],
                     "criteriaPattern" : "1"
@@ -980,9 +1049,9 @@
                   "downloadURL" : null,
                   "modifiedById" : "7000000000247",
                   "createdBy" : {
-                    "photoURL" : "https://desk.zoho.com/api/v1/agents/7000000000247/photo?orgId=15273347",
-                    "firstName" : "Nirmal",
-                    "lastName" : "Kumar",
+                    "photoURL" : "https://desk.example.com/api/v1/agents/7000000000247/photo?orgId=1234567890",
+                    "firstName" : "William",
+                    "lastName" : "Jones",
                     "id" : "7000000000247",
                     "email" : "nirmal@zylker.com"
                   },
@@ -990,9 +1059,9 @@
                   "sarNumber" : "141",
                   "createdTime" : 1603973511890,
                   "modifiedBy" : {
-                    "photoURL" : "https://desk.zoho.com/api/v1/agents/7000000000247/photo?orgId=15273347",
-                    "firstName" : "Nirmal",
-                    "lastName" : "Kumar",
+                    "photoURL" : "https://desk.example.com/api/v1/agents/7000000000247/photo?orgId=1234567890",
+                    "firstName" : "William",
+                    "lastName" : "Jones",
                     "id" : "7000000000247",
                     "email" : "john@zylker.com"
                   },
@@ -1010,42 +1079,50 @@
         "content" : {
           "application/json" : {
             "schema" : {
+              "type" : [ "object" ],
               "allOf" : [ {
-                "type" : "object",
+                "type" : [ "object" ],
                 "properties" : {
                   "data" : {
-                    "type" : "array",
+                    "description" : "List of subject access request entries",
+                    "type" : [ "array" ],
                     "items" : {
-                      "type" : "object",
+                      "type" : [ "object" ],
                       "properties" : {
                         "createdBy" : {
-                          "type" : [ "null", "object" ],
+                          "description" : "Details of the agent who created the request",
+                          "type" : [ "object", "null" ],
                           "additionalProperties" : false,
                           "maxProperties" : 5,
                           "minProperties" : 5,
                           "properties" : {
                             "photoURL" : {
+                              "description" : "URL of the creator's profile photo",
                               "type" : [ "string", "null" ],
                               "maxLength" : 200,
                               "minLength" : 0,
                               "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
                             },
                             "firstName" : {
+                              "description" : "First name of the creator",
                               "type" : [ "string", "null" ],
                               "maxLength" : 50,
                               "minLength" : 0
                             },
                             "lastName" : {
+                              "description" : "Last name of the creator",
                               "type" : [ "string", "null" ],
                               "maxLength" : 50,
                               "minLength" : 0
                             },
                             "id" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "description" : "Unique ID of the creator",
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
                               "pattern" : "([0-9]+)"
                             },
                             "email" : {
+                              "description" : "Email address of the creator",
                               "type" : [ "string", "null" ],
                               "maxLength" : 100,
                               "minLength" : 0,
@@ -1055,33 +1132,39 @@
                           "required" : [ "email", "firstName", "id", "lastName", "photoURL" ]
                         },
                         "modifiedBy" : {
-                          "type" : [ "null", "object" ],
+                          "description" : "Details of the agent who last modified the request",
+                          "type" : [ "object", "null" ],
                           "additionalProperties" : false,
                           "maxProperties" : 5,
                           "minProperties" : 5,
                           "properties" : {
                             "photoURL" : {
+                              "description" : "URL of the modifier's profile photo",
                               "type" : [ "string", "null" ],
                               "maxLength" : 200,
                               "minLength" : 0,
                               "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
                             },
                             "firstName" : {
+                              "description" : "First name of the modifier",
                               "type" : [ "string", "null" ],
                               "maxLength" : 50,
                               "minLength" : 0
                             },
                             "lastName" : {
+                              "description" : "Last name of the modifier",
                               "type" : [ "string", "null" ],
                               "maxLength" : 50,
                               "minLength" : 0
                             },
                             "id" : {
-                              "type" : [ "string", "null", "integer" ],
+                              "description" : "Unique ID of the modifier",
+                              "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
                               "pattern" : "([0-9]+)"
                             },
                             "email" : {
+                              "description" : "Email address of the modifier",
                               "type" : [ "string", "null" ],
                               "maxLength" : 100,
                               "minLength" : 0,
@@ -1090,16 +1173,19 @@
                           },
                           "required" : [ "email", "firstName", "id", "lastName", "photoURL" ]
                         }
-                      }
+                      },
+                      "additionalProperties" : false
                     }
                   }
-                }
+                },
+                "additionalProperties" : false
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "data" : {
-                    "$ref" : "./SubjectAccessRequest.json#/components/schemas/data"
+                    "description" : "List of subject access request entries",
+                    "$ref" : "#/components/schemas/data"
                   }
                 },
                 "required" : [ "data" ]
@@ -1113,7 +1199,7 @@
                     "contactEmailId" : "john@zylker.com",
                     "modifiedById" : "7000000000247",
                     "createdBy" : {
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/7000000000247/photo?orgId=15273347",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/7000000000247/photo?orgId=1234567890",
                       "firstName" : "Jack",
                       "lastName" : "Carol",
                       "id" : "7000000000247",
@@ -1122,7 +1208,7 @@
                     "sarNumber" : "141",
                     "createdTime" : 1603973511890,
                     "modifiedBy" : {
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/7000000000247/photo?orgId=15273347",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/7000000000247/photo?orgId=1234567890",
                       "firstName" : "Jack",
                       "lastName" : "Carol",
                       "id" : "7000000000247",
@@ -1135,7 +1221,7 @@
                     "contactEmailId" : "nirmal@zylker.com",
                     "modifiedById" : "7000000000247",
                     "createdBy" : {
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/7000000000247/photo?orgId=15273347",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/7000000000247/photo?orgId=1234567890",
                       "firstName" : "Jack",
                       "lastName" : "Carol",
                       "id" : "7000000000247",
@@ -1145,7 +1231,7 @@
                     "sarNumber" : "140",
                     "createdTime" : 1603973416890,
                     "modifiedBy" : {
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/7000000000247/photo?orgId=15273347",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/7000000000247/photo?orgId=1234567890",
                       "firstName" : "Jack",
                       "lastName" : "Carol",
                       "id" : "7000000000247",
@@ -1158,7 +1244,7 @@
                     "contactEmailId" : "mark@zylker.com",
                     "modifiedById" : "7000000000247",
                     "createdBy" : {
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/7000000000247/photo?orgId=15273347",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/7000000000247/photo?orgId=1234567890",
                       "firstName" : "Jack",
                       "lastName" : "Carol",
                       "id" : "7000000000247",
@@ -1168,7 +1254,7 @@
                     "sarNumber" : "139",
                     "createdTime" : 1603973298838,
                     "modifiedBy" : {
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/7000000000247/photo?orgId=15273347",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/7000000000247/photo?orgId=1234567890",
                       "firstName" : "Jack",
                       "lastName" : "Carol",
                       "id" : "7000000000247",
@@ -1181,7 +1267,7 @@
                     "contactEmailId" : "john@zylker.com",
                     "modifiedById" : "7000000000247",
                     "createdBy" : {
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/7000000000247/photo?orgId=15273347",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/7000000000247/photo?orgId=1234567890",
                       "firstName" : "Jack",
                       "lastName" : "Carol",
                       "id" : "7000000000247",
@@ -1191,7 +1277,7 @@
                     "sarNumber" : "138",
                     "createdTime" : 1603972949954,
                     "modifiedBy" : {
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/7000000000247/photo?orgId=15273347",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/7000000000247/photo?orgId=1234567890",
                       "firstName" : "Jack",
                       "lastName" : "Carol",
                       "id" : "7000000000247",
@@ -1204,7 +1290,7 @@
                     "contactEmailId" : "mark@zylker.com",
                     "modifiedById" : "7000000000247",
                     "createdBy" : {
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/7000000000247/photo?orgId=15273347",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/7000000000247/photo?orgId=1234567890",
                       "firstName" : "Jack",
                       "lastName" : "Carol",
                       "id" : "7000000000247",
@@ -1214,7 +1300,7 @@
                     "sarNumber" : "137",
                     "createdTime" : 1603972766592,
                     "modifiedBy" : {
-                      "photoURL" : "https://desk.zoho.com/api/v1/agents/7000000000247/photo?orgId=15273347",
+                      "photoURL" : "https://desk.example.com/api/v1/agents/7000000000247/photo?orgId=1234567890",
                       "firstName" : "Jack",
                       "lastName" : "Carol",
                       "id" : "7000000000247",
@@ -1235,88 +1321,93 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "modifiedTime" : {
+                  "description" : "Timestamp when this record was last modified (epoch milliseconds)",
                   "type" : [ "string", "null" ],
                   "maxLength" : 100,
                   "minLength" : 0
                 },
                 "contactEmailId" : {
+                  "description" : "Email address of the contact whose resources are being exported",
                   "type" : [ "string", "null" ],
                   "maxLength" : 255,
                   "minLength" : 0,
                   "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
                 },
                 "requestType" : {
+                  "description" : "Accepted values: ACCESS_REQUEST, ERASURE_REQUEST",
                   "type" : [ "string", "null" ],
-                  "enum" : [ "ACCESS_REQUEST", "ERASURE_REQUEST" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "enum" : [ "ACCESS_REQUEST", "ERASURE_REQUEST" ]
                 },
                 "recordType" : {
+                  "description" : "Accepted values: ALL, SPECIFIC",
                   "type" : [ "string", "null" ],
-                  "enum" : [ "ALL", "SPECIFIC" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "enum" : [ "ALL", "SPECIFIC" ]
                 },
                 "query" : {
-                  "type" : [ "null", "object" ],
+                  "description" : "Criteria used to filter records for the request",
+                  "type" : [ "object", "null" ],
                   "additionalProperties" : false
                 },
                 "module" : {
+                  "description" : "Accepted values: allEntities, contacts, tickets",
                   "type" : [ "string", "null" ],
-                  "enum" : [ "allEntities", "contacts", "tickets" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "enum" : [ "allEntities", "contacts", "tickets" ]
                 },
                 "downloadURL" : {
+                  "description" : "URL to download the exported subject data",
                   "type" : [ "string", "null" ],
                   "maxLength" : 1000,
                   "minLength" : 0
                 },
                 "type" : {
+                  "description" : "Accepted values: ALL, SPECIFIC",
                   "type" : [ "string", "null" ],
-                  "enum" : [ "ALL", "SPECIFIC" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "enum" : [ "ALL", "SPECIFIC" ]
                 },
                 "modifiedById" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Unique ID of the agent who last modified the request",
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "referenceTicketNumber" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Ticket number linked to the request",
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int32",
                   "pattern" : "([0-9]+)"
                 },
                 "sarNumber" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Unique number assigned to the subject access request",
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int32",
                   "pattern" : "([0-9]+)"
                 },
                 "createdTime" : {
+                  "description" : "Timestamp when this record was created (epoch milliseconds)",
                   "type" : [ "string", "null" ],
                   "maxLength" : 100,
                   "minLength" : 0
                 },
                 "id" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Unique ID of the subject access request",
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "createdById" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Unique ID of the agent who created the request",
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "status" : {
+                  "description" : "Accepted values: INITIATED, INPROGRESS, COMPLETED, CANCELED, EXPORTED, PARTIALLY_COMPLETED, PARTIALLY_EXPORTED, FAILED",
                   "type" : [ "string", "null" ],
-                  "enum" : [ "FAILED", "INITIATED", "INPROGRESS", "COMPLETED", "CANCELED", "EXPORTED", "PARTIALLY_COMPLETED", "PARTIALLY_EXPORTED" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "enum" : [ "FAILED", "INITIATED", "INPROGRESS", "COMPLETED", "CANCELED", "EXPORTED", "PARTIALLY_COMPLETED", "PARTIALLY_EXPORTED" ]
                 }
               },
               "required" : [ "contactEmailId", "createdById", "createdTime", "downloadURL", "id", "modifiedById", "modifiedTime", "module", "query", "recordType", "referenceTicketNumber", "requestType", "sarNumber", "status", "type" ]
@@ -1341,7 +1432,7 @@
                           "displayKey" : "${CURRENTTIME}",
                           "key" : "${CURRENTTIME}"
                         } ],
-                        "type" : "primitive"
+                        "type" : [ "primitive" ]
                       }
                     } ],
                     "criteriaPattern" : "1"
@@ -1365,10 +1456,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "count" : {
+                  "description" : "Total number of resources related to the subject",
                   "type" : [ "string", "null" ],
                   "maxLength" : 100,
                   "minLength" : 0,
@@ -1388,52 +1480,38 @@
         }
       }
     },
-    "parameters" : {
-      "sarId" : {
-        "name" : "sarId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      }
-    },
     "requestBodies" : {
       "sarExportAll" : {
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "fieldConditions" : {
-                  "type" : [ "null", "array" ],
+                  "description" : "Field-level conditions used to filter the data",
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "null", "object" ],
+                    "type" : [ "object" ],
                     "additionalProperties" : false,
                     "maxProperties" : 3,
                     "minProperties" : 3,
                     "properties" : {
                       "condition" : {
-                        "type" : [ "string", "null" ],
-                        "enum" : [ "is", "starts with" ],
-                        "maxLength" : 100,
-                        "minLength" : 0
+                        "description" : "Condition to apply to the field",
+                        "type" : [ "string" ],
+                        "enum" : [ "is", "starts with" ]
                       },
                       "fieldName" : {
-                        "type" : [ "string", "null" ],
-                        "enum" : [ "All" ],
-                        "maxLength" : 100,
-                        "minLength" : 0
+                        "description" : "Name of the field to filter on",
+                        "type" : [ "string" ],
+                        "enum" : [ "All" ]
                       },
                       "value" : {
-                        "type" : [ "null", "array" ],
+                        "description" : "Value(s) to match against the field",
+                        "type" : [ "array" ],
                         "items" : {
-                          "type" : [ "string", "null" ],
+                          "type" : [ "string" ],
                           "maxLength" : 100,
                           "minLength" : 0,
                           "pattern" : "[a-zA-Z0-9\\_\\-\\+\\?\\!\\.\\P{InBasicLatin}\\(\\)\\s]+"
@@ -1446,25 +1524,24 @@
                   "uniqueItems" : false
                 },
                 "contactEmailId" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 255,
-                  "minLength" : 0,
+                  "description" : "Email address of the contact whose data must be exported",
+                  "type" : [ "string" ],
+                  "maxLength" : 100,
                   "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
                 },
                 "callBackUrl" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 2000,
-                  "minLength" : 0,
-                  "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+                  "description" : "Callback URL to receive a notification when the export is complete",
+                  "type" : [ "string" ],
+                  "maxLength" : 2000
                 },
                 "module" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "allEntities", "contacts", "tickets" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "description" : "Accepted values: allEntities, contacts, tickets",
+                  "type" : [ "string" ],
+                  "enum" : [ "allEntities", "contacts", "tickets" ]
                 },
                 "referenceTicketNumber" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Ticket number linked to the request",
+                  "type" : [ "string", "integer" ],
                   "format" : "int32",
                   "pattern" : "([0-9]+)"
                 }
@@ -1492,33 +1569,33 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "fieldConditions" : {
-                  "type" : [ "null", "array" ],
+                  "description" : "Field-level conditions used to filter the data",
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "null", "object" ],
+                    "type" : [ "object" ],
                     "additionalProperties" : false,
                     "maxProperties" : 3,
                     "minProperties" : 3,
                     "properties" : {
                       "condition" : {
-                        "type" : [ "string", "null" ],
-                        "enum" : [ "is", "starts with" ],
-                        "maxLength" : 100,
-                        "minLength" : 0
+                        "description" : "Condition to apply to the field",
+                        "type" : [ "string" ],
+                        "enum" : [ "is", "starts with" ]
                       },
                       "fieldName" : {
-                        "type" : [ "string", "null" ],
-                        "enum" : [ "All" ],
-                        "maxLength" : 100,
-                        "minLength" : 0
+                        "description" : "Name of the field to filter on",
+                        "type" : [ "string" ],
+                        "enum" : [ "All" ]
                       },
                       "value" : {
-                        "type" : [ "null", "array" ],
+                        "description" : "Value(s) to match against the field",
+                        "type" : [ "array" ],
                         "items" : {
-                          "type" : [ "string", "null" ],
+                          "type" : [ "string" ],
                           "maxLength" : 100,
                           "minLength" : 0,
                           "pattern" : "[a-zA-Z0-9\\_\\-\\+\\?\\!\\.\\P{InBasicLatin}\\(\\)\\s]+"
@@ -1531,19 +1608,19 @@
                   "uniqueItems" : false
                 },
                 "contactEmailId" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 255,
-                  "minLength" : 0,
+                  "description" : "Email address of the contact whose data must be erased",
+                  "type" : [ "string" ],
+                  "maxLength" : 100,
                   "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
                 },
                 "module" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "allEntities", "contacts", "tickets" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "description" : "Accepted values: allEntities, contacts, tickets",
+                  "type" : [ "string" ],
+                  "enum" : [ "allEntities", "contacts", "tickets" ]
                 },
                 "referenceTicketNumber" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Ticket number linked to the request",
+                  "type" : [ "string", "integer" ],
                   "format" : "int32",
                   "pattern" : "([0-9]+)"
                 }
@@ -1570,22 +1647,24 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "contactEmailId" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 255,
-                  "minLength" : 0,
+                  "description" : "Email address of the contact whose resources must be exported",
+                  "type" : [ "string" ],
+                  "maxLength" : 100,
                   "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
                 },
                 "referenceTicketNumber" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Ticket number linked to the request",
+                  "type" : [ "string", "integer" ],
                   "format" : "int32",
                   "pattern" : "([0-9]+)"
                 },
                 "ids" : {
-                  "$ref" : "./SubjectAccessRequest.json#/components/schemas/ids"
+                  "description" : "ID(s) of the resources to be exported",
+                  "$ref" : "#/components/schemas/ids"
                 }
               },
               "required" : [ "contactEmailId", "ids" ]
@@ -1605,33 +1684,33 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "fieldConditions" : {
-                  "type" : [ "null", "array" ],
+                  "description" : "Field-level conditions used to filter the data",
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "null", "object" ],
+                    "type" : [ "object" ],
                     "additionalProperties" : false,
                     "maxProperties" : 3,
                     "minProperties" : 3,
                     "properties" : {
                       "condition" : {
-                        "type" : [ "string", "null" ],
-                        "enum" : [ "is", "starts with" ],
-                        "maxLength" : 100,
-                        "minLength" : 0
+                        "description" : "Condition to apply to the field",
+                        "type" : [ "string" ],
+                        "enum" : [ "is", "starts with" ]
                       },
                       "fieldName" : {
-                        "type" : [ "string", "null" ],
-                        "enum" : [ "All" ],
-                        "maxLength" : 100,
-                        "minLength" : 0
+                        "description" : "Name of the field to filter on",
+                        "type" : [ "string" ],
+                        "enum" : [ "All" ]
                       },
                       "value" : {
-                        "type" : [ "null", "array" ],
+                        "description" : "Value(s) to match against the field",
+                        "type" : [ "array" ],
                         "items" : {
-                          "type" : [ "string", "null" ],
+                          "type" : [ "string" ],
                           "maxLength" : 100,
                           "minLength" : 0,
                           "pattern" : "[a-zA-Z0-9\\_\\-\\+\\?\\!\\.\\P{InBasicLatin}\\(\\)\\s]+"
@@ -1644,16 +1723,15 @@
                   "uniqueItems" : false
                 },
                 "contactEmailId" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 255,
-                  "minLength" : 0,
+                  "description" : "Email address of the contact whose resources must be counted",
+                  "type" : [ "string" ],
+                  "maxLength" : 100,
                   "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
                 },
                 "module" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "allEntities", "contacts", "tickets" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "description" : "Accepted values: allEntities, contacts, tickets",
+                  "type" : [ "string" ],
+                  "enum" : [ "allEntities", "contacts", "tickets" ]
                 }
               },
               "required" : [ "contactEmailId", "module" ]
@@ -1673,22 +1751,24 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "contactEmailId" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 255,
-                  "minLength" : 0,
+                  "description" : "Email address of the contact whose resources must be erased",
+                  "type" : [ "string" ],
+                  "maxLength" : 100,
                   "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
                 },
                 "referenceTicketNumber" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Ticket number linked to the request",
+                  "type" : [ "string", "integer" ],
                   "format" : "int32",
                   "pattern" : "([0-9]+)"
                 },
                 "ids" : {
-                  "$ref" : "./SubjectAccessRequest.json#/components/schemas/ids"
+                  "description" : "ID(s) of the resources to be erased",
+                  "$ref" : "#/components/schemas/ids"
                 }
               },
               "required" : [ "contactEmailId", "ids" ]
@@ -1706,6 +1786,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

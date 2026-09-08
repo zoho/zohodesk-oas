@@ -11,22 +11,44 @@
         "summary" : "Get Ticket Time Entry",
         "description" : "This API fetches a time entry recorded for a ticket.",
         "operationId" : "getTicketTimeEntry",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
-          "description" : "Secondary information related to the time entry. Value supported is @owner@.",
+          "description" : "Secondary information related to the time entry. Value supported is owner.",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : "string",
-            "description" : "Secondary information related to the time entry. Value supported is @owner@.",
-            "enum" : [ "owner" ]
+            "type" : [ "string" ],
+            "enum" : [ "owner" ],
+            "maxLength" : 100,
+            "pattern" : "(owner)"
           }
         }, {
-          "$ref" : "#/components/parameters/timeEntryId"
+          "name" : "timeEntryId",
+          "in" : "path",
+          "description" : "Unique ID of the time entry",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/ticketId"
+          "name" : "ticketId",
+          "in" : "path",
+          "description" : "ID of the ticket",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -46,9 +68,29 @@
         "description" : "This API deletes a time entry recorded for a ticket",
         "operationId" : "deleteTicketTimeEntry",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/timeEntryId"
+          "name" : "timeEntryId",
+          "in" : "path",
+          "description" : "Unique ID of the time entry",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/ticketId"
+          "name" : "ticketId",
+          "in" : "path",
+          "description" : "ID of the ticket",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -72,20 +114,32 @@
         "summary" : "List Ticket Time Entries",
         "description" : "This API lists the time entries associated with a ticket.",
         "operationId" : "getTicketTimeEntries",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
-          "description" : "Secondary information related to the time entry. Value supported is @owner@.",
+          "description" : "Secondary information related to the time entry. Value supported is owner.",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Secondary information related to the time entry. Value supported is @owner@.",
-            "enum" : [ "owner" ]
+            "type" : [ "string" ],
+            "enum" : [ "owner" ],
+            "maxLength" : 100,
+            "pattern" : "(owner)"
           }
         }, {
-          "$ref" : "#/components/parameters/module"
+          "name" : "module",
+          "in" : "query",
+          "description" : "Module from which the time entries must be fetched. Accepted values: tickets, tasks, calls, events.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "enum" : [ "tickets", "tasks", "calls", "events" ]
+          }
         }, {
           "name" : "createdTimeRange",
           "in" : "query",
@@ -94,10 +148,8 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Key that filters time entries created in a particular period of time. Enter the from and to dates in the ISO date format of yyyy-MM-ddThh:mm:ss.SSSZ; for example, createdTimeRange=2017-11-05T00:00:00.000Z,2018-09-05T23:59:00.000Z.",
+            "type" : [ "string" ],
             "maxLength" : 100,
-            "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)),(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null"
           }
         }, {
@@ -108,24 +160,35 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "integer" ],
             "format" : "int32",
-            "description" : "Number of time entries to fetch",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "maximum" : 100
           }
         }, {
-          "$ref" : "#/components/parameters/billStatus"
-        }, {
-          "name" : "orderBy",
+          "name" : "billStatus",
           "in" : "query",
-          "description" : "Key that sorts the time entries in ascending or descending order, based on the @executedTime@ attribute. Values allowed are @ASC@ (default) and @DESC@.",
+          "description" : "Key that filters time entries based on their billing status. Accepted values: nonBillable, billable, billed.",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Key that sorts the time entries in ascending or descending order, based on the @executedTime@ attribute. Values allowed are @ASC@ (default) and @DESC@.",
-            "enum" : [ "ASC", "DESC" ]
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "enum" : [ "nonBillable", "billable", "billed" ]
+          }
+        }, {
+          "name" : "orderBy",
+          "in" : "query",
+          "description" : "Key that sorts the time entries in ascending or descending order, based on the executedTime attribute. Accepted values: ASC (default), DESC.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "ASC", "DESC" ],
+            "maxLength" : 100
           }
         }, {
           "name" : "from",
@@ -135,10 +198,10 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "integer" ],
             "format" : "int32",
-            "description" : "Index number, starting from which the time entries must be fetched",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "default" : 0
           }
         }, {
           "name" : "modifiedTimeRange",
@@ -148,20 +211,19 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Key that filters time entries whose details were modified in a particular period of time. Enter the from and to dates in the ISO date format of yyyy-MM-ddThh:mm:ss.SSSZ; for example, modifiedTimeRange=2017-11-05T00:00:00.000Z,2018-09-05T23:59:00.000Z.",
+            "type" : [ "string" ],
             "maxLength" : 100,
-            "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)),(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null"
           }
         }, {
           "name" : "caseId",
           "in" : "path",
+          "description" : "Unique ID of the ticket",
           "required" : true,
           "style" : "simple",
           "explode" : false,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
@@ -188,6 +250,7 @@
         "summary" : "Update Ticket Time Entry",
         "description" : "This API updates an existing ticket time entry",
         "operationId" : "updateTicketTimeEntry",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "teId",
           "in" : "path",
@@ -195,12 +258,22 @@
           "style" : "simple",
           "explode" : false,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
         }, {
-          "$ref" : "#/components/parameters/ticketId"
+          "name" : "ticketId",
+          "in" : "path",
+          "description" : "ID of the ticket",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -227,12 +300,43 @@
         "summary" : "Get summation of Ticket Time Entries",
         "description" : "This API fetches the sum of time entries associated with a ticket.",
         "operationId" : "getSummationOfTimeEntryForTicket",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/module"
+          "name" : "module",
+          "in" : "query",
+          "description" : "Module from which the time entries must be fetched. Accepted values: tickets, tasks, calls, events.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "enum" : [ "tickets", "tasks", "calls", "events" ]
+          }
         }, {
-          "$ref" : "#/components/parameters/billStatus"
+          "name" : "billStatus",
+          "in" : "query",
+          "description" : "Key that filters time entries based on their billing status. Accepted values: nonBillable, billable, billed.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "enum" : [ "nonBillable", "billable", "billed" ]
+          }
         }, {
-          "$ref" : "#/components/parameters/ticketId"
+          "name" : "ticketId",
+          "in" : "path",
+          "description" : "ID of the ticket",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -256,8 +360,19 @@
         "summary" : "Add Ticket Time Entry",
         "description" : "This API adds a time entry in your help desk",
         "operationId" : "createTicketTimeEntry",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/ticketId"
+          "name" : "ticketId",
+          "in" : "path",
+          "description" : "ID of the ticket",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -284,34 +399,69 @@
         "summary" : "Get Ticket Time Entries by Billing Type",
         "description" : "This API fetches time entries for a ticket created after recently modified time of the given billing type from your help desk",
         "operationId" : "getTicketTimeEntriesByBillingType",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
-          "description" : "Allowed value is : @owner@ ",
-          "required" : true,
+          "description" : "Secondary information related to the time entry. Value supported is owner.",
+          "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Allowed value is : @owner@ ",
-            "enum" : [ "owner" ]
+            "type" : [ "string" ],
+            "enum" : [ "owner" ],
+            "maxLength" : 100,
+            "pattern" : "(owner)"
           }
         }, {
           "name" : "billingType",
           "in" : "query",
-          "description" : "Allowed values are @FIXED_COST_FOR_TICKETS@ @FIXED_COST_FOR_AGENTS@ @SPECIFIC_COST_PER_AGENT@ @SPECIFIC_COST_PER_PROFILE@",
+          "description" : "Accepted values: FIXED_COST_FOR_TICKETS, FIXED_COST_FOR_AGENTS, SPECIFIC_COST_PER_AGENT, SPECIFIC_COST_PER_PROFILE.",
           "required" : true,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "description" : "Allowed values are @FIXED_COST_FOR_TICKETS@ @FIXED_COST_FOR_AGENTS@ @SPECIFIC_COST_PER_AGENT@ @SPECIFIC_COST_PER_PROFILE@",
-            "enum" : [ "FIXED_COST_FOR_TICKETS", "FIXED_COST_FOR_AGENTS", "SPECIFIC_COST_PER_PROFILE", "SPECIFIC_COST_PER_AGENT" ],
+            "type" : [ "string" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "FIXED_COST_FOR_TICKETS", "FIXED_COST_FOR_AGENTS", "SPECIFIC_COST_PER_PROFILE", "SPECIFIC_COST_PER_AGENT" ]
           }
         }, {
-          "$ref" : "#/components/parameters/ticketId"
+          "name" : "from",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "default" : 0
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Index number, starting from which the time entries must be fetched"
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "minimum" : 1,
+            "maximum" : 100
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Number of time entries to fetch"
+        }, {
+          "name" : "ticketId",
+          "in" : "path",
+          "description" : "ID of the ticket",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -336,64 +486,75 @@
   "components" : {
     "schemas" : {
       "owner" : {
-        "type" : "object",
+        "type" : [ "object" ],
         "properties" : {
           "firstName" : {
             "type" : [ "string", "null" ],
+            "description" : "First name of the user associated with the time entry",
             "maxLength" : 50,
             "minLength" : 0
           },
           "lastName" : {
             "type" : [ "string", "null" ],
+            "description" : "Last name of the user associated with the time entry",
             "maxLength" : 50,
             "minLength" : 0
           },
           "photoURL" : {
             "type" : [ "string", "null" ],
+            "description" : "URL of the user's profile photo",
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
+            "description" : "Unique ID of the user associated with the time entry",
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "name" : {
             "type" : [ "string", "null" ],
+            "description" : "Display name of the user associated with the time entry",
             "maxLength" : 100,
             "minLength" : 0
           }
         },
-        "required" : [ "firstName", "id", "lastName", "name", "photoURL" ]
+        "required" : [ "firstName", "id", "lastName", "name", "photoURL" ],
+        "additionalProperties" : false
       },
       "ticketTimeEntryResponse" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "parent" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
+            "description" : "Parent entity associated with the time entry",
             "additionalProperties" : false,
             "maxProperties" : 4,
             "minProperties" : 4,
             "properties" : {
               "ticketNumber" : {
-                "type" : [ "string", "null", "integer" ],
+                "type" : [ "string", "integer", "null" ],
+                "description" : "Ticket number of the associated ticket",
                 "format" : "int32",
                 "pattern" : "([0-9]+)"
               },
               "subject" : {
                 "type" : [ "string", "null" ],
+                "description" : "Subject of the associated record",
                 "maxLength" : 100,
                 "minLength" : 0
               },
               "id" : {
-                "type" : [ "string", "null", "integer" ],
+                "type" : [ "string", "integer", "null" ],
+                "description" : "Unique ID of the associated record",
                 "format" : "int64",
                 "pattern" : "([0-9]+)"
               },
               "type" : {
                 "type" : [ "string", "null" ],
+                "description" : "Module type of the associated record",
                 "maxLength" : 100,
                 "minLength" : 0
               }
@@ -402,12 +563,14 @@
           },
           "executedTime" : {
             "type" : [ "string", "null" ],
+            "description" : "Time when work related to the time entry was started",
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "customFields" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
+            "description" : "User-defined fields related to the time entry. Deprecated: use cf instead",
             "additionalProperties" : false,
             "patternProperties" : {
               "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
@@ -419,70 +582,79 @@
             }
           },
           "departmentId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
+            "description" : "Unique ID of the department associated with the time entry",
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "agentCostPerHour" : {
             "type" : [ "string", "null" ],
+            "description" : "Hourly cost of the agent",
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "([0-9]{1,13}(\\.[0-9]*)?)"
           },
           "description" : {
             "type" : [ "string", "null" ],
+            "description" : "Description of the time entry",
             "maxLength" : 100,
             "minLength" : 0
           },
           "ownerId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
+            "description" : "Unique ID of the user associated with the time entry",
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "mode" : {
             "type" : [ "string", "null" ],
-            "enum" : [ "MANUAL", "AUTO" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "description" : "Time tracking mode configured for the time entry. Accepted values: MANUAL, AUTO",
+            "enum" : [ "MANUAL", "AUTO" ]
           },
           "isTrashed" : {
-            "type" : [ "boolean", "null" ]
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the time entry is in the Recycle Bin"
           },
           "requestId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
+            "description" : "ID of the associated request",
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "createdTime" : {
             "type" : [ "string", "null" ],
+            "description" : "Time when the time entry was created",
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
+            "description" : "Unique ID of the time entry",
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "requestChargeType" : {
             "type" : [ "string", "null" ],
-            "enum" : [ "Customer Service", "Upgrade Request", "Product Consultation", "Support and Maintenance" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "description" : "Type of request associated with the ticket time entry. Accepted values: Customer Service, Upgrade Request, Product Consultation, Support and Maintenance",
+            "enum" : [ "Customer Service", "Upgrade Request", "Product Consultation", "Support and Maintenance" ]
           },
           "layoutDetails" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
+            "description" : "Layout details of the time entry",
             "additionalProperties" : false,
             "maxProperties" : 2,
             "minProperties" : 2,
             "properties" : {
               "id" : {
-                "type" : [ "string", "null", "integer" ],
+                "type" : [ "string", "integer", "null" ],
+                "description" : "Unique ID of the layout",
                 "format" : "int64",
                 "pattern" : "([0-9]+)"
               },
               "layoutName" : {
                 "type" : [ "string", "null" ],
+                "description" : "Name of the layout",
                 "maxLength" : 120,
                 "minLength" : 0,
                 "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
@@ -491,12 +663,14 @@
             "required" : [ "id", "layoutName" ]
           },
           "secondsSpent" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
+            "description" : "Number of seconds recorded in the time entry",
             "format" : "int32",
             "pattern" : "([0-9]+)"
           },
           "cf" : {
-            "type" : [ "null", "object" ],
+            "type" : [ "object", "null" ],
+            "description" : "User-defined fields related to the time entry",
             "additionalProperties" : false,
             "patternProperties" : {
               "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
@@ -508,54 +682,64 @@
             }
           },
           "fixedCost" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0,
+            "type" : [ "number", "string", "null" ],
+            "format" : "double",
+            "description" : "Fixed cost applied to the time entry",
             "pattern" : "([0-9]{1,13}(\\.[0-9]*)?)"
           },
           "minutesSpent" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
+            "description" : "Number of minutes recorded in the time entry",
             "format" : "int32",
             "pattern" : "([0-9]+)"
           },
           "hoursSpent" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
+            "description" : "Number of hours recorded in the time entry",
             "format" : "int32",
+            "minimum" : 0,
+            "maximum" : 999,
             "pattern" : "([0-9]+)"
           },
           "layoutId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
+            "description" : "Layout of the time entry",
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "isBillable" : {
             "type" : [ "boolean", "null" ],
-            "description" : "Key that returns if the time tracked is billable or not"
+            "description" : "Indicates whether the time entry is billable"
           },
           "createdBy" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
+            "description" : "ID of the user who created the time entry",
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "invoiceId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
+            "description" : "Unique ID of the invoice related to the time entry",
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "additionalCost" : {
             "type" : [ "string", "null" ],
+            "description" : "Additional cost incurred for the time entry",
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "([0-9]{1,13}(\\.[0-9]*)?)"
           },
           "totalCost" : {
             "type" : [ "string", "null" ],
+            "description" : "Total cost incurred for the time entry",
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "([0-9]{1,13}(\\.[0-9]*)?)"
           },
           "taskId" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
+            "description" : "ID of the associated task",
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
@@ -566,31 +750,33 @@
         "required" : [ "additionalCost", "agentCostPerHour", "cf", "createdBy", "createdTime", "customFields", "departmentId", "description", "executedTime", "fixedCost", "hoursSpent", "id", "invoiceId", "isBillable", "isTrashed", "layoutDetails", "layoutId", "minutesSpent", "mode", "ownerId", "parent", "requestChargeType", "requestId", "secondsSpent", "taskId", "totalCost" ]
       },
       "listTicketTimeEntryResponse" : {
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "allOf" : [ {
-          "$ref" : "./TicketTimeEntry.json#/components/schemas/ticketTimeEntryResponse"
+          "$ref" : "#/components/schemas/ticketTimeEntryResponse"
         }, {
-          "type" : [ "null", "object" ],
+          "type" : [ "object", "null" ],
           "properties" : {
             "createdBy" : {
-              "type" : [ "string", "null", "integer" ],
+              "type" : [ "string", "integer", "null" ],
+              "description" : "ID of the user who created the time entry",
               "format" : "int64",
               "pattern" : "([0-9]+)"
             },
             "billingType" : {
               "type" : [ "string", "null" ],
-              "enum" : [ "FIXED_COST_FOR_TICKETS", "FIXED_COST_FOR_AGENTS", "SPECIFIC_COST_PER_PROFILE", "SPECIFIC_COST_PER_AGENT" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "description" : "Billing type configured for time tracking. Accepted values: FIXED_COST_FOR_TICKETS, FIXED_COST_FOR_AGENTS, SPECIFIC_COST_PER_AGENT, SPECIFIC_COST_PER_PROFILE",
+              "enum" : [ "FIXED_COST_FOR_TICKETS", "FIXED_COST_FOR_AGENTS", "SPECIFIC_COST_PER_PROFILE", "SPECIFIC_COST_PER_AGENT" ]
             }
           },
-          "required" : [ "billingType", "createdBy" ]
+          "required" : [ "billingType", "createdBy" ],
+          "additionalProperties" : false
         } ]
       },
       "ticketTimeEntryData" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./TicketTimeEntry.json#/components/schemas/listTicketTimeEntryResponse"
+          "$ref" : "#/components/schemas/listTicketTimeEntryResponse"
         }
       }
     },
@@ -610,7 +796,7 @@
                     "ticketNumber" : "1004",
                     "subject" : "Ticket subject",
                     "id" : "4000000031007",
-                    "type" : "TICKETS"
+                    "type" : [ "TICKETS" ]
                   },
                   "cf" : {
                     "cf_timeentryname" : "time2"
@@ -645,11 +831,12 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./TicketTimeEntry.json#/components/schemas/ticketTimeEntryData"
+                  "description" : "List of time entry records associated with the ticket",
+                  "$ref" : "#/components/schemas/ticketTimeEntryData"
                 }
               },
               "required" : [ "data" ]
@@ -659,10 +846,10 @@
                 "value" : {
                   "data" : [ {
                     "owner" : {
-                      "firstName" : "Eswer",
-                      "lastName" : "KM",
-                      "photoURL" : "https://contacts.zoho.com/file?t=user&ID=4851669",
-                      "name" : "Eswer KM",
+                      "firstName" : "Oliver",
+                      "lastName" : "Miller",
+                      "photoURL" : "https://contacts.example.com/file?t=user&ID=1234567890",
+                      "name" : "Oliver Miller",
                       "id" : "4000000008688129"
                     },
                     "secondsSpent" : "0",
@@ -670,7 +857,7 @@
                       "ticketNumber" : "1004",
                       "subject" : "Ticket subject",
                       "id" : "4000000031007",
-                      "type" : "TICKETS"
+                      "type" : [ "TICKETS" ]
                     },
                     "cf" : { },
                     "executedTime" : null,
@@ -694,10 +881,10 @@
                     "totalCost" : "0.0"
                   }, {
                     "owner" : {
-                      "firstName" : "Eswer",
-                      "lastName" : "KM",
-                      "photoURL" : "https://contacts.zoho.com/file?t=user&ID=4851669",
-                      "name" : "Eswer KM",
+                      "firstName" : "Oliver",
+                      "lastName" : "Miller",
+                      "photoURL" : "https://contacts.example.com/file?t=user&ID=1234567890",
+                      "name" : "Oliver Miller",
                       "id" : "4000000008688129"
                     },
                     "secondsSpent" : "0",
@@ -705,7 +892,7 @@
                       "ticketNumber" : "1004",
                       "subject" : "Ticket subject",
                       "id" : "4000000031007",
-                      "type" : "TICKETS"
+                      "type" : [ "TICKETS" ]
                     },
                     "cf" : { },
                     "executedTime" : 1513793360000,
@@ -739,26 +926,30 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "totalMins" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
+                  "description" : "Total number of minutes across the matched time entries",
                   "format" : "int32",
                   "pattern" : "([0-9]+)"
                 },
                 "totalHours" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
+                  "description" : "Total number of hours across the matched time entries",
                   "format" : "int32",
                   "pattern" : "([0-9]+)"
                 },
                 "totalCosts" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
+                  "description" : "Total cost across the matched time entries",
                   "format" : "int32",
                   "pattern" : "([0-9]+)"
                 },
                 "totalSeconds" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer", "null" ],
+                  "description" : "Total number of seconds across the matched time entries",
                   "format" : "int32",
                   "pattern" : "([0-9]+)"
                 }
@@ -779,84 +970,26 @@
         }
       }
     },
-    "parameters" : {
-      "timeEntryId" : {
-        "name" : "timeEntryId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "module" : {
-        "name" : "module",
-        "in" : "query",
-        "description" : "Module from which the time entries must be fetched. Values allowed are @tickets@ and @tasks@.",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null" ],
-          "description" : "Module from which the time entries must be fetched. Values allowed are @tickets@ and @tasks@.",
-          "enum" : [ "tickets", "tasks" ],
-          "maxLength" : 100,
-          "minLength" : 0
-        }
-      },
-      "billStatus" : {
-        "name" : "billStatus",
-        "in" : "query",
-        "description" : "Key that filters time entries, based on their billing status: @nonBillable@ , @billable@ or @billed@",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null" ],
-          "description" : "Key that filters time entries, based on their billing status: @nonBillable@ , @billable@ or @billed@",
-          "enum" : [ "nonBillable", "billable", "billed" ],
-          "maxLength" : 100,
-          "minLength" : 0
-        }
-      },
-      "ticketId" : {
-        "name" : "ticketId",
-        "in" : "path",
-        "description" : "ID of the ticket",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "description" : "ID of the ticket",
-          "pattern" : "([0-9]+)"
-        }
-      }
-    },
     "requestBodies" : {
       "timeEntryJson" : {
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "secondsSpent" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer" ],
                   "format" : "int32",
                   "description" : "Number of seconds in the time entry.",
                   "pattern" : "([0-9]+)"
                 },
                 "cf" : {
-                  "type" : [ "null", "object" ],
+                  "type" : [ "object" ],
                   "additionalProperties" : false,
                   "patternProperties" : {
                     "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
-                      "type" : [ "string", "null" ],
+                      "type" : [ "string" ],
                       "maxLength" : 100,
                       "minLength" : 0,
                       "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
@@ -864,18 +997,18 @@
                   }
                 },
                 "executedTime" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "description" : "Time when work related to the time entry was started.",
                   "maxLength" : 100,
                   "minLength" : 0,
                   "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
                 },
                 "customFields" : {
-                  "type" : [ "null", "object" ],
+                  "type" : [ "object" ],
                   "additionalProperties" : false,
                   "patternProperties" : {
                     "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
-                      "type" : [ "string", "null" ],
+                      "type" : [ "string" ],
                       "maxLength" : 100,
                       "minLength" : 0,
                       "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
@@ -883,60 +1016,72 @@
                   }
                 },
                 "minutesSpent" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer" ],
                   "format" : "int32",
                   "description" : "Number of minutes in the time entry.",
                   "pattern" : "([0-9]+)"
                 },
                 "agentCostPerHour" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "description" : "Per hour cost of an agent.",
                   "maxLength" : 100,
                   "minLength" : 0,
                   "pattern" : "([0-9]{1,13}(\\.[0-9]*)?)"
                 },
                 "description" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "description" : "Description of the time entry",
                   "maxLength" : 100,
                   "minLength" : 0
                 },
                 "hoursSpent" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer" ],
                   "format" : "int32",
                   "description" : "Number of hours in the time entry.",
                   "pattern" : "([0-9]+)"
                 },
                 "ownerId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer" ],
                   "format" : "int64",
                   "description" : "ID of the user associated with the time entry",
                   "pattern" : "([0-9]+)"
                 },
                 "isBillable" : {
-                  "type" : [ "boolean", "null" ],
+                  "type" : [ "boolean" ],
                   "description" : "Billing Preference"
                 },
                 "billingType" : {
-                  "type" : [ "string", "null" ],
-                  "description" : "Billing type configured in the time tracking. Possible values are @FIXED_COST_FOR_TICKETS@ @FIXED_COST_FOR_AGENTS@ @SPECIFIC_COST_PER_AGENT@ and @SPECIFIC_COST_PER_PROFILE@",
-                  "enum" : [ "FIXED_COST_FOR_TICKETS", "FIXED_COST_FOR_AGENTS", "SPECIFIC_COST_PER_PROFILE", "SPECIFIC_COST_PER_AGENT" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "type" : [ "string" ],
+                  "description" : "Billing type configured in the time tracking. Accepted values: FIXED_COST_FOR_TICKETS, FIXED_COST_FOR_AGENTS, SPECIFIC_COST_PER_AGENT, SPECIFIC_COST_PER_PROFILE.",
+                  "enum" : [ "FIXED_COST_FOR_TICKETS", "FIXED_COST_FOR_AGENTS", "SPECIFIC_COST_PER_PROFILE", "SPECIFIC_COST_PER_AGENT" ]
                 },
                 "requestChargeType" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "description" : "Type of request in the ticket. Values supported are Customer Service, Upgrade Request, Product Consultation, and Support and Maintenance.",
-                  "enum" : [ "Customer Service", "Upgrade Request", "Product Consultation", "Support and Maintenance" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "enum" : [ "Customer Service", "Upgrade Request", "Product Consultation", "Support and Maintenance" ]
                 },
                 "additionalCost" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "description" : "Additional cost incurred",
                   "maxLength" : 100,
                   "minLength" : 0,
                   "pattern" : "([0-9]{1,13}(\\.[0-9]*)?)"
+                },
+                "fixedCost" : {
+                  "type" : [ "number", "string" ],
+                  "format" : "double",
+                  "description" : "Fixed cost",
+                  "pattern" : "([0-9]{1,13}(\\.[0-9]*)?)"
+                },
+                "mode" : {
+                  "type" : [ "string" ],
+                  "enum" : [ "MANUAL", "AUTO" ],
+                  "x-regex-name" : "timeTrackMode"
+                },
+                "layoutId" : {
+                  "type" : [ "string", "integer" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
                 }
               }
             },
@@ -955,21 +1100,21 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "secondsSpent" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer" ],
                   "format" : "int32",
                   "description" : "Number of seconds in the time entry.",
                   "pattern" : "([0-9]+)"
                 },
                 "cf" : {
-                  "type" : [ "null", "object" ],
+                  "type" : [ "object" ],
                   "additionalProperties" : false,
                   "patternProperties" : {
                     "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
-                      "type" : [ "string", "null" ],
+                      "type" : [ "string" ],
                       "maxLength" : 100,
                       "minLength" : 0,
                       "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
@@ -977,18 +1122,17 @@
                   }
                 },
                 "executedTime" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "description" : "Time when work related to the time entry was started.",
                   "maxLength" : 100,
-                  "minLength" : 0,
-                  "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+                  "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null"
                 },
                 "customFields" : {
-                  "type" : [ "null", "object" ],
+                  "type" : [ "object" ],
                   "additionalProperties" : false,
                   "patternProperties" : {
                     "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
-                      "type" : [ "string", "null" ],
+                      "type" : [ "string" ],
                       "maxLength" : 100,
                       "minLength" : 0,
                       "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
@@ -996,60 +1140,74 @@
                   }
                 },
                 "minutesSpent" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer" ],
                   "format" : "int32",
                   "description" : "Number of minutes in the time entry.",
                   "pattern" : "([0-9]+)"
                 },
                 "agentCostPerHour" : {
-                  "type" : [ "string", "null" ],
                   "description" : "Per hour cost of an agent.",
                   "maxLength" : 100,
-                  "minLength" : 0,
-                  "pattern" : "([0-9]{1,13}(\\.[0-9]*)?)"
+                  "type" : [ "number" ],
+                  "format" : "double"
                 },
                 "description" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "description" : "Description of the time entry",
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "maxLength" : 65535
                 },
                 "hoursSpent" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer" ],
                   "format" : "int32",
                   "description" : "Number of hours in the time entry.",
                   "pattern" : "([0-9]+)"
                 },
                 "ownerId" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "type" : [ "string", "integer" ],
                   "format" : "int64",
                   "description" : "ID of the user associated with the time entry",
-                  "pattern" : "([0-9]+)"
+                  "pattern" : "([0-9]*|null|undefined)"
                 },
                 "isBillable" : {
-                  "type" : [ "boolean", "null" ],
+                  "type" : [ "boolean" ],
                   "description" : "Billing Preference"
                 },
                 "billingType" : {
-                  "type" : [ "string", "null" ],
-                  "description" : "Billing type configured in the time tracking. Possible values are @FIXED_COST_FOR_TICKETS@ @FIXED_COST_FOR_AGENTS@ @SPECIFIC_COST_PER_AGENT@ and @SPECIFIC_COST_PER_PROFILE@",
-                  "enum" : [ "FIXED_COST_FOR_TICKETS", "FIXED_COST_FOR_AGENTS", "SPECIFIC_COST_PER_PROFILE", "SPECIFIC_COST_PER_AGENT" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "type" : [ "string" ],
+                  "description" : "Billing type configured in the time tracking. Accepted values: FIXED_COST_FOR_TICKETS, FIXED_COST_FOR_AGENTS, SPECIFIC_COST_PER_AGENT, SPECIFIC_COST_PER_PROFILE.",
+                  "enum" : [ "FIXED_COST_FOR_TICKETS", "FIXED_COST_FOR_AGENTS", "SPECIFIC_COST_PER_PROFILE", "SPECIFIC_COST_PER_AGENT" ]
                 },
                 "requestChargeType" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "description" : "Type of request in the ticket. Values supported are Customer Service, Upgrade Request, Product Consultation, and Support and Maintenance.",
                   "enum" : [ "Customer Service", "Upgrade Request", "Product Consultation", "Support and Maintenance" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
                 },
                 "additionalCost" : {
-                  "type" : [ "string", "null" ],
                   "description" : "Additional cost incurred",
                   "maxLength" : 100,
-                  "minLength" : 0,
-                  "pattern" : "([0-9]{1,13}(\\.[0-9]*)?)"
+                  "type" : [ "number" ],
+                  "format" : "double"
+                },
+                "fixedCost" : {
+                  "type" : [ "number", "string" ],
+                  "format" : "double",
+                  "description" : "Fixed cost"
+                },
+                "mode" : {
+                  "type" : [ "string" ],
+                  "enum" : [ "MANUAL", "AUTO" ],
+                  "x-regex-name" : "timeTrackMode"
+                },
+                "layoutId" : {
+                  "type" : [ "string", "integer" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "invoiceId" : {
+                  "type" : [ "string", "integer" ],
+                  "format" : "int64",
+                  "description" : "ID of the invoice related to the time entry"
                 }
               },
               "required" : [ "executedTime" ]
@@ -1079,6 +1237,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

@@ -8,15 +8,44 @@
     "/api/v1/{moduleAPIName}/{entityId}/followersCount" : {
       "get" : {
         "tags" : [ "Followers" ],
-        "summary" : "Get Entity followers count",
-        "description" : "This API fetches the count of follower list based on given filter",
+        "summary" : "Get Entity Followers Count",
+        "description" : "Retrieves the count of followers for the specified entity, with optional filtering by user type.",
         "operationId" : "getEntityFollowersCount",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/userType"
+          "name" : "userType",
+          "in" : "query",
+          "description" : "Filters the count by user type. If not provided, all users are counted. Possible values:AGENTS, END_USERS",
+          "required" : false,
+          "style" : "form",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/userType"
+          }
         }, {
-          "$ref" : "#/components/parameters/moduleAPIName"
+          "name" : "moduleAPIName",
+          "description" : "API name of the module in Desk. Possible values: articleTranslations, kbRootCategories, kbSections",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "articleTranslations", "kbRootCategories", "kbSections" ],
+            "pattern" : "(articleTranslations|kbRootCategories|kbSections)"
+          }
         }, {
-          "$ref" : "#/components/parameters/entityId"
+          "name" : "entityId",
+          "description" : "Unique ID of the entity",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -37,20 +66,20 @@
     "/api/v1/{moduleAPIName}/{entityId}/followers" : {
       "get" : {
         "tags" : [ "Followers" ],
-        "summary" : "Get Entity followers details",
-        "description" : "This API fetches the list of follower details based on the given filter",
+        "summary" : "Get Entity Followers",
+        "description" : "Retrieves the list of followers for the specified entity, with pagination support.",
         "operationId" : "getEntityFollowers",
+        "x-mcp-ready" : true,
         "parameters" : [ {
           "name" : "limit",
           "in" : "query",
-          "description" : "Number of followers to list",
+          "description" : "Number of followers to return",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "integer" ],
             "format" : "int32",
-            "description" : "Number of followers to list",
             "maximum" : 100,
             "minimum" : 1,
             "pattern" : "([0-9]+)"
@@ -58,23 +87,51 @@
         }, {
           "name" : "from",
           "in" : "query",
-          "description" : "Index number, starting from which the followers must be listed. Default value is 1.",
+          "description" : "Starting index from which the followers must be listed. Default value is 1.",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "integer" ],
             "format" : "int32",
-            "description" : "Index number, starting from which the followers must be listed. Default value is 1.",
             "minimum" : 0,
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "default" : 1
           }
         }, {
-          "$ref" : "#/components/parameters/userType"
+          "name" : "userType",
+          "in" : "query",
+          "description" : "Filters the results by user type. If not provided, all users are returned. Possible values: AGENTS, END_USERS",
+          "required" : false,
+          "style" : "form",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/userType"
+          }
         }, {
-          "$ref" : "#/components/parameters/moduleAPIName"
+          "name" : "moduleAPIName",
+          "description" : "API name of the module in Desk. Possible values: articleTranslations, kbRootCategories, kbSections",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "articleTranslations", "kbRootCategories", "kbSections" ],
+            "pattern" : "(articleTranslations|kbRootCategories|kbSections)"
+          }
         }, {
-          "$ref" : "#/components/parameters/entityId"
+          "name" : "entityId",
+          "description" : "Unique ID of the entity",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -95,13 +152,34 @@
     "/api/v1/{moduleAPIName}/{entityId}/unfollow" : {
       "post" : {
         "tags" : [ "Followers" ],
-        "summary" : "UnFollow the entity",
-        "description" : "This API unfollows the requested entity by the requested user",
+        "summary" : "UnFollow Entity",
+        "description" : "Removes the follow relationship between the current user and the specified entity.",
         "operationId" : "unfollowEntity",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/moduleAPIName"
+          "name" : "moduleAPIName",
+          "description" : "API name of the module in Desk. Possible values: articleTranslations, kbRootCategories, kbSections",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "articleTranslations", "kbRootCategories", "kbSections" ],
+            "pattern" : "(articleTranslations|kbRootCategories|kbSections)"
+          }
         }, {
-          "$ref" : "#/components/parameters/entityId"
+          "name" : "entityId",
+          "description" : "Unique ID of the entity",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -125,13 +203,34 @@
     "/api/v1/{moduleAPIName}/{entityId}/follow" : {
       "post" : {
         "tags" : [ "Followers" ],
-        "summary" : "Follow the Entity",
-        "description" : "This API follows the requested entity by the requested user",
+        "summary" : "Follow Entity",
+        "description" : "Creates a follow relationship between the current user and the specified entity.",
+        "x-mcp-ready" : true,
         "operationId" : "followEntity",
         "parameters" : [ {
-          "$ref" : "#/components/parameters/moduleAPIName"
+          "name" : "moduleAPIName",
+          "description" : "API name of the module in Desk. Possible values: articleTranslations, kbRootCategories, kbSections",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "articleTranslations", "kbRootCategories", "kbSections" ],
+            "pattern" : "(articleTranslations|kbRootCategories|kbSections)"
+          }
         }, {
-          "$ref" : "#/components/parameters/entityId"
+          "name" : "entityId",
+          "description" : "Unique ID of the entity",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -151,64 +250,364 @@
         } ],
         "x-audience" : [ "external-public" ]
       }
+    },
+    "/api/v1/getMyFollowedEntities" : {
+      "get" : {
+        "tags" : [ "Followers" ],
+        "summary" : "Get My Followed Entities",
+        "description" : "Retrieves the list of entities followed by the current user, filtered by entity type, with pagination support.",
+        "operationId" : "getMyFollowedEntities",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "entityType",
+          "in" : "query",
+          "description" : "Type of entity to retrieve. Possible values:kbRootCategories, kbSections, articleTranslations",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "kbRootCategories", "kbSections", "articleTranslations" ],
+            "pattern" : "(kbRootCategories|kbSections|articleTranslations)"
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of followed entities to return. Default is 20",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 50,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)",
+            "default" : 20
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Starting index from which the list of followed entities must be fetched",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/fromForQuery"
+          }
+        }, {
+          "name" : "locale",
+          "in" : "query",
+          "description" : "The locale or language of the entity.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "en", "ja", "zh", "es", "de", "fr", "tr", "ru", "pt", "it", "nl", "da", "sv", "pl", "ar", "he", "af", "cs", "fr-ca", "bg", "fi", "el", "hu", "id", "nb", "ro", "th", "uk", "vi", "ur", "hi", "te", "kn", "ta", "mr", "ko", "fa", "bn", "gu", "ms", "ml", "en-gb", "sk", "hr", "sl", "zh_TW", "zh-tw", "ca", "ka", "kk", "my", "km", "pt-br" ],
+            "pattern" : "[a-zA-Z]{2,4}([-_][a-zA-Z]{2})?",
+            "x-audience" : [ "external-public" ]
+          },
+          "x-audience" : [ "external-public" ]
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/followerList"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
     }
   },
   "components" : {
     "schemas" : {
+      "followedEntityObject" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "entityType" : {
+            "description" : "Type of the followed entity",
+            "type" : [ "string", "null" ],
+            "enum" : [ "kbRootCategories", "articleTranslations", "kbSections" ],
+            "pattern" : "(articleTranslations|kbRootCategories|kbSections)"
+          },
+          "id" : {
+            "description" : "Unique ID of the followed entity",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        },
+        "required" : [ "entityType", "id" ]
+      },
+      "followedEntitiesList" : {
+        "description" : "List of followed entity references",
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/followedEntityObject"
+        }
+      },
+      "kbRootCategoryFollowerDetails" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "webUrl" : {
+            "description" : "URL to access the category",
+            "type" : [ "null" ],
+            "maxLength" : 250,
+            "minLength" : 0
+          },
+          "name" : {
+            "description" : "Name of the category",
+            "type" : [ "string", "null" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "description" : {
+            "description" : "Description of the category",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "id" : {
+            "description" : "Unique ID of the category",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "locale" : {
+            "description" : "Locale of the category",
+            "type" : [ "string", "null" ],
+            "enum" : [ "en", "ja", "zh", "es", "de", "fr", "tr", "ru", "pt", "it", "nl", "da", "sv", "pl", "ar", "he", "af", "cs", "fr-ca", "bg", "fi", "el", "hu", "id", "nb", "ro", "th", "uk", "vi", "ur", "hi", "te", "kn", "ta", "mr", "ko", "fa", "bn", "gu", "ms", "ml", "en-gb", "sk", "hr", "sl", "zh_TW", "zh-tw", "ca", "ka", "kk", "my", "km", "pt-br" ],
+            "pattern" : "([a-zA-Z]{2,4}([-_][a-zA-Z]{2})?)"
+          },
+          "logoUrl" : {
+            "description" : "URL of the category logo",
+            "type" : [ "string", "null" ],
+            "maxLength" : 250,
+            "minLength" : 0,
+            "pattern" : "^((ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?|\\/[a-zA-Z0-9_\\-\\/\\.]+)$"
+          },
+          "sectionsCount" : {
+            "description" : "Number of sections in the category",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          }
+        },
+        "required" : [ "description", "id", "locale", "logoUrl", "name", "sectionsCount", "webUrl" ]
+      },
+      "kbCategoryEntitiesList" : {
+        "description" : "List of followed knowledge base categories",
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/kbRootCategoryFollowerDetails"
+        }
+      },
+      "kbArticleTranslationFollowerDetails" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "webUrl" : {
+            "description" : "URL to access the article",
+            "type" : [ "string", "null" ],
+            "maxLength" : 250,
+            "minLength" : 0,
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+          },
+          "name" : {
+            "description" : "Name of the article",
+            "type" : [ "string", "null" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "description" : {
+            "description" : "Description of the article",
+            "type" : [ "string", "null" ],
+            "maxLength" : 500,
+            "minLength" : 0
+          },
+          "id" : {
+            "description" : "Unique ID of the article",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "locale" : {
+            "description" : "Locale of the article",
+            "type" : [ "string", "null" ],
+            "enum" : [ "en", "ja", "zh", "es", "de", "fr", "tr", "ru", "pt", "it", "nl", "da", "sv", "pl", "ar", "he", "af", "cs", "fr-ca", "bg", "fi", "el", "hu", "id", "nb", "ro", "th", "uk", "vi", "ur", "hi", "te", "kn", "ta", "mr", "ko", "fa", "bn", "gu", "ms", "ml", "en-gb", "sk", "hr", "sl", "zh_TW", "zh-tw", "ca", "ka", "kk", "my", "km", "pt-br" ],
+            "pattern" : "([a-zA-Z]{2,4}([-_][a-zA-Z]{2})?)"
+          },
+          "logoUrl" : {
+            "description" : "URL of the article logo",
+            "type" : [ "string", "null" ],
+            "maxLength" : 250,
+            "minLength" : 0,
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+          },
+          "categoryId" : {
+            "description" : "Unique ID of the category the article belongs to",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "articleId" : {
+            "description" : "Unique ID of the article",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "articleNumber" : {
+            "$ref" : "./Common.json#/components/schemas/articleNumber"
+          },
+          "sectionsCount" : {
+            "type" : [ "string", "integer" ]
+          }
+        },
+        "required" : [ "articleId", "categoryId", "description", "id", "locale", "logoUrl", "name", "webUrl" ]
+      },
+      "kbArticleTranslationEntitiesList" : {
+        "description" : "List of followed article translations",
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/kbArticleTranslationFollowerDetails"
+        }
+      },
+      "kbSectionFollowerDetails" : {
+        "description" : "List of followed knowledge base sections",
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "webUrl" : {
+            "description" : "URL to access the section",
+            "type" : [ "null" ],
+            "maxLength" : 250,
+            "minLength" : 0
+          },
+          "name" : {
+            "description" : "Name of the section",
+            "type" : [ "string", "null" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "description" : {
+            "description" : "Description of the section",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]*"
+          },
+          "id" : {
+            "description" : "Unique ID of the section",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "locale" : {
+            "description" : "Locale of the section",
+            "type" : [ "string", "null" ],
+            "enum" : [ "en", "ja", "zh", "es", "de", "fr", "tr", "ru", "pt", "it", "nl", "da", "sv", "pl", "ar", "he", "af", "cs", "fr-ca", "bg", "fi", "el", "hu", "id", "nb", "ro", "th", "uk", "vi", "ur", "hi", "te", "kn", "ta", "mr", "ko", "fa", "bn", "gu", "ms", "ml", "en-gb", "sk", "hr", "sl", "zh_TW", "zh-tw", "ca", "ka", "kk", "my", "km", "pt-br" ],
+            "pattern" : "([a-zA-Z]{2,4}([-_][a-zA-Z]{2})?)"
+          },
+          "logoUrl" : {
+            "description" : "URL of the section logo",
+            "type" : [ "string", "null" ],
+            "maxLength" : 250,
+            "minLength" : 0,
+            "pattern" : "^((ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?|\\/[a-zA-Z0-9_\\-\\/\\.]+)$"
+          },
+          "sectionsCount" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        },
+        "required" : [ "description", "id", "locale", "logoUrl", "name", "webUrl" ]
+      },
+      "kbSectionEntitiesList" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/kbSectionFollowerDetails"
+        }
+      },
       "followersDetails" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "lastName" : {
+            "description" : "Last name of the follower",
             "type" : [ "string", "null" ],
             "maxLength" : 50,
             "minLength" : 0
           },
           "firstName" : {
+            "description" : "First name of the follower",
             "type" : [ "string", "null" ],
             "maxLength" : 50,
             "minLength" : 0
           },
           "photoUrl" : {
+            "description" : "URL to access the photo of the follower",
             "type" : [ "string", "null" ],
             "maxLength" : 200,
             "minLength" : 0,
             "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
           },
           "webUrl" : {
+            "description" : "URL to access the agent details",
             "type" : [ "string", "null" ],
             "maxLength" : 255,
             "minLength" : 3,
             "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
           },
           "name" : {
+            "description" : "Display name of the follower",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "label" : {
-            "type" : [ "null", "object" ],
+            "description" : "Label details of the follower",
+            "type" : [ "object", "null" ],
             "additionalProperties" : false,
             "maxProperties" : 4,
             "minProperties" : 4,
             "properties" : {
               "preferences" : {
-                "type" : [ "null", "object" ],
+                "description" : "UI preferences of the label",
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "maxProperties" : 3,
                 "minProperties" : 3,
                 "properties" : {
                   "bgColor" : {
+                    "description" : "Background color of the label",
                     "type" : [ "string", "null" ],
                     "maxLength" : 100,
                     "minLength" : 0
                   },
                   "shape" : {
+                    "description" : "Shape of the label",
                     "type" : [ "string", "null" ],
                     "maxLength" : 100,
                     "minLength" : 0
                   },
                   "textColor" : {
+                    "description" : "Text color of the label",
                     "type" : [ "string", "null" ],
                     "maxLength" : 100,
                     "minLength" : 0
@@ -217,16 +616,19 @@
                 "required" : [ "bgColor", "shape", "textColor" ]
               },
               "name" : {
+                "description" : "Name of the label",
                 "type" : [ "string", "null" ],
                 "maxLength" : 255,
                 "minLength" : 0
               },
               "id" : {
-                "type" : [ "string", "null", "integer" ],
+                "description" : "Unique ID of the label",
+                "type" : [ "string", "integer", "null" ],
                 "format" : "int64",
                 "pattern" : "([0-9]+)"
               },
               "logoUrl" : {
+                "description" : "URL of the label logo image",
                 "type" : [ "string", "null" ],
                 "maxLength" : 1000,
                 "minLength" : 0,
@@ -236,17 +638,18 @@
             "required" : [ "id", "logoUrl", "name", "preferences" ]
           },
           "userType" : {
+            "description" : "Type of user. Possible values:AGENT, END_USER",
             "type" : [ "string", "null" ],
-            "enum" : [ "END_USER", "AGENT", "TEAM", "TICKET", "ACTIVITY" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "enum" : [ "END_USER", "AGENT", "TEAM", "TICKET", "ACTIVITY" ]
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "description" : "Unique ID of the follower",
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "email" : {
+            "description" : "Email ID of the follower",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
@@ -256,23 +659,36 @@
         "required" : [ "email", "firstName", "id", "label", "lastName", "name", "photoUrl", "userType", "webUrl" ]
       },
       "followersList" : {
-        "type" : [ "null", "array" ],
+        "description" : "List of follower details",
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./Followers.json#/components/schemas/followersDetails"
+          "$ref" : "#/components/schemas/followersDetails"
         }
+      },
+      "userType" : {
+        "type" : [ "string" ],
+        "enum" : [ "AGENT", "END_USER" ]
+      },
+      "fromForQuery" : {
+        "type" : [ "integer" ],
+        "format" : "int32",
+        "minimum" : 0,
+        "pattern" : "([0-9]+)",
+        "default" : 1
       }
     },
     "responses" : {
       "followersCountJSON" : {
-        "description" : "followersCountJSON template definitions",
+        "description" : "Total number of followers for the entity",
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "count" : {
-                  "type" : [ "string", "null", "integer" ],
+                  "description" : "Total number of followers for the entity",
+                  "type" : [ "string", "integer", "null" ],
                   "format" : "int32",
                   "pattern" : "([0-9]+)"
                 }
@@ -294,11 +710,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object", "null" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "./Followers.json#/components/schemas/followersList"
+                  "$ref" : "#/components/schemas/followersList"
                 }
               },
               "required" : [ "data" ]
@@ -308,9 +724,9 @@
                 "value" : {
                   "data" : [ {
                     "firstName" : "",
-                    "lastName" : "deskagent",
-                    "photoURL" : "https://desk.zoho.com/api/v1/agent/5000000012902/photo?orgId=3115331",
-                    "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#setup/users-control/agents/5000000000347",
+                    "lastName" : "Baker",
+                    "photoURL" : "https://desk.example.com/api/v1/agent/5000000012902/photo?orgId=1234567890",
+                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#setup/users-control/agents/5000000000347",
                     "name" : "Desk Agent",
                     "id" : "5000000012902",
                     "label" : {
@@ -321,7 +737,7 @@
                       },
                       "name" : "MVP",
                       "id" : "5000000081009",
-                      "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/35531135311?portalId=3153815r1fnf113131rf31n9"
+                      "logoUrl" : "https://desk.example.com/portal/api/publicImages/35531135311?portalId=3153815r1fnf113131rf31n9"
                     },
                     "userType" : "AGENT",
                     "email" : "deskagent@zylker.com"
@@ -331,52 +747,85 @@
             }
           }
         }
-      }
-    },
-    "parameters" : {
-      "moduleAPIName" : {
-        "name" : "moduleAPIName",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null" ],
-          "enum" : [ "articleTranslations", "kbRootCategories", "kbSections" ],
-          "maxLength" : 100,
-          "minLength" : 0,
-          "pattern" : "(articleTranslations|kbRootCategories|kbSections)"
-        }
       },
-      "entityId" : {
-        "name" : "entityId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "userType" : {
-        "name" : "userType",
-        "in" : "query",
-        "description" : "To get the followers count based on userType allowed values !@ AGENTS@!, !@ END_USERS@!,      default value : all users will be processed",
-        "required" : false,
-        "style" : "form",
-        "explode" : true,
-        "schema" : {
-          "type" : [ "string", "null" ],
-          "description" : "To get the followers count based on userType allowed values !@ AGENTS@!, !@ END_USERS@!,      default value : all users will be processed",
-          "enum" : [ "AGENT", "END_USER" ],
-          "maxLength" : 100,
-          "minLength" : 0
+      "followerList" : {
+        "description" : "followerList template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "followedEntities" : {
+                  "$ref" : "#/components/schemas/followedEntitiesList"
+                },
+                "kbRootCategories" : {
+                  "$ref" : "#/components/schemas/kbCategoryEntitiesList"
+                },
+                "articleTranslations" : {
+                  "$ref" : "#/components/schemas/kbArticleTranslationEntitiesList"
+                },
+                "kbSections" : {
+                  "$ref" : "#/components/schemas/kbSectionEntitiesList"
+                }
+              },
+              "required" : [ "articleTranslations", "followedEntities", "kbRootCategories", "kbSections" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "followedEntities" : [ {
+                    "entityType" : "articleTranslations",
+                    "id" : "55315324524"
+                  }, {
+                    "entityType" : "kbRootCategories",
+                    "id" : "55315324525"
+                  }, {
+                    "entityType" : "kbSections",
+                    "id" : "55315324526"
+                  } ],
+                  "kbRootCategories" : [ {
+                    "webURL" : "https://desk.example.com/agents/users/33134/",
+                    "name" : "First Category",
+                    "description" : "kb category",
+                    "id" : "55315324525",
+                    "locale" : "en",
+                    "logoURL" : "https://desk.example.com/api/v1/users/33134/photo",
+                    "sectionsCount" : 5
+                  } ],
+                  "articleTranslations" : [ {
+                    "webURL" : "https://desk.example.com/agents/users/33134/",
+                    "name" : "First Article",
+                    "description" : "kb article translation",
+                    "id" : "55315324524",
+                    "locale" : "en",
+                    "logoURL" : "https://desk.example.com/api/v1/users/33134/photo",
+                    "categoryId" : "55315324526",
+                    "articleId" : "55315324530",
+                    "articleNumber" : "1001"
+                  } ],
+                  "kbSections" : [ {
+                    "webURL" : "https://desk.example.com/agents/users/33134/",
+                    "name" : "First Section",
+                    "description" : "kb section",
+                    "id" : "55315324526",
+                    "locale" : "en",
+                    "logoURL" : "https://desk.example.com/api/v1/users/33134/photo"
+                  } ]
+                }
+              }
+            }
+          }
         }
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

@@ -11,8 +11,55 @@
         "summary" : "List approvals",
         "description" : "This API lists the approvals submitted in your help desk.",
         "operationId" : "getTicketApprovals",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/ticketId"
+          "name" : "from",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "default" : 0
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Index number starting from which the approvals must be fetched"
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "minimum" : 1,
+            "maximum" : 100
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Number of approvals to fetch"
+        }, {
+          "name" : "status",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "Approved", "Rejected", "Pending" ]
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Key that filters the approvals by status. Accepted values: Approved, Rejected, Pending"
+        }, {
+          "name" : "ticketId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "description" : "Unique ID of the ticket",
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -34,8 +81,19 @@
         "summary" : "Create approval",
         "description" : "This API creates an approval in your help desk.",
         "operationId" : "createTicketApproval",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/ticketId"
+          "name" : "ticketId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "description" : "Unique ID of the ticket",
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -62,10 +120,31 @@
         "summary" : "Get approval",
         "description" : "This API fetches the details of an approval.",
         "operationId" : "getTicketApproval",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/approvalId"
+          "name" : "approvalId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "description" : "Unique ID of the approval",
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/ticketId"
+          "name" : "ticketId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "description" : "Unique ID of the ticket",
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -84,10 +163,31 @@
         "summary" : "Update approval",
         "description" : "This API updates the details of an existing ticket approval.",
         "operationId" : "updateTicketApproval",
+        "x-mcp-ready" : true,
         "parameters" : [ {
-          "$ref" : "#/components/parameters/approvalId"
+          "name" : "approvalId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "description" : "Unique ID of the approval",
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
-          "$ref" : "#/components/parameters/ticketId"
+          "name" : "ticketId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "description" : "Unique ID of the ticket",
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -115,89 +215,98 @@
   "components" : {
     "schemas" : {
       "approvalActor" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "firstName" : {
             "type" : [ "string", "null" ],
             "maxLength" : 50,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "First name of the approver"
           },
           "lastName" : {
             "type" : [ "string", "null" ],
             "maxLength" : 50,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Last name of the approver"
           },
           "photoURL" : {
             "type" : [ "string", "null" ],
             "maxLength" : 200,
             "minLength" : 0,
-            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+            "description" : "URL of the approver's profile photo"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the approver"
           },
           "email" : {
-            "type" : [ "string", "null" ],
+            "type" : [ "string" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+            "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$",
+            "description" : "Email address of the approver"
           }
         },
         "required" : [ "email", "firstName", "id", "lastName", "photoURL" ]
       },
       "approvalDetails" : {
-        "type" : [ "null", "object" ],
+        "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "approver" : {
-            "$ref" : "./TicketApprovals.json#/components/schemas/approvalActor"
+            "$ref" : "#/components/schemas/approvalActor"
           },
           "requester" : {
-            "$ref" : "./TicketApprovals.json#/components/schemas/approvalActor"
+            "$ref" : "#/components/schemas/approvalActor"
           },
           "requestedTime" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "[a-zA-Z_/\\-\\+0-9]*"
+            "pattern" : "[a-zA-Z_/\\-\\+0-9]*",
+            "description" : "Time when the approval was requested"
           },
           "subject" : {
             "type" : [ "string", "null" ],
             "maxLength" : 1000,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Subject of the approval"
           },
           "description" : {
             "type" : [ "string", "null" ],
             "maxLength" : 65535,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Description of the approval"
           },
           "id" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the approval"
           },
           "status" : {
             "type" : [ "string", "null" ],
             "enum" : [ "Approved", "Rejected", "Pending" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "description" : "Status of the approval. Accepted values: Approved, Rejected, Pending"
           },
           "processedTime" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "[a-zA-Z_/\\-\\+0-9]*"
+            "pattern" : "[a-zA-Z_/\\-\\+0-9]*",
+            "description" : "Time when the approval was processed"
           }
         },
         "required" : [ "approver", "description", "id", "processedTime", "requestedTime", "requester", "status", "subject" ]
       },
       "listApprovalsData" : {
-        "type" : [ "null", "array" ],
+        "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "./TicketApprovals.json#/components/schemas/approvalDetails"
+          "$ref" : "#/components/schemas/approvalDetails"
         }
       }
     },
@@ -208,28 +317,28 @@
           "application/json" : {
             "schema" : {
               "oneOf" : [ {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "data" : {
-                    "$ref" : "./TicketApprovals.json#/components/schemas/listApprovalsData"
+                    "$ref" : "#/components/schemas/listApprovalsData"
                   }
                 },
                 "required" : [ "data" ]
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "errorCode" : {
                     "type" : [ "string", "null" ],
                     "enum" : [ "URL_NOT_FOUND", "UNAUTHORIZED", "INVALID_OAUTH", "SCOPE_MISMATCH", "FORBIDDEN", "LICENSE_ACCESS_LIMITED", "METHOD_NOT_ALLOWED", "RESOURCE_SIZE_EXCEEDED", "UNSUPPORTED_MEDIA_TYPE", "INVALID_DATA", "UNPROCESSABLE_ENTITY", "ONLY_LIVECHAT_USER", "INTEGRATION_ADMIN_ERROR", "THRESHOLD_EXCEEDED", "INTERNAL_SERVER_ERROR", "EMPTY_PAYLOAD" ],
-                    "maxLength" : 100,
-                    "minLength" : 0
+                    "description" : "Error code indicating the type of failure. Accepted values: URL_NOT_FOUND, UNAUTHORIZED, INVALID_OAUTH, SCOPE_MISMATCH, FORBIDDEN, LICENSE_ACCESS_LIMITED, METHOD_NOT_ALLOWED, RESOURCE_SIZE_EXCEEDED, UNSUPPORTED_MEDIA_TYPE, INVALID_DATA, UNPROCESSABLE_ENTITY, ONLY_LIVECHAT_USER, INTEGRATION_ADMIN_ERROR, THRESHOLD_EXCEEDED, INTERNAL_SERVER_ERROR, EMPTY_PAYLOAD"
                   },
                   "message" : {
                     "type" : [ "string", "null" ],
                     "maxLength" : 255,
-                    "minLength" : 0
+                    "minLength" : 0,
+                    "description" : "Human-readable error message"
                   }
                 },
                 "required" : [ "errorCode", "message" ]
@@ -241,15 +350,15 @@
                   "data" : [ {
                     "approver" : {
                       "firstName" : "",
-                      "lastName" : "raj",
-                      "photoUrl" : "https://desk.zoho.com/api/v1/agent/4000000015001/photo",
+                      "lastName" : "Jones",
+                      "photoUrl" : "https://desk.example.com/api/v1/agent/4000000015001/photo",
                       "id" : "4000000015001",
                       "email" : "carol@zylker.com"
                     },
                     "requester" : {
                       "firstName" : "",
-                      "lastName" : "saran",
-                      "photoUrl" : "https://desk.zoho.com/api/v1/agent/4000000012629/photo",
+                      "lastName" : "Williams",
+                      "photoUrl" : "https://desk.example.com/api/v1/agent/4000000012629/photo",
                       "id" : "4000000012629",
                       "email" : "carol@zylker.com"
                     },
@@ -272,64 +381,68 @@
           "application/json" : {
             "schema" : {
               "oneOf" : [ {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "approver" : {
-                    "$ref" : "./TicketApprovals.json#/components/schemas/approvalActor"
+                    "$ref" : "#/components/schemas/approvalActor"
                   },
                   "requester" : {
-                    "$ref" : "./TicketApprovals.json#/components/schemas/approvalActor"
+                    "$ref" : "#/components/schemas/approvalActor"
                   },
                   "requestedTime" : {
                     "type" : [ "string", "null" ],
                     "maxLength" : 100,
                     "minLength" : 0,
-                    "pattern" : "[a-zA-Z_/\\-\\+0-9]*"
+                    "pattern" : "[a-zA-Z_/\\-\\+0-9]*",
+                    "description" : "Time when the approval was requested"
                   },
                   "subject" : {
                     "type" : [ "string", "null" ],
                     "maxLength" : 1000,
-                    "minLength" : 0
+                    "minLength" : 0,
+                    "description" : "Subject of the approval"
                   },
                   "description" : {
                     "type" : [ "string", "null" ],
                     "maxLength" : 65535,
-                    "minLength" : 0
+                    "minLength" : 0,
+                    "description" : "Description of the approval"
                   },
                   "id" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
-                    "pattern" : "([0-9]+)"
+                    "pattern" : "([0-9]+)",
+                    "description" : "Unique ID of the approval"
                   },
                   "status" : {
                     "type" : [ "string", "null" ],
                     "enum" : [ "Approved", "Rejected", "Pending" ],
-                    "maxLength" : 100,
-                    "minLength" : 0
+                    "description" : "Status of the approval. Accepted values: Approved, Rejected, Pending"
                   },
                   "processedTime" : {
                     "type" : [ "string", "null" ],
                     "maxLength" : 100,
                     "minLength" : 0,
-                    "pattern" : "[a-zA-Z_/\\-\\+0-9]*"
+                    "pattern" : "[a-zA-Z_/\\-\\+0-9]*",
+                    "description" : "Time when the approval was processed"
                   }
                 },
                 "required" : [ "approver", "description", "id", "processedTime", "requestedTime", "requester", "status", "subject" ]
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "errorCode" : {
                     "type" : [ "string", "null" ],
                     "enum" : [ "URL_NOT_FOUND", "UNAUTHORIZED", "INVALID_OAUTH", "SCOPE_MISMATCH", "FORBIDDEN", "LICENSE_ACCESS_LIMITED", "METHOD_NOT_ALLOWED", "RESOURCE_SIZE_EXCEEDED", "UNSUPPORTED_MEDIA_TYPE", "INVALID_DATA", "UNPROCESSABLE_ENTITY", "ONLY_LIVECHAT_USER", "INTEGRATION_ADMIN_ERROR", "THRESHOLD_EXCEEDED", "INTERNAL_SERVER_ERROR", "EMPTY_PAYLOAD" ],
-                    "maxLength" : 100,
-                    "minLength" : 0
+                    "description" : "Error code indicating the type of failure. Accepted values: URL_NOT_FOUND, UNAUTHORIZED, INVALID_OAUTH, SCOPE_MISMATCH, FORBIDDEN, LICENSE_ACCESS_LIMITED, METHOD_NOT_ALLOWED, RESOURCE_SIZE_EXCEEDED, UNSUPPORTED_MEDIA_TYPE, INVALID_DATA, UNPROCESSABLE_ENTITY, ONLY_LIVECHAT_USER, INTEGRATION_ADMIN_ERROR, THRESHOLD_EXCEEDED, INTERNAL_SERVER_ERROR, EMPTY_PAYLOAD"
                   },
                   "message" : {
                     "type" : [ "string", "null" ],
                     "maxLength" : 255,
-                    "minLength" : 0
+                    "minLength" : 0,
+                    "description" : "Human-readable error message"
                   }
                 },
                 "required" : [ "errorCode", "message" ]
@@ -339,16 +452,16 @@
               "Valid responses Definitions" : {
                 "value" : {
                   "approver" : {
-                    "firstName" : "saran",
-                    "lastName" : "raj",
-                    "photoUrl" : "https://desk.zoho.com/api/v1/agent/4000000015001/photo",
+                    "firstName" : "William",
+                    "lastName" : "Jones",
+                    "photoUrl" : "https://desk.example.com/api/v1/agent/4000000015001/photo",
                     "id" : "4000000015001",
                     "email" : null
                   },
                   "requester" : {
-                    "firstName" : "aravind",
-                    "lastName" : "a",
-                    "photoUrl" : "https://desk.zoho.com/api/v1/agent/4000000012629/photo",
+                    "firstName" : "Jack",
+                    "lastName" : "Adams",
+                    "photoUrl" : "https://desk.example.com/api/v1/agent/4000000012629/photo",
                     "id" : "4000000012629",
                     "email" : null
                   },
@@ -370,28 +483,28 @@
           "application/json" : {
             "schema" : {
               "oneOf" : [ {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "approvals" : {
-                    "$ref" : "./TicketApprovals.json#/components/schemas/listApprovalsData"
+                    "$ref" : "#/components/schemas/listApprovalsData"
                   }
                 },
                 "required" : [ "approvals" ]
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "errorCode" : {
                     "type" : [ "string", "null" ],
                     "enum" : [ "URL_NOT_FOUND", "UNAUTHORIZED", "INVALID_OAUTH", "SCOPE_MISMATCH", "FORBIDDEN", "LICENSE_ACCESS_LIMITED", "METHOD_NOT_ALLOWED", "RESOURCE_SIZE_EXCEEDED", "UNSUPPORTED_MEDIA_TYPE", "INVALID_DATA", "UNPROCESSABLE_ENTITY", "ONLY_LIVECHAT_USER", "INTEGRATION_ADMIN_ERROR", "THRESHOLD_EXCEEDED", "INTERNAL_SERVER_ERROR", "EMPTY_PAYLOAD" ],
-                    "maxLength" : 100,
-                    "minLength" : 0
+                    "description" : "Error code indicating the type of failure. Accepted values: URL_NOT_FOUND, UNAUTHORIZED, INVALID_OAUTH, SCOPE_MISMATCH, FORBIDDEN, LICENSE_ACCESS_LIMITED, METHOD_NOT_ALLOWED, RESOURCE_SIZE_EXCEEDED, UNSUPPORTED_MEDIA_TYPE, INVALID_DATA, UNPROCESSABLE_ENTITY, ONLY_LIVECHAT_USER, INTEGRATION_ADMIN_ERROR, THRESHOLD_EXCEEDED, INTERNAL_SERVER_ERROR, EMPTY_PAYLOAD"
                   },
                   "message" : {
                     "type" : [ "string", "null" ],
                     "maxLength" : 255,
-                    "minLength" : 0
+                    "minLength" : 0,
+                    "description" : "Human-readable error message"
                   }
                 },
                 "required" : [ "errorCode", "message" ]
@@ -402,16 +515,16 @@
                 "value" : {
                   "approvals" : [ {
                     "approver" : {
-                      "firstName" : "saran",
-                      "lastName" : "raj",
-                      "photoUrl" : "https://desk.zoho.com/api/v1/agent/4000000015001/photo",
+                      "firstName" : "William",
+                      "lastName" : "Jones",
+                      "photoUrl" : "https://desk.example.com/api/v1/agent/4000000015001/photo",
                       "id" : "4000000015001",
                       "email" : null
                     },
                     "requester" : {
-                      "firstName" : "aravind",
-                      "lastName" : "a",
-                      "photoUrl" : "https://desk.zoho.com/api/v1/agent/4000000012629/photo",
+                      "firstName" : "Jack",
+                      "lastName" : "Adams",
+                      "photoUrl" : "https://desk.example.com/api/v1/agent/4000000012629/photo",
                       "id" : "4000000012629",
                       "email" : null
                     },
@@ -434,64 +547,68 @@
           "application/json" : {
             "schema" : {
               "oneOf" : [ {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "approver" : {
-                    "$ref" : "./TicketApprovals.json#/components/schemas/approvalActor"
+                    "$ref" : "#/components/schemas/approvalActor"
                   },
                   "requester" : {
-                    "$ref" : "./TicketApprovals.json#/components/schemas/approvalActor"
+                    "$ref" : "#/components/schemas/approvalActor"
                   },
                   "requestedTime" : {
                     "type" : [ "string", "null" ],
                     "maxLength" : 100,
                     "minLength" : 0,
-                    "pattern" : "[a-zA-Z_/\\-\\+0-9]*"
+                    "pattern" : "[a-zA-Z_/\\-\\+0-9]*",
+                    "description" : "Time when the approval was requested"
                   },
                   "subject" : {
                     "type" : [ "string", "null" ],
                     "maxLength" : 1000,
-                    "minLength" : 0
+                    "minLength" : 0,
+                    "description" : "Subject of the approval"
                   },
                   "description" : {
                     "type" : [ "string", "null" ],
                     "maxLength" : 65535,
-                    "minLength" : 0
+                    "minLength" : 0,
+                    "description" : "Description of the approval"
                   },
                   "id" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
-                    "pattern" : "([0-9]+)"
+                    "pattern" : "([0-9]+)",
+                    "description" : "Unique ID of the approval"
                   },
                   "status" : {
                     "type" : [ "string", "null" ],
                     "enum" : [ "Approved", "Rejected", "Pending" ],
-                    "maxLength" : 100,
-                    "minLength" : 0
+                    "description" : "Status of the approval. Accepted values: Approved, Rejected, Pending"
                   },
                   "processedTime" : {
                     "type" : [ "string", "null" ],
                     "maxLength" : 100,
                     "minLength" : 0,
-                    "pattern" : "[a-zA-Z_/\\-\\+0-9]*"
+                    "pattern" : "[a-zA-Z_/\\-\\+0-9]*",
+                    "description" : "Time when the approval was processed"
                   }
                 },
                 "required" : [ "approver", "description", "id", "processedTime", "requestedTime", "requester", "status", "subject" ]
               }, {
-                "type" : [ "null", "object" ],
+                "type" : [ "object", "null" ],
                 "additionalProperties" : false,
                 "properties" : {
                   "errorCode" : {
                     "type" : [ "string", "null" ],
                     "enum" : [ "URL_NOT_FOUND", "UNAUTHORIZED", "INVALID_OAUTH", "SCOPE_MISMATCH", "FORBIDDEN", "LICENSE_ACCESS_LIMITED", "METHOD_NOT_ALLOWED", "RESOURCE_SIZE_EXCEEDED", "UNSUPPORTED_MEDIA_TYPE", "INVALID_DATA", "UNPROCESSABLE_ENTITY", "ONLY_LIVECHAT_USER", "INTEGRATION_ADMIN_ERROR", "THRESHOLD_EXCEEDED", "INTERNAL_SERVER_ERROR", "EMPTY_PAYLOAD" ],
-                    "maxLength" : 100,
-                    "minLength" : 0
+                    "description" : "Error code indicating the type of failure. Accepted values: URL_NOT_FOUND, UNAUTHORIZED, INVALID_OAUTH, SCOPE_MISMATCH, FORBIDDEN, LICENSE_ACCESS_LIMITED, METHOD_NOT_ALLOWED, RESOURCE_SIZE_EXCEEDED, UNSUPPORTED_MEDIA_TYPE, INVALID_DATA, UNPROCESSABLE_ENTITY, ONLY_LIVECHAT_USER, INTEGRATION_ADMIN_ERROR, THRESHOLD_EXCEEDED, INTERNAL_SERVER_ERROR, EMPTY_PAYLOAD"
                   },
                   "message" : {
                     "type" : [ "string", "null" ],
                     "maxLength" : 255,
-                    "minLength" : 0
+                    "minLength" : 0,
+                    "description" : "Human-readable error message"
                   }
                 },
                 "required" : [ "errorCode", "message" ]
@@ -501,16 +618,16 @@
               "Valid responses Definitions" : {
                 "value" : {
                   "approver" : {
-                    "firstName" : "saran",
-                    "lastName" : "raj",
-                    "photoUrl" : "https://desk.zoho.com/api/v1/agent/4000000015001/photo",
+                    "firstName" : "William",
+                    "lastName" : "Jones",
+                    "photoUrl" : "https://desk.example.com/api/v1/agent/4000000015001/photo",
                     "id" : "4000000015001",
                     "email" : null
                   },
                   "requester" : {
-                    "firstName" : "aravind",
-                    "lastName" : "a",
-                    "photoUrl" : "https://desk.zoho.com/api/v1/agent/4000000012629/photo",
+                    "firstName" : "Jack",
+                    "lastName" : "Adams",
+                    "photoUrl" : "https://desk.example.com/api/v1/agent/4000000012629/photo",
                     "id" : "4000000012629",
                     "email" : null
                   },
@@ -529,58 +646,38 @@
         }
       }
     },
-    "parameters" : {
-      "approvalId" : {
-        "name" : "approvalId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      },
-      "ticketId" : {
-        "name" : "ticketId",
-        "in" : "path",
-        "required" : true,
-        "style" : "simple",
-        "explode" : false,
-        "schema" : {
-          "type" : [ "string", "null", "integer" ],
-          "format" : "int64",
-          "pattern" : "([0-9]+)"
-        }
-      }
-    },
     "requestBodies" : {
       "addApproval" : {
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "approverIds" : {
-                  "type" : [ "null", "array" ],
+                  "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "null", "integer" ],
+                    "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
                   },
-                  "uniqueItems" : true
+                  "uniqueItems" : true,
+                  "description" : "ID(s) of the users to whom the approval is submitted"
                 },
                 "subject" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "maxLength" : 1000,
-                  "minLength" : 0
+                  "description" : "Subject of the approval"
                 },
                 "description" : {
-                  "type" : [ "string", "null" ],
-                  "maxLength" : 65535,
-                  "minLength" : 0
+                  "type" : [ "string" ],
+                  "maxLength" : 32000,
+                  "description" : "Description of the approval"
+                },
+                "status" : {
+                  "type" : [ "string" ],
+                  "enum" : [ "Approved", "Rejected" ],
+                  "description" : "Status of the approval. Accepted values: Approved, Rejected"
                 }
               },
               "required" : [ "approverIds", "subject" ]
@@ -601,14 +698,34 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "status" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
                   "enum" : [ "Approved", "Rejected" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "description" : "Status of the approval. Accepted values: Approved, Rejected"
+                },
+                "approverIds" : {
+                  "type" : [ "array" ],
+                  "items" : {
+                    "type" : [ "string", "integer" ],
+                    "format" : "int64",
+                    "pattern" : "([0-9]+)"
+                  },
+                  "minItems" : 1,
+                  "maxItems" : 150,
+                  "description" : "ID(s) of the users to whom the approval is submitted"
+                },
+                "subject" : {
+                  "type" : [ "string" ],
+                  "maxLength" : 1000,
+                  "description" : "Subject of the approval"
+                },
+                "description" : {
+                  "type" : [ "string" ],
+                  "maxLength" : 32000,
+                  "description" : "Description of the approval"
                 }
               },
               "required" : [ "status" ]
@@ -625,6 +742,12 @@
       }
     },
     "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }

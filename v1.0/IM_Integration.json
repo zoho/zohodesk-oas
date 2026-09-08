@@ -1,0 +1,941 @@
+{
+  "openapi" : "3.1.0",
+  "x-mcp-group" : [ "IM Integration" ],
+  "info" : {
+    "title" : "IM_Integration",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/im/integrationServices/WHATSAPP/phonenumbers" : {
+      "get" : {
+        "tags" : [ "IM_Integration" ],
+        "operationId" : "getWhatsappPhoneNumbers",
+        "summary" : "List WhatsApp phone numbers",
+        "description" : "Returns the list of WhatsApp phone numbers available under the linked WhatsApp Business Accounts for the current org. Use the optional wabaId query parameter to filter by a specific WABA. Include CHANNELS_CONFIGURED or COMMERCE_SETTINGS to fetch additional metadata per number.",
+        "parameters" : [ {
+          "name" : "wabaId",
+          "in" : "query",
+          "description" : "WhatsApp Business Account id",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "maxLength" : 50,
+            "minLength" : 0
+          }
+        }, {
+          "name" : "include",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "enum" : [ "CHANNELS_CONFIGURED", "COMMERCE_SETTINGS" ]
+            },
+            "maxItems" : 2
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Include fields with phonenumbers"
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/getWhatsappPhoneNumbers"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.InstantMessages.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/im/integrationServices/WHATSAPP/templateCreditExhaustStatus" : {
+      "get" : {
+        "tags" : [ "IM_Integration" ],
+        "operationId" : "getTemplateCreditExhaustStatus",
+        "summary" : "Get template credit exhaust status",
+        "description" : "Checks whether sufficient WhatsApp template-message credits remain for the given receiver and channel. Call this before the Initiate Session API to confirm credits are available; a 204 means credits are sufficient, while a 403 with errorCode INSUFFICIENT_CREDITS means they are not.",
+        "parameters" : [ {
+          "name" : "receiverId",
+          "in" : "query",
+          "description" : "ID to which Message Has to be sent",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "channelId",
+          "in" : "query",
+          "description" : "channel id",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "403" : {
+            "$ref" : "#/components/responses/templateCreditExhaustForbiddenResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.InstantMessages.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/im/integrationServices/WHATSAPP/sandBoxTesters" : {
+      "get" : {
+        "tags" : [ "IM_Integration" ],
+        "operationId" : "getSandboxTesters",
+        "summary" : "Get WhatsApp sandbox testers",
+        "description" : "Retrieve the list of phone numbers registered as sandbox testers for the WhatsApp channel. Sandbox testers are used to validate messaging behavior on the Zoho Desk portal before onboarding the official business phone number. Each tester number must start with a plus sign followed by numerals (e.g. +13312040199). This API is available only after a WhatsApp sandbox channel has been created.",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/getSandboxTesters"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.InstantMessages.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      },
+      "post" : {
+        "tags" : [ "IM_Integration" ],
+        "operationId" : "updateSandboxTesters",
+        "summary" : "Add or update WhatsApp sandbox testers",
+        "description" : "Add or update the list of sandbox tester phone numbers for the WhatsApp channel. Use this endpoint to register numbers that will receive test messages through the sandbox environment. Each number must start with a plus sign followed by numerals (e.g. +13312040199). This allows verification of incoming and outgoing messages on the Zoho Desk portal before integrating the official business phone number.",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/updateSandboxTesters"
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/getSandboxTesters"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.InstantMessages.CREATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/im/integrationServices/WHATSAPP/phonenumbers/{phoneNumberId}/codeVerification" : {
+      "get" : {
+        "tags" : [ "IM_Integration" ],
+        "operationId" : "getWhatsAppPhonenumberOTP",
+        "summary" : "Request WhatsApp phone number OTP",
+        "description" : "Triggers an OTP verification code to be sent to the specified WhatsApp phone number via SMS or voice call. This API is used when the phone number's codeVerificationStatus is EXPIRED or NOT_VERIFIED. Use the mode query parameter to choose the delivery method (sms or voice).",
+        "parameters" : [ {
+          "name" : "mode",
+          "in" : "query",
+          "description" : "OTP delivery method — sms or voice call",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "sms", "voice" ]
+          }
+        }, {
+          "name" : "phoneNumberId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "pattern" : "([0-9]+)",
+            "maxLength" : 100,
+            "minLength" : 1
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/codeVerificationSuccessResponse"
+          },
+          "500" : {
+            "$ref" : "#/components/responses/codeVerificationErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.InstantMessages.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      },
+      "post" : {
+        "tags" : [ "IM_Integration" ],
+        "operationId" : "submitWhatsAppPhonenumberOTP",
+        "summary" : "Submit WhatsApp phone number OTP",
+        "description" : "Submits the 6-digit OTP verification code received on the specified WhatsApp phone number to complete the number verification process. On success the phone number's codeVerificationStatus changes to VERIFIED.",
+        "parameters" : [ {
+          "name" : "phoneNumberId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "pattern" : "([0-9]+)",
+            "maxLength" : 100,
+            "minLength" : 1
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/whatsAppOtp"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/codeVerificationSuccessResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "500" : {
+            "$ref" : "#/components/responses/codeVerificationErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.InstantMessages.CREATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/im/integrationServices/WHATSAPP/templateTags" : {
+      "get" : {
+        "tags" : [ "IM_Integration" ],
+        "summary" : "List WhatsApp template tag categories",
+        "description" : "Returns allowed WhatsApp Cloud API template category tags (for example UTILITY, MARKETING) for the WHATSAPP integration in the organization.",
+        "operationId" : "getWhatsAppTemplateTags",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/getWhatsAppTemplateTags"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.InstantMessages.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/im/integrationServices/WHATSAPP/details" : {
+      "get" : {
+        "tags" : [ "IM_Integration" ],
+        "summary" : "Get WhatsApp integration details",
+        "description" : "Returns WhatsApp Business Account (WABA) metadata, per-WABA phone number status, and aggregate WABA approval state for the WHATSAPP integration.",
+        "operationId" : "getWhatsAppDetails",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/getWhatsAppDetails"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.InstantMessages.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    },
+    "/api/v1/im/integrationServices/WHATSAPP/templateLanguages" : {
+      "post" : {
+        "tags" : [ "IM_Integration" ],
+        "operationId" : "getTemplateLanguage",
+        "summary" : "List WhatsApp template supported languages",
+        "description" : "Returns the list of language codes and display names supported for WhatsApp template messages for the WHATSAPP integration (`data` array, `kind` discriminator).",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/getTemplateLanguages"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.InstantMessages.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "templateCreditExhaustErrorResponse" : {
+        "type" : "object",
+        "description" : "Error returned when WhatsApp template-message credits are insufficient.",
+        "additionalProperties" : false,
+        "properties" : {
+          "errorCode" : {
+            "type" : "string",
+            "const" : "INSUFFICIENT_CREDITS",
+            "description" : "Machine-readable error code indicating credits are exhausted."
+          },
+          "message" : {
+            "type" : "string",
+            "description" : "Additional detail from the server (e.g. remaining credit count)."
+          }
+        },
+        "required" : [ "errorCode", "message" ]
+      },
+      "phoneNumbersResponse" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "nameVerificationStatus" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "APPROVED", "DECLINED", "AVAILABLE_WITHOUT_REVIEW" ]
+          },
+          "phoneNumber" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "^\\+[0-9]*$"
+          },
+          "connectionMessage" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "AVAILABLE", "NAME_STATUS_PENDING", "CONFIGURED_IN_CHANNEL", "OTP_VERIFICATION_PENDING", "CERTIFICATE_NOT_FOUND", "NAME_STATUS_DECLINED" ]
+          },
+          "connectionStatus" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "PENDING", "CONNECTED", "DISCONNECTED" ]
+          },
+          "hasCertificate" : {
+            "type" : [ "boolean", "null" ]
+          },
+          "canConnect" : {
+            "type" : [ "boolean", "null" ]
+          },
+          "id" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "verifiedName" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "codeVerificationStatus" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "VERIFIED", "NOT_VERIFIED", "EXPIRED" ]
+          },
+          "quality" : {
+            "type" : [ "string", "null" ],
+            "description" : "Quality rating determined by Meta based on recent customer feedback over the past seven days.",
+            "enum" : [ "GREEN", "YELLOW", "RED", "NO_QUALITY" ]
+          },
+          "isOnBizApp" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Whether the phone number is registered on the WhatsApp Business App."
+          },
+          "tier" : {
+            "type" : [ "string", "null" ],
+            "description" : "Messaging limit tier provided by WhatsApp. Available only when the phone number is in connected status; otherwise NO_TIER.",
+            "enum" : [ "NO_TIER", "TIER_50", "TIER_250", "TIER_1K", "TIER_10K", "TIER_100K", "TIER_UNLIMITED" ]
+          },
+          "throughput" : {
+            "type" : [ "string", "null" ],
+            "description" : "Message throughput level determined by Meta. STANDARD supports up to 80 mps, HIGH up to 1000 mps.",
+            "enum" : [ "STANDARD", "HIGH", "NOT_APPLICABLE" ]
+          },
+          "configurations" : {
+            "type" : [ "array", "null" ],
+            "description" : "List of channel configurations associated with this phone number. Present when include=CHANNELS_CONFIGURED is passed.",
+            "items" : {
+              "$ref" : "#/components/schemas/phoneNumberConfigurationItem"
+            }
+          },
+          "commerceSettings" : {
+            "description" : "Commerce settings for this phone number. Present when include=COMMERCE_SETTINGS is passed.",
+            "$ref" : "#/components/schemas/phoneNumberCommerceSettings"
+          }
+        },
+        "required" : [ "canConnect", "codeVerificationStatus", "connectionMessage", "connectionStatus", "hasCertificate", "id", "nameVerificationStatus", "phoneNumber", "verifiedName" ]
+      },
+      "phoneNumberConfigurationItem" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "subscribers" : {
+            "type" : [ "string", "null" ],
+            "description" : "Service subscriber name for this configuration.",
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "description" : "Name of the channel configuration.",
+            "maxLength" : 200,
+            "minLength" : 0
+          },
+          "createdTime" : {
+            "type" : [ "string", "null" ],
+            "description" : "Timestamp when the channel configuration was created.",
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "isActive" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Whether this channel configuration is currently active."
+          },
+          "channelId" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int64",
+            "description" : "Unique identifier of the channel."
+          }
+        },
+        "required" : [ "channelId", "createdTime", "isActive", "name", "subscribers" ]
+      },
+      "phoneNumberCommerceSettings" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "description" : "Commerce-related settings for the WhatsApp phone number.",
+        "properties" : {
+          "isCartEnabled" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Whether cart and cart-related buttons are enabled in the business phone number's messages, catalogs, and product details."
+          },
+          "isCatalogVisible" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Whether the catalog storefront icon and catalog-related buttons appear in the business phone number's messages and business profile."
+          }
+        },
+        "required" : [ "isCartEnabled", "isCatalogVisible" ]
+      },
+      "listofPhoneNumbers" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/phoneNumbersResponse"
+        }
+      },
+      "getWhatsAppTemplateTags_data" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "tags" : {
+            "type" : [ "array", "null" ],
+            "description" : "Template category tags allowed for WhatsApp templates.",
+            "items" : {
+              "$ref" : "./IMCannedMessage.json#/components/schemas/whatsAppTemplateTagCategory"
+            },
+            "minItems" : 0,
+            "uniqueItems" : true
+          }
+        },
+        "required" : [ "tags" ]
+      },
+      "getWhatsAppTemplateTags_responseBody" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "data" : {
+            "$ref" : "#/components/schemas/getWhatsAppTemplateTags_data"
+          },
+          "kind" : {
+            "type" : "string",
+            "const" : "single.json",
+            "description" : "Response envelope discriminator for a single JSON payload."
+          }
+        },
+        "required" : [ "data", "kind" ]
+      },
+      "whatsAppPhoneNumberStatus" : {
+        "type" : "string",
+        "description" : "Presence or registration state of the WhatsApp phone number.",
+        "enum" : [ "ABSENT", "PRESENT" ]
+      },
+      "whatsAppWabaLifecycleStatus" : {
+        "type" : "string",
+        "description" : "WhatsApp Business Account approval or linkage lifecycle state.",
+        "enum" : [ "NONE", "PENDING", "APPROVED", "REJECTED" ]
+      },
+      "whatsAppWabaDetailRow" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "wabaId" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 64,
+            "minLength" : 0,
+            "description" : "WhatsApp Business Account id."
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 500,
+            "minLength" : 0,
+            "description" : "Display name of the WABA."
+          },
+          "businessId" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 64,
+            "minLength" : 0,
+            "description" : "Meta business portfolio id."
+          },
+          "numberStatus" : {
+            "$ref" : "#/components/schemas/whatsAppPhoneNumberStatus"
+          },
+          "wabaStatus" : {
+            "$ref" : "#/components/schemas/whatsAppWabaLifecycleStatus"
+          }
+        },
+        "required" : [ "businessId", "name", "numberStatus", "wabaId", "wabaStatus" ]
+      },
+      "getWhatsAppDetails_data" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "numberStatus" : {
+            "$ref" : "#/components/schemas/whatsAppPhoneNumberStatus"
+          },
+          "wabaDetail" : {
+            "type" : [ "array", "null" ],
+            "description" : "Linked WhatsApp Business Accounts and their per-account statuses.",
+            "items" : {
+              "$ref" : "#/components/schemas/whatsAppWabaDetailRow"
+            },
+            "minItems" : 0
+          },
+          "wabaStatus" : {
+            "$ref" : "#/components/schemas/whatsAppWabaLifecycleStatus"
+          }
+        },
+        "required" : [ "numberStatus", "wabaDetail", "wabaStatus" ]
+      },
+      "getWhatsAppDetails_responseBody" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "data" : {
+            "$ref" : "#/components/schemas/getWhatsAppDetails_data"
+          },
+          "kind" : {
+            "type" : "string",
+            "const" : "single.json",
+            "description" : "Response envelope discriminator for a single JSON payload."
+          }
+        },
+        "required" : [ "data", "kind" ]
+      },
+      "templateLanguageJSON" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "code" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 10,
+            "minLength" : 1
+          },
+          "language" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 25,
+            "minLength" : 2
+          }
+        },
+        "required" : [ "code", "language" ]
+      },
+      "codeVerificationSuccess" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "properties" : {
+          "success" : {
+            "type" : [ "boolean", "null" ]
+          },
+          "kind" : {
+            "type" : [ "string", "null" ],
+            "const" : "single.json"
+          }
+        },
+        "required" : [ "kind", "success" ]
+      },
+      "codeVerificationError" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "properties" : {
+          "errorCode" : {
+            "type" : [ "string", "null" ],
+            "description" : "Machine-readable error code."
+          },
+          "message" : {
+            "type" : [ "string", "null" ],
+            "description" : "Human-readable error description."
+          }
+        },
+        "required" : [ "errorCode", "message" ]
+      },
+      "templateLanguageList" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/templateLanguageJSON"
+        }
+      },
+      "getTemplateLanguages_responseBody" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "data" : {
+            "$ref" : "#/components/schemas/templateLanguageList"
+          },
+          "kind" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 15,
+            "minLength" : 1,
+            "description" : "Response envelope discriminator (for example `single.json` for this API)."
+          }
+        },
+        "required" : [ "data", "kind" ]
+      }
+    },
+    "responses" : {
+      "getWhatsappPhoneNumbers" : {
+        "description" : "getWhatsappPhoneNumbers template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "#/components/schemas/listofPhoneNumbers"
+                },
+                "kind" : {
+                  "type" : [ "string", "null" ],
+                  "const" : "single.json"
+                }
+              },
+              "required" : [ "data", "kind" ]
+            },
+            "examples" : {
+              "GetWhatsappPhoneNumbers_200" : {
+                "$ref" : "./examples/IM_Integration.json#/components/examples/GetWhatsappPhoneNumbers_200"
+              }
+            }
+          }
+        }
+      },
+      "getSandboxTesters" : {
+        "description" : "Response containing the list of WhatsApp sandbox tester phone numbers and the last modified timestamp",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "modifiedTime" : {
+                  "type" : [ "string", "null" ],
+                  "description" : "ISO 8601 UTC timestamp indicating when the sandbox testers list was last modified",
+                  "maxLength" : 100,
+                  "minLength" : 0,
+                  "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+                },
+                "sandBoxTesters" : {
+                  "type" : [ "array", "null" ],
+                  "description" : "List of phone numbers registered as sandbox testers. Each number starts with a plus sign followed by numerals (e.g. +911234567890)",
+                  "items" : {
+                    "type" : [ "string", "null" ],
+                    "description" : "Phone number of a sandbox tester in E.164 format (e.g. +911234567890)",
+                    "maxLength" : 100,
+                    "minLength" : 0,
+                    "pattern" : "^\\+[0-9]*$"
+                  },
+                  "uniqueItems" : false
+                },
+                "kind" : {
+                  "type" : [ "string", "null" ],
+                  "description" : "Response format identifier",
+                  "const" : "single.json"
+                }
+              },
+              "required" : [ "kind", "modifiedTime", "sandBoxTesters" ]
+            },
+            "examples" : {
+              "Sandbox testers response" : {
+                "summary" : "List of registered sandbox tester numbers",
+                "value" : {
+                  "modifiedTime" : "2026-05-15T07:16:55.374Z",
+                  "sandBoxTesters" : [ "+911234567890" ],
+                  "kind" : "single.json"
+                }
+              }
+            }
+          }
+        }
+      },
+      "getWhatsAppTemplateTags" : {
+        "description" : "200 response for GET /api/v1/im/integrationServices/WHATSAPP/templateTags.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/getWhatsAppTemplateTags_responseBody"
+            },
+            "examples" : {
+              "GetWhatsAppTemplateTags_200" : {
+                "$ref" : "./examples/IM_Integration.json#/components/examples/GetWhatsAppTemplateTags_200"
+              }
+            }
+          }
+        }
+      },
+      "getWhatsAppDetails" : {
+        "description" : "200 response for GET /api/v1/im/integrationServices/WHATSAPP/details.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/getWhatsAppDetails_responseBody"
+            },
+            "examples" : {
+              "GetWhatsAppDetails_200" : {
+                "$ref" : "./examples/IM_Integration.json#/components/examples/GetWhatsAppDetails_200"
+              }
+            }
+          }
+        }
+      },
+      "getTemplateLanguages" : {
+        "description" : "200 response for POST /api/v1/im/integrationServices/WHATSAPP/templateLanguages: supported template languages as `data` with `kind` discriminator.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/getTemplateLanguages_responseBody"
+            },
+            "examples" : {
+              "GetTemplateLanguages_200" : {
+                "$ref" : "./examples/IM_Integration.json#/components/examples/GetTemplateLanguages_200"
+              }
+            }
+          }
+        }
+      },
+      "codeVerificationSuccessResponse" : {
+        "description" : "OTP code verification operation completed successfully.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/codeVerificationSuccess"
+            },
+            "examples" : {
+              "CodeVerificationSuccess_200" : {
+                "$ref" : "./examples/IM_Integration.json#/components/examples/CodeVerificationSuccess_200"
+              }
+            }
+          }
+        }
+      },
+      "templateCreditExhaustForbiddenResponse" : {
+        "description" : "Insufficient credits to send a WhatsApp template message.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/templateCreditExhaustErrorResponse"
+            },
+            "examples" : {
+              "TemplateCreditExhaust_403" : {
+                "summary" : "Insufficient WhatsApp template credits",
+                "value" : {
+                  "errorCode" : "INSUFFICIENT_CREDITS",
+                  "message" : "1"
+                }
+              }
+            }
+          }
+        }
+      },
+      "codeVerificationErrorResponse" : {
+        "description" : "OTP code verification failed due to rate limiting or incorrect code.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/codeVerificationError"
+            },
+            "examples" : {
+              "CodeVerificationError_500_rateLimit" : {
+                "$ref" : "./examples/IM_Integration.json#/components/examples/CodeVerificationError_500_rateLimit"
+              },
+              "CodeVerificationError_500_incorrectCode" : {
+                "$ref" : "./examples/IM_Integration.json#/components/examples/CodeVerificationError_500_incorrectCode"
+              }
+            }
+          }
+        }
+      }
+    },
+    "requestBodies" : {
+      "whatsAppOtp" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "otp" : {
+                  "type" : [ "string" ],
+                  "description" : "6-digit OTP verification code",
+                  "pattern" : "^\\d{6}$",
+                  "maxLength" : 6,
+                  "minLength" : 6
+                }
+              },
+              "required" : [ "otp" ]
+            },
+            "examples" : {
+              "SubmitWhatsAppOtp" : {
+                "summary" : "Submit 6-digit OTP",
+                "value" : {
+                  "otp" : "123456"
+                }
+              }
+            }
+          }
+        }
+      },
+      "updateSandboxTesters" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "sandBoxTesters" : {
+                  "type" : [ "array" ],
+                  "description" : "Array of phone numbers to register as sandbox testers. Each number must start with a plus sign followed by numerals (e.g. +911234567890)",
+                  "items" : {
+                    "type" : [ "string" ],
+                    "description" : "Phone number in E.164 format (e.g. +911234567890)",
+                    "maxLength" : 100,
+                    "minLength" : 0,
+                    "pattern" : "^\\+[0-9]*$"
+                  },
+                  "uniqueItems" : false
+                }
+              },
+              "required" : [ ]
+            },
+            "examples" : {
+              "Add sandbox testers" : {
+                "summary" : "Register phone numbers as sandbox testers",
+                "value" : {
+                  "sandBoxTesters" : [ "+911234567890" ]
+                }
+              },
+              "Remove all sandbox testers" : {
+                "summary" : "Pass an empty array to remove all registered sandbox testers",
+                "value" : {
+                  "sandBoxTesters" : [ ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "IM_Integration"
+}

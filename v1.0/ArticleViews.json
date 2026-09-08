@@ -1,0 +1,275 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "ArticleViews",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/displayPreferences" : {
+      "get" : {
+        "tags" : [ "ArticleViews" ],
+        "summary" : "Get Article View Display Preference",
+        "description" : "Retrieves a list of article view display preferences.",
+        "operationId" : "getArticleViewDisplayPreferences",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "name" : "departmentId",
+          "description" : "Filters article views to the specified department. If not specified, returns views for all departments",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string" ]
+          }
+        }, {
+          "name" : "categoryId",
+          "description" : "Filters article views by the specified category",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "string" ]
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/articleViews"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.READ" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      },
+      "post" : {
+        "tags" : [ "ArticleViews" ],
+        "summary" : "Update Article View Display Preference",
+        "description" : "Updates the display preference for a specific article view in a department.",
+        "operationId" : "updateArticleViewDisplayPreference",
+        "x-mcp-ready" : true,
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/updateViewPreference"
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/articleViewResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.UPDATE" ]
+        } ],
+        "x-audience" : [ "external-public" ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "articleViewResponse" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "sortColumn" : {
+            "type" : [ "string", "null" ],
+            "description" : "Attribute used to sort articles in the view",
+            "enum" : [ "createdTime", "modifiedTime", "solutionTitle" ]
+          },
+          "viewName" : {
+            "type" : [ "string", "null" ],
+            "description" : "Name of the custom article view",
+            "enum" : [ "ALL_DRAFT", "MY_DRAFT", "ALL_EXPIRED", "MY_EXPIRED", "REVIEW_PENDING", "PUBLISHED" ]
+          },
+          "departmentId" : {
+            "type" : [ "string", "integer", "null" ],
+            "description" : "Unique ID of the department associated with the view",
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "sortOrder" : {
+            "type" : [ "string", "null" ],
+            "description" : "Sorting order applied to articles in the view. Possible values: ascending, descending.",
+            "enum" : [ "ascending", "descending" ]
+          },
+          "recordsPerPage" : {
+            "type" : [ "string", "integer", "null" ],
+            "description" : "Number of articles displayed per page in the view",
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          }
+        },
+        "required" : [ "departmentId", "recordsPerPage", "sortColumn", "sortOrder", "viewName" ]
+      },
+      "articleViewData" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/articleViewResponse"
+        }
+      }
+    },
+    "responses" : {
+      "articleViews" : {
+        "description" : "articleViews template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "#/components/schemas/articleViewData",
+                  "description" : "List of article view display preference entries"
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "data" : [ {
+                    "sortColumn" : "createdTime",
+                    "viewName" : "MY_DRAFT",
+                    "departmentId" : "1000000012856",
+                    "sortOrder" : "ascending",
+                    "recordsPerPage" : "10"
+                  }, {
+                    "sortColumn" : "solutionTitle",
+                    "viewName" : "REVIEW_PENDING",
+                    "departmentId" : "1000000012856",
+                    "sortOrder" : "descending",
+                    "recordsPerPage" : "25"
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "articleViewResponse" : {
+        "description" : "articleViewResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "sortColumn" : {
+                  "type" : [ "string", "null" ],
+                  "description" : "Attribute used to sort articles in the view",
+                  "enum" : [ "createdTime", "modifiedTime", "solutionTitle", "positionArticle" ]
+                },
+                "viewName" : {
+                  "type" : [ "string", "null" ],
+                  "description" : "Name of the custom article view",
+                  "enum" : [ "ALL_DRAFT", "MY_DRAFT", "ALL_EXPIRED", "MY_EXPIRED", "REVIEW_PENDING", "PUBLISHED" ]
+                },
+                "departmentId" : {
+                  "type" : [ "string", "integer", "null" ],
+                  "description" : "Unique ID of the department associated with the view",
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "sortOrder" : {
+                  "type" : [ "string", "null" ],
+                  "description" : "Sorting order applied to articles in the view. Possible values: ascending, descending.",
+                  "enum" : [ "ascending", "descending" ]
+                },
+                "recordsPerPage" : {
+                  "type" : [ "string", "integer", "null" ],
+                  "description" : "Number of articles displayed per page in the view",
+                  "format" : "int32",
+                  "pattern" : "([0-9]+)"
+                }
+              },
+              "required" : [ "departmentId", "recordsPerPage", "sortColumn", "sortOrder", "viewName" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "sortColumn" : "modifiedTime",
+                  "viewName" : "PUBLISHED",
+                  "departmentId" : "1000000012856",
+                  "sortOrder" : "descending",
+                  "recordsPerPage" : "20"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "requestBodies" : {
+      "updateViewPreference" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "sortColumn" : {
+                  "type" : [ "string" ],
+                  "description" : "Attribute used to sort articles. Possible values: solutionTitle, createdTime, modifiedTime, positionArticle.",
+                  "enum" : [ "createdTime", "modifiedTime", "solutionTitle", "positionArticle" ]
+                },
+                "viewName" : {
+                  "type" : [ "string" ],
+                  "description" : "Name of the custom view for which the display preference must be updated. Possible values: ALL_DRAFT, MY_DRAFT, ALL_EXPIRED, MY_EXPIRED, REVIEW_PENDING, PUBLISHED.",
+                  "enum" : [ "ALL_DRAFT", "MY_DRAFT", "ALL_EXPIRED", "MY_EXPIRED", "REVIEW_PENDING", "PUBLISHED" ]
+                },
+                "sortOrder" : {
+                  "type" : [ "string" ],
+                  "description" : "Sorting order for articles. Possible values: ascending, descending.",
+                  "enum" : [ "ascending", "descending" ]
+                },
+                "departmentId" : {
+                  "type" : [ "string", "integer" ],
+                  "format" : "int64",
+                  "description" : "Unique ID of the department in which the display preference must be updated. If not specified, updates the preference for all departments",
+                  "pattern" : "([0-9]+)"
+                },
+                "recordsPerPage" : {
+                  "type" : [ "string", "integer" ],
+                  "format" : "int32",
+                  "description" : "Number of articles to display per page",
+                  "pattern" : "([0-9]+)"
+                },
+                "categoryId" : {
+                  "type" : [ "string" ],
+                  "description" : "Unique ID of the category for which the display preference must be updated"
+                }
+              },
+              "required" : [ "viewName" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "sortColumn" : "modifiedTime",
+                  "viewName" : "PUBLISHED",
+                  "departmentId" : "1000000012856",
+                  "sortOrder" : "descending",
+                  "recordsPerPage" : "20"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "ArticleViews"
+}

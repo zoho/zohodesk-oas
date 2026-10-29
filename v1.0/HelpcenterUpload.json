@@ -1,0 +1,194 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "HelpcenterUpload",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/helpCenters/{helpCenterId}/imageUpload" : {
+      "post" : {
+        "tags" : [ "HelpcenterUpload" ],
+        "summary" : "Upload Image",
+        "description" : "Uploads an image to a help center.",
+        "operationId" : "uploadHCLogo",
+        "parameters" : [ {
+          "name" : "entityType",
+          "description" : "Source type of the image",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "EDITOR", "ATTACHMENT" ]
+          }
+        }, {
+          "name" : "helpCenterId",
+          "description" : "Unique ID of the help center",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "multipart/form-data" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/uploadRequestJson"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/uploadResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.UPDATE" ]
+        } ]
+      }
+    }
+  },
+  "components" : {
+    "responses" : {
+      "uploadResponse" : {
+        "description" : "uploadResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/uploadResponseJson"
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "size" : "48298",
+                  "name" : "Tesla_logo.png",
+                  "id" : "2029254000000178001",
+                  "url" : "https://desk.zoho.com/portal/api/publicImages/2029254000000178001"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    },
+    "schemas" : {
+      "uploadResponseJson" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "size" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "File size in bytes"
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "description" : "Name of the uploaded file"
+          },
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the uploaded file"
+          },
+          "url" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 255,
+            "minLength" : 0,
+            "description" : "Public URL of the uploaded image",
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+          }
+        },
+        "required" : [ "id", "name", "size", "url" ]
+      },
+      "uploadRequestJson" : {
+        "type" : [ "object" ],
+        "properties" : {
+          "file" : {
+            "type" : [ "string" ],
+            "format" : "binary",
+            "description" : "helpcenter uploads. Maximum file size 1 MB. Allowed extensions: jpg, png, gif, jpeg, ico."
+          },
+          "imageUrl" : {
+            "type" : [ "string" ],
+            "format" : "binary",
+            "description" : "upload image from URL. Maximum file size 1 MB."
+          },
+          "source" : {
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "enum" : [ "zohodocs", "gdrive", "dropbox", "box", "skydrive", "evernote", "office365", "workdrive" ],
+            "description" : "Source of attaching document"
+          },
+          "id" : {
+            "type" : [ "string" ],
+            "maxLength" : 300,
+            "description" : "Unique ID of the attaching document"
+          },
+          "name" : {
+            "type" : [ "string" ],
+            "description" : "Name of the attaching document",
+            "maxLength" : 300
+          },
+          "isPublic" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the attaching document is public"
+          },
+          "type" : {
+            "type" : [ "string" ],
+            "description" : "Document type of the attaching document",
+            "maxLength" : 300,
+            "enum" : [ "file", "presentation", "pdf", "document", "spreadsheet" ]
+          },
+          "filePath" : {
+            "type" : [ "string" ],
+            "description" : "File path of the attaching document (for Dropbox)",
+            "maxLength" : 300
+          },
+          "accountId" : {
+            "type" : [ "string" ],
+            "description" : "Account ID of the Dropbox",
+            "maxLength" : 300
+          },
+          "mimeType" : {
+            "type" : [ "string" ],
+            "description" : "MIME type for Google Drive",
+            "maxLength" : 300
+          }
+        },
+        "additionalProperties" : false,
+        "required" : [ "file", "source", "id", "name" ]
+      }
+    }
+  },
+  "x-entity" : "HelpcenterUpload"
+}

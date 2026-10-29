@@ -11,6 +11,7 @@
         "summary" : "Get Linked Tickets by Bug ID",
         "description" : "Retrieves support tickets associated with the specified bug.",
         "operationId" : "getBugLinkedTicketDetails",
+        "x-mcp-group" : [ "Integrations" ],
         "parameters" : [ {
           "name" : "bugId",
           "in" : "path",
@@ -44,6 +45,75 @@
           "iam-oauth2-schema" : [ "Desk.tickets.READ" ]
         } ]
       }
+    },
+    "/api/v1/tickets/{ticketId}/bug" : {
+      "get" : {
+        "tags" : [ "BugInteg" ],
+        "summary" : "Get bug details for a ticket",
+        "description" : "Retrieves BugTracker/Projects issue details linked to the specified support ticket. Response includes core bug fields plus additional issue fields labeled with BugTracker field display names (including custom fields when present on the issue).",
+        "operationId" : "getBugInfo",
+        "parameters" : [ {
+          "name" : "ticketId",
+          "in" : "path",
+          "required" : true,
+          "description" : "Unique ID of the support ticket.",
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/bugInfoResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.tickets.READ" ]
+        } ]
+      },
+      "post" : {
+        "tags" : [ "BugInteg" ],
+        "summary" : "Create and link a bug to a ticket",
+        "description" : "Creates a new BugTracker/Projects issue and links it to the specified support ticket. The ticket department must be mapped to the given project.",
+        "operationId" : "addBug",
+        "parameters" : [ {
+          "name" : "ticketId",
+          "in" : "path",
+          "required" : true,
+          "description" : "Unique ID of the support ticket.",
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/addBugPayload"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/addBugResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.tickets.UPDATE" ]
+        } ]
+      }
     }
   },
   "components" : {
@@ -61,14 +131,12 @@
           "subject" : {
             "description" : "Subject of the ticket.",
             "type" : [ "string", "null" ],
-            "maxLength" : 1000,
-            "minLength" : 0
+            "maxLength" : 1000
           },
           "dueDate" : {
             "description" : "Due date of the ticket.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
-            "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "id" : {
@@ -79,7 +147,8 @@
           },
           "status" : {
             "description" : "Current status of the ticket.",
-            "type" : [ "string", "null" ]
+            "type" : [ "string", "null" ],
+            "x-dynamic-enum" : true
           },
           "commentCount" : {
             "description" : "Number of comments on the ticket.",
@@ -95,6 +164,146 @@
         "items" : {
           "$ref" : "#/components/schemas/ticketJson"
         }
+      },
+      "bugInfoJson" : {
+        "type" : "object",
+        "additionalProperties" : {
+          "type" : [ "string", "null" ]
+        },
+        "properties" : {
+          "id" : {
+            "description" : "Unique ID of the linked issue.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100
+          },
+          "projectId" : {
+            "description" : "Unique ID of the BugTracker project containing the issue.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100
+          },
+          "bugkey" : {
+            "description" : "Issue key prefix in BugTracker (e.g. EZ1-I2).",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100
+          },
+          "title" : {
+            "description" : "Title of the linked issue.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 1000
+          },
+          "status" : {
+            "description" : "Current status of the linked issue.",
+            "type" : [ "string", "null" ],
+            "x-dynamic-enum" : true
+          },
+          "assigneename" : {
+            "description" : "Name of the assignee of the linked issue.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 200
+          },
+          "bugInfoUrl" : {
+            "description" : "URL to view the linked issue in BugTracker.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 2000
+          },
+          "Total Tickets Linked" : {
+            "description" : "Total number of support tickets linked to this issue.",
+            "type" : [ "integer", "null" ],
+            "format" : "int64"
+          },
+          "message" : {
+            "description" : "Desk status message when bug details cannot be returned (for example no bug id, no content, or a retrieval problem). Present instead of issue fields.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 500
+          }
+        }
+      },
+      "addBugResponseJson" : {
+        "type" : "object",
+        "additionalProperties" : true,
+        "properties" : {
+          "bugid" : {
+            "description" : "Unique ID of the created bug.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100
+          },
+          "key" : {
+            "description" : "Bug key of the created issue.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100
+          },
+          "title" : {
+            "description" : "Title of the created bug.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 1000
+          },
+          "status" : {
+            "description" : "Current status of the created bug.",
+            "type" : [ "string", "null" ]
+          },
+          "assigneename" : {
+            "description" : "Name of the assignee of the created bug.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 200
+          },
+          "projectid" : {
+            "description" : "Unique ID of the BugTracker project containing the created bug.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100
+          },
+          "severity" : {
+            "description" : "Severity of the created bug.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100
+          },
+          "totalTicketsLinked" : {
+            "description" : "Total number of support tickets linked to this bug.",
+            "type" : [ "string", "integer", "null" ]
+          },
+          "message" : {
+            "description" : "Desk status message when a bug could not be created (for example integration disabled or already filed).",
+            "type" : [ "string", "null" ],
+            "maxLength" : 500
+          },
+          "error" : {
+            "description" : "Error message when bug creation fails.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 500
+          }
+        }
+      },
+      "addBugRequestJsonRequestPayloadRequestPayloadRequest" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "properties" : {
+          "projectId" : {
+            "description" : "Unique ID of the BugTracker project in which the issue must be created. The ticket department must be mapped to this project.",
+            "type" : "string",
+            "format" : "int64"
+          },
+          "title" : {
+            "description" : "Title of the bug to create.",
+            "type" : "string",
+            "maxLength" : 295
+          },
+          "description" : {
+            "description" : "Description of the bug to create.",
+            "type" : "string",
+            "maxLength" : 1048576
+          },
+          "threadId" : {
+            "description" : "Optional ticket thread ID whose attachments should be copied to the bug.",
+            "type" : "string",
+            "format" : "int64"
+          },
+          "reporterEmail" : {
+            "description" : "Reporter email for the bug. Defaults to the ticket contact email when omitted.",
+            "type" : "string",
+            "maxLength" : 100,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s\\^\\{\\}\\~\\[\\]\\*\\+~\\|\\\"]+",
+            "x-regex-name" : "email"
+          }
+        }
       }
     },
     "responses" : {
@@ -103,7 +312,7 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "object", "null" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
@@ -136,6 +345,79 @@
             }
           }
         }
+      },
+      "bugInfoResponse" : {
+        "description" : "bugInfoResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/bugInfoJson"
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "id" : "12000000001234",
+                  "projectId" : "12000000000555",
+                  "bugkey" : "EZ1-I2",
+                  "title" : "Order processing delay issue",
+                  "status" : "Open",
+                  "assigneename" : "Carol Smith",
+                  "bugInfoUrl" : "https://bugtrackerapp.zoho.com/portal/zylker/issues/2",
+                  "Total Tickets Linked" : 3,
+                  "Flag" : "Internal",
+                  "Severity" : "None",
+                  "Custom Field 1" : "csvalue1",
+                  "Due Date" : ""
+                }
+              }
+            }
+          }
+        }
+      },
+      "addBugResponse" : {
+        "description" : "Response after creating and linking a bug to a ticket",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/addBugResponseJson"
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "bugid" : "12000000001234",
+                  "key" : "EZ1-I2",
+                  "title" : "Order processing delay issue",
+                  "status" : "Open",
+                  "assigneename" : "Carol Smith",
+                  "projectid" : "12000000000555",
+                  "severity" : "None",
+                  "totalTicketsLinked" : "1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "requestBodies" : {
+      "addBugPayload" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/addBugRequestJsonRequestPayloadRequestPayloadRequest"
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "projectId" : "12000000000555",
+                  "title" : "Order processing delay issue",
+                  "description" : "Customer reported delay while processing orders.",
+                  "reporterEmail" : "carol@zylker.com"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "securitySchemes" : {
@@ -149,5 +431,6 @@
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "BugInteg"
 }

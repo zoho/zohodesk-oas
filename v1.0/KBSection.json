@@ -11,11 +11,77 @@
         "summary" : "Create a KB section",
         "description" : "This API creates a section in your helpdesk",
         "operationId" : "addKBSection",
+        "x-mcp-group" : [ "KB Admin", "Manage KB Category" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "requestBody" : {
           "$ref" : "#/components/requestBodies/createCategoryJson"
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/sectionResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.CREATE" ]
+        } ]
+      }
+    },
+    "/api/v1/kbRootCategories/{rootCategoryId}/kbSections" : {
+      "post" : {
+        "tags" : [ "KBSection" ],
+        "summary" : "Create Section under Root Category",
+        "description" : "Creates a section directly under a specified root category.",
+        "operationId" : "addSectionUnderKBRootCategory",
+        "parameters" : [ {
+          "name" : "rootCategoryId",
+          "in" : "path",
+          "description" : "Unique ID of the root category",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/addSectionUnderParentJson"
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/sectionResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.CREATE" ]
+        } ]
+      }
+    },
+    "/api/v1/kbSections/{sectionId}/kbSections" : {
+      "post" : {
+        "tags" : [ "KBSection" ],
+        "summary" : "Create Section under Section",
+        "description" : "Creates a section nested under another section.",
+        "operationId" : "addSectionUnderKBSection",
+        "parameters" : [ {
+          "description" : "Unique ID of the parent section",
+          "$ref" : "#/components/parameters/sectionId"
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/addSectionUnderParentJson"
         },
         "responses" : {
           "422" : {
@@ -36,6 +102,7 @@
         "summary" : "Update Section Permalinks",
         "description" : "Updates the primary and secondary permalinks of a section translation.",
         "operationId" : "updateKBSectionPermalinks",
+        "x-mcp-group" : [ "KnowledgeBase_Publishing", "KB Admin", "Manage KB Category" ],
         "parameters" : [ {
           "name" : "sectionId",
           "in" : "path",
@@ -85,6 +152,7 @@
         "summary" : "Reorder Sections",
         "description" : "Reorders sections within a parent category.",
         "operationId" : "reorderSections",
+        "x-mcp-group" : [ "KB Admin", "Manage KB Category" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -110,6 +178,7 @@
         "summary" : "Get a KB section",
         "description" : "This API fetches a section in your helpdesk",
         "operationId" : "getKBSection",
+        "x-mcp-group" : [ "KB Admin", "KB Dashboard", "Manage KB Category", "View KB Category", "Manage KB Moderation", "View KB Moderation", "Manage KB Recyclebin", "View KB Recyclebin", "Manage KB Templates", "View KB Templates", "Manage KB Articles", "View KB Articles", "Manage KB Feedbacks", "View KB Feedbacks", "View KB" ],
         "parameters" : [ {
           "name" : "sectionId",
           "in" : "path",
@@ -156,6 +225,7 @@
         "summary" : "Update a KB section",
         "description" : "This API updates a section in your helpdesk",
         "operationId" : "updateKBSection",
+        "x-mcp-group" : [ "KB Admin", "Manage KB Category" ],
         "parameters" : [ {
           "name" : "sectionId",
           "in" : "path",
@@ -193,6 +263,7 @@
         "summary" : "Delete Section Permalink",
         "description" : "Removes a permalink from a section translation.",
         "operationId" : "deleteSectionPermalink",
+        "x-mcp-group" : [ "KnowledgeBase_Publishing", "KB Admin", "Manage KB Category" ],
         "parameters" : [ {
           "name" : "sectionId",
           "in" : "path",
@@ -242,6 +313,7 @@
         "summary" : "Create Section Permalink",
         "description" : "Adds a permalink to a section translation.",
         "operationId" : "createSectionPermalink",
+        "x-mcp-group" : [ "KnowledgeBase_Publishing", "KB Admin", "Manage KB Category" ],
         "parameters" : [ {
           "name" : "sectionId",
           "in" : "path",
@@ -284,6 +356,52 @@
           "iam-oauth2-schema" : [ "Desk.articles.UPDATE" ]
         } ]
       }
+    },
+    "/api/v1/kbSections/{sectionId}/translations/{locale}" : {
+      "delete" : {
+        "tags" : [ "KBSection" ],
+        "summary" : "Delete Section Translation",
+        "description" : "This API deletes a translation of a KB section.",
+        "operationId" : "deleteKBSectionTranslation",
+        "parameters" : [ {
+          "name" : "sectionId",
+          "in" : "path",
+          "description" : "Unique ID of the section",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "locale",
+          "in" : "path",
+          "description" : "Locale code of the translation",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "en", "ja", "zh", "es", "de", "fr", "tr", "ru", "pt", "it", "nl", "da", "sv", "pl", "ar", "he", "af", "cs", "fr-ca", "bg", "fi", "el", "hu", "id", "nb", "ro", "th", "uk", "vi", "ur", "hi", "te", "kn", "ta", "mr", "ko", "fa", "bn", "gu", "ms", "ml", "en-gb", "sk", "hr", "sl", "zh_TW", "zh-tw", "ca", "ka", "kk", "my", "km", "pt-br" ],
+            "pattern" : "[a-zA-Z]{2,4}([-_][a-zA-Z]{2})?"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.DELETE" ]
+        } ]
+      }
     }
   },
   "components" : {
@@ -301,6 +419,12 @@
             "type" : [ "string", "null" ],
             "description" : "Permalink of the section",
             "maxLength" : 500
+          },
+          "description" : {
+            "type" : [ "string", "null" ],
+            "description" : "A short description of the section",
+            "x-regex-name" : "cleartextampersand",
+            "maxLength" : 300
           },
           "locale" : {
             "type" : [ "string", "null" ],
@@ -322,13 +446,15 @@
         "properties" : {
           "visibility" : {
             "type" : [ "string", "null" ],
-            "description" : "Visibility of the section. Values allowed are !@AGENTS@!, !@GROUP_USERS@!, !@ALL_USERS@!,!@NONE@!,!@PRIVATE_IP@! ",
+            "description" : "Visibility setting of the section. Possible values: AGENTS, GROUP_USERS, ALL_USERS, PRIVATE_IP, NONE",
             "enum" : [ "ALL_USERS", "AGENTS", "GROUP_USERS", "PRIVATE_IP", "NONE" ]
           },
           "translations" : {
+            "description" : "List of locale-specific translations for the section",
             "$ref" : "#/components/schemas/addSectionTranslationJsonArray"
           },
           "groupIds" : {
+            "description" : "List of group IDs to associate with the section",
             "type" : [ "array", "null" ],
             "items" : {
               "type" : [ "string", "integer", "null" ],
@@ -339,11 +465,12 @@
           },
           "name" : {
             "type" : [ "string", "null" ],
-            "description" : "Section Name",
+            "description" : "Name of the section",
             "maxLength" : 300,
             "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+"
           },
           "ipAddresses" : {
+            "description" : "List of IP addresses to associate with the section",
             "type" : [ "array", "null" ],
             "items" : {
               "type" : [ "object", "null" ]
@@ -352,7 +479,7 @@
           },
           "status" : {
             "type" : [ "string", "null" ],
-            "description" : "Status of the section",
+            "description" : "Activation status of the section. Possible values: SHOW_IN_HELPCENTER, HIDE_IN_HELPCENTER, DISABLED",
             "enum" : [ "SHOW_IN_HELPCENTER", "HIDE_IN_HELPCENTER", "DISABLED" ]
           }
         },
@@ -369,67 +496,82 @@
               "additionalProperties" : false,
               "properties" : {
                 "modifiedTime" : {
+                  "description" : "Time when the section was last modified",
                   "type" : [ "string", "null" ],
                   "maxLength" : 100,
                   "minLength" : 0,
                   "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
                 },
                 "isFollowing" : {
+                  "description" : "Indicates whether the current user is following the section. Possible values: • true = following • false = not following",
                   "type" : [ "boolean", "null" ]
                 },
                 "visibility" : {
+                  "description" : "Visibility setting of the section. Possible values: AGENTS, GROUP_USERS, ALL_USERS, NONE",
                   "type" : [ "string", "null" ],
                   "enum" : [ "ALL_USERS", "AGENTS", "GROUP_USERS", "PRIVATE_IP", "NONE" ]
                 },
                 "description" : {
+                  "description" : "Brief description of the section",
                   "type" : [ "string", "null" ],
                   "maxLength" : 100,
                   "minLength" : 0,
                   "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]*"
                 },
                 "groups" : {
+                  "description" : "List of groups associated with the section",
                   "$ref" : "./KbCategory.json#/components/schemas/groupJsonArr"
                 },
                 "logoUrl" : {
+                  "description" : "URL of the section logo",
                   "type" : [ "string", "null" ],
                   "maxLength" : 255,
                   "minLength" : 0,
                   "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
                 },
                 "rootCategoryId" : {
+                  "description" : "Unique ID of the root category to which the section belongs",
                   "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "isTrashed" : {
+                  "description" : "Indicates whether the section is in the Recycle Bin. Possible values: • true = in Recycle Bin • false = not in Recycle Bin",
                   "type" : [ "boolean", "null" ]
                 },
                 "createdBy" : {
+                  "description" : "Details of the user who created the section",
                   "$ref" : "./ArticleTranslation.json#/components/schemas/modifiedBy"
                 },
                 "translations" : {
+                  "description" : "List of locale-specific translations for the section",
                   "$ref" : "./KBRootCategory.json#/components/schemas/rootTranslationResponseJsonArr"
                 },
                 "name" : {
+                  "description" : "Name of the section",
                   "type" : [ "string", "null" ],
                   "maxLength" : 100,
                   "minLength" : 0
                 },
                 "createdTime" : {
+                  "description" : "Time when the section was created",
                   "type" : [ "string", "null" ],
                   "maxLength" : 100,
                   "minLength" : 0,
                   "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
                 },
                 "modifiedBy" : {
+                  "description" : "Details of the user who last modified the section",
                   "$ref" : "./ArticleTranslation.json#/components/schemas/modifiedBy"
                 },
                 "parentCategoryId" : {
+                  "description" : "Unique ID of the parent category",
                   "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "ipAddresses" : {
+                  "description" : "List of IP addresses associated with the section",
                   "type" : [ "array", "null" ],
                   "items" : {
                     "type" : [ "string", "null" ],
@@ -440,18 +582,21 @@
                   "uniqueItems" : false
                 },
                 "id" : {
+                  "description" : "Unique ID of the section",
                   "type" : [ "string", "integer" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
                 "order" : {
+                  "description" : "Position of the section in the overall order within its parent",
                   "type" : [ "string", "integer", "null" ],
                   "format" : "int32",
                   "pattern" : "([0-9]+)"
                 },
                 "status" : {
+                  "description" : "Activation status of the section. Possible values: SHOW_IN_HELPCENTER, HIDE_IN_HELPCENTER, DISABLED",
                   "type" : [ "string", "null" ],
-                  "enum" : [ "SHOW_IN_HELPCENTER", "HIDE_IN_HELPCENTER" ]
+                  "enum" : [ "SHOW_IN_HELPCENTER", "HIDE_IN_HELPCENTER", "DISABLED" ]
                 },
                 "publicArticlesCount" : {
                   "$ref" : "./KBRootCategory.json#/components/schemas/countData"
@@ -476,7 +621,7 @@
                   "visibility" : "ALL_USERS",
                   "description" : "Section 1 description",
                   "groups" : [ ],
-                  "logoUrl" : "https://desk.example.com/support/App/build/fonts/certificate.svg",
+                  "logoUrl" : "https://desk.zoho.com/support/App/build/fonts/certificate.svg",
                   "rootCategoryId" : "5000000066427",
                   "isTrashed" : false,
                   "createdBy" : {
@@ -484,7 +629,7 @@
                     "name" : "Zylker",
                     "id" : "5000000015867",
                     "status" : "ACTIVE",
-                    "zuid" : "1234567890"
+                    "zuid" : "343224"
                   },
                   "translations" : [ {
                     "modifiedTime" : 1578359714000,
@@ -493,7 +638,7 @@
                       "name" : "Zylker",
                       "id" : "5000000015867",
                       "status" : "ACTIVE",
-                      "zuid" : "1234567890"
+                      "zuid" : "343224"
                     },
                     "name" : "For Agents",
                     "description" : "Section 1 description",
@@ -503,7 +648,7 @@
                       "name" : "Zylker",
                       "id" : "5000000015867",
                       "status" : "ACTIVE",
-                      "zuid" : "1234567890"
+                      "zuid" : "343224"
                     },
                     "id" : "5000000341019",
                     "permalink" : "for-agents",
@@ -518,7 +663,7 @@
                     "name" : "Zylker",
                     "id" : "5000000015867",
                     "status" : "ACTIVE",
-                    "zuid" : "1234567890"
+                    "zuid" : "343224"
                   },
                   "id" : "5000000341017",
                   "status" : "SHOW_IN_HELPCENTER",
@@ -527,6 +672,21 @@
               }
             }
           }
+        }
+      }
+    },
+    "parameters" : {
+      "sectionId" : {
+        "name" : "sectionId",
+        "in" : "path",
+        "description" : "Unique ID of the section",
+        "required" : true,
+        "style" : "simple",
+        "explode" : false,
+        "schema" : {
+          "type" : [ "string", "integer" ],
+          "format" : "int64",
+          "pattern" : "([0-9]+)"
         }
       }
     },
@@ -554,7 +714,7 @@
                 "properties" : {
                   "description" : {
                     "type" : [ "string" ],
-                    "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+",
+                    "x-regex-name" : "cleartextampersand",
                     "maxLength" : 250
                   },
                   "logoId" : {
@@ -596,6 +756,63 @@
           }
         }
       },
+      "addSectionUnderParentJson" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "additionalProperties" : false,
+              "allOf" : [ {
+                "$ref" : "#/components/schemas/commonCategoryJson"
+              }, {
+                "type" : [ "object" ],
+                "properties" : {
+                  "description" : {
+                    "type" : [ "string" ],
+                    "description" : "Brief description of the section",
+                    "x-regex-name" : "cleartextampersand",
+                    "maxLength" : 250
+                  },
+                  "logoId" : {
+                    "type" : [ "string", "integer" ],
+                    "format" : "int64",
+                    "description" : "Unique ID of the logo for the section",
+                    "pattern" : "([0-9]+)"
+                  },
+                  "articlePermission" : {
+                    "type" : [ "string" ],
+                    "description" : "Visibility setting of articles based on the section's visibility",
+                    "enum" : [ "ALL_USERS", "REGISTERED_USERS", "AGENTS_ONLY", "ALL", "REGISTEREDUSERS", "AGENTS" ]
+                  }
+                }
+              } ],
+              "properties" : {
+                "description" : {
+                  "type" : [ "string", "null" ],
+                  "description" : "Brief description of the section",
+                  "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+"
+                }
+              }
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "articlePermission" : "ALL",
+                  "translations" : [ {
+                    "name" : "For Agents",
+                    "description" : "Section 1 description",
+                    "locale" : "en",
+                    "permalink" : "for-agents"
+                  } ],
+                  "name" : "For Agents",
+                  "description" : "Section 1 description",
+                  "logoId" : "10",
+                  "status" : "SHOW_IN_HELPCENTER"
+                }
+              }
+            }
+          }
+        }
+      },
       "permalinkUpdateJson" : {
         "content" : {
           "application/json" : {
@@ -607,8 +824,8 @@
                   "type" : [ "string" ],
                   "description" : "Primary permalink of a translation",
                   "maxLength" : 300,
-                  "minLength" : 0,
-                  "pattern" : "[A-Za-z0-9%\\-+\\/=\\P{InBasicLatin}]+"
+                  "pattern" : "[A-Za-z0-9%\\-+\\/=\\P{InBasicLatin}]+",
+                  "x-regex-name" : "categorypermalink"
                 },
                 "secondaryPermalinks" : {
                   "description" : "Secondary permalinks of a translation. Note: Maximum of 3 secondary permalinks allowed.",
@@ -624,6 +841,11 @@
                   "uniqueItems" : false
                 }
               },
+              "anyOf" : [ {
+                "required" : [ "primaryPermalink" ]
+              }, {
+                "required" : [ "secondaryPermalinks" ]
+              } ],
               "required" : [ "primaryPermalink", "secondaryPermalinks" ]
             },
             "examples" : {
@@ -646,13 +868,15 @@
               "properties" : {
                 "visibility" : {
                   "type" : [ "string" ],
-                  "description" : "Visibility of the section. Values allowed are !@AGENTS@!, !@GROUP_USERS@!, !@ALL_USERS@!,!@PRIVATE_IP@!,!@NONE@! ",
+                  "description" : "Visibility setting of the section. Possible values: AGENTS, GROUP_USERS, ALL_USERS, PRIVATE_IP, NONE",
                   "enum" : [ "ALL_USERS", "AGENTS", "GROUP_USERS", "PRIVATE_IP", "NONE" ]
                 },
                 "translations" : {
+                  "description" : "List of locale-specific translations for the section",
                   "$ref" : "#/components/schemas/addSectionTranslationJsonArray"
                 },
                 "groupIds" : {
+                  "description" : "List of group IDs to associate with the section",
                   "type" : [ "array" ],
                   "items" : {
                     "type" : [ "string", "integer" ],
@@ -663,11 +887,13 @@
                 },
                 "name" : {
                   "type" : [ "string" ],
-                  "description" : "Section Name",
+                  "x-unique" : true,
+                  "description" : "Name of the section",
                   "maxLength" : 300,
                   "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+"
                 },
                 "ipAddresses" : {
+                  "description" : "List of IP addresses to associate with the section",
                   "type" : [ "array" ],
                   "items" : {
                     "type" : [ "object" ],
@@ -677,21 +903,24 @@
                 },
                 "status" : {
                   "type" : [ "string" ],
-                  "description" : "Status of the section",
+                  "description" : "Activation status of the section. Possible values: SHOW_IN_HELPCENTER, HIDE_IN_HELPCENTER, DISABLED",
                   "enum" : [ "SHOW_IN_HELPCENTER", "HIDE_IN_HELPCENTER", "DISABLED" ]
                 },
                 "description" : {
                   "type" : [ "string" ],
-                  "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+",
+                  "description" : "Brief description of the section",
+                  "x-regex-name" : "cleartextampersand",
                   "maxLength" : 250
                 },
                 "logoId" : {
                   "type" : [ "string", "integer" ],
                   "format" : "int64",
+                  "description" : "Unique ID of the logo for the section",
                   "pattern" : "([0-9]+)"
                 },
                 "articlePermission" : {
                   "type" : [ "string" ],
+                  "description" : "Visibility setting of articles based on the section's visibility",
                   "enum" : [ "ALL_USERS", "REGISTERED_USERS", "AGENTS_ONLY", "ALL", "REGISTEREDUSERS", "AGENTS" ]
                 }
               }
@@ -723,5 +952,6 @@
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "KBSection"
 }

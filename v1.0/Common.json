@@ -74,6 +74,22 @@
         "maximum" : 50,
         "minimum" : 1,
         "default" : 10
+      },
+      "invalidLayoutSchema" : {
+        "type" : "object",
+        "properties" : {
+          "message" : {
+            "type" : "string"
+          },
+          "errorCode" : {
+            "type" : "string",
+            "enum" : [ "InvalidLayout" ]
+          },
+          "additionalInfo" : {
+            "type" : "object"
+          }
+        },
+        "required" : [ "errorCode", "message" ]
       }
     },
     "responses" : {
@@ -333,6 +349,25 @@
             }
           }
         }
+      },
+      "invalidLayoutResponse" : {
+        "description" : "This errorCode value appears if the authentication token in the API request is invalid",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/invalidLayoutSchema"
+            },
+            "examples" : {
+              "UnAuthenticatedErrorResponse" : {
+                "value" : {
+                  "errorCode" : "BAD_REQUEST",
+                  "message" : "You are not authorized to perform this operation.",
+                  "additionalInfo" : { }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "parameters" : {
@@ -345,7 +380,7 @@
         "explode" : true,
         "schema" : {
           "type" : "string",
-          "format" : "int32",
+          "format" : "int64",
           "pattern" : "([0-9]+)"
         }
       }
@@ -397,6 +432,7 @@
               "Desk.activities.tasks.CREATE" : "CREATE Allow operations on task activities",
               "Desk.activities.tasks.UPDATE" : "UPDATE Allow operations on task activities",
               "Desk.activities.tasks.DELETE" : "DELETE Allow operations on task activities",
+              "Desk.admin.UPDATE" : "Update admin and license settings.",
               "Desk.agents.ALL" : "Create, read, update, and delete agents.",
               "Desk.agents.READ" : "Read agents.",
               "Desk.agents.CREATE" : "Create agents.",
@@ -514,32 +550,49 @@
               "Desk.integrations.CREATE" : "Grants access to create integration related data",
               "Desk.integrations.UPDATE" : "Grants access to update integration related data",
               "Desk.integrations.DELETE" : "Grants access to delete integration related data",
+              "Desk.organization.READ" : "Read organization details.",
+              "Desk.organization.CREATE" : "Create organization.",
+              "Desk.organization.UPDATE" : "Update organization details.",
               "Desk.phonebridge.ALL" : "To read, create, update and delete ticket, threads, time entry",
               "Desk.phonebridge.READ" : "READ phonebridge",
               "Desk.phonebridge.CREATE" : "CREATE phonebridge",
               "Desk.phonebridge.UPDATE" : "UPDATE phonebridge",
               "Desk.phonebridge.DELETE" : "DELETE phonebridge",
+              "Desk.permissions.READ" : "Read permissions, profiles, roles, and sharing rules.",
+              "Desk.permissions.CREATE" : "Create permissions, profiles, and roles.",
+              "Desk.permissions.UPDATE" : "Update permissions, profiles, roles, and sharing rules.",
+              "Desk.permissions.DELETE" : "Delete permissions, profiles, and roles.",
               "Desk.products.ALL" : "READ,CREATE,UPDATE,DELETE Allow operations on products",
               "Desk.products.READ" : "READ Allow operations on products",
               "Desk.products.CREATE" : "CREATE Allow operations on products",
               "Desk.products.UPDATE" : "UPDATE Allow operations on products",
               "Desk.products.DELETE" : "DELETE Allow operations on products",
               "Desk.search.READ" : "READ Search across data in your desk account.",
+              "Desk.search.CREATE" : "CREATE Search across data in your desk account.",
               "Desk.settings.ALL" : "READ,CREATE,UPDATE,DELETE All settings data such as customizations,automations,permissions,organization,license",
               "Desk.settings.READ" : "READ All settings data such as customizations,automations,permissions,organization,license",
               "Desk.settings.CREATE" : "CREATE All settings data such as customizations,automations,permissions,organization,license",
               "Desk.settings.UPDATE" : "UPDATE All settings data such as customizations,automations,permissions,organization,license",
               "Desk.settings.DELETE" : "DELETE All settings data such as customizations,automations,permissions,organization,license",
+              "Desk.settings.WRITE" : "WRITE All settings data such as customizations,automations,permissions,organization,license",
               "Desk.settings.extension.ALL" : "READ,CREATE,UPDATE,DELETE Allow access to all extension related data",
               "Desk.settings.extension.READ" : "READ Allow access to all extension related data",
               "Desk.settings.extension.CREATE" : "CREATE Allow access to all extension related data",
               "Desk.settings.extension.UPDATE" : "UPDATE Allow access to all extension related data",
               "Desk.settings.extension.DELETE" : "DELETE Allow access to all extension related data",
+              "Desk.settings.bots.READ" : "Read bot settings.",
+              "Desk.settings.bots.CREATE" : "Create bot settings.",
+              "Desk.settings.bots.UPDATE" : "Update bot settings.",
+              "Desk.settings.bots.DELETE" : "Delete bot settings.",
               "Desk.tasks.ALL" : "READ,CREATE,UPDATE,DELETE Tasks and its sub resources",
               "Desk.tasks.READ" : "READ Tasks and its sub resources",
               "Desk.tasks.CREATE" : "CREATE Tasks and its sub resources",
               "Desk.tasks.UPDATE" : "UPDATE Tasks and its sub resources",
               "Desk.tasks.DELETE" : "DELETE Tasks and its sub resources",
+              "Desk.teams.READ" : "Read teams.",
+              "Desk.teams.CREATE" : "Create teams.",
+              "Desk.teams.UPDATE" : "Update teams.",
+              "Desk.teams.DELETE" : "Delete teams.",
               "Desk.templates.ALL" : "Create, read, update, and delete templates such as Ticket templates, Email templates and Snippets.",
               "Desk.templates.READ" : "Read templates such as Ticket templates, Email templates and Snippets.",
               "Desk.templates.CREATE" : "Create templates such as Ticket templates, Email templates and Snippets.",
@@ -565,11 +618,11 @@
               "DRE.dreapi.CREATE" : "Integrated with services for automation feature",
               "DRE.dreapi.UPDATE" : "Integrated with services for automation feature",
               "DRE.dreapi.DELETE" : "Integrated with services for automation feature",
-              "profile.userphoto.ALL" : "READ,CREATE,UPDATE,DELETE get zoho User photo",
-              "profile.userphoto.READ" : "READ get zoho User photo",
-              "profile.userphoto.CREATE" : "CREATE get zoho User photo",
-              "profile.userphoto.UPDATE" : "UPDATE get zoho User photo",
-              "profile.userphoto.DELETE" : "DELETE get zoho User photo",
+              "zohoprofile.userphoto.ALL" : "READ,CREATE,UPDATE,DELETE get zoho User photo",
+              "zohoprofile.userphoto.READ" : "READ get zoho User photo",
+              "zohoprofile.userphoto.CREATE" : "CREATE get zoho User photo",
+              "zohoprofile.userphoto.UPDATE" : "UPDATE get zoho User photo",
+              "zohoprofile.userphoto.DELETE" : "DELETE get zoho User photo",
               "Desk.layouts.ALL" : "Create, read, update, and delete layouts, layout rules, and validation rules.",
               "Desk.layouts.READ" : "Read layouts, layout rules, and validation rules.",
               "Desk.layouts.CREATE" : "Create layouts, layout rules, and validation rules.",
@@ -580,9 +633,57 @@
               "Desk.modules.CREATE" : "Create modules.",
               "Desk.modules.UPDATE" : "Update module settings.",
               "Desk.modules.DELETE" : "Delete modules.",
-              "Desk.deskOembed.READ" : "null",
-              "Desk.imports" : "CUSTOM Grants access to import data into Zoho Desk modules",
-              "Desk.exports" : "CUSTOM Scope for Zoho Desk Export API's for ZohoDesk Modules"
+              "Desk.deskOembed.READ" : "Read basic data of all modules for oEmbed unfurling",
+              "Desk.imports.CUSTOM" : "CUSTOM Grants access to import data into Zoho Desk modules",
+              "Desk.exports.CUSTOM" : "CUSTOM Scope for Zoho Desk Export API's for ZohoDesk Modules",
+              "Desk.sandbox.READ" : "Read sandboxes, changesets, and deployment logs.",
+              "Desk.sandbox.CREATE" : "Create sandboxes.",
+              "Desk.sandbox.UPDATE" : "Update and rebuild sandboxes.",
+              "Desk.sandbox.deploy" : "Deploy sandbox changesets to the production portal."
+            }
+          }
+        }
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "type" : "oauth2",
+        "description" : "Deprecated OAuth scopes (legacy IAM scopes scheduled for removal)",
+        "flows" : {
+          "authorizationCode" : {
+            "authorizationUrl" : "/oauth/v2/auth",
+            "tokenUrl" : "/oauth/v2/token",
+            "scopes" : {
+              "Desk.accounts.READ" : "Read accounts.",
+              "Desk.activities.calls.READ" : "READ Allow operations on call activities",
+              "Desk.activities.events.READ" : "READ Allow operations on event activities",
+              "Desk.basic.READ" : "READ Basic desk data such as organizations,agents,departments,role,profile,group",
+              "Desk.basic.CREATE" : "CREATE Basic desk data such as organizations,agents,departments,role,profile,group",
+              "Desk.basic.UPDATE" : "UPDATE Basic desk data such as organizations,agents,departments,role,profile,group",
+              "Desk.basic.DELETE" : "DELETE Basic desk data such as organizations,agents,departments,role,profile,group",
+              "Desk.calls.READ" : "READ operations on calls module",
+              "Desk.calls.CREATE" : "CREATE operations on calls module",
+              "Desk.calls.UPDATE" : "UPDATE operations on calls module",
+              "Desk.calls.DELETE" : "DELETE operations on calls module",
+              "Desk.contacts.READ" : "READ Contacts and its sub resources",
+              "Desk.contacts.CREATE" : "CREATE Contacts and its sub resources",
+              "Desk.contacts.UPDATE" : "UPDATE Contacts and its sub resources",
+              "Desk.contacts.DELETE" : "DELETE Contacts and its sub resources",
+              "Desk.events.READ" : "READ Desk events",
+              "Desk.events.CREATE" : "CREATE Desk events",
+              "Desk.events.UPDATE" : "UPDATE Desk events",
+              "Desk.events.DELETE" : "DELETE Desk events",
+              "Desk.search.READ" : "READ Search across data in your desk account.",
+              "Desk.settings.ALL" : "READ,CREATE,UPDATE,DELETE All settings data such as customizations,automations,permissions,organization,license",
+              "Desk.settings.READ" : "READ All settings data such as customizations,automations,permissions,organization,license",
+              "Desk.settings.CREATE" : "CREATE All settings data such as customizations,automations,permissions,organization,license",
+              "Desk.settings.UPDATE" : "UPDATE All settings data such as customizations,automations,permissions,organization,license",
+              "Desk.settings.DELETE" : "DELETE All settings data such as customizations,automations,permissions,organization,license",
+              "Desk.settings.extension.READ" : "READ Allow access to all extension related data",
+              "Desk.tasks.READ" : "READ Tasks and its sub resources",
+              "Desk.tasks.CREATE" : "CREATE Tasks and its sub resources",
+              "Desk.tasks.UPDATE" : "UPDATE Tasks and its sub resources",
+              "Desk.tasks.DELETE" : "DELETE Tasks and its sub resources",
+              "Desk.tickets.READ" : "READ Tickets and its sub resources",
+              "Desk.tickets.UPDATE" : "UPDATE Tickets and its sub resources"
             }
           }
         }

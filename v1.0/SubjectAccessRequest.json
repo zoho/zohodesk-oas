@@ -11,11 +11,12 @@
         "summary" : "Export all subject data from Zoho Desk",
         "description" : "This API exports data related to the subject, from your Zoho Desk portal.",
         "operationId" : "sarExportAll",
+        "x-mcp-group" : [ "Subject Access Requests" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/sarExportAll"
+          "$ref" : "#/components/requestBodies/sarExportAllRequest"
         },
         "responses" : {
           "422" : {
@@ -39,6 +40,7 @@
         "summary" : "Get fields and conditions",
         "description" : "This API fetches the available filter fields and their supported conditions for the specified module.",
         "operationId" : "getFieldsAndConditions",
+        "x-mcp-group" : [ "Subject Access Requests" ],
         "parameters" : [ {
           "name" : "module",
           "in" : "query",
@@ -66,7 +68,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.privacysettings.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       }
     },
@@ -76,6 +80,7 @@
         "summary" : "Get subject access request",
         "description" : "This API fetches the details of a particular SAR.",
         "operationId" : "getSubjectAccessRequest",
+        "x-mcp-group" : [ "Subject Access Requests" ],
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
@@ -118,7 +123,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.privacysettings.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       }
     },
@@ -127,7 +134,7 @@
         "tags" : [ "SubjectAccessRequest" ],
         "summary" : "Erase all subject data from Zoho Desk",
         "description" : "This API erases data related to the subject, from your Zoho Desk portal.",
-        "operationId" : "sarEraseAll",
+        "operationId" : "deleteAllSubjectAccessRequests",
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -156,6 +163,7 @@
         "summary" : "List subject access requests",
         "description" : "This API lists a particular number of subject access requests, based on the limit specified.",
         "operationId" : "getSubjectAccessRequestList",
+        "x-mcp-group" : [ "Subject Access Requests" ],
         "parameters" : [ {
           "name" : "duration",
           "in" : "query",
@@ -292,7 +300,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.privacysettings.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       }
     },
@@ -302,11 +312,12 @@
         "summary" : "Export specific resources",
         "description" : "This API exports specific resources related to a subject access request.",
         "operationId" : "sarExport",
+        "x-mcp-group" : [ "Subject Access Requests" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/sarExport"
+          "$ref" : "#/components/requestBodies/sarExportRequest"
         },
         "responses" : {
           "422" : {
@@ -330,6 +341,7 @@
         "summary" : "Get count of resources related to request",
         "description" : "This API returns the number of resources related to a subject access request.",
         "operationId" : "getSubjectAccessRequestCount",
+        "x-mcp-group" : [ "Subject Access Requests" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -348,7 +360,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.privacysettings.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       }
     },
@@ -362,7 +376,7 @@
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/sarErase_sarExport"
+          "$ref" : "#/components/requestBodies/sarEraseRequest"
         },
         "responses" : {
           "422" : {
@@ -377,6 +391,36 @@
         },
         "security" : [ {
           "iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+        } ]
+      }
+    },
+    "/api/v1/subjectAccessRequests/entities" : {
+      "post" : {
+        "tags" : [ "SubjectAccessRequest" ],
+        "summary" : "List subject access request entities",
+        "description" : "This API lists the tickets and/or contacts related to a subject access request, based on the specified criteria.",
+        "operationId" : "getSubjectAccessRequestEntities",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/sarGetEntities"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/getSarEntitiesResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.privacysettings.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       }
     }
@@ -551,6 +595,324 @@
           "format" : "int64",
           "pattern" : "([0-9]+)"
         }
+      },
+      "sarEntityAccount" : {
+        "description" : "Account associated with the contact",
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "id" : {
+            "description" : "Unique ID of the account",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "accountName" : {
+            "description" : "Name of the account",
+            "type" : [ "string", "null" ],
+            "maxLength" : 255,
+            "minLength" : 0
+          },
+          "website" : {
+            "description" : "Website URL of the account",
+            "type" : [ "string", "null" ],
+            "maxLength" : 255,
+            "minLength" : 0,
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+          }
+        },
+        "required" : [ "accountName", "id", "website" ]
+      },
+      "sarEntityTeam" : {
+        "description" : "Team assigned to the ticket",
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "id" : {
+            "description" : "Unique ID of the team",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "name" : {
+            "description" : "Name of the team",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "id", "name" ]
+      },
+      "sarEntityAssignee" : {
+        "description" : "Agent to whom the ticket is assigned",
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "id" : {
+            "description" : "Unique ID of the assignee",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "firstName" : {
+            "description" : "First name of the assignee",
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "minLength" : 0
+          },
+          "lastName" : {
+            "description" : "Last name of the assignee",
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "minLength" : 0
+          },
+          "email" : {
+            "description" : "Email ID of the assignee",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+          }
+        },
+        "required" : [ "email", "firstName", "id", "lastName" ]
+      },
+      "sarEntityContactFields" : {
+        "description" : "Filtered contact fields, nested inside a ticket resource",
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "id" : {
+            "description" : "Unique ID of the contact",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "firstName" : {
+            "description" : "First name of the contact",
+            "type" : [ "string", "null" ],
+            "maxLength" : 40,
+            "minLength" : 0
+          },
+          "lastName" : {
+            "description" : "Last name of the contact",
+            "type" : [ "string", "null" ],
+            "maxLength" : 200,
+            "minLength" : 0
+          },
+          "fullName" : {
+            "description" : "Full name of the contact",
+            "type" : [ "string", "null" ],
+            "maxLength" : 240,
+            "minLength" : 0
+          },
+          "email" : {
+            "description" : "Email ID of the contact",
+            "type" : [ "string", "null" ],
+            "maxLength" : 255,
+            "minLength" : 0,
+            "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+          },
+          "phone" : {
+            "description" : "Phone number of the contact",
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "minLength" : 0,
+            "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\$@\\?\\,\\;\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+          },
+          "mobile" : {
+            "description" : "Mobile number of the contact",
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "minLength" : 0,
+            "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\$@\\?\\,\\;\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+          },
+          "accountId" : {
+            "description" : "Unique ID of the account to which the contact is mapped",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "account" : {
+            "$ref" : "#/components/schemas/sarEntityAccount"
+          },
+          "webUrl" : {
+            "description" : "Web URL of the contact",
+            "type" : [ "string", "null" ],
+            "maxLength" : 500,
+            "minLength" : 0,
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+          },
+          "createdTime" : {
+            "description" : "Timestamp when the contact was created (epoch milliseconds)",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "type" : {
+            "description" : "Type of the contact",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "account", "accountId", "createdTime", "email", "firstName", "fullName", "id", "lastName", "mobile", "phone", "type", "webUrl" ]
+      },
+      "sarEntityContact" : {
+        "description" : "Filtered contact resource returned in the subject access request entities list",
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "module" : {
+            "description" : "Indicates this resource is a contact",
+            "type" : [ "string" ],
+            "enum" : [ "CONTACT" ]
+          },
+          "id" : {
+            "description" : "Unique ID of the contact",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "firstName" : {
+            "description" : "First name of the contact",
+            "type" : [ "string", "null" ],
+            "maxLength" : 40,
+            "minLength" : 0
+          },
+          "lastName" : {
+            "description" : "Last name of the contact",
+            "type" : [ "string", "null" ],
+            "maxLength" : 200,
+            "minLength" : 0
+          },
+          "fullName" : {
+            "description" : "Full name of the contact",
+            "type" : [ "string", "null" ],
+            "maxLength" : 240,
+            "minLength" : 0
+          },
+          "email" : {
+            "description" : "Email ID of the contact",
+            "type" : [ "string", "null" ],
+            "maxLength" : 255,
+            "minLength" : 0,
+            "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+          },
+          "phone" : {
+            "description" : "Phone number of the contact",
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "minLength" : 0,
+            "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\$@\\?\\,\\;\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+          },
+          "mobile" : {
+            "description" : "Mobile number of the contact",
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "minLength" : 0,
+            "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\$@\\?\\,\\;\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+          },
+          "accountId" : {
+            "description" : "Unique ID of the account to which the contact is mapped",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "account" : {
+            "$ref" : "#/components/schemas/sarEntityAccount"
+          },
+          "webUrl" : {
+            "description" : "Web URL of the contact",
+            "type" : [ "string", "null" ],
+            "maxLength" : 500,
+            "minLength" : 0,
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+          },
+          "createdTime" : {
+            "description" : "Timestamp when the contact was created (epoch milliseconds)",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "type" : {
+            "description" : "Type of the contact",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "account", "accountId", "createdTime", "email", "firstName", "fullName", "id", "lastName", "mobile", "module", "phone", "type", "webUrl" ]
+      },
+      "sarEntityTicket" : {
+        "description" : "Filtered ticket resource returned in the subject access request entities list",
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "module" : {
+            "description" : "Indicates this resource is a ticket",
+            "type" : [ "string" ],
+            "enum" : [ "TICKET" ]
+          },
+          "id" : {
+            "description" : "Unique ID of the ticket",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "ticketNumber" : {
+            "description" : "Number of the ticket",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "subject" : {
+            "description" : "Subject of the ticket",
+            "type" : [ "string", "null" ],
+            "maxLength" : 250,
+            "minLength" : 0
+          },
+          "createdTime" : {
+            "description" : "Timestamp when the ticket was created (epoch milliseconds)",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "webUrl" : {
+            "description" : "Web URL of the ticket",
+            "type" : [ "string", "null" ],
+            "maxLength" : 500,
+            "minLength" : 0,
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+          },
+          "contactId" : {
+            "description" : "Unique ID of the contact associated with the ticket",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "assigneeId" : {
+            "description" : "Unique ID of the agent to whom the ticket is assigned",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "contact" : {
+            "$ref" : "#/components/schemas/sarEntityContactFields"
+          },
+          "assignee" : {
+            "$ref" : "#/components/schemas/sarEntityAssignee"
+          },
+          "teamId" : {
+            "description" : "Unique ID of the team assigned to the ticket",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "team" : {
+            "$ref" : "#/components/schemas/sarEntityTeam"
+          }
+        },
+        "required" : [ "assignee", "assigneeId", "contact", "contactId", "createdTime", "id", "module", "subject", "team", "teamId", "ticketNumber", "webUrl" ]
       }
     },
     "responses" : {
@@ -579,8 +941,7 @@
                   "description" : "Callback URL provided for export completion notification",
                   "type" : [ "string", "null" ],
                   "maxLength" : 2000,
-                  "minLength" : 0,
-                  "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+                  "minLength" : 0
                 },
                 "requestType" : {
                   "description" : "Accepted values: ACCESS_REQUEST, ERASURE_REQUEST",
@@ -807,206 +1168,180 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "allOf" : [ {
-                "type" : [ "object" ],
-                "properties" : {
-                  "createdBy" : {
-                    "description" : "Details of the agent who created the request",
-                    "type" : [ "object", "null" ],
-                    "additionalProperties" : false,
-                    "maxProperties" : 5,
-                    "minProperties" : 5,
-                    "properties" : {
-                      "photoURL" : {
-                        "description" : "URL of the creator's profile photo",
-                        "type" : [ "string", "null" ],
-                        "maxLength" : 200,
-                        "minLength" : 0,
-                        "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
-                      },
-                      "firstName" : {
-                        "description" : "First name of the creator",
-                        "type" : [ "string", "null" ],
-                        "maxLength" : 50,
-                        "minLength" : 0
-                      },
-                      "lastName" : {
-                        "description" : "Last name of the creator",
-                        "type" : [ "string", "null" ],
-                        "maxLength" : 50,
-                        "minLength" : 0
-                      },
-                      "id" : {
-                        "description" : "Unique ID of the creator",
-                        "type" : [ "string", "integer", "null" ],
-                        "format" : "int64",
-                        "pattern" : "([0-9]+)"
-                      },
-                      "email" : {
-                        "description" : "Email address of the creator",
-                        "type" : [ "string", "null" ],
-                        "maxLength" : 100,
-                        "minLength" : 0,
-                        "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
-                      }
-                    },
-                    "required" : [ "email", "firstName", "id", "lastName", "photoURL" ]
-                  },
-                  "modifiedBy" : {
-                    "description" : "Details of the agent who last modified the request",
-                    "type" : [ "object", "null" ],
-                    "additionalProperties" : false,
-                    "maxProperties" : 5,
-                    "minProperties" : 5,
-                    "properties" : {
-                      "photoURL" : {
-                        "description" : "URL of the modifier's profile photo",
-                        "type" : [ "string", "null" ],
-                        "maxLength" : 200,
-                        "minLength" : 0,
-                        "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
-                      },
-                      "firstName" : {
-                        "description" : "First name of the modifier",
-                        "type" : [ "string", "null" ],
-                        "maxLength" : 50,
-                        "minLength" : 0
-                      },
-                      "lastName" : {
-                        "description" : "Last name of the modifier",
-                        "type" : [ "string", "null" ],
-                        "maxLength" : 50,
-                        "minLength" : 0
-                      },
-                      "id" : {
-                        "description" : "Unique ID of the modifier",
-                        "type" : [ "string", "integer", "null" ],
-                        "format" : "int64",
-                        "pattern" : "([0-9]+)"
-                      },
-                      "email" : {
-                        "description" : "Email address of the modifier",
-                        "type" : [ "string", "null" ],
-                        "maxLength" : 100,
-                        "minLength" : 0,
-                        "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
-                      }
-                    },
-                    "required" : [ "email", "firstName", "id", "lastName", "photoURL" ]
-                  }
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "modifiedTime" : {
+                  "description" : "Timestamp when this record was last modified (epoch milliseconds)",
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 100,
+                  "minLength" : 0
                 },
-                "additionalProperties" : false
-              }, {
-                "oneOf" : [ {
+                "contactEmailId" : {
+                  "description" : "Email address of the contact who made the request",
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 255,
+                  "minLength" : 0,
+                  "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+                },
+                "requestType" : {
+                  "description" : "Accepted values: ACCESS_REQUEST, ERASURE_REQUEST",
+                  "type" : [ "string", "null" ],
+                  "enum" : [ "ACCESS_REQUEST", "ERASURE_REQUEST" ]
+                },
+                "recordType" : {
+                  "description" : "Accepted values: ALL, SPECIFIC",
+                  "type" : [ "string", "null" ],
+                  "enum" : [ "ALL", "SPECIFIC" ]
+                },
+                "query" : {
+                  "description" : "Criteria used to filter records for the request",
+                  "type" : [ "object", "null" ],
+                  "additionalProperties" : false
+                },
+                "module" : {
+                  "description" : "Accepted values: allEntities, contacts, tickets",
+                  "type" : [ "string", "null" ],
+                  "enum" : [ "allEntities", "contacts", "tickets" ]
+                },
+                "downloadURL" : {
+                  "description" : "URL to download the exported subject data",
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 1000,
+                  "minLength" : 0
+                },
+                "type" : {
+                  "description" : "Accepted values: ALL, SPECIFIC",
+                  "type" : [ "string", "null" ],
+                  "enum" : [ "ALL", "SPECIFIC" ]
+                },
+                "modifiedById" : {
+                  "description" : "Unique ID of the agent who last modified the request",
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "referenceTicketNumber" : {
+                  "description" : "Ticket number linked to the request",
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int32",
+                  "pattern" : "([0-9]+)"
+                },
+                "sarNumber" : {
+                  "description" : "Unique number assigned to the subject access request",
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int32",
+                  "pattern" : "([0-9]+)"
+                },
+                "createdTime" : {
+                  "description" : "Timestamp when this record was created (epoch milliseconds)",
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 100,
+                  "minLength" : 0
+                },
+                "id" : {
+                  "description" : "Unique ID of the subject access request",
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "createdById" : {
+                  "description" : "Unique ID of the agent who created the request",
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "status" : {
+                  "description" : "Accepted values: INITIATED, INPROGRESS, COMPLETED, CANCELED, EXPORTED, PARTIALLY_COMPLETED, PARTIALLY_EXPORTED, FAILED",
+                  "type" : [ "string", "null" ],
+                  "enum" : [ "FAILED", "INITIATED", "INPROGRESS", "COMPLETED", "CANCELED", "EXPORTED", "PARTIALLY_COMPLETED", "PARTIALLY_EXPORTED" ]
+                },
+                "callBackUrl" : {
+                  "description" : "Callback URL provided for export completion notification",
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 2000,
+                  "minLength" : 0
+                },
+                "createdBy" : {
+                  "description" : "Details of the agent who created the request",
                   "type" : [ "object", "null" ],
                   "additionalProperties" : false,
                   "properties" : {
-                    "modifiedTime" : {
-                      "description" : "Timestamp when this record was last modified (epoch milliseconds)",
+                    "photoURL" : {
+                      "description" : "URL of the creator's profile photo",
                       "type" : [ "string", "null" ],
-                      "maxLength" : 100,
+                      "maxLength" : 200,
                       "minLength" : 0
                     },
-                    "contactEmailId" : {
-                      "description" : "Email address of the contact who made the request",
+                    "firstName" : {
+                      "description" : "First name of the creator",
                       "type" : [ "string", "null" ],
-                      "maxLength" : 255,
-                      "minLength" : 0,
-                      "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
-                    },
-                    "requestType" : {
-                      "description" : "Accepted values: ACCESS_REQUEST, ERASURE_REQUEST",
-                      "type" : [ "string", "null" ],
-                      "enum" : [ "ACCESS_REQUEST", "ERASURE_REQUEST" ]
-                    },
-                    "recordType" : {
-                      "description" : "Accepted values: ALL, SPECIFIC",
-                      "type" : [ "string", "null" ],
-                      "enum" : [ "ALL", "SPECIFIC" ]
-                    },
-                    "query" : {
-                      "description" : "Criteria used to filter records for the request",
-                      "type" : [ "object", "null" ],
-                      "additionalProperties" : false
-                    },
-                    "module" : {
-                      "description" : "Accepted values: allEntities, contacts, tickets",
-                      "type" : [ "string", "null" ],
-                      "enum" : [ "allEntities", "contacts", "tickets" ]
-                    },
-                    "downloadURL" : {
-                      "description" : "URL to download the exported subject data",
-                      "type" : [ "string", "null" ],
-                      "maxLength" : 1000,
+                      "maxLength" : 50,
                       "minLength" : 0
                     },
-                    "type" : {
-                      "description" : "Accepted values: ALL, SPECIFIC",
+                    "lastName" : {
+                      "description" : "Last name of the creator",
                       "type" : [ "string", "null" ],
-                      "enum" : [ "ALL", "SPECIFIC" ]
-                    },
-                    "modifiedById" : {
-                      "description" : "Unique ID of the agent who last modified the request",
-                      "type" : [ "string", "integer", "null" ],
-                      "format" : "int64",
-                      "pattern" : "([0-9]+)"
-                    },
-                    "referenceTicketNumber" : {
-                      "description" : "Ticket number linked to the request",
-                      "type" : [ "string", "integer", "null" ],
-                      "format" : "int32",
-                      "pattern" : "([0-9]+)"
-                    },
-                    "sarNumber" : {
-                      "description" : "Unique number assigned to the subject access request",
-                      "type" : [ "string", "integer", "null" ],
-                      "format" : "int32",
-                      "pattern" : "([0-9]+)"
-                    },
-                    "createdTime" : {
-                      "description" : "Timestamp when this record was created (epoch milliseconds)",
-                      "type" : [ "string", "null" ],
-                      "maxLength" : 100,
+                      "maxLength" : 50,
                       "minLength" : 0
                     },
                     "id" : {
-                      "description" : "Unique ID of the subject access request",
+                      "description" : "Unique ID of the creator",
                       "type" : [ "string", "integer", "null" ],
                       "format" : "int64",
                       "pattern" : "([0-9]+)"
                     },
-                    "createdById" : {
-                      "description" : "Unique ID of the agent who created the request",
-                      "type" : [ "string", "integer", "null" ],
-                      "format" : "int64",
-                      "pattern" : "([0-9]+)"
-                    },
-                    "status" : {
-                      "description" : "Accepted values: INITIATED, INPROGRESS, COMPLETED, CANCELED, EXPORTED, PARTIALLY_COMPLETED, PARTIALLY_EXPORTED, FAILED",
+                    "email" : {
+                      "description" : "Email address of the creator",
                       "type" : [ "string", "null" ],
-                      "enum" : [ "FAILED", "INITIATED", "INPROGRESS", "COMPLETED", "CANCELED", "EXPORTED", "PARTIALLY_COMPLETED", "PARTIALLY_EXPORTED" ]
+                      "maxLength" : 100,
+                      "minLength" : 0,
+                      "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
                     }
                   },
-                  "required" : [ "contactEmailId", "createdById", "createdTime", "downloadURL", "id", "modifiedById", "modifiedTime", "module", "query", "recordType", "referenceTicketNumber", "requestType", "sarNumber", "status", "type" ]
-                }, {
+                  "required" : [ "email", "firstName", "id", "lastName", "photoURL" ]
+                },
+                "modifiedBy" : {
+                  "description" : "Details of the agent who last modified the request",
                   "type" : [ "object", "null" ],
                   "additionalProperties" : false,
                   "properties" : {
-                    "errorCode" : {
-                      "description" : "Error code indicating the type of error",
+                    "photoURL" : {
+                      "description" : "URL of the modifier's profile photo",
                       "type" : [ "string", "null" ],
-                      "enum" : [ "URL_NOT_FOUND", "UNAUTHORIZED", "INVALID_OAUTH", "SCOPE_MISMATCH", "FORBIDDEN", "LICENSE_ACCESS_LIMITED", "METHOD_NOT_ALLOWED", "RESOURCE_SIZE_EXCEEDED", "UNSUPPORTED_MEDIA_TYPE", "INVALID_DATA", "UNPROCESSABLE_ENTITY", "ONLY_LIVECHAT_USER", "INTEGRATION_ADMIN_ERROR", "THRESHOLD_EXCEEDED", "INTERNAL_SERVER_ERROR", "EMPTY_PAYLOAD" ]
-                    },
-                    "message" : {
-                      "description" : "Human-readable description of the error",
-                      "type" : [ "string", "null" ],
-                      "maxLength" : 255,
+                      "maxLength" : 200,
                       "minLength" : 0
+                    },
+                    "firstName" : {
+                      "description" : "First name of the modifier",
+                      "type" : [ "string", "null" ],
+                      "maxLength" : 50,
+                      "minLength" : 0
+                    },
+                    "lastName" : {
+                      "description" : "Last name of the modifier",
+                      "type" : [ "string", "null" ],
+                      "maxLength" : 50,
+                      "minLength" : 0
+                    },
+                    "id" : {
+                      "description" : "Unique ID of the modifier",
+                      "type" : [ "string", "integer", "null" ],
+                      "format" : "int64",
+                      "pattern" : "([0-9]+)"
+                    },
+                    "email" : {
+                      "description" : "Email address of the modifier",
+                      "type" : [ "string", "null" ],
+                      "maxLength" : 100,
+                      "minLength" : 0,
+                      "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
                     }
                   },
-                  "required" : [ "errorCode", "message" ]
-                } ]
-              } ]
+                  "required" : [ "email", "firstName", "id", "lastName", "photoURL" ]
+                }
+              },
+              "required" : [ "contactEmailId", "createdById", "createdTime", "downloadURL", "id", "modifiedById", "modifiedTime", "module", "query", "recordType", "referenceTicketNumber", "requestType", "sarNumber", "status", "type", "callBackUrl" ]
             },
             "examples" : {
               "Valid responses Definitions" : {
@@ -1035,9 +1370,9 @@
                   "downloadURL" : null,
                   "modifiedById" : "7000000000247",
                   "createdBy" : {
-                    "photoURL" : "https://desk.example.com/api/v1/agents/7000000000247/photo?orgId=1234567890",
-                    "firstName" : "William",
-                    "lastName" : "Jones",
+                    "photoURL" : "https://desk.zoho.com/api/v1/agents/7000000000247/photo?orgId=15273347",
+                    "firstName" : "Nirmal",
+                    "lastName" : "Kumar",
                     "id" : "7000000000247",
                     "email" : "nirmal@zylker.com"
                   },
@@ -1045,9 +1380,9 @@
                   "sarNumber" : "141",
                   "createdTime" : 1603973511890,
                   "modifiedBy" : {
-                    "photoURL" : "https://desk.example.com/api/v1/agents/7000000000247/photo?orgId=1234567890",
-                    "firstName" : "William",
-                    "lastName" : "Jones",
+                    "photoURL" : "https://desk.zoho.com/api/v1/agents/7000000000247/photo?orgId=15273347",
+                    "firstName" : "Nirmal",
+                    "lastName" : "Kumar",
                     "id" : "7000000000247",
                     "email" : "john@zylker.com"
                   },
@@ -1185,7 +1520,7 @@
                     "contactEmailId" : "john@zylker.com",
                     "modifiedById" : "7000000000247",
                     "createdBy" : {
-                      "photoURL" : "https://desk.example.com/api/v1/agents/7000000000247/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/7000000000247/photo?orgId=15273347",
                       "firstName" : "Jack",
                       "lastName" : "Carol",
                       "id" : "7000000000247",
@@ -1194,7 +1529,7 @@
                     "sarNumber" : "141",
                     "createdTime" : 1603973511890,
                     "modifiedBy" : {
-                      "photoURL" : "https://desk.example.com/api/v1/agents/7000000000247/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/7000000000247/photo?orgId=15273347",
                       "firstName" : "Jack",
                       "lastName" : "Carol",
                       "id" : "7000000000247",
@@ -1207,7 +1542,7 @@
                     "contactEmailId" : "nirmal@zylker.com",
                     "modifiedById" : "7000000000247",
                     "createdBy" : {
-                      "photoURL" : "https://desk.example.com/api/v1/agents/7000000000247/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/7000000000247/photo?orgId=15273347",
                       "firstName" : "Jack",
                       "lastName" : "Carol",
                       "id" : "7000000000247",
@@ -1217,7 +1552,7 @@
                     "sarNumber" : "140",
                     "createdTime" : 1603973416890,
                     "modifiedBy" : {
-                      "photoURL" : "https://desk.example.com/api/v1/agents/7000000000247/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/7000000000247/photo?orgId=15273347",
                       "firstName" : "Jack",
                       "lastName" : "Carol",
                       "id" : "7000000000247",
@@ -1230,7 +1565,7 @@
                     "contactEmailId" : "mark@zylker.com",
                     "modifiedById" : "7000000000247",
                     "createdBy" : {
-                      "photoURL" : "https://desk.example.com/api/v1/agents/7000000000247/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/7000000000247/photo?orgId=15273347",
                       "firstName" : "Jack",
                       "lastName" : "Carol",
                       "id" : "7000000000247",
@@ -1240,7 +1575,7 @@
                     "sarNumber" : "139",
                     "createdTime" : 1603973298838,
                     "modifiedBy" : {
-                      "photoURL" : "https://desk.example.com/api/v1/agents/7000000000247/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/7000000000247/photo?orgId=15273347",
                       "firstName" : "Jack",
                       "lastName" : "Carol",
                       "id" : "7000000000247",
@@ -1253,7 +1588,7 @@
                     "contactEmailId" : "john@zylker.com",
                     "modifiedById" : "7000000000247",
                     "createdBy" : {
-                      "photoURL" : "https://desk.example.com/api/v1/agents/7000000000247/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/7000000000247/photo?orgId=15273347",
                       "firstName" : "Jack",
                       "lastName" : "Carol",
                       "id" : "7000000000247",
@@ -1263,7 +1598,7 @@
                     "sarNumber" : "138",
                     "createdTime" : 1603972949954,
                     "modifiedBy" : {
-                      "photoURL" : "https://desk.example.com/api/v1/agents/7000000000247/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/7000000000247/photo?orgId=15273347",
                       "firstName" : "Jack",
                       "lastName" : "Carol",
                       "id" : "7000000000247",
@@ -1276,7 +1611,7 @@
                     "contactEmailId" : "mark@zylker.com",
                     "modifiedById" : "7000000000247",
                     "createdBy" : {
-                      "photoURL" : "https://desk.example.com/api/v1/agents/7000000000247/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/7000000000247/photo?orgId=15273347",
                       "firstName" : "Jack",
                       "lastName" : "Carol",
                       "id" : "7000000000247",
@@ -1286,7 +1621,7 @@
                     "sarNumber" : "137",
                     "createdTime" : 1603972766592,
                     "modifiedBy" : {
-                      "photoURL" : "https://desk.example.com/api/v1/agents/7000000000247/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/7000000000247/photo?orgId=15273347",
                       "firstName" : "Jack",
                       "lastName" : "Carol",
                       "id" : "7000000000247",
@@ -1394,9 +1729,15 @@
                   "description" : "Accepted values: INITIATED, INPROGRESS, COMPLETED, CANCELED, EXPORTED, PARTIALLY_COMPLETED, PARTIALLY_EXPORTED, FAILED",
                   "type" : [ "string", "null" ],
                   "enum" : [ "FAILED", "INITIATED", "INPROGRESS", "COMPLETED", "CANCELED", "EXPORTED", "PARTIALLY_COMPLETED", "PARTIALLY_EXPORTED" ]
+                },
+                "callBackUrl" : {
+                  "description" : "Callback URL provided for export completion notification",
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 2000,
+                  "minLength" : 0
                 }
               },
-              "required" : [ "contactEmailId", "createdById", "createdTime", "downloadURL", "id", "modifiedById", "modifiedTime", "module", "query", "recordType", "referenceTicketNumber", "requestType", "sarNumber", "status", "type" ]
+              "required" : [ "contactEmailId", "createdById", "createdTime", "downloadURL", "id", "modifiedById", "modifiedTime", "module", "query", "recordType", "referenceTicketNumber", "requestType", "sarNumber", "status", "type", "callBackUrl" ]
             },
             "examples" : {
               "Valid responses Definitions" : {
@@ -1464,10 +1805,98 @@
             }
           }
         }
+      },
+      "getSarEntitiesResponse" : {
+        "description" : "getSarEntitiesResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "description" : "List of tickets and/or contacts related to the subject access request",
+                  "type" : [ "array", "null" ],
+                  "items" : {
+                    "oneOf" : [ {
+                      "$ref" : "#/components/schemas/sarEntityTicket"
+                    }, {
+                      "$ref" : "#/components/schemas/sarEntityContact"
+                    } ]
+                  }
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "data" : [ {
+                    "module" : "TICKET",
+                    "id" : "7000000075023",
+                    "ticketNumber" : "1021",
+                    "subject" : "Unable to access my account",
+                    "createdTime" : "1603728618930",
+                    "webUrl" : "https://desk.zoho.com/support/jordan/ShowHomePage.do#Cases/dv/7000000075023",
+                    "contactId" : "7000000065001",
+                    "assigneeId" : "7000000000247",
+                    "contact" : {
+                      "id" : "7000000065001",
+                      "firstName" : "Jack",
+                      "lastName" : "Carol",
+                      "fullName" : "Jack Carol",
+                      "email" : "jackcarol@zylker.com",
+                      "phone" : null,
+                      "mobile" : null,
+                      "accountId" : "7000000060001",
+                      "account" : {
+                        "id" : "7000000060001",
+                        "accountName" : "Zylker Corp",
+                        "website" : "https://www.zylker.com"
+                      },
+                      "webUrl" : "https://desk.zoho.com/support/jordan/ShowHomePage.do#Contacts/dv/7000000065001",
+                      "createdTime" : "1603728000000",
+                      "type" : "Customer"
+                    },
+                    "assignee" : {
+                      "id" : "7000000000247",
+                      "firstName" : "Patricia",
+                      "lastName" : "Sherman",
+                      "email" : "patricia@zylker.com"
+                    },
+                    "teamId" : "7000000021001",
+                    "team" : {
+                      "id" : "7000000021001",
+                      "name" : "Product Support"
+                    }
+                  }, {
+                    "module" : "CONTACT",
+                    "id" : "7000000075001",
+                    "firstName" : "Jack",
+                    "lastName" : "Carol",
+                    "fullName" : "Jack Carol",
+                    "email" : "jackcarol@zylker.com",
+                    "phone" : null,
+                    "mobile" : null,
+                    "accountId" : "7000000060001",
+                    "account" : {
+                      "id" : "7000000060001",
+                      "accountName" : "Zylker Corp",
+                      "website" : "https://www.zylker.com"
+                    },
+                    "webUrl" : "https://desk.zoho.com/support/jordan/ShowHomePage.do#Contacts/dv/7000000075001",
+                    "createdTime" : "1603728618930",
+                    "type" : "Customer"
+                  } ]
+                }
+              }
+            }
+          }
+        }
       }
     },
     "requestBodies" : {
-      "sarExportAll" : {
+      "sarExportAllRequest" : {
         "content" : {
           "application/json" : {
             "schema" : {
@@ -1481,17 +1910,17 @@
                     "type" : [ "object" ],
                     "additionalProperties" : false,
                     "maxProperties" : 3,
-                    "minProperties" : 3,
+                    "minProperties" : 2,
                     "properties" : {
                       "condition" : {
-                        "description" : "Condition to apply to the field",
-                        "type" : [ "string" ],
-                        "enum" : [ "is", "starts with" ]
+                        "description" : "Condition to apply to the field. Accepted values: is, starts with",
+                        "type" : [ "string" ]
                       },
                       "fieldName" : {
                         "description" : "Name of the field to filter on",
                         "type" : [ "string" ],
-                        "enum" : [ "All" ]
+                        "maxLength" : 100,
+                        "minLength" : 1
                       },
                       "value" : {
                         "description" : "Value(s) to match against the field",
@@ -1505,7 +1934,7 @@
                         "uniqueItems" : false
                       }
                     },
-                    "required" : [ "condition", "fieldName", "value" ]
+                    "required" : [ "condition", "fieldName" ]
                   },
                   "uniqueItems" : false
                 },
@@ -1565,17 +1994,17 @@
                     "type" : [ "object" ],
                     "additionalProperties" : false,
                     "maxProperties" : 3,
-                    "minProperties" : 3,
+                    "minProperties" : 2,
                     "properties" : {
                       "condition" : {
-                        "description" : "Condition to apply to the field",
-                        "type" : [ "string" ],
-                        "enum" : [ "is", "starts with" ]
+                        "description" : "Condition to apply to the field. Accepted values: is, starts with",
+                        "type" : [ "string" ]
                       },
                       "fieldName" : {
                         "description" : "Name of the field to filter on",
                         "type" : [ "string" ],
-                        "enum" : [ "All" ]
+                        "maxLength" : 100,
+                        "minLength" : 1
                       },
                       "value" : {
                         "description" : "Value(s) to match against the field",
@@ -1589,7 +2018,7 @@
                         "uniqueItems" : false
                       }
                     },
-                    "required" : [ "condition", "fieldName", "value" ]
+                    "required" : [ "condition", "fieldName" ]
                   },
                   "uniqueItems" : false
                 },
@@ -1629,7 +2058,7 @@
           }
         }
       },
-      "sarExport" : {
+      "sarExportRequest" : {
         "content" : {
           "application/json" : {
             "schema" : {
@@ -1680,17 +2109,17 @@
                     "type" : [ "object" ],
                     "additionalProperties" : false,
                     "maxProperties" : 3,
-                    "minProperties" : 3,
+                    "minProperties" : 2,
                     "properties" : {
                       "condition" : {
-                        "description" : "Condition to apply to the field",
-                        "type" : [ "string" ],
-                        "enum" : [ "is", "starts with" ]
+                        "description" : "Condition to apply to the field. Accepted values: is, starts with",
+                        "type" : [ "string" ]
                       },
                       "fieldName" : {
                         "description" : "Name of the field to filter on",
                         "type" : [ "string" ],
-                        "enum" : [ "All" ]
+                        "maxLength" : 100,
+                        "minLength" : 1
                       },
                       "value" : {
                         "description" : "Value(s) to match against the field",
@@ -1704,7 +2133,7 @@
                         "uniqueItems" : false
                       }
                     },
-                    "required" : [ "condition", "fieldName", "value" ]
+                    "required" : [ "condition", "fieldName" ]
                   },
                   "uniqueItems" : false
                 },
@@ -1733,7 +2162,92 @@
           }
         }
       },
-      "sarErase_sarExport" : {
+      "sarGetEntities" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "fieldConditions" : {
+                  "description" : "Field-level conditions used to filter the data",
+                  "type" : [ "array" ],
+                  "items" : {
+                    "type" : [ "object" ],
+                    "additionalProperties" : false,
+                    "maxProperties" : 3,
+                    "minProperties" : 2,
+                    "properties" : {
+                      "condition" : {
+                        "description" : "Condition to apply to the field. Accepted values: is, starts with",
+                        "type" : [ "string" ]
+                      },
+                      "fieldName" : {
+                        "description" : "Name of the field to filter on",
+                        "type" : [ "string" ],
+                        "maxLength" : 100,
+                        "minLength" : 1
+                      },
+                      "value" : {
+                        "description" : "Value(s) to match against the field",
+                        "type" : [ "array" ],
+                        "items" : {
+                          "type" : [ "string" ],
+                          "maxLength" : 100,
+                          "minLength" : 0,
+                          "pattern" : "[a-zA-Z0-9\\_\\-\\+\\?\\!\\.\\P{InBasicLatin}\\(\\)\\s]+"
+                        },
+                        "uniqueItems" : false
+                      }
+                    },
+                    "required" : [ "condition", "fieldName" ]
+                  },
+                  "uniqueItems" : false
+                },
+                "contactEmailId" : {
+                  "description" : "Email address of the contact who made the request",
+                  "type" : [ "string" ],
+                  "maxLength" : 100,
+                  "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+                },
+                "module" : {
+                  "description" : "Accepted values: allEntities, contacts, tickets",
+                  "type" : [ "string" ],
+                  "enum" : [ "allEntities", "contacts", "tickets" ]
+                },
+                "from" : {
+                  "description" : "Index number, starting from which the resources must be fetched",
+                  "type" : [ "integer" ],
+                  "format" : "int32",
+                  "pattern" : "([0-9]+)",
+                  "minimum" : 1
+                },
+                "limit" : {
+                  "description" : "Number of resources to list. The default value is 10 and the maximum value supported is 50",
+                  "type" : [ "integer" ],
+                  "format" : "int32",
+                  "pattern" : "([0-9]+)",
+                  "minimum" : 1,
+                  "maximum" : 50,
+                  "default" : 10
+                }
+              },
+              "required" : [ "contactEmailId", "module" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "contactEmailId" : "johncarol@zylker.com",
+                  "module" : "allEntities",
+                  "from" : 1,
+                  "limit" : 10
+                }
+              }
+            }
+          }
+        }
+      },
+      "sarEraseRequest" : {
         "content" : {
           "application/json" : {
             "schema" : {
@@ -1780,7 +2294,11 @@
       },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "SubjectAccessRequest"
 }

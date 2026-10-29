@@ -1,0 +1,1125 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Sandbox",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/sandbox/{sandboxId}/rebuild" : {
+      "post" : {
+        "tags" : [ "Sandbox" ],
+        "summary" : "Rebuild Sandbox",
+        "description" : "Rebuilds a specific sandbox by copying the current setup configuration data from the production environment to the sandbox. Note: Rebuilding the sandbox deletes all undeployed changes in the sandbox. You can rebuild a sandbox a maximum of three times per day. While a sandbox create, rebuild, or deploy operation is in progress, requests to start any of these operations are rejected. You can start another one only after the current operation completes.",
+        "operationId" : "rebuildSandbox",
+        "parameters" : [ {
+          "name" : "sandboxId",
+          "in" : "path",
+          "description" : "Unique ID of the sandbox",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "400" : {
+            "$ref" : "#/components/responses/sandboxActionRestrictionResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.sandbox.UPDATE" ]
+        } ]
+      }
+    },
+    "/api/v1/sandbox" : {
+      "get" : {
+        "tags" : [ "Sandbox" ],
+        "summary" : "Get Sandboxes",
+        "description" : "Retrieves all sandboxes in the portal, with pagination support.",
+        "operationId" : "getAllSandboxes",
+        "x-mcp-group" : [ "Sandbox" ],
+        "parameters" : [ {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of sandboxes to fetch",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 100,
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "default" : 10
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number from which sandboxes must be fetched",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "default" : 1
+          }
+        }, {
+          "name" : "status",
+          "in" : "query",
+          "description" : "Filters sandboxes based on their status. Possible values: ACTIVE, CREATING, REBUILDING. Note: The default value includes all statuses",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "ACTIVE", "CREATING", "REBUILDING" ]
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/allSandboxResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.sandbox.READ" ]
+        } ]
+      },
+      "post" : {
+        "tags" : [ "Sandbox" ],
+        "summary" : "Create Sandbox",
+        "description" : "Creates a new sandbox in the portal. Note: While a sandbox create, rebuild, or deploy operation is in progress, requests to start any of these operations are rejected. You can start another one only after the current operation completes.",
+        "operationId" : "addSandbox",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/sandboxAddJson"
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "400" : {
+            "$ref" : "#/components/responses/sandboxActionRestrictionResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/sandboxResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.sandbox.CREATE" ]
+        } ]
+      }
+    },
+    "/api/v1/sandbox/{sandboxId}" : {
+      "get" : {
+        "tags" : [ "Sandbox" ],
+        "summary" : "Get Sandbox",
+        "description" : "Retrieves the details of a specific sandbox.",
+        "operationId" : "getSandbox",
+        "x-mcp-group" : [ "Sandbox" ],
+        "parameters" : [ {
+          "name" : "sandboxId",
+          "in" : "path",
+          "description" : "Unique ID of the sandbox",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/sandboxResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.sandbox.READ" ]
+        } ]
+      },
+      "patch" : {
+        "tags" : [ "Sandbox" ],
+        "summary" : "Update Sandbox",
+        "description" : "Updates an existing sandbox.",
+        "operationId" : "updateSandbox",
+        "x-mcp-group" : [ "Sandbox" ],
+        "parameters" : [ {
+          "name" : "sandboxId",
+          "in" : "path",
+          "description" : "Unique ID of the sandbox",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/sandboxUpdateJson"
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/sandboxResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.sandbox.UPDATE" ]
+        } ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "sandboxEntityType" : {
+        "type" : [ "string", "null" ],
+        "enum" : [ "Fields", "Layouts", "Layout Rules", "Validation Rules", "Ticket Templates", "Email Templates Folder", "Email Templates", "Modules", "Time Tracking", "Field Dependencies", "Direct Assignment Rule", "Round Robin Rule", "Notification Rules", "Feed Preferences", "Skill Type", "Skills", "Skill Configuration", "Alerts", "Tasks", "Field Updates", "Custom Function", "Schedules", "Macro", "Supervise", "Custom Action", "Blueprint", "Workflow", "SLA", "ActionMapping", "Automation Studio" ],
+        "description" : "Type of the entity"
+      },
+      "sandboxEntityObject" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "maxProperties" : 3,
+        "minProperties" : 3,
+        "properties" : {
+          "name" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "description" : "Name of the entity"
+          },
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the entity"
+          },
+          "type" : {
+            "$ref" : "#/components/schemas/sandboxEntityType"
+          }
+        },
+        "required" : [ "id", "name", "type" ]
+      },
+      "sandboxActor" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "maxProperties" : 5,
+        "minProperties" : 5,
+        "properties" : {
+          "photoURL" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "URL of the user's profile photo"
+          },
+          "firstName" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "description" : "First name of the user"
+          },
+          "lastName" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "description" : "Last name of the user"
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "description" : "Full name of the user"
+          },
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the user"
+          }
+        },
+        "required" : [ "firstName", "id", "lastName", "name", "photoURL" ]
+      },
+      "sandboxDepartment" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "maxProperties" : 2,
+        "minProperties" : 2,
+        "properties" : {
+          "name" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "description" : "Name of the department"
+          },
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the department"
+          }
+        },
+        "required" : [ "id", "name" ]
+      },
+      "sandboxModule" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "maxProperties" : 2,
+        "minProperties" : 2,
+        "properties" : {
+          "apiName" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "description" : "API name of the module"
+          },
+          "displayName" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "description" : "Display name of the module"
+          }
+        },
+        "required" : [ "apiName", "displayName" ]
+      },
+      "changesetAction" : {
+        "type" : [ "string", "null" ],
+        "enum" : [ "ADD", "UPDATE", "DELETE" ],
+        "description" : "Action performed. Possible values: ADD, UPDATE, DELETE"
+      },
+      "sandboxAccessibleToResponse" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "agents" : {
+            "description" : "Agents that have access to the sandbox",
+            "type" : [ "array", "null" ],
+            "items" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "maxProperties" : 5,
+              "minProperties" : 5,
+              "properties" : {
+                "firstName" : {
+                  "description" : "First name of the agent",
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 50,
+                  "minLength" : 0
+                },
+                "lastName" : {
+                  "description" : "Last name of the agent",
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 50,
+                  "minLength" : 0
+                },
+                "photoURL" : {
+                  "description" : "URL of the agent's profile photo",
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 100,
+                  "minLength" : 0,
+                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                },
+                "name" : {
+                  "description" : "Full name of the agent",
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 100,
+                  "minLength" : 0
+                },
+                "id" : {
+                  "description" : "Unique ID of the agent",
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                }
+              },
+              "required" : [ "firstName", "id", "lastName", "name", "photoURL" ]
+            },
+            "uniqueItems" : false
+          }
+        },
+        "required" : [ "agents" ]
+      },
+      "sandboxResponse" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "modifiedTime" : {
+            "description" : "Time at which the sandbox was last modified (ISO 8601 format)",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+          },
+          "creator" : {
+            "description" : "User who created the sandbox",
+            "type" : [ "object", "null" ],
+            "additionalProperties" : false,
+            "maxProperties" : 5,
+            "minProperties" : 5,
+            "properties" : {
+              "firstName" : {
+                "description" : "First name of the creator",
+                "type" : [ "string", "null" ],
+                "maxLength" : 50,
+                "minLength" : 0
+              },
+              "lastName" : {
+                "description" : "Last name of the creator",
+                "type" : [ "string", "null" ],
+                "maxLength" : 50,
+                "minLength" : 0
+              },
+              "photoURL" : {
+                "description" : "URL of the creator's profile photo",
+                "type" : [ "string", "null" ],
+                "maxLength" : 100,
+                "minLength" : 0,
+                "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+              },
+              "name" : {
+                "description" : "Full name of the creator",
+                "type" : [ "string", "null" ],
+                "maxLength" : 100,
+                "minLength" : 0
+              },
+              "id" : {
+                "description" : "Unique ID of the creator",
+                "type" : [ "string", "integer", "null" ],
+                "format" : "int64",
+                "pattern" : "([0-9]+)"
+              }
+            },
+            "required" : [ "firstName", "id", "lastName", "name", "photoURL" ]
+          },
+          "modifier" : {
+            "description" : "User who last modified the sandbox",
+            "type" : [ "object", "null" ],
+            "additionalProperties" : false,
+            "maxProperties" : 5,
+            "minProperties" : 5,
+            "properties" : {
+              "firstName" : {
+                "description" : "First name of the modifier",
+                "type" : [ "string", "null" ],
+                "maxLength" : 50,
+                "minLength" : 0
+              },
+              "lastName" : {
+                "description" : "Last name of the modifier",
+                "type" : [ "string", "null" ],
+                "maxLength" : 50,
+                "minLength" : 0
+              },
+              "photoURL" : {
+                "description" : "URL of the modifier's profile photo",
+                "type" : [ "string", "null" ],
+                "maxLength" : 100,
+                "minLength" : 0,
+                "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+              },
+              "name" : {
+                "description" : "Full name of the modifier",
+                "type" : [ "string", "null" ],
+                "maxLength" : 100,
+                "minLength" : 0
+              },
+              "id" : {
+                "description" : "Unique ID of the modifier",
+                "type" : [ "string", "integer", "null" ],
+                "format" : "int64",
+                "pattern" : "([0-9]+)"
+              }
+            },
+            "required" : [ "firstName", "id", "lastName", "name", "photoURL" ]
+          },
+          "name" : {
+            "description" : "Name of the sandbox",
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "minLength" : 0
+          },
+          "description" : {
+            "description" : "Description of the sandbox",
+            "type" : [ "string", "null" ],
+            "maxLength" : 255,
+            "minLength" : 0
+          },
+          "createdTime" : {
+            "description" : "Time at which the sandbox was created (ISO 8601 format)",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+          },
+          "id" : {
+            "description" : "Unique ID of the sandbox",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "accessibleTo" : {
+            "description" : "Agents that have access to the sandbox",
+            "$ref" : "#/components/schemas/sandboxAccessibleToResponse"
+          },
+          "status" : {
+            "description" : "Current status of the sandbox. Possible values: ACTIVE, CREATING, REBUILDING",
+            "type" : [ "string", "null" ],
+            "enum" : [ "CREATING", "ACTIVE", "REBUILDING" ]
+          },
+          "sandboxPortalURL" : {
+            "description" : "URL of the sandbox portal",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "rebuilder" : {
+            "description" : "User who last rebuilt the sandbox",
+            "type" : [ "object", "null" ],
+            "additionalProperties" : false,
+            "maxProperties" : 5,
+            "minProperties" : 5,
+            "properties" : {
+              "firstName" : {
+                "description" : "First name of the rebuilder",
+                "type" : [ "string", "null" ],
+                "maxLength" : 50,
+                "minLength" : 0
+              },
+              "lastName" : {
+                "description" : "Last name of the rebuilder",
+                "type" : [ "string", "null" ],
+                "maxLength" : 50,
+                "minLength" : 0
+              },
+              "photoURL" : {
+                "description" : "URL of the rebuilder's profile photo",
+                "type" : [ "string", "null" ],
+                "maxLength" : 100,
+                "minLength" : 0,
+                "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+              },
+              "name" : {
+                "description" : "Full name of the rebuilder",
+                "type" : [ "string", "null" ],
+                "maxLength" : 100,
+                "minLength" : 0
+              },
+              "id" : {
+                "description" : "Unique ID of the rebuilder",
+                "type" : [ "string", "integer", "null" ],
+                "format" : "int64",
+                "pattern" : "([0-9]+)"
+              }
+            },
+            "required" : [ "firstName", "id", "lastName", "name", "photoURL" ]
+          },
+          "rebuildTime" : {
+            "description" : "Time at which the sandbox was last rebuilt (ISO 8601 format)",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+          }
+        },
+        "required" : [ "accessibleTo", "createdTime", "creator", "description", "id", "modifiedTime", "modifier", "name", "sandboxPortalURL", "status", "rebuildTime", "rebuilder" ]
+      },
+      "sandboxArr" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/sandboxResponse"
+        }
+      },
+      "actionRestrictionInfo" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "sandboxName" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "minLength" : 0,
+            "description" : "Name of the sandbox on which the action was attempted"
+          },
+          "actionPerformed" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "BUILD", "REBUILD", "DEPLOY" ],
+            "description" : "Action that was attempted on the sandbox. Possible values: BUILD, REBUILD, DEPLOY"
+          },
+          "message" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 255,
+            "minLength" : 0,
+            "description" : "Message describing why the action was restricted"
+          },
+          "initiatedBy" : {
+            "type" : [ "object", "null" ],
+            "additionalProperties" : false,
+            "maxProperties" : 5,
+            "minProperties" : 5,
+            "properties" : {
+              "firstName" : {
+                "type" : [ "string", "null" ],
+                "maxLength" : 50,
+                "minLength" : 0,
+                "description" : "First name of the user who initiated the action"
+              },
+              "lastName" : {
+                "type" : [ "string", "null" ],
+                "maxLength" : 50,
+                "minLength" : 0,
+                "description" : "Last name of the user who initiated the action"
+              },
+              "photoURL" : {
+                "type" : [ "string", "null" ],
+                "maxLength" : 100,
+                "minLength" : 0,
+                "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+                "description" : "URL of the profile photo of the user who initiated the action"
+              },
+              "name" : {
+                "type" : [ "string", "null" ],
+                "maxLength" : 100,
+                "minLength" : 0,
+                "description" : "Full name of the user who initiated the action"
+              },
+              "id" : {
+                "type" : [ "string", "integer", "null" ],
+                "format" : "int64",
+                "pattern" : "([0-9]+)",
+                "description" : "Unique ID of the user who initiated the action"
+              }
+            },
+            "required" : [ "firstName", "id", "lastName", "name", "photoURL" ],
+            "description" : "User who initiated the action"
+          }
+        },
+        "required" : [ "sandboxName", "actionPerformed", "message", "initiatedBy" ]
+      }
+    },
+    "responses" : {
+      "sandboxResponse" : {
+        "description" : "sandboxResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "modifiedTime" : {
+                  "description" : "Time at which the sandbox was last modified (ISO 8601 format)",
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 100,
+                  "minLength" : 0,
+                  "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+                },
+                "creator" : {
+                  "description" : "User who created the sandbox",
+                  "type" : [ "object", "null" ],
+                  "additionalProperties" : false,
+                  "maxProperties" : 5,
+                  "minProperties" : 5,
+                  "properties" : {
+                    "firstName" : {
+                      "description" : "First name of the creator",
+                      "type" : [ "string", "null" ],
+                      "maxLength" : 50,
+                      "minLength" : 0
+                    },
+                    "lastName" : {
+                      "description" : "Last name of the creator",
+                      "type" : [ "string", "null" ],
+                      "maxLength" : 50,
+                      "minLength" : 0
+                    },
+                    "photoURL" : {
+                      "description" : "URL of the creator's profile photo",
+                      "type" : [ "string", "null" ],
+                      "maxLength" : 100,
+                      "minLength" : 0,
+                      "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                    },
+                    "name" : {
+                      "description" : "Full name of the creator",
+                      "type" : [ "string", "null" ],
+                      "maxLength" : 100,
+                      "minLength" : 0
+                    },
+                    "id" : {
+                      "description" : "Unique ID of the creator",
+                      "type" : [ "string", "integer", "null" ],
+                      "format" : "int64",
+                      "pattern" : "([0-9]+)"
+                    }
+                  },
+                  "required" : [ "firstName", "id", "lastName", "name", "photoURL" ]
+                },
+                "modifier" : {
+                  "description" : "User who last modified the sandbox",
+                  "type" : [ "object", "null" ],
+                  "additionalProperties" : false,
+                  "maxProperties" : 5,
+                  "minProperties" : 5,
+                  "properties" : {
+                    "firstName" : {
+                      "description" : "First name of the modifier",
+                      "type" : [ "string", "null" ],
+                      "maxLength" : 50,
+                      "minLength" : 0
+                    },
+                    "lastName" : {
+                      "description" : "Last name of the modifier",
+                      "type" : [ "string", "null" ],
+                      "maxLength" : 50,
+                      "minLength" : 0
+                    },
+                    "photoURL" : {
+                      "description" : "URL of the modifier's profile photo",
+                      "type" : [ "string", "null" ],
+                      "maxLength" : 100,
+                      "minLength" : 0,
+                      "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                    },
+                    "name" : {
+                      "description" : "Full name of the modifier",
+                      "type" : [ "string", "null" ],
+                      "maxLength" : 100,
+                      "minLength" : 0
+                    },
+                    "id" : {
+                      "description" : "Unique ID of the modifier",
+                      "type" : [ "string", "integer", "null" ],
+                      "format" : "int64",
+                      "pattern" : "([0-9]+)"
+                    }
+                  },
+                  "required" : [ "firstName", "id", "lastName", "name", "photoURL" ]
+                },
+                "rebuilder" : {
+                  "description" : "User who last rebuilt the sandbox",
+                  "type" : [ "object", "null" ],
+                  "additionalProperties" : false,
+                  "maxProperties" : 5,
+                  "minProperties" : 5,
+                  "properties" : {
+                    "firstName" : {
+                      "description" : "First name of the rebuilder",
+                      "type" : [ "string", "null" ],
+                      "maxLength" : 50,
+                      "minLength" : 0
+                    },
+                    "lastName" : {
+                      "description" : "Last name of the rebuilder",
+                      "type" : [ "string", "null" ],
+                      "maxLength" : 50,
+                      "minLength" : 0
+                    },
+                    "photoURL" : {
+                      "description" : "URL of the rebuilder's profile photo",
+                      "type" : [ "string", "null" ],
+                      "maxLength" : 100,
+                      "minLength" : 0,
+                      "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                    },
+                    "name" : {
+                      "description" : "Full name of the rebuilder",
+                      "type" : [ "string", "null" ],
+                      "maxLength" : 100,
+                      "minLength" : 0
+                    },
+                    "id" : {
+                      "description" : "Unique ID of the rebuilder",
+                      "type" : [ "string", "integer", "null" ],
+                      "format" : "int64",
+                      "pattern" : "([0-9]+)"
+                    }
+                  },
+                  "required" : [ "firstName", "id", "lastName", "name", "photoURL" ]
+                },
+                "name" : {
+                  "description" : "Name of the sandbox",
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 50,
+                  "minLength" : 0
+                },
+                "description" : {
+                  "description" : "Description of the sandbox",
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 255,
+                  "minLength" : 0
+                },
+                "createdTime" : {
+                  "description" : "Time at which the sandbox was created (ISO 8601 format)",
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 100,
+                  "minLength" : 0,
+                  "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+                },
+                "rebuildTime" : {
+                  "description" : "Time at which the sandbox was last rebuilt (ISO 8601 format)",
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 100,
+                  "minLength" : 0,
+                  "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+                },
+                "id" : {
+                  "description" : "Unique ID of the sandbox",
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "accessibleTo" : {
+                  "description" : "Agents that have access to the sandbox",
+                  "$ref" : "#/components/schemas/sandboxAccessibleToResponse"
+                },
+                "status" : {
+                  "description" : "Current status of the sandbox. Possible values: ACTIVE, CREATING, REBUILDING",
+                  "type" : [ "string", "null" ],
+                  "enum" : [ "CREATING", "ACTIVE", "REBUILDING" ]
+                },
+                "sandboxPortalURL" : {
+                  "description" : "URL of the sandbox portal",
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 100,
+                  "minLength" : 0,
+                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                }
+              },
+              "required" : [ "accessibleTo", "createdTime", "creator", "description", "id", "modifiedTime", "modifier", "name", "sandboxPortalURL", "status", "rebuildTime", "rebuilder" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "modifiedTime" : 1689811555000,
+                  "creator" : {
+                    "firstName" : "George",
+                    "lastName" : "McKinson",
+                    "photoURL" : null,
+                    "name" : "George McKinson",
+                    "id" : "5000000015911"
+                  },
+                  "modifier" : {
+                    "firstName" : "George",
+                    "lastName" : "McKinson",
+                    "photoURL" : null,
+                    "name" : "George McKinson",
+                    "id" : "5000000015911"
+                  },
+                  "name" : "Sandbox to test workflows",
+                  "description" : "This Sandbox used to test the workflow rules",
+                  "createdTime" : 1663632355000,
+                  "id" : "10000000117019",
+                  "accessibleTo" : {
+                    "agents" : [ {
+                      "firstName" : "George",
+                      "lastName" : "McKinson",
+                      "photoURL" : null,
+                      "name" : "George McKinson",
+                      "id" : "5000000015911"
+                    }, {
+                      "firstName" : "David",
+                      "lastName" : null,
+                      "photoURL" : null,
+                      "name" : "David",
+                      "id" : "5000000015912"
+                    } ]
+                  },
+                  "status" : "ACTIVE",
+                  "sandboxPortalURL" : "https://desk.zoho.com/support/desksandbox/ShowHomePage.do",
+                  "rebuilder" : {
+                    "id" : "5000000000523",
+                    "name" : "CHANDRUBHARATHI P",
+                    "photoURL" : null,
+                    "firstName" : "CHANDRUBHARATHI",
+                    "lastName" : "P"
+                  },
+                  "rebuildTime" : "2025-12-04T10:23:32.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "sandboxActionRestrictionResponse" : {
+        "description" : "Sandbox action restriction reponse",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "additionalInfo" : {
+                  "$ref" : "#/components/schemas/actionRestrictionInfo",
+                  "description" : "Additional details about the restricted action"
+                },
+                "message" : {
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 255,
+                  "minLength" : 0,
+                  "description" : "Error message describing why the action was restricted"
+                },
+                "errorCode" : {
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 255,
+                  "minLength" : 0,
+                  "description" : "Error code associated with the restricted action"
+                }
+              },
+              "required" : [ "additionalInfo", "errorCode", "message" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "additionalInfo" : {
+                    "sandboxName" : "Sandbox to test workflows",
+                    "actionPerformed" : "REBUILD",
+                    "message" : "A rebuild is already in progress for this Sandbox",
+                    "initiatedBy" : {
+                      "firstName" : "George",
+                      "lastName" : "McKinson",
+                      "photoURL" : null,
+                      "name" : "George McKinson",
+                      "id" : "5000000015911"
+                    }
+                  },
+                  "message" : "The requested action cannot be performed at this time",
+                  "errorCode" : "ACTION_RESTRICTED"
+                }
+              }
+            }
+          }
+        }
+      },
+      "allSandboxResponse" : {
+        "description" : "allSandboxResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "description" : "List of sandbox entries in the portal",
+                  "$ref" : "#/components/schemas/sandboxArr"
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "data" : [ {
+                    "modifiedTime" : 1689811555000,
+                    "creator" : {
+                      "firstName" : "George",
+                      "lastName" : "McKinson",
+                      "photoURL" : null,
+                      "name" : "George McKinson",
+                      "id" : "5000000015911"
+                    },
+                    "modifier" : {
+                      "firstName" : "George",
+                      "lastName" : "McKinson",
+                      "photoURL" : null,
+                      "name" : "George McKinson",
+                      "id" : "5000000015911"
+                    },
+                    "name" : "Sandbox to test workflows",
+                    "description" : "This Sandbox used to test the workflow rules",
+                    "createdTime" : 1663632355000,
+                    "id" : "10000000117019",
+                    "accessibleTo" : {
+                      "agents" : [ {
+                        "firstName" : "George",
+                        "lastName" : "McKinson",
+                        "photoURL" : null,
+                        "name" : "George McKinson",
+                        "id" : "5000000015911"
+                      }, {
+                        "firstName" : "David",
+                        "lastName" : null,
+                        "photoURL" : null,
+                        "name" : "David",
+                        "id" : "5000000015912"
+                      } ]
+                    },
+                    "status" : "ACTIVE",
+                    "sandboxPortalURL" : "https://desk.zoho.com/support/desksandbox/ShowHomePage.do",
+                    "rebuilder" : {
+                      "id" : "5000000000523",
+                      "name" : "CHANDRUBHARATHI P",
+                      "photoURL" : null,
+                      "firstName" : "CHANDRUBHARATHI",
+                      "lastName" : "P"
+                    },
+                    "rebuildTime" : "2025-12-04T10:23:32.000Z"
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "parameters" : {
+      "sandboxId" : {
+        "name" : "sandboxId",
+        "in" : "path",
+        "description" : "Unique ID of the sandbox",
+        "required" : true,
+        "style" : "simple",
+        "explode" : false,
+        "schema" : {
+          "type" : [ "string", "integer" ],
+          "format" : "int64",
+          "pattern" : "([0-9]+)"
+        }
+      }
+    },
+    "requestBodies" : {
+      "sandboxAddJson" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "agentIds" : {
+                  "description" : "ID(s) of the agents who can access the sandbox. Note: Light agent IDs are not supported.",
+                  "type" : [ "array" ],
+                  "items" : {
+                    "type" : [ "string", "integer" ],
+                    "format" : "int64",
+                    "pattern" : "([0-9]+)"
+                  },
+                  "minItems" : 1,
+                  "uniqueItems" : false
+                },
+                "name" : {
+                  "description" : "Name of the sandbox",
+                  "type" : [ "string" ],
+                  "maxLength" : 100,
+                  "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+"
+                },
+                "description" : {
+                  "description" : "Description of the sandbox",
+                  "type" : [ "string" ],
+                  "maxLength" : 100
+                }
+              },
+              "required" : [ "agentIds", "name" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "agentIds" : [ "5000000015911", "5000000015912" ],
+                  "name" : "Sandbox to test workflow rules",
+                  "description" : "It is used for working with workflow rules event"
+                }
+              }
+            }
+          }
+        }
+      },
+      "sandboxUpdateJson" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "agentIds" : {
+                  "description" : "ID(s) of the agents who can access the sandbox. Note: Light agent IDs are not supported.",
+                  "type" : [ "array" ],
+                  "items" : {
+                    "type" : [ "string", "integer" ],
+                    "format" : "int64",
+                    "pattern" : "([0-9]+)"
+                  },
+                  "minItems" : 1,
+                  "uniqueItems" : false
+                },
+                "name" : {
+                  "description" : "Name of the sandbox",
+                  "type" : [ "string" ],
+                  "maxLength" : 100,
+                  "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+"
+                },
+                "description" : {
+                  "description" : "Description of the sandbox",
+                  "type" : [ "string" ],
+                  "maxLength" : 100
+                }
+              }
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "agentIds" : [ "5000000015913" ],
+                  "name" : "Workflow Rule Sandbox",
+                  "description" : "It is used for working with workflow event"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "Sandbox"
+}

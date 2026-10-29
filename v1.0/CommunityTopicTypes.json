@@ -1,0 +1,84 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "CommunityTopicTypes",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/communityTopicTypes/disable" : {
+      "post" : {
+        "tags" : [ "CommunityTopicTypes" ],
+        "summary" : "Disable Topic Type",
+        "description" : "Disables a topic type in the user community and reassigns existing topics of that type to another type.",
+        "operationId" : "disableTopicType",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/disableTopicTypeRequest"
+        },
+        "responses" : {
+          "204" : {
+            "$ref" : "#/components/responses/disableTopicTypeEmptyResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.forums.UPDATE", "Desk.community.UPDATE" ]
+        } ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "disableTopicTypeRequest" : {
+        "type" : "object",
+        "properties" : {
+          "changeExisitingTopicToType" : {
+            "type" : "string",
+            "description" : "Topic type that must be applied to existing topics mapped to the disabled type. Possible values: DISCUSSION, IDEA, PROBLEM, QUESTION",
+            "enum" : [ "QUESTION", "IDEA", "PROBLEM", "DISCUSSION" ]
+          },
+          "type" : {
+            "type" : "string",
+            "description" : "Topic type that must be disabled. Possible values: DISCUSSION, IDEA, PROBLEM, QUESTION",
+            "enum" : [ "QUESTION", "IDEA", "PROBLEM", "DISCUSSION", "ANNOUNCEMENT" ]
+          }
+        },
+        "required" : [ "changeExisitingTopicToType", "type" ]
+      }
+    },
+    "requestBodies" : {
+      "disableTopicTypeRequest" : {
+        "description" : "Request body for disabling a community topic type.",
+        "required" : true,
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/disableTopicTypeRequest"
+            }
+          }
+        }
+      }
+    },
+    "responses" : {
+      "disableTopicTypeEmptyResponse" : {
+        "description" : "This API returns a 204 status code with no response body."
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "CommunityTopicTypes"
+}

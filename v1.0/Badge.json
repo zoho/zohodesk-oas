@@ -37,7 +37,7 @@
             "type" : [ "integer" ],
             "format" : "int32",
             "pattern" : "([0-9]+)",
-            "minimum" : 1,
+            "minimum" : 0,
             "default" : 1
           }
         }, {
@@ -63,7 +63,34 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
+        } ]
+      },
+      "post" : {
+        "tags" : [ "Badge" ],
+        "summary" : "Add Badge",
+        "description" : "add badge",
+        "operationId" : "createBadge",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/createBadgeRequest"
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/badgeResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.CREATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.CREATE" ]
         } ]
       }
     },
@@ -79,6 +106,7 @@
           "required" : false,
           "schema" : {
             "type" : [ "string" ],
+            "maxLength" : 100,
             "enum" : [ "custom", "default" ]
           },
           "style" : "form",
@@ -110,19 +138,20 @@
             "type" : [ "integer" ],
             "format" : "int32",
             "pattern" : "([0-9]+)",
-            "minimum" : 1,
+            "minimum" : 0,
             "default" : 1
           }
         }, {
           "name" : "sortBy",
           "in" : "query",
-          "description" : "Sort by the @createdTime@ attribute. The default sorting order is ascending. A @-@ prefix denotes descending order of sorting.",
+          "description" : "Sort by the createdTime attribute. The default sorting order is ascending. A - prefix denotes descending order of sorting.",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
-            "enum" : [ "createdTime" ],
+            "maxLength" : 100,
+            "const" : "createdTime",
             "pattern" : "-?(createdTime)"
           }
         }, {
@@ -135,7 +164,8 @@
           "schema" : {
             "type" : [ "string" ],
             "maxLength" : 100,
-            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null"
+            "pattern" : "((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)",
+            "x-regex-name" : "APIDateTime"
           }
         }, {
           "name" : "endTime",
@@ -147,7 +177,8 @@
           "schema" : {
             "type" : [ "string" ],
             "maxLength" : 100,
-            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null"
+            "pattern" : "((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)",
+            "x-regex-name" : "APIDateTime"
           }
         }, {
           "name" : "userId",
@@ -169,7 +200,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.contacts.READ", "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.contacts.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       }
     },
@@ -202,10 +235,15 @@
           },
           "200" : {
             "$ref" : "./MassActionResponse.json#/components/responses/massActionListResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.contacts.UPDATE", "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.contacts.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
         } ]
       }
     },
@@ -238,10 +276,974 @@
           },
           "200" : {
             "$ref" : "./MassActionResponse.json#/components/responses/massActionListResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.contacts.UPDATE", "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.contacts.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+        } ]
+      }
+    },
+    "/api/v1/badges/{badgeId}" : {
+      "put" : {
+        "tags" : [ "Badge" ],
+        "summary" : "Update Badge",
+        "description" : "This API updates the details of a specific badge identified by its ID.",
+        "operationId" : "updateBadge",
+        "parameters" : [ {
+          "name" : "badgeId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "description" : "Unique identifier of the badge",
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/updateBadgeRequest"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/badgeResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "Badge" ],
+        "summary" : "Delete Badge",
+        "description" : "This API deletes a specific badge identified by its ID.",
+        "operationId" : "deleteBadge",
+        "parameters" : [ {
+          "name" : "badgeId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "description" : "Unique identifier of the badge",
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.DELETE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.DELETE" ]
+        } ]
+      }
+    },
+    "/api/v1/levels" : {
+      "get" : {
+        "tags" : [ "Level" ],
+        "summary" : "List Levels",
+        "description" : "This API lists all the levels available in the organization.",
+        "operationId" : "getLevels",
+        "parameters" : [ {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of badges to list",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 50,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)",
+            "default" : 10
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number starting from which the badges must be listed",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "minimum" : 0,
+            "default" : 1
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/levelsListResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
+        } ]
+      },
+      "post" : {
+        "tags" : [ "Level" ],
+        "summary" : "Create Level",
+        "description" : "This API creates a new level in the organization.",
+        "operationId" : "createLevel",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/createLevelRequest"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/levelResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.CREATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.CREATE" ]
+        } ]
+      }
+    },
+    "/api/v1/levels/{levelId}" : {
+      "put" : {
+        "tags" : [ "Level" ],
+        "summary" : "Update Level",
+        "description" : "This API updates the details of a specific level identified by its ID.",
+        "operationId" : "updateLevel",
+        "parameters" : [ {
+          "name" : "levelId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "description" : "Unique identifier of the level",
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/createLevelRequest"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/levelResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "Level" ],
+        "summary" : "Delete Level",
+        "description" : "This API deletes a specific level identified by its ID.",
+        "operationId" : "deleteLevel",
+        "parameters" : [ {
+          "name" : "levelId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "description" : "Unique identifier of the level",
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.DELETE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.DELETE" ]
+        } ]
+      }
+    },
+    "/api/v1/availableBadgeIcons" : {
+      "get" : {
+        "tags" : [ "Badge" ],
+        "summary" : "List Available Badge Icons",
+        "description" : "This API lists all the available badge icons in the organization.",
+        "operationId" : "getAvailableBadgeIcons",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/availableBadgeIconsResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.READ", "Desk.basic.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
+        } ]
+      }
+    },
+    "/api/v1/customCreditReports" : {
+      "get" : {
+        "tags" : [ "Badge" ],
+        "summary" : "List Custom Credit Reports",
+        "description" : "This API lists all the custom credit reports available in the organization.",
+        "operationId" : "getCustomCreditReports",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of badges to list",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 50,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)",
+            "default" : 10
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number starting from which the badges must be listed",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "minimum" : 0,
+            "default" : 1
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/customCreditReportsResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
+        } ]
+      }
+    },
+    "/api/v1/customBadgeReports" : {
+      "get" : {
+        "tags" : [ "Badge" ],
+        "summary" : "List Custom Badge Reports",
+        "description" : "This API lists all the custom badge reports available in the organization.",
+        "operationId" : "getCustomBadgeReports",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of badges to list",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 50,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)",
+            "default" : 10
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number starting from which the badges must be listed",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "minimum" : 0,
+            "default" : 1
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/customBadgeReportsResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
+        } ]
+      }
+    },
+    "/api/v1/credits" : {
+      "get" : {
+        "tags" : [ "Badge" ],
+        "summary" : "List Credits",
+        "description" : "This API lists all the credits available in the organization.",
+        "operationId" : "getCredits",
+        "parameters" : [ {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of badges to list",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 50,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)",
+            "default" : 10
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number starting from which the badges must be listed",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "minimum" : 0,
+            "default" : 1
+          }
+        }, {
+          "name" : "type",
+          "in" : "query",
+          "description" : "Type of credit: custom or default",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "enum" : [ "custom", "default" ]
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/creditListResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
+        } ]
+      },
+      "post" : {
+        "tags" : [ "Badge" ],
+        "summary" : "Create Credit",
+        "description" : "This API creates a new credit in the organization.",
+        "operationId" : "createCredit",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/createCreditRequest"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/creditResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.CREATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.CREATE" ]
+        } ]
+      }
+    },
+    "/api/v1/credits/{creditId}" : {
+      "put" : {
+        "tags" : [ "Badge" ],
+        "summary" : "Update Credit",
+        "description" : "This API updates the details of a specific credit identified by its ID.",
+        "operationId" : "updateCredit",
+        "parameters" : [ {
+          "name" : "creditId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "description" : "Unique identifier of the credit",
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/updateCreditRequest"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/creditResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "Badge" ],
+        "summary" : "Delete Credit",
+        "description" : "This API deletes a specific credit identified by its ID.",
+        "operationId" : "deleteCredit",
+        "parameters" : [ {
+          "name" : "creditId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "description" : "Unique identifier of the credit",
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.DELETE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.DELETE" ]
+        } ]
+      }
+    },
+    "/api/v1/badges/{badgeId}/users" : {
+      "get" : {
+        "tags" : [ "Badge" ],
+        "summary" : "List Users of a Badge",
+        "description" : "This API lists all users associated with a specific badge.",
+        "operationId" : "getBadgeUsers",
+        "parameters" : [ {
+          "name" : "badgeId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "description" : "Unique identifier of the badge",
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of badges to list",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 50,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)",
+            "default" : 10
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number starting from which the badges must be listed",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "minimum" : 0,
+            "default" : 1
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/badgeUsersResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
+        } ]
+      }
+    },
+    "/api/v1/badges/{badgeId}/associateUsers" : {
+      "post" : {
+        "tags" : [ "Badge" ],
+        "summary" : "Associate Users to Badge",
+        "description" : "This API associates specified users to a badge.",
+        "operationId" : "associateUsersToBadge",
+        "parameters" : [ {
+          "name" : "badgeId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "description" : "Unique identifier of the badge",
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/associateUsersToBadgeRequest"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+        } ]
+      }
+    },
+    "/api/v1/badges/{badgeId}/dissociateUsers" : {
+      "post" : {
+        "tags" : [ "Badge" ],
+        "summary" : "Dissociate Users from Badge",
+        "description" : "This API dissociates specified users from a badge.",
+        "operationId" : "dissociateUsersFromBadge",
+        "parameters" : [ {
+          "name" : "badgeId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "description" : "Unique identifier of the badge",
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/dissociateUsersFromBadgeRequest"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+        } ]
+      }
+    },
+    "/api/v1/credits/{creditId}/users" : {
+      "get" : {
+        "tags" : [ "Badge" ],
+        "summary" : "List Users of a Credit",
+        "description" : "This API lists all users associated with a specific credit.",
+        "operationId" : "getCreditUsers",
+        "parameters" : [ {
+          "name" : "creditId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "description" : "Unique identifier of the credit",
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of badges to list",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 50,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)",
+            "default" : 10
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number starting from which the badges must be listed",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "minimum" : 0,
+            "default" : 1
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/creditUsersResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
+        } ]
+      }
+    },
+    "/api/v1/credits/{creditId}/associateUsers" : {
+      "post" : {
+        "tags" : [ "Badge" ],
+        "summary" : "Associate Users to Credit",
+        "description" : "This API associates specified users to a credit.",
+        "operationId" : "associateUsersToCredit",
+        "parameters" : [ {
+          "name" : "creditId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "description" : "Unique identifier of the credit",
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/associateUsersToCreditRequest"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+        } ]
+      }
+    },
+    "/api/v1/credits/{creditId}/dissociateUsers" : {
+      "post" : {
+        "tags" : [ "Badge" ],
+        "summary" : "Dissociate Users from Credit",
+        "description" : "This API dissociates specified users from a credit.",
+        "operationId" : "dissociateUsersFromCredit",
+        "parameters" : [ {
+          "name" : "creditId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "description" : "Unique identifier of the credit",
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/dissociateUsersFromCreditRequest"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+        } ]
+      }
+    },
+    "/api/v1/gameAchievements" : {
+      "get" : {
+        "tags" : [ "Badge" ],
+        "summary" : "Get Game Achievements",
+        "description" : "This API retrieves game achievements for a specific agent.",
+        "operationId" : "getGameAchievements",
+        "parameters" : [ {
+          "name" : "duration",
+          "in" : "query",
+          "description" : "Duration filter for game achievements",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "last30days", "last6months", "lastyear" ]
+          }
+        }, {
+          "name" : "agentId",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "description" : "Unique identifier of the agent",
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/gameAchievementsResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
+        } ]
+      }
+    },
+    "/api/v1/gameBadgeStatus" : {
+      "get" : {
+        "tags" : [ "Badge" ],
+        "summary" : "Get Game Badge Status",
+        "description" : "This API retrieves badge status for a specific agent in games.",
+        "operationId" : "getGameBadgeStatus",
+        "parameters" : [ {
+          "name" : "agentId",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "description" : "Unique identifier of the agent",
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/gameBadgeStatusResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       }
     }
@@ -284,6 +1286,534 @@
         "items" : {
           "$ref" : "#/components/schemas/badgesDetail"
         }
+      },
+      "createBadgeRequestSchema" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "properties" : {
+          "name" : {
+            "description" : "Name of the badge",
+            "type" : [ "string" ],
+            "maxLength" : 200,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+          },
+          "description" : {
+            "description" : "Description of the badge",
+            "type" : [ "string" ],
+            "maxLength" : 200,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+          },
+          "isCustom" : {
+            "description" : "Key that specifies if the badge is user-defined or not",
+            "type" : "boolean"
+          },
+          "customIconId" : {
+            "description" : "ID of the file attachment that contains the badge icon",
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "defaultIconId" : {
+            "description" : "ID of the default icon",
+            "type" : [ "string", "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          }
+        },
+        "required" : [ "name", "isCustom", "defaultIconId" ]
+      },
+      "updateBadgeRequestSchema" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "properties" : {
+          "name" : {
+            "description" : "Name of the badge",
+            "type" : [ "string" ],
+            "maxLength" : 200,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+          },
+          "description" : {
+            "description" : "Description of the badge",
+            "type" : [ "string" ],
+            "maxLength" : 200,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+          },
+          "customIconId" : {
+            "description" : "ID of the file attachment that contains the badge icon",
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "defaultIconId" : {
+            "description" : "ID of the default icon",
+            "type" : [ "string", "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          }
+        },
+        "required" : [ "name" ]
+      },
+      "badgeInLevel" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "iconUrl" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 255,
+            "minLength" : 0,
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+          }
+        },
+        "required" : [ "id", "name", "iconUrl" ]
+      },
+      "levelDetail" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "description" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 255,
+            "minLength" : 0
+          },
+          "badge" : {
+            "$ref" : "#/components/schemas/badgeInLevel"
+          },
+          "pointsToReach" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "isEnabled" : {
+            "type" : [ "boolean", "null" ]
+          }
+        },
+        "required" : [ "id", "name", "description", "badge", "pointsToReach", "isEnabled" ]
+      },
+      "levelArray" : {
+        "type" : [ "array" ],
+        "items" : {
+          "$ref" : "#/components/schemas/levelDetail"
+        }
+      },
+      "createLevelRequestSchema" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "properties" : {
+          "name" : {
+            "description" : "Name of the level",
+            "type" : [ "string" ],
+            "maxLength" : 200,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+          },
+          "description" : {
+            "description" : "Description of the level",
+            "type" : [ "string" ],
+            "maxLength" : 200,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+          },
+          "pointsToReach" : {
+            "description" : "Number of points required to reach this level",
+            "type" : [ "number" ],
+            "format" : "double"
+          },
+          "badgeId" : {
+            "description" : "ID of the badge associated with this level",
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        },
+        "required" : [ "name", "pointsToReach" ]
+      },
+      "badgeIconDetail" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "url" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 255,
+            "minLength" : 0,
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+          }
+        },
+        "required" : [ "id", "url" ]
+      },
+      "customCreditReportDetail" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "holdersCount" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 255,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "id", "name", "holdersCount", "description" ]
+      },
+      "customBadgeReportDetail" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "holdersCount" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 255,
+            "minLength" : 0
+          },
+          "iconUrl" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 255,
+            "minLength" : 0,
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+          }
+        },
+        "required" : [ "id", "name", "holdersCount", "description", "iconUrl" ]
+      },
+      "creditDetail" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "description" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 255,
+            "minLength" : 0
+          },
+          "points" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "isEnabled" : {
+            "type" : [ "boolean", "null" ]
+          },
+          "isCustom" : {
+            "type" : [ "boolean", "null" ]
+          }
+        },
+        "required" : [ "id", "name", "description", "points", "isEnabled", "isCustom" ]
+      },
+      "createCreditRequestSchema" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "properties" : {
+          "name" : {
+            "description" : "Name of the credit",
+            "type" : [ "string" ],
+            "maxLength" : 200,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+          },
+          "description" : {
+            "description" : "Description of the credit",
+            "type" : [ "string" ],
+            "maxLength" : 200,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+          },
+          "points" : {
+            "description" : "Points awarded for this credit",
+            "type" : [ "number" ],
+            "format" : "double"
+          }
+        },
+        "required" : [ "name", "points" ]
+      },
+      "updateCreditRequestSchema" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "properties" : {
+          "name" : {
+            "description" : "Name of the credit",
+            "type" : [ "string" ],
+            "maxLength" : 200,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+          },
+          "description" : {
+            "description" : "Description of the credit",
+            "type" : [ "string" ],
+            "maxLength" : 200,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+          },
+          "points" : {
+            "description" : "Points awarded for this credit",
+            "type" : [ "number" ],
+            "format" : "double"
+          },
+          "isEnabled" : {
+            "type" : [ "boolean" ]
+          }
+        },
+        "required" : [ "name", "points" ]
+      },
+      "badgeUserItem" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "id", "name" ]
+      },
+      "badgeUsersDetail" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "users" : {
+            "type" : [ "array", "null" ],
+            "items" : {
+              "$ref" : "#/components/schemas/badgeUserItem"
+            }
+          }
+        },
+        "required" : [ "users" ]
+      },
+      "badgeUserIdsRequestSchema" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "properties" : {
+          "userIds" : {
+            "description" : "List of user IDs",
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string", "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "minItems" : 1,
+            "uniqueItems" : false
+          }
+        },
+        "required" : [ "userIds" ]
+      },
+      "gameAchievementBadgeItem" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "achievedTime" : {
+            "type" : [ "array", "null" ],
+            "items" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 50
+            }
+          },
+          "iconType" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32"
+          },
+          "count" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32"
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100
+          }
+        },
+        "required" : [ "achievedTime", "iconType", "count", "name" ]
+      },
+      "gameAchievementTrophyGameItem" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "gameId" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100
+          },
+          "endTime" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 50
+          }
+        },
+        "required" : [ "gameId", "name", "endTime" ]
+      },
+      "gameAchievementTrophyItem" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "iconType" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32"
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100
+          },
+          "count" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32"
+          },
+          "games" : {
+            "type" : [ "array", "null" ],
+            "items" : {
+              "$ref" : "#/components/schemas/gameAchievementTrophyGameItem"
+            }
+          }
+        },
+        "required" : [ "iconType", "name", "count", "games" ]
+      },
+      "gameAchievementDetail" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "totalBadges" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32"
+          },
+          "badges" : {
+            "type" : [ "array", "null" ],
+            "items" : {
+              "$ref" : "#/components/schemas/gameAchievementBadgeItem"
+            }
+          },
+          "totalTrophies" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32"
+          },
+          "trophies" : {
+            "type" : [ "array", "null" ],
+            "items" : {
+              "$ref" : "#/components/schemas/gameAchievementTrophyItem"
+            }
+          },
+          "firstPlaceCount" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32"
+          },
+          "secondPlaceCount" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32"
+          },
+          "thirdPlaceCount" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32"
+          }
+        },
+        "required" : [ ]
+      },
+      "gameBadgeCreditDetail" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "balance" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32"
+          },
+          "time" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32"
+          },
+          "target" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32"
+          }
+        },
+        "required" : [ "balance", "time", "target" ]
+      },
+      "gameBadgeStatusItem" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "iconType" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32"
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100
+          },
+          "credit" : {
+            "$ref" : "#/components/schemas/gameBadgeCreditDetail"
+          }
+        },
+        "required" : [ "iconType", "name", "credit" ]
+      },
+      "gameBadgeStatusDetail" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "badgeStatus" : {
+            "type" : [ "array", "null" ],
+            "items" : {
+              "$ref" : "#/components/schemas/gameBadgeStatusItem"
+            }
+          }
+        },
+        "required" : [ "badgeStatus" ]
       }
     },
     "responses" : {
@@ -335,6 +1865,358 @@
                   "id" : "1",
                   "iconUrl" : "https://www.zylker.com/badge1.jpg"
                 } ]
+              }
+            }
+          }
+        }
+      },
+      "badgeResponse" : {
+        "description" : "Single badge object",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/badgesDetail"
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "id" : "1",
+                  "name" : "Badge 1",
+                  "description" : "Best Contributor",
+                  "levelName" : null,
+                  "isCustom" : "true",
+                  "iconUrl" : "https://www.zylker.com/badge1.jpg"
+                }
+              }
+            }
+          }
+        }
+      },
+      "levelResponse" : {
+        "description" : "Single level object",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/levelDetail"
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "id" : "3000000000345",
+                  "name" : "Level 1",
+                  "description" : "Beginner",
+                  "badge" : {
+                    "id" : "3000000000395",
+                    "name" : "Best Contributor",
+                    "iconUrl" : "https://www.zylker.com/badge1.jpg"
+                  },
+                  "pointsToReach" : "200",
+                  "isEnabled" : true
+                }
+              }
+            }
+          }
+        }
+      },
+      "levelsListResponse" : {
+        "description" : "List of level objects",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/levelArray"
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : [ {
+                  "id" : "3000000000345",
+                  "name" : "Level 1",
+                  "description" : "Beginner",
+                  "badge" : {
+                    "id" : "3000000000395",
+                    "name" : "Best Contributor",
+                    "iconUrl" : "https://www.zylker.com/badge1.jpg"
+                  },
+                  "pointsToReach" : "200",
+                  "isEnabled" : true
+                } ]
+              }
+            }
+          }
+        }
+      },
+      "availableBadgeIconsResponse" : {
+        "description" : "List of available badge icon objects",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "array" ],
+              "items" : {
+                "$ref" : "#/components/schemas/badgeIconDetail"
+              }
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : [ {
+                  "id" : "3000000000234",
+                  "url" : "https://www.zylker.com/pic1.jpg"
+                }, {
+                  "id" : "3000000000722",
+                  "url" : "https://www.zylker.com/pic2.jpg"
+                } ]
+              }
+            }
+          }
+        }
+      },
+      "customCreditReportsResponse" : {
+        "description" : "List of custom credit report objects",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "array" ],
+              "items" : {
+                "$ref" : "#/components/schemas/customCreditReportDetail"
+              }
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : [ {
+                  "id" : "3000000000793",
+                  "name" : "CustomCredit 1",
+                  "holdersCount" : "3",
+                  "description" : "CustomBadge 1"
+                }, {
+                  "id" : "3000000000734",
+                  "name" : "CustomCredit 2",
+                  "holdersCount" : "5",
+                  "description" : "CustomBadge 2"
+                } ]
+              }
+            }
+          }
+        }
+      },
+      "customBadgeReportsResponse" : {
+        "description" : "List of custom badge report objects",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "array" ],
+              "items" : {
+                "$ref" : "#/components/schemas/customBadgeReportDetail"
+              }
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : [ {
+                  "id" : "3000000000893",
+                  "name" : "CustomBadge 1",
+                  "holdersCount" : "3",
+                  "description" : "CustomBadge 1",
+                  "iconUrl" : "https://www.zylker.com/image1.jpg"
+                }, {
+                  "id" : "3000000000899",
+                  "name" : "CustomBadge 2",
+                  "holdersCount" : "5",
+                  "description" : "CustomBadge 2",
+                  "iconUrl" : "https://www.zylker.com/image2.jpg"
+                } ]
+              }
+            }
+          }
+        }
+      },
+      "creditResponse" : {
+        "description" : "Single credit object",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/creditDetail"
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "id" : "3000000000343",
+                  "name" : "Custom Credit",
+                  "description" : "This is given to the people who have attended Webinar",
+                  "points" : "100",
+                  "isEnabled" : true,
+                  "isCustom" : true
+                }
+              }
+            }
+          }
+        }
+      },
+      "creditListResponse" : {
+        "description" : "List of credit objects",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "array" ],
+              "items" : {
+                "$ref" : "#/components/schemas/creditDetail"
+              }
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : [ {
+                  "id" : "3000000000315",
+                  "name" : "Post Idea",
+                  "description" : "Post an Idea to get 100 points",
+                  "points" : "100",
+                  "isEnabled" : true,
+                  "isCustom" : false
+                }, {
+                  "id" : "3000000000320",
+                  "name" : "Post Question",
+                  "description" : "Post a Question to get 50 points",
+                  "points" : "50",
+                  "isEnabled" : true,
+                  "isCustom" : false
+                } ]
+              }
+            }
+          }
+        }
+      },
+      "badgeUsersResponse" : {
+        "description" : "List of users associated with a badge",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/badgeUsersDetail"
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "users" : [ {
+                    "id" : "3000000000455",
+                    "name" : "Jade Tywin"
+                  }, {
+                    "id" : "3000000000385",
+                    "name" : "Steve"
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "creditUsersResponse" : {
+        "description" : "List of users associated with a credit",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/badgeUsersDetail"
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "users" : [ {
+                    "id" : "3000000000485",
+                    "name" : "Jade Tywin"
+                  }, {
+                    "id" : "3000000000487",
+                    "name" : "Steve"
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "gameAchievementsResponse" : {
+        "description" : "Game achievements for an agent",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/gameAchievementDetail"
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "totalBadges" : 3,
+                  "badges" : [ {
+                    "achievedTime" : [ "2017-07-20T13:31:46.000Z", "2017-07-20T13:32:03.000Z" ],
+                    "iconType" : 5,
+                    "count" : 3,
+                    "name" : "Emailer"
+                  }, {
+                    "achievedTime" : [ "2017-07-20T13:32:08.000Z" ],
+                    "iconType" : 1,
+                    "count" : 1,
+                    "name" : "Resolver"
+                  } ],
+                  "totalTrophies" : 3,
+                  "trophies" : [ {
+                    "iconType" : 7,
+                    "name" : "Quick Resolutioner",
+                    "count" : 2,
+                    "games" : [ {
+                      "gameId" : 4000000054055,
+                      "name" : "Two Group",
+                      "endTime" : "2017-07-21T12:00:00.000Z"
+                    }, {
+                      "gameId" : 4000000053005,
+                      "name" : "Three Player",
+                      "endTime" : "2017-07-20T12:00:00.000Z"
+                    } ]
+                  }, {
+                    "iconType" : 9,
+                    "name" : "Customer Hero",
+                    "count" : 1,
+                    "games" : [ {
+                      "gameId" : 4000000053005,
+                      "name" : "Three Player",
+                      "endTime" : "2017-07-20T12:00:00.000Z"
+                    } ]
+                  } ],
+                  "firstPlaceCount" : 3,
+                  "secondPlaceCount" : 0,
+                  "thirdPlaceCount" : 0
+                }
+              }
+            }
+          }
+        }
+      },
+      "gameBadgeStatusResponse" : {
+        "description" : "Badge status for an agent in games",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/gameBadgeStatusDetail"
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "badgeStatus" : [ {
+                    "iconType" : 2,
+                    "name" : "Chatter",
+                    "credit" : {
+                      "balance" : 10,
+                      "time" : 261,
+                      "target" : 10
+                    }
+                  }, {
+                    "iconType" : 1,
+                    "name" : "Resolver",
+                    "credit" : {
+                      "balance" : 8,
+                      "time" : 261,
+                      "target" : 10
+                    }
+                  }, {
+                    "iconType" : 4,
+                    "name" : "Solutioner",
+                    "credit" : {
+                      "balance" : 10,
+                      "time" : 32661,
+                      "target" : 10
+                    }
+                  } ]
+                }
               }
             }
           }
@@ -401,6 +2283,163 @@
             }
           }
         }
+      },
+      "createBadgeRequest" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/createBadgeRequestSchema"
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "name" : "Badge 1",
+                  "description" : "Best Contributor",
+                  "levelName" : null,
+                  "isCustom" : true,
+                  "iconUrl" : "https://www.zylker.com/badge1.jpg"
+                }
+              }
+            }
+          }
+        }
+      },
+      "updateBadgeRequest" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/updateBadgeRequestSchema"
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "name" : "Badge 2",
+                  "description" : "Top Contributor",
+                  "customIconId" : "3000000000017"
+                }
+              }
+            }
+          }
+        }
+      },
+      "createLevelRequest" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/createLevelRequestSchema"
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "name" : "Level 1",
+                  "description" : "Beginner",
+                  "pointsToReach" : "200",
+                  "badgeId" : "3000000000345"
+                }
+              }
+            }
+          }
+        }
+      },
+      "createCreditRequest" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/createCreditRequestSchema"
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "name" : "Custom Credit",
+                  "description" : "This is given to the people who have attended Webinar",
+                  "points" : "100"
+                }
+              }
+            }
+          }
+        }
+      },
+      "updateCreditRequest" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/updateCreditRequestSchema"
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "name" : "Active User",
+                  "description" : "This is given to the people who are active",
+                  "points" : "200"
+                }
+              }
+            }
+          }
+        }
+      },
+      "associateUsersToBadgeRequest" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/badgeUserIdsRequestSchema"
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "userIds" : [ "3000000000378", "3000000000395" ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "dissociateUsersFromBadgeRequest" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/badgeUserIdsRequestSchema"
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "userIds" : [ "3000000000813", "3000000000193", "3000000000903" ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "associateUsersToCreditRequest" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/badgeUserIdsRequestSchema"
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "userIds" : [ "3000000000985", "3000000000485" ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "dissociateUsersFromCreditRequest" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/badgeUserIdsRequestSchema"
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "userIds" : [ "3000000000885", "3000000000495", "3000000000285" ]
+                }
+              }
+            }
+          }
+        }
       }
     },
     "securitySchemes" : {
@@ -412,7 +2451,11 @@
       },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "Badge"
 }

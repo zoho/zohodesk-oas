@@ -1,5 +1,6 @@
 {
   "openapi" : "3.1.0",
+  "x-mcp-group" : [ "Modules, Fields and Layouts" ],
   "info" : {
     "title" : "Layout",
     "version" : "1.0.0"
@@ -42,8 +43,8 @@
           "schema" : {
             "type" : [ "integer" ],
             "format" : "int32",
-            "maximum" : 99,
-            "default" : 99
+            "maximum" : 100,
+            "default" : 100
           },
           "style" : "form",
           "explode" : true,
@@ -143,7 +144,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.layouts.CREATE", "Desk.settings.CREATE" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.CREATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.CREATE" ]
         } ]
       }
     },
@@ -249,7 +252,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.layouts.CREATE", "Desk.settings.CREATE" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.CREATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.CREATE" ]
         } ]
       }
     },
@@ -271,7 +276,7 @@
             "description" : "Export Format in which format should be shown.This value can be @CSV@",
             "enum" : [ "CSV" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "pattern" : "CSV"
           }
         }, {
           "name" : "layoutId",
@@ -287,6 +292,7 @@
         }, {
           "name" : "fieldId",
           "in" : "path",
+          "description" : "ID of the field",
           "required" : true,
           "style" : "simple",
           "explode" : false,
@@ -298,18 +304,20 @@
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
-          "400" : {
-            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
-          },
           "200" : {
             "$ref" : "./Common.json#/components/responses/fileResponse"
           },
           "204" : {
             "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.layouts.READ", "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       }
     },
@@ -340,6 +348,9 @@
           "200" : {
             "$ref" : "#/components/responses/layoutJson"
           },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
           "400" : {
             "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
           },
@@ -357,7 +368,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.layouts.UPDATE", "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
         } ]
       }
     },
@@ -382,14 +395,14 @@
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/getLayoutResponse"
+          },
           "400" : {
             "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
           },
           "422" : {
             "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
-          },
-          "200" : {
-            "$ref" : "#/components/responses/getLayoutResponse"
           }
         },
         "security" : [ {
@@ -415,6 +428,9 @@
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/layoutTransferJson"
+        },
         "responses" : {
           "204" : {
             "$ref" : "./Common.json#/components/responses/emptyResponse"
@@ -436,11 +452,10 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.layouts.DELETE", "Desk.settings.DELETE" ]
-        } ],
-        "requestBody" : {
-          "$ref" : "#/components/requestBodies/layoutTransferJson"
-        }
+          "iam-oauth2-schema" : [ "Desk.layouts.DELETE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.DELETE" ]
+        } ]
       },
       "patch" : {
         "tags" : [ "Layout" ],
@@ -485,7 +500,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.layouts.UPDATE", "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
         } ]
       }
     },
@@ -530,7 +547,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.layouts.UPDATE", "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
         } ]
       }
     },
@@ -554,6 +573,7 @@
         }, {
           "name" : "fieldId",
           "in" : "path",
+          "description" : "ID of the field",
           "required" : true,
           "style" : "simple",
           "explode" : false,
@@ -569,14 +589,16 @@
         },
         "responses" : {
           "200" : {
-            "$ref" : "./Common.json#/components/responses/emptyResponse"
+            "$ref" : "#/components/responses/cloneFieldsToOtherLayoutsJson"
           },
           "422" : {
             "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.layouts.UPDATE", "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
         } ]
       }
     },
@@ -621,7 +643,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.layouts.READ", "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       },
       "patch" : {
@@ -667,7 +691,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.layouts.UPDATE", "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
         } ]
       }
     },
@@ -675,7 +701,7 @@
       "get" : {
         "tags" : [ "Layout" ],
         "summary" : "Get My Form",
-        "description" : "This API fetches details of a layout, based on the profile of the current user.",
+        "description" : "Retrieves layout details based on the current user profile.",
         "operationId" : "getMyForm",
         "parameters" : [ {
           "name" : "layoutId",
@@ -692,11 +718,20 @@
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
-          "422" : {
-            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
-          },
           "200" : {
             "$ref" : "#/components/responses/getMyFormResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/licenseErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/unprocessableEntityErrorResponse"
           }
         },
         "security" : [ {
@@ -707,8 +742,8 @@
     "/api/v1/layouts/{layoutId}/replaceValues" : {
       "post" : {
         "tags" : [ "Layout" ],
-        "summary" : "Replace PickList Value",
-        "description" : "This API replaces the old value with the new value for the PickList field type in all existing records only.<p><b>Note</b>: When a value that does not exist in the PickList values is provided as new value, then this API will create the new value without deleting the old one.</p>",
+        "summary" : "Replace Picklist Value",
+        "description" : "Replaces an old picklist value with a new value in all existing records. Note: If the new value does not exist in the picklist, the API creates the new value without deleting the old value.",
         "operationId" : "replacePickListValue",
         "parameters" : [ {
           "name" : "layoutId",
@@ -725,18 +760,29 @@
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/replaceValueRequestJson"
+          "$ref" : "#/components/requestBodies/replacePickListValueRequest"
         },
         "responses" : {
-          "422" : {
-            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
-          },
           "200" : {
             "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/licenseErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/unprocessableEntityErrorResponse"
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.layouts.UPDATE", "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
         } ]
       }
     },
@@ -760,6 +806,7 @@
         }, {
           "name" : "fieldId",
           "in" : "path",
+          "description" : "ID of the field",
           "required" : true,
           "style" : "simple",
           "explode" : false,
@@ -794,14 +841,16 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.layouts.UPDATE", "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
         } ]
       }
     },
     "/api/v1/layouts/{layoutId}/fields/{fieldId}/unassociate" : {
       "post" : {
         "tags" : [ "Layout" ],
-        "summary" : "Remove Field From Layout",
+        "summary" : "Remove Field From Layout.",
         "description" : "This API is to remove fields from a layout.",
         "operationId" : "unAssociateLayoutField",
         "parameters" : [ {
@@ -818,6 +867,7 @@
         }, {
           "name" : "fieldId",
           "in" : "path",
+          "description" : "ID of the field",
           "required" : true,
           "style" : "simple",
           "explode" : false,
@@ -835,12 +885,20 @@
           "400" : {
             "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
           },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/licenseErrorResponse"
+          },
           "422" : {
             "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.layouts.UPDATE", "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
         } ]
       }
     }
@@ -862,7 +920,8 @@
             "pattern" : "([0-9]+)"
           }
         },
-        "required" : [ "available", "maximumLimit" ]
+        "required" : [ "available", "maximumLimit" ],
+        "description" : "layout Count Details J S O N schema"
       },
       "basicLayoutJson" : {
         "type" : [ "object", "null" ],
@@ -930,6 +989,11 @@
             "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
+          "departmentId" : {
+            "description" : "Unique ID of the department in which the layout is configured",
+            "type" : [ "string", "integer", "null" ],
+            "pattern" : "([0-9]+)"
+          },
           "modifiedBy" : {
             "description" : "ID of the user who last modified this layout",
             "type" : [ "string", "integer", "null" ],
@@ -946,10 +1010,11 @@
             "enum" : [ "active", "inactive" ]
           }
         },
-        "required" : [ "createdBy", "createdTime", "hasLogo", "id", "isDefaultLayout", "isStandardLayout", "layoutDesc", "layoutDisplayName", "layoutName", "modifiedBy", "modifiedTime", "photoURL", "skipDeptAccessValidation", "status" ]
+        "required" : [ "createdBy", "createdTime", "hasLogo", "id", "isDefaultLayout", "isStandardLayout", "layoutDesc", "layoutDisplayName", "layoutName", "modifiedBy", "modifiedTime", "photoURL", "skipDeptAccessValidation", "status" ],
+        "additionalProperties" : false,
+        "description" : "basic Layout J S O N schema"
       },
       "layoutJson" : {
-        "type" : "object",
         "allOf" : [ {
           "$ref" : "#/components/schemas/basicLayoutJson"
         }, {
@@ -980,15 +1045,18 @@
                     "enum" : [ "Administrator", "Standard", "Light", "Portal", "Custom" ]
                   }
                 },
-                "required" : [ "id", "isDefault", "profileName", "type" ]
+                "required" : [ "id", "isDefault", "profileName", "type" ],
+                "description" : "layoutProfilesItem schema"
               },
-              "uniqueItems" : false
+              "uniqueItems" : false,
+              "description" : "layoutProfiles schema"
             }
-          }
-        } ]
+          },
+          "description" : "layoutJson_allOf1 schema"
+        } ],
+        "description" : "layout J S O N schema"
       },
       "layoutCommonResponse" : {
-        "type" : "object",
         "allOf" : [ {
           "$ref" : "#/components/schemas/layoutJson"
         }, {
@@ -999,11 +1067,12 @@
               "type" : [ "string", "null" ]
             }
           },
-          "required" : [ "module" ]
-        } ]
+          "required" : [ "module" ],
+          "description" : "layoutCommonResponse_allOf1 schema"
+        } ],
+        "description" : "layout Common response schema"
       },
       "getLayoutSpecificModuleResponse" : {
-        "type" : "object",
         "allOf" : [ {
           "$ref" : "#/components/schemas/layoutCommonResponse"
         }, {
@@ -1014,8 +1083,10 @@
               "pattern" : "([0-9]+)"
             }
           },
-          "required" : [ "departmentId" ]
-        } ]
+          "required" : [ "departmentId" ],
+          "description" : "getLayoutSpecificModuleResponse_allOf1 schema"
+        } ],
+        "description" : "get Layout Specific Module response schema"
       },
       "layoutData" : {
         "type" : [ "array", "null" ],
@@ -1024,8 +1095,10 @@
             "$ref" : "#/components/schemas/layoutCommonResponse"
           }, {
             "$ref" : "#/components/schemas/getLayoutSpecificModuleResponse"
-          } ]
-        }
+          } ],
+          "description" : "layoutDataItem schema"
+        },
+        "description" : "layout Data schema"
       },
       "commonFieldResponse" : {
         "allOf" : [ {
@@ -1040,8 +1113,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isRemovable", "isSystemMandatory" ]
-        } ]
+          "required" : [ "isRemovable", "isSystemMandatory" ],
+          "description" : "commonFieldResponse_allOf1 schema"
+        } ],
+        "description" : "common Field response schema"
       },
       "testFieldResponse" : {
         "allOf" : [ {
@@ -1056,8 +1131,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isRemovable", "isSystemMandatory" ]
-        } ]
+          "required" : [ "isRemovable", "isSystemMandatory" ],
+          "description" : "testFieldResponse_allOf1 schema"
+        } ],
+        "description" : "test Field response schema"
       },
       "myFormTextFieldResponse" : {
         "allOf" : [ {
@@ -1069,8 +1146,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isReadOnly" ]
-        } ]
+          "required" : [ "isReadOnly" ],
+          "description" : "myFormTextFieldResponse_allOf1 schema"
+        } ],
+        "description" : "my Form Text Field response schema"
       },
       "integerFieldResponse" : {
         "allOf" : [ {
@@ -1085,8 +1164,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isRemovable", "isSystemMandatory" ]
-        } ]
+          "required" : [ "isRemovable", "isSystemMandatory" ],
+          "description" : "integerFieldResponse_allOf1 schema"
+        } ],
+        "description" : "integer Field response schema"
       },
       "myFormIntegerFieldResponse" : {
         "allOf" : [ {
@@ -1098,8 +1179,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isReadOnly" ]
-        } ]
+          "required" : [ "isReadOnly" ],
+          "description" : "myFormIntegerFieldResponse_allOf1 schema"
+        } ],
+        "description" : "my Form Integer Field response schema"
       },
       "percentFieldResponse" : {
         "allOf" : [ {
@@ -1114,8 +1197,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isRemovable", "isSystemMandatory" ]
-        } ]
+          "required" : [ "isRemovable", "isSystemMandatory" ],
+          "description" : "percentFieldResponse_allOf1 schema"
+        } ],
+        "description" : "percent Field response schema"
       },
       "myFormPercentFieldResponse" : {
         "allOf" : [ {
@@ -1127,8 +1212,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isReadOnly" ]
-        } ]
+          "required" : [ "isReadOnly" ],
+          "description" : "myFormPercentFieldResponse_allOf1 schema"
+        } ],
+        "description" : "my Form Percent Field response schema"
       },
       "decimalFieldResponse" : {
         "allOf" : [ {
@@ -1144,8 +1231,10 @@
               "pattern" : "([0-9]+)"
             }
           },
-          "required" : [ "decimalPlaces" ]
-        } ]
+          "required" : [ "decimalPlaces" ],
+          "description" : "decimalFieldResponse_allOf1 schema"
+        } ],
+        "description" : "decimal Field response schema"
       },
       "myFormDecimalFieldResponse" : {
         "allOf" : [ {
@@ -1157,8 +1246,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isReadOnly" ]
-        } ]
+          "required" : [ "isReadOnly" ],
+          "description" : "myFormDecimalFieldResponse_allOf1 schema"
+        } ],
+        "description" : "my Form Decimal Field response schema"
       },
       "currencyFieldResponse" : {
         "allOf" : [ {
@@ -1185,8 +1276,10 @@
               "pattern" : "([0-9]+)"
             }
           },
-          "required" : [ "decimalPlaces", "roundingOption", "roundingPrecision" ]
-        } ]
+          "required" : [ "decimalPlaces", "roundingOption", "roundingPrecision" ],
+          "description" : "currencyFieldResponse_allOf1 schema"
+        } ],
+        "description" : "currency Field response schema"
       },
       "myFormCurrencyFieldResponse" : {
         "allOf" : [ {
@@ -1198,8 +1291,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isReadOnly" ]
-        } ]
+          "required" : [ "isReadOnly" ],
+          "description" : "myFormCurrencyFieldResponse_allOf1 schema"
+        } ],
+        "description" : "my Form Currency Field response schema"
       },
       "dateFieldResponse" : {
         "allOf" : [ {
@@ -1214,8 +1309,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isRemovable", "isSystemMandatory" ]
-        } ]
+          "required" : [ "isRemovable", "isSystemMandatory" ],
+          "description" : "dateFieldResponse_allOf1 schema"
+        } ],
+        "description" : "date Field response schema"
       },
       "myFormDateFieldResponse" : {
         "allOf" : [ {
@@ -1227,8 +1324,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isReadOnly" ]
-        } ]
+          "required" : [ "isReadOnly" ],
+          "description" : "myFormDateFieldResponse_allOf1 schema"
+        } ],
+        "description" : "my Form Date Field response schema"
       },
       "dateTimeFieldResponse" : {
         "allOf" : [ {
@@ -1243,8 +1342,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isRemovable", "isSystemMandatory" ]
-        } ]
+          "required" : [ "isRemovable", "isSystemMandatory" ],
+          "description" : "dateTimeFieldResponse_allOf1 schema"
+        } ],
+        "description" : "date Time Field response schema"
       },
       "myFormDateTimeFieldResponse" : {
         "allOf" : [ {
@@ -1256,8 +1357,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isReadOnly" ]
-        } ]
+          "required" : [ "isReadOnly" ],
+          "description" : "myFormDateTimeFieldResponse_allOf1 schema"
+        } ],
+        "description" : "my Form Date Time Field response schema"
       },
       "emailFieldResponse" : {
         "allOf" : [ {
@@ -1272,8 +1375,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isRemovable", "isSystemMandatory" ]
-        } ]
+          "required" : [ "isRemovable", "isSystemMandatory" ],
+          "description" : "emailFieldResponse_allOf1 schema"
+        } ],
+        "description" : "email Field response schema"
       },
       "myFormEmailFieldResponse" : {
         "allOf" : [ {
@@ -1285,8 +1390,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isReadOnly" ]
-        } ]
+          "required" : [ "isReadOnly" ],
+          "description" : "myFormEmailFieldResponse_allOf1 schema"
+        } ],
+        "description" : "my Form Email Field response schema"
       },
       "phoneFieldResponse" : {
         "allOf" : [ {
@@ -1301,8 +1408,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isRemovable", "isSystemMandatory" ]
-        } ]
+          "required" : [ "isRemovable", "isSystemMandatory" ],
+          "description" : "phoneFieldResponse_allOf1 schema"
+        } ],
+        "description" : "phone Field response schema"
       },
       "myFormPhoneFieldResponse" : {
         "allOf" : [ {
@@ -1314,8 +1423,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isReadOnly" ]
-        } ]
+          "required" : [ "isReadOnly" ],
+          "description" : "myFormPhoneFieldResponse_allOf1 schema"
+        } ],
+        "description" : "my Form Phone Field response schema"
       },
       "pickListFieldBasicResponse" : {
         "allOf" : [ {
@@ -1331,7 +1442,8 @@
                 "minLength" : 0,
                 "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
               },
-              "uniqueItems" : false
+              "uniqueItems" : false,
+              "description" : "allowedValues schema"
             },
             "defaultValue" : {
               "type" : [ "string", "null" ],
@@ -1340,8 +1452,10 @@
               "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
             }
           },
-          "required" : [ "allowedValues", "defaultValue" ]
-        } ]
+          "required" : [ "allowedValues", "defaultValue" ],
+          "description" : "pickListFieldBasicResponse_allOf1 schema"
+        } ],
+        "description" : "pick List Field Basic response schema"
       },
       "pickListFieldResponse" : {
         "allOf" : [ {
@@ -1354,8 +1468,10 @@
               "enum" : [ "alphabetical", "userDefined" ]
             }
           },
-          "required" : [ "sortBy" ]
-        } ]
+          "required" : [ "sortBy" ],
+          "description" : "pickListFieldResponse_allOf1 schema"
+        } ],
+        "description" : "pick List Field response schema"
       },
       "myFormPickListFieldResponse" : {
         "allOf" : [ {
@@ -1367,8 +1483,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isReadOnly" ]
-        } ]
+          "required" : [ "isReadOnly" ],
+          "description" : "myFormPickListFieldResponse_allOf1 schema"
+        } ],
+        "description" : "my Form Pick List Field response schema"
       },
       "pickListFieldSimpleResponse" : {
         "allOf" : [ {
@@ -1384,11 +1502,14 @@
                 "minLength" : 0,
                 "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
               },
-              "uniqueItems" : false
+              "uniqueItems" : false,
+              "description" : "allowedValues schema"
             }
           },
-          "required" : [ "allowedValues" ]
-        } ]
+          "required" : [ "allowedValues" ],
+          "description" : "pickListFieldSimpleResponse_allOf1 schema"
+        } ],
+        "description" : "pick List Field Simple response schema"
       },
       "urlFieldResponse" : {
         "allOf" : [ {
@@ -1403,8 +1524,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isRemovable", "isSystemMandatory" ]
-        } ]
+          "required" : [ "isRemovable", "isSystemMandatory" ],
+          "description" : "urlFieldResponse_allOf1 schema"
+        } ],
+        "description" : "url Field response schema"
       },
       "myFormUrlFieldResponse" : {
         "allOf" : [ {
@@ -1416,8 +1539,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isReadOnly" ]
-        } ]
+          "required" : [ "isReadOnly" ],
+          "description" : "myFormUrlFieldResponse_allOf1 schema"
+        } ],
+        "description" : "my Form Url Field response schema"
       },
       "textAreaFieldResponse" : {
         "allOf" : [ {
@@ -1432,8 +1557,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isRemovable", "isSystemMandatory" ]
-        } ]
+          "required" : [ "isRemovable", "isSystemMandatory" ],
+          "description" : "textAreaFieldResponse_allOf1 schema"
+        } ],
+        "description" : "text Area Field response schema"
       },
       "myFormTextAreaFieldResponse" : {
         "allOf" : [ {
@@ -1445,8 +1572,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isReadOnly" ]
-        } ]
+          "required" : [ "isReadOnly" ],
+          "description" : "myFormTextAreaFieldResponse_allOf1 schema"
+        } ],
+        "description" : "my Form Text Area Field response schema"
       },
       "booleanFieldResponse" : {
         "allOf" : [ {
@@ -1459,8 +1588,10 @@
               "enum" : [ "true", "false" ]
             }
           },
-          "required" : [ "defaultValue" ]
-        } ]
+          "required" : [ "defaultValue" ],
+          "description" : "booleanFieldResponse_allOf1 schema"
+        } ],
+        "description" : "boolean Field response schema"
       },
       "myFormBooleanFieldResponse" : {
         "allOf" : [ {
@@ -1472,8 +1603,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isReadOnly" ]
-        } ]
+          "required" : [ "isReadOnly" ],
+          "description" : "myFormBooleanFieldResponse_allOf1 schema"
+        } ],
+        "description" : "my Form Boolean Field response schema"
       },
       "multiPickListFieldBasicResponse" : {
         "allOf" : [ {
@@ -1489,7 +1622,8 @@
                 "minLength" : 0,
                 "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
               },
-              "uniqueItems" : false
+              "uniqueItems" : false,
+              "description" : "allowedValues schema"
             },
             "defaultValue" : {
               "type" : [ "string", "null" ],
@@ -1498,8 +1632,10 @@
               "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
             }
           },
-          "required" : [ "allowedValues", "defaultValue" ]
-        } ]
+          "required" : [ "allowedValues", "defaultValue" ],
+          "description" : "multiPickListFieldBasicResponse_allOf1 schema"
+        } ],
+        "description" : "multi Pick List Field Basic response schema"
       },
       "multiPickListFieldResponse" : {
         "allOf" : [ {
@@ -1512,8 +1648,10 @@
               "enum" : [ "alphabetical", "userDefined" ]
             }
           },
-          "required" : [ "sortBy" ]
-        } ]
+          "required" : [ "sortBy" ],
+          "description" : "multiPickListFieldResponse_allOf1 schema"
+        } ],
+        "description" : "multi Pick List Field response schema"
       },
       "myFormMultiPickListFieldResponse" : {
         "allOf" : [ {
@@ -1525,8 +1663,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isReadOnly" ]
-        } ]
+          "required" : [ "isReadOnly" ],
+          "description" : "myFormMultiPickListFieldResponse_allOf1 schema"
+        } ],
+        "description" : "my Form Multi Pick List Field response schema"
       },
       "multiPickListFieldSimpleResponse" : {
         "allOf" : [ {
@@ -1542,11 +1682,14 @@
                 "minLength" : 0,
                 "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
               },
-              "uniqueItems" : false
+              "uniqueItems" : false,
+              "description" : "allowedValues schema"
             }
           },
-          "required" : [ "allowedValues" ]
-        } ]
+          "required" : [ "allowedValues" ],
+          "description" : "multiPickListFieldSimpleResponse_allOf1 schema"
+        } ],
+        "description" : "multi Pick List Field Simple response schema"
       },
       "faxFieldResponse" : {
         "allOf" : [ {
@@ -1561,8 +1704,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isRemovable", "isSystemMandatory" ]
-        } ]
+          "required" : [ "isRemovable", "isSystemMandatory" ],
+          "description" : "faxFieldResponse_allOf1 schema"
+        } ],
+        "description" : "fax Field response schema"
       },
       "myFormFaxFieldResponse" : {
         "allOf" : [ {
@@ -1574,8 +1719,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isReadOnly" ]
-        } ]
+          "required" : [ "isReadOnly" ],
+          "description" : "myFormFaxFieldResponse_allOf1 schema"
+        } ],
+        "description" : "my Form Fax Field response schema"
       },
       "autoNumberFieldResponse" : {
         "allOf" : [ {
@@ -1590,8 +1737,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isRemovable", "isSystemMandatory" ]
-        } ]
+          "required" : [ "isRemovable", "isSystemMandatory" ],
+          "description" : "autoNumberFieldResponse_allOf1 schema"
+        } ],
+        "description" : "auto Number Field response schema"
       },
       "myFormAutoNumberFieldResponse" : {
         "allOf" : [ {
@@ -1603,8 +1752,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isReadOnly" ]
-        } ]
+          "required" : [ "isReadOnly" ],
+          "description" : "myFormAutoNumberFieldResponse_allOf1 schema"
+        } ],
+        "description" : "my Form Auto Number Field response schema"
       },
       "lookUpFieldResponse" : {
         "allOf" : [ {
@@ -1619,8 +1770,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isRemovable", "isSystemMandatory" ]
-        } ]
+          "required" : [ "isRemovable", "isSystemMandatory" ],
+          "description" : "lookUpFieldResponse_allOf1 schema"
+        } ],
+        "description" : "look Up Field response schema"
       },
       "myFormLookUpFieldResponse" : {
         "allOf" : [ {
@@ -1632,8 +1785,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isReadOnly" ]
-        } ]
+          "required" : [ "isReadOnly" ],
+          "description" : "myFormLookUpFieldResponse_allOf1 schema"
+        } ],
+        "description" : "my Form Look Up Field response schema"
       },
       "statusFieldResponse" : {
         "allOf" : [ {
@@ -1649,7 +1804,8 @@
                 "minLength" : 0,
                 "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
               },
-              "uniqueItems" : false
+              "uniqueItems" : false,
+              "description" : "allowedValues schema"
             },
             "defaultValue" : {
               "type" : [ "string", "null" ],
@@ -1662,8 +1818,10 @@
               "enum" : [ "alphabetical", "userDefined" ]
             }
           },
-          "required" : [ "allowedValues", "defaultValue", "sortBy" ]
-        } ]
+          "required" : [ "allowedValues", "defaultValue", "sortBy" ],
+          "description" : "statusFieldResponse_allOf1 schema"
+        } ],
+        "description" : "status Field response schema"
       },
       "myFormStatusFieldResponse" : {
         "allOf" : [ {
@@ -1675,8 +1833,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isReadOnly" ]
-        } ]
+          "required" : [ "isReadOnly" ],
+          "description" : "myFormStatusFieldResponse_allOf1 schema"
+        } ],
+        "description" : "my Form Status Field response schema"
       },
       "ticketStatusFieldResponse" : {
         "allOf" : [ {
@@ -1692,11 +1852,14 @@
                 "minLength" : 0,
                 "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
               },
-              "uniqueItems" : false
+              "uniqueItems" : false,
+              "description" : "restoreOnReplyValues schema"
             }
           },
-          "required" : [ "restoreOnReplyValues" ]
-        } ]
+          "required" : [ "restoreOnReplyValues" ],
+          "description" : "ticketStatusFieldResponse_allOf1 schema"
+        } ],
+        "description" : "ticket Status Field response schema"
       },
       "myFormTicketStatusFieldResponse" : {
         "allOf" : [ {
@@ -1708,8 +1871,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isReadOnly" ]
-        } ]
+          "required" : [ "isReadOnly" ],
+          "description" : "myFormTicketStatusFieldResponse_allOf1 schema"
+        } ],
+        "description" : "my Form Ticket Status Field response schema"
       },
       "layoutFieldResponse" : {
         "allOf" : [ {
@@ -1727,8 +1892,10 @@
               "minLength" : 0
             }
           },
-          "required" : [ "toolTip", "toolTipType" ]
-        } ]
+          "required" : [ "toolTip", "toolTipType" ],
+          "description" : "layoutFieldResponse_allOf1 schema"
+        } ],
+        "description" : "layout Field response schema"
       },
       "productDepartmentFieldResponse" : {
         "allOf" : [ {
@@ -1744,11 +1911,14 @@
                 "minLength" : 0,
                 "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
               },
-              "uniqueItems" : false
+              "uniqueItems" : false,
+              "description" : "allowedValues schema"
             }
           },
-          "required" : [ "allowedValues" ]
-        } ]
+          "required" : [ "allowedValues" ],
+          "description" : "productDepartmentFieldResponse_allOf1 schema"
+        } ],
+        "description" : "product Department Field response schema"
       },
       "myFormProductDepartmentFieldResponse" : {
         "allOf" : [ {
@@ -1760,8 +1930,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isReadOnly" ]
-        } ]
+          "required" : [ "isReadOnly" ],
+          "description" : "myFormProductDepartmentFieldResponse_allOf1 schema"
+        } ],
+        "description" : "my Form Product Department Field response schema"
       },
       "secondaryContactFieldResponse" : {
         "allOf" : [ {
@@ -1776,8 +1948,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isRemovable", "isSystemMandatory" ]
-        } ]
+          "required" : [ "isRemovable", "isSystemMandatory" ],
+          "description" : "secondaryContactFieldResponse_allOf1 schema"
+        } ],
+        "description" : "secondary Contact Field response schema"
       },
       "nestedPickListFieldResponse" : {
         "allOf" : [ {
@@ -1789,8 +1963,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isNested" ]
-        } ]
+          "required" : [ "isNested" ],
+          "description" : "nestedPickListFieldResponse_allOf1 schema"
+        } ],
+        "description" : "nested Pick List Field response schema"
       },
       "nestedMultiPickListFieldResponse" : {
         "allOf" : [ {
@@ -1802,8 +1978,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isNested" ]
-        } ]
+          "required" : [ "isNested" ],
+          "description" : "nestedMultiPickListFieldResponse_allOf1 schema"
+        } ],
+        "description" : "nested Multi Pick List Field response schema"
       },
       "nestedTicketStatusFieldResponse" : {
         "allOf" : [ {
@@ -1815,8 +1993,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isNested" ]
-        } ]
+          "required" : [ "isNested" ],
+          "description" : "nestedTicketStatusFieldResponse_allOf1 schema"
+        } ],
+        "description" : "nested Ticket Status Field response schema"
       },
       "myFormNestedTicketStatusFieldResponse" : {
         "allOf" : [ {
@@ -1828,8 +2008,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isNested" ]
-        } ]
+          "required" : [ "isNested" ],
+          "description" : "myFormNestedTicketStatusFieldResponse_allOf1 schema"
+        } ],
+        "description" : "my Form Nested Ticket Status Field response schema"
       },
       "myFormNestedPickListFieldResponse" : {
         "allOf" : [ {
@@ -1841,8 +2023,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isNested" ]
-        } ]
+          "required" : [ "isNested" ],
+          "description" : "myFormNestedPickListFieldResponse_allOf1 schema"
+        } ],
+        "description" : "my Form Nested Pick List Field response schema"
       },
       "myFormNestedMultiPickListFieldResponse" : {
         "allOf" : [ {
@@ -1854,8 +2038,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isNested" ]
-        } ]
+          "required" : [ "isNested" ],
+          "description" : "myFormNestedMultiPickListFieldResponse_allOf1 schema"
+        } ],
+        "description" : "my Form Nested Multi Pick List Field response schema"
       },
       "layoutFieldsJson" : {
         "type" : [ "array", "null" ],
@@ -1964,8 +2150,10 @@
             "$ref" : "#/components/schemas/myFormNestedPickListFieldResponse"
           }, {
             "$ref" : "#/components/schemas/myFormNestedMultiPickListFieldResponse"
-          } ]
-        }
+          } ],
+          "description" : "layoutFieldsJsonItem schema"
+        },
+        "description" : "layout Fields J S O N schema"
       },
       "sectionJSON" : {
         "type" : [ "object", "null" ],
@@ -1986,13 +2174,16 @@
             "$ref" : "#/components/schemas/layoutFieldsJson"
           }
         },
-        "required" : [ "fields", "id", "name" ]
+        "required" : [ "fields", "id", "name" ],
+        "additionalProperties" : false,
+        "description" : "section J S O N schema"
       },
       "sectionList" : {
         "type" : [ "array", "null" ],
         "items" : {
           "$ref" : "#/components/schemas/sectionJSON"
-        }
+        },
+        "description" : "section List schema"
       },
       "sectionJSONForLayout" : {
         "allOf" : [ {
@@ -2005,8 +2196,10 @@
               "type" : [ "boolean", "null" ]
             }
           },
-          "required" : [ "isCustomSection" ]
-        } ]
+          "required" : [ "isCustomSection" ],
+          "description" : "sectionJSONForLayout_allOf1 schema"
+        } ],
+        "description" : "section J S O N For Layout schema"
       },
       "i18NSectionJSONForLayout" : {
         "allOf" : [ {
@@ -2022,8 +2215,10 @@
               "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
             }
           },
-          "required" : [ "i18NLabel" ]
-        } ]
+          "required" : [ "i18NLabel" ],
+          "description" : "i18NSectionJSONForLayout_allOf1 schema"
+        } ],
+        "description" : "i18 N Section J S O N For Layout schema"
       },
       "sectionListForLayout" : {
         "type" : [ "array", "null" ],
@@ -2032,7 +2227,335 @@
             "$ref" : "#/components/schemas/sectionJSONForLayout"
           }, {
             "$ref" : "#/components/schemas/i18NSectionJSONForLayout"
+          } ],
+          "description" : "sectionListForLayoutItem schema"
+        },
+        "description" : "section List For Layout schema"
+      },
+      "myFormLayoutFieldAttributes" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "isSystemMandatory" : {
+            "description" : "Whether a built-in field in the system is mandatory in the layout",
+            "type" : [ "boolean", "null" ]
+          },
+          "isReadOnly" : {
+            "description" : "Whether the field is read-only in the layout",
+            "type" : [ "boolean", "null" ]
+          },
+          "isRemovable" : {
+            "description" : "Whether the field can be removed from the layout",
+            "type" : [ "boolean", "null" ]
+          }
+        },
+        "required" : [ "isSystemMandatory", "isReadOnly", "isRemovable" ]
+      },
+      "myFormPickListValue" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "value" : {
+            "description" : "Allowed picklist value of the field",
+            "type" : [ "string", "null" ],
+            "maxLength" : 120,
+            "minLength" : 0
+          },
+          "colorCode" : {
+            "description" : "Color code associated with the picklist value. Applicable to ColorCoded picklists",
+            "type" : [ "string", "null" ],
+            "maxLength" : 20,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "value" ]
+      },
+      "myFormFormulaFieldResponse" : {
+        "allOf" : [ {
+          "$ref" : "./Field.json#/components/schemas/formulaFieldResponseNew"
+        }, {
+          "$ref" : "#/components/schemas/myFormLayoutFieldAttributes"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "expression" : {
+              "description" : "Formula expression used to compute the field value",
+              "type" : [ "string", "null" ],
+              "maxLength" : 1000,
+              "minLength" : 0
+            }
+          }
+        } ]
+      },
+      "myFormPickListCommonAttributes" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "subType" : {
+            "description" : "Sub-type classification of the picklist or multi-select field. Accepted values: Plain, ColorCoded",
+            "type" : [ "string", "null" ],
+            "enum" : [ "Plain", "ColorCoded" ]
+          },
+          "defaultValue" : {
+            "description" : "Default value set for the picklist or multi-select field",
+            "type" : [ "string", "null" ],
+            "maxLength" : 120
+          },
+          "isNested" : {
+            "description" : "Whether the picklist or multi-select field is nested",
+            "type" : [ "boolean", "null" ]
+          },
+          "sortBy" : {
+            "description" : "Order in which picklist values are sorted. Accepted values: userDefined, alphabetical",
+            "type" : [ "string", "null" ],
+            "enum" : [ "userDefined", "alphabetical" ]
+          },
+          "pickListValues" : {
+            "description" : "List of allowed picklist values for the field",
+            "type" : [ "array", "null" ],
+            "items" : {
+              "$ref" : "#/components/schemas/myFormPickListValue"
+            }
+          }
+        },
+        "required" : [ "pickListValues" ]
+      },
+      "myFormPickListFieldResponseNew" : {
+        "allOf" : [ {
+          "$ref" : "./Field.json#/components/schemas/pickListFieldBasicResponseNew"
+        }, {
+          "$ref" : "#/components/schemas/myFormLayoutFieldAttributes"
+        }, {
+          "$ref" : "#/components/schemas/myFormPickListCommonAttributes"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "type" : {
+              "type" : "string",
+              "const" : "Picklist",
+              "description" : "Type of the field. Always \"Picklist\" for picklist field responses"
+            },
+            "restoreOnReplyValues" : {
+              "description" : "Values in the Status field that are set to fall back to the default value",
+              "type" : [ "array", "null" ],
+              "items" : {
+                "type" : [ "string", "null" ],
+                "maxLength" : 120
+              }
+            }
+          }
+        } ]
+      },
+      "myFormMultiSelectFieldResponse" : {
+        "allOf" : [ {
+          "$ref" : "./Field.json#/components/schemas/multiPickListFieldBasicResponseNew"
+        }, {
+          "$ref" : "#/components/schemas/myFormLayoutFieldAttributes"
+        }, {
+          "$ref" : "#/components/schemas/myFormPickListCommonAttributes"
+        } ]
+      },
+      "myFormTextFieldResponseNew" : {
+        "allOf" : [ {
+          "$ref" : "./Field.json#/components/schemas/textFieldResponseNew"
+        }, {
+          "$ref" : "#/components/schemas/myFormLayoutFieldAttributes"
+        } ]
+      },
+      "myFormIntegerFieldResponseNew" : {
+        "allOf" : [ {
+          "$ref" : "./Field.json#/components/schemas/integerFieldResponseNew"
+        }, {
+          "$ref" : "#/components/schemas/myFormLayoutFieldAttributes"
+        } ]
+      },
+      "myFormPercentFieldResponseNew" : {
+        "allOf" : [ {
+          "$ref" : "./Field.json#/components/schemas/percentFieldResponseNew"
+        }, {
+          "$ref" : "#/components/schemas/myFormLayoutFieldAttributes"
+        } ]
+      },
+      "myFormDecimalFieldResponseNew" : {
+        "allOf" : [ {
+          "$ref" : "./Field.json#/components/schemas/decimalFieldResponseNew"
+        }, {
+          "$ref" : "#/components/schemas/myFormLayoutFieldAttributes"
+        } ]
+      },
+      "myFormCurrencyFieldResponseNew" : {
+        "allOf" : [ {
+          "$ref" : "./Field.json#/components/schemas/currencyFieldResponseNew"
+        }, {
+          "$ref" : "#/components/schemas/myFormLayoutFieldAttributes"
+        } ]
+      },
+      "myFormDateFieldResponseNew" : {
+        "allOf" : [ {
+          "$ref" : "./Field.json#/components/schemas/dateFieldResponseNew"
+        }, {
+          "$ref" : "#/components/schemas/myFormLayoutFieldAttributes"
+        } ]
+      },
+      "myFormDateTimeFieldResponseNew" : {
+        "allOf" : [ {
+          "$ref" : "./Field.json#/components/schemas/dateTimeFieldResponseNew"
+        }, {
+          "$ref" : "#/components/schemas/myFormLayoutFieldAttributes"
+        } ]
+      },
+      "myFormEmailFieldResponseNew" : {
+        "allOf" : [ {
+          "$ref" : "./Field.json#/components/schemas/emailFieldResponseNew"
+        }, {
+          "$ref" : "#/components/schemas/myFormLayoutFieldAttributes"
+        } ]
+      },
+      "myFormPhoneFieldResponseNew" : {
+        "allOf" : [ {
+          "$ref" : "./Field.json#/components/schemas/phoneFieldResponseNew"
+        }, {
+          "$ref" : "#/components/schemas/myFormLayoutFieldAttributes"
+        } ]
+      },
+      "myFormUrlFieldResponseNew" : {
+        "allOf" : [ {
+          "$ref" : "./Field.json#/components/schemas/urlFieldResponseNew"
+        }, {
+          "$ref" : "#/components/schemas/myFormLayoutFieldAttributes"
+        } ]
+      },
+      "myFormTextAreaFieldResponseNew" : {
+        "allOf" : [ {
+          "$ref" : "./Field.json#/components/schemas/textAreaFieldResponseNew"
+        }, {
+          "$ref" : "#/components/schemas/myFormLayoutFieldAttributes"
+        } ]
+      },
+      "myFormBooleanFieldResponseNew" : {
+        "allOf" : [ {
+          "$ref" : "./Field.json#/components/schemas/booleanFieldResponseNew"
+        }, {
+          "$ref" : "#/components/schemas/myFormLayoutFieldAttributes"
+        } ]
+      },
+      "myFormFaxFieldResponseNew" : {
+        "allOf" : [ {
+          "$ref" : "./Field.json#/components/schemas/faxFieldResponseNew"
+        }, {
+          "$ref" : "#/components/schemas/myFormLayoutFieldAttributes"
+        } ]
+      },
+      "myFormAutoNumberFieldResponseNew" : {
+        "allOf" : [ {
+          "$ref" : "./Field.json#/components/schemas/autoNumberFieldResponseNew"
+        }, {
+          "$ref" : "#/components/schemas/myFormLayoutFieldAttributes"
+        } ]
+      },
+      "myFormLookUpFieldResponseNew" : {
+        "allOf" : [ {
+          "$ref" : "./Field.json#/components/schemas/commonFieldResponse"
+        }, {
+          "$ref" : "#/components/schemas/myFormLayoutFieldAttributes"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "type" : {
+              "type" : "string",
+              "const" : "LookUp",
+              "description" : "Type of the field. Always \"LookUp\" for lookup field responses"
+            }
+          }
+        } ]
+      },
+      "myFormLargeTextFieldResponseNew" : {
+        "allOf" : [ {
+          "$ref" : "./Field.json#/components/schemas/largeTextFieldResponseNew"
+        }, {
+          "$ref" : "#/components/schemas/myFormLayoutFieldAttributes"
+        } ]
+      },
+      "myFormLayoutFieldsJson" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "anyOf" : [ {
+            "$ref" : "#/components/schemas/myFormTextFieldResponseNew"
+          }, {
+            "$ref" : "#/components/schemas/myFormIntegerFieldResponseNew"
+          }, {
+            "$ref" : "#/components/schemas/myFormPercentFieldResponseNew"
+          }, {
+            "$ref" : "#/components/schemas/myFormDecimalFieldResponseNew"
+          }, {
+            "$ref" : "#/components/schemas/myFormCurrencyFieldResponseNew"
+          }, {
+            "$ref" : "#/components/schemas/myFormDateFieldResponseNew"
+          }, {
+            "$ref" : "#/components/schemas/myFormDateTimeFieldResponseNew"
+          }, {
+            "$ref" : "#/components/schemas/myFormEmailFieldResponseNew"
+          }, {
+            "$ref" : "#/components/schemas/myFormPhoneFieldResponseNew"
+          }, {
+            "$ref" : "#/components/schemas/myFormPickListFieldResponseNew"
+          }, {
+            "$ref" : "#/components/schemas/myFormUrlFieldResponseNew"
+          }, {
+            "$ref" : "#/components/schemas/myFormTextAreaFieldResponseNew"
+          }, {
+            "$ref" : "#/components/schemas/myFormBooleanFieldResponseNew"
+          }, {
+            "$ref" : "#/components/schemas/myFormMultiSelectFieldResponse"
+          }, {
+            "$ref" : "#/components/schemas/myFormFaxFieldResponseNew"
+          }, {
+            "$ref" : "#/components/schemas/myFormAutoNumberFieldResponseNew"
+          }, {
+            "$ref" : "#/components/schemas/myFormLookUpFieldResponseNew"
+          }, {
+            "$ref" : "#/components/schemas/myFormLargeTextFieldResponseNew"
+          }, {
+            "$ref" : "#/components/schemas/myFormFormulaFieldResponse"
           } ]
+        }
+      },
+      "myFormSectionJSON" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "name" : {
+            "description" : "Name of the section",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "i18NLabel" : {
+            "description" : "Internationalized (localized) label of the section",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "isCustomSection" : {
+            "description" : "Whether this is a custom section",
+            "type" : [ "boolean", "null" ]
+          },
+          "id" : {
+            "description" : "Unique ID of the section",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "fields" : {
+            "$ref" : "#/components/schemas/myFormLayoutFieldsJson"
+          }
+        },
+        "required" : [ "fields", "id", "isCustomSection", "name" ]
+      },
+      "myFormSectionList" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/myFormSectionJSON"
         }
       },
       "cloneLayoutCommonResponse" : {
@@ -2049,8 +2572,10 @@
               "$ref" : "#/components/schemas/sectionListForLayout"
             }
           },
-          "required" : [ "module", "sections" ]
-        } ]
+          "required" : [ "module", "sections" ],
+          "description" : "cloneLayoutCommonResponse_allOf1 schema"
+        } ],
+        "description" : "clone Layout Common response schema"
       },
       "textFieldRequestJson" : {
         "type" : "object",
@@ -2058,23 +2583,23 @@
         "properties" : {
           "id" : {
             "description" : "ID of the field in the layout. Send as a string (IDs can exceed safe integer precision).",
-            "type" : [ "string", "integer", "null" ],
+            "type" : [ "string", "integer" ],
             "pattern" : "([0-9]+)"
           },
           "isMandatory" : {
             "description" : "Whether this field is mandatory in the layout",
-            "type" : [ "boolean", "null" ]
+            "type" : "boolean"
           },
           "allowedValues" : {
             "description" : "Allowed values for the field. Applicable to pick list fields.",
-            "type" : [ "array", "null" ],
+            "type" : "array",
             "items" : {
               "type" : [ "string" ]
             }
           },
           "defaultValue" : {
             "description" : "Default value set for the field. Applicable to pick list and checkbox fields.",
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "maxLength" : 120
           },
           "sortBy" : {
@@ -2084,11 +2609,11 @@
           },
           "isNested" : {
             "description" : "Whether the pick list field is nested",
-            "type" : [ "boolean", "null" ]
+            "type" : "boolean"
           },
           "restoreOnReplyValues" : {
             "description" : "Values in the Status field that are set to fall back to the default value.",
-            "type" : [ "array", "null" ],
+            "type" : "array",
             "items" : {
               "type" : [ "string" ],
               "maxLength" : 120
@@ -2160,26 +2685,27 @@
             "readOnly" : true
           }
         },
-        "required" : [ "id", "isMandatory" ]
+        "required" : [ "id", "isMandatory" ],
+        "description" : "text Field request J S O N schema"
       },
       "layoutFieldRequestJson" : {
         "description" : "Array of field objects in this section. Each element must be an object with 'id' (the field ID, sent as a string to preserve precision for large IDs) and 'isMandatory' (boolean).",
-        "type" : [ "array", "null" ],
+        "type" : "array",
         "items" : {
           "$ref" : "#/components/schemas/textFieldRequestJson"
         }
       },
       "sectionRequestJSON" : {
-        "type" : [ "object", "null" ],
+        "type" : "object",
         "additionalProperties" : false,
         "properties" : {
           "name" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "maxLength" : 100,
             "minLength" : 0
           },
           "id" : {
-            "type" : [ "string", "integer", "null" ],
+            "type" : [ "string", "integer" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           },
@@ -2188,20 +2714,23 @@
             "$ref" : "#/components/schemas/layoutFieldRequestJson"
           }
         },
-        "required" : [ "fields", "id", "name" ]
+        "required" : [ "fields", "id", "name" ],
+        "description" : "section request J S O N schema"
       },
       "sectionRequestArr" : {
-        "type" : [ "array", "null" ],
+        "type" : "array",
         "items" : {
           "$ref" : "#/components/schemas/sectionRequestJSON"
-        }
+        },
+        "description" : "section request array schema"
       },
       "layoutIdsArray" : {
-        "type" : [ "array", "null" ],
+        "type" : "array",
         "items" : {
-          "type" : [ "string", "integer", "null" ],
+          "type" : [ "string", "integer" ],
           "pattern" : "([0-9]+)"
-        }
+        },
+        "description" : "layout Ids arrayay schema"
       },
       "layoutProfileIdsJson" : {
         "description" : "List of profile IDs to associate with the layout",
@@ -2236,13 +2765,149 @@
             "enum" : [ "Administrator", "Standard", "Light", "Portal", "Custom" ]
           }
         },
-        "required" : [ "id", "isDefault", "profileName", "type" ]
+        "required" : [ "id", "isDefault", "profileName", "type" ],
+        "description" : "layout Profile J S O N schema"
       },
       "layoutProfileJsonArray" : {
         "type" : [ "array", "null" ],
         "items" : {
           "$ref" : "#/components/schemas/layoutProfileJson"
-        }
+        },
+        "description" : "layout Profile J S O N arrayay schema"
+      },
+      "createLayoutFieldResponse" : {
+        "type" : [ "object", "null" ],
+        "description" : "createLayout field response. Property schemas collected from FieldOld.commonFieldResponse (+ Layout isRemovable/isSystemMandatory and optional picklist keys). isTrackLastActivityTime kept optional (present in FieldOld but not returned by createLayout).",
+        "additionalProperties" : false,
+        "properties" : {
+          "displayLabel" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "apiName" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "isCustomField" : {
+            "type" : [ "boolean", "null" ]
+          },
+          "i18NLabel" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "isEncryptedField" : {
+            "type" : [ "boolean", "null" ]
+          },
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "isTrackLastActivityTime" : {
+            "type" : [ "boolean", "null" ]
+          },
+          "type" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "Text", "URL", "Textarea", "Email", "Phone", "Multiselect", "Date", "DateTime", "Number", "Checkbox", "Percent", "Decimal", "Currency", "Picklist", "LookUp", "MultiLookup", "AutoNumber", "Boolean", "Fax", "LargeText" ]
+          },
+          "isMandatory" : {
+            "type" : [ "boolean", "null" ]
+          },
+          "maxLength" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "minimum" : 1,
+            "pattern" : "([0-9]+)"
+          },
+          "isRemovable" : {
+            "type" : [ "boolean", "null" ]
+          },
+          "isSystemMandatory" : {
+            "type" : [ "boolean", "null" ]
+          },
+          "allowedValues" : {
+            "type" : [ "array", "null" ],
+            "items" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 120,
+              "minLength" : 0,
+              "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
+            },
+            "uniqueItems" : false,
+            "description" : "allowedValues schema"
+          },
+          "defaultValue" : {
+            "type" : [ "string", "boolean", "null" ],
+            "maxLength" : 120,
+            "minLength" : 0
+          },
+          "sortBy" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "alphabetical", "userDefined" ]
+          },
+          "isNested" : {
+            "type" : [ "boolean", "null" ]
+          },
+          "subType" : {
+            "description" : "Subtype of the field, applicable to PickList fields. Values include Plain and ColorCoded.",
+            "type" : [ "string", "null" ]
+          },
+          "restoreOnReplyValues" : {
+            "type" : [ "array", "null" ],
+            "items" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 120,
+              "minLength" : 0,
+              "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
+            },
+            "uniqueItems" : false,
+            "description" : "restoreOnReplyValues schema"
+          }
+        },
+        "required" : [ "apiName", "displayLabel", "i18NLabel", "id", "isCustomField", "isEncryptedField", "isMandatory", "isRemovable", "isSystemMandatory", "maxLength", "name", "type" ]
+      },
+      "createLayoutFieldsJson" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/createLayoutFieldResponse"
+        },
+        "description" : "create Layout Fields J S O N schema"
+      },
+      "createLayoutSectionList" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "name" : {
+              "type" : [ "string", "null" ]
+            },
+            "id" : {
+              "type" : [ "string", "integer", "null" ],
+              "pattern" : "([0-9]+)"
+            },
+            "isCustomSection" : {
+              "type" : [ "boolean", "null" ]
+            },
+            "fields" : {
+              "$ref" : "#/components/schemas/createLayoutFieldsJson"
+            }
+          },
+          "required" : [ "name", "id", "isCustomSection", "fields" ],
+          "description" : "createLayoutSectionListItem schema"
+        },
+        "description" : "create Layout Section List schema"
       }
     },
     "responses" : {
@@ -2251,7 +2916,7 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "object", "null" ],
+              "type" : "object",
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
@@ -2278,7 +2943,7 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "object", "null" ],
+              "type" : "object",
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
@@ -2382,7 +3047,7 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "object", "null" ],
+              "type" : "object",
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
@@ -2583,35 +3248,20 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "oneOf" : [ {
-                "allOf" : [ {
-                  "$ref" : "#/components/schemas/basicLayoutJson"
-                }, {
-                  "type" : [ "object", "null" ],
-                  "properties" : {
-                    "module" : {
-                      "description" : "Module the layout belongs to. Standard values: Cases, Contacts, Accounts, Tasks, Calls, Events, TimeEntry, Contracts, Products. Custom modules are also supported.",
-                      "type" : [ "string", "null" ]
-                    },
-                    "sections" : {
-                      "$ref" : "#/components/schemas/sectionListForLayout"
-                    }
-                  },
-                  "required" : [ "module", "sections" ]
-                } ]
+              "allOf" : [ {
+                "$ref" : "#/components/schemas/basicLayoutJson"
               }, {
-                "allOf" : [ {
-                  "$ref" : "#/components/schemas/cloneLayoutCommonResponse"
-                }, {
-                  "type" : [ "object", "null" ],
-                  "properties" : {
-                    "departmentId" : {
-                      "type" : [ "string", "integer", "null" ],
-                      "pattern" : "([0-9]+)"
-                    }
+                "type" : [ "object", "null" ],
+                "properties" : {
+                  "module" : {
+                    "description" : "Module the layout belongs to. Standard values: Cases, Contacts, Accounts, Tasks, Calls, Events, TimeEntry, Contracts, Products. Custom modules are also supported.",
+                    "type" : [ "string", "null" ]
                   },
-                  "required" : [ "departmentId" ]
-                } ]
+                  "sections" : {
+                    "$ref" : "#/components/schemas/sectionListForLayout"
+                  }
+                },
+                "required" : [ "module", "sections" ]
               } ]
             },
             "examples" : {
@@ -2721,37 +3371,20 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "anyOf" : [ {
-                "type" : "object",
-                "allOf" : [ {
-                  "$ref" : "#/components/schemas/basicLayoutJson"
-                }, {
-                  "type" : [ "object", "null" ],
-                  "properties" : {
-                    "module" : {
-                      "description" : "Module the layout belongs to. Standard values: Cases, Contacts, Accounts, Tasks, Calls, Events, TimeEntry, Contracts, Products. Custom modules are also supported.",
-                      "type" : [ "string", "null" ]
-                    },
-                    "sections" : {
-                      "$ref" : "#/components/schemas/sectionListForLayout"
-                    }
-                  },
-                  "required" : [ "module", "sections" ]
-                } ]
+              "allOf" : [ {
+                "$ref" : "#/components/schemas/basicLayoutJson"
               }, {
-                "type" : "object",
-                "allOf" : [ {
-                  "$ref" : "#/components/schemas/cloneLayoutCommonResponse"
-                }, {
-                  "type" : [ "object", "null" ],
-                  "properties" : {
-                    "departmentId" : {
-                      "type" : [ "string", "integer", "null" ],
-                      "pattern" : "([0-9]+)"
-                    }
+                "type" : [ "object", "null" ],
+                "properties" : {
+                  "module" : {
+                    "description" : "Module the layout belongs to. Standard values: Cases, Contacts, Accounts, Tasks, Calls, Events, TimeEntry, Contracts, Products. Custom modules are also supported.",
+                    "type" : [ "string", "null" ]
                   },
-                  "required" : [ "departmentId" ]
-                } ]
+                  "sections" : {
+                    "$ref" : "#/components/schemas/createLayoutSectionList"
+                  }
+                },
+                "required" : [ "module", "sections" ]
               } ]
             },
             "examples" : {
@@ -2882,7 +3515,7 @@
                     "uniqueItems" : false
                   }
                 },
-                "required" : [ "layoutProfiles" ]
+                "required" : [ ]
               } ]
             },
             "examples" : {
@@ -3424,298 +4057,149 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "anyOf" : [ {
-                "allOf" : [ {
-                  "$ref" : "#/components/schemas/basicLayoutJson"
-                }, {
-                  "type" : [ "object", "null" ],
-                  "properties" : {
-                    "module" : {
-                      "type" : [ "string", "null" ],
-                      "enum" : [ "Cases", "Contacts", "Accounts", "Tasks", "Calls", "Events", "TimeEntry", "Contracts", "Products" ]
-                    },
-                    "sections" : {
-                      "$ref" : "#/components/schemas/sectionListForLayout"
-                    }
-                  },
-                  "required" : [ "module", "sections" ]
-                } ]
+              "allOf" : [ {
+                "$ref" : "#/components/schemas/basicLayoutJson"
               }, {
-                "allOf" : [ {
-                  "$ref" : "#/components/schemas/cloneLayoutCommonResponse"
-                }, {
-                  "type" : [ "object", "null" ],
-                  "properties" : {
-                    "departmentId" : {
-                      "type" : [ "string", "integer", "null" ],
-                      "pattern" : "([0-9]+)"
-                    }
+                "type" : [ "object", "null" ],
+                "properties" : {
+                  "module" : {
+                    "$ref" : "./Field.json#/components/parameters/moduleAPIName/schema"
                   },
-                  "required" : [ "departmentId" ]
-                } ]
+                  "sections" : {
+                    "$ref" : "#/components/schemas/myFormSectionList"
+                  }
+                },
+                "required" : [ "module", "sections" ]
               } ]
             },
             "examples" : {
               "Valid responses Definitions" : {
                 "value" : {
-                  "modifiedTime" : 1499682731000,
-                  "createdBy" : "4000000009118",
-                  "departmentId" : "4000000007175",
-                  "createdTime" : 1498894564000,
-                  "modifiedBy" : "4000000009118",
-                  "id" : "4000000007177",
+                  "modifiedTime" : "2026-01-01T01:00:00.000Z",
+                  "isStandardLayout" : true,
+                  "hasLogo" : false,
+                  "departmentId" : "2800000000006",
+                  "module" : "Cases",
+                  "layoutDisplayName" : "Complaints",
+                  "layoutDesc" : "Complaints",
                   "isDefaultLayout" : true,
                   "sections" : [ {
-                    "name" : "Ticket Information",
+                    "name" : "Case Information",
+                    "i18NLabel" : "Ticket Information",
                     "isCustomSection" : false,
                     "id" : 1,
                     "fields" : [ {
-                      "displayLabel" : "Department",
-                      "apiName" : "departmentId",
-                      "isReadOnly" : false,
-                      "isCustomField" : false,
-                      "isEncryptedField" : false,
-                      "id" : "4000000000353",
-                      "type" : [ "LookUp" ],
-                      "maxLength" : 50,
-                      "isMandatory" : true
-                    }, {
                       "displayLabel" : "Contact Name",
                       "apiName" : "contactId",
-                      "isReadOnly" : false,
                       "isCustomField" : false,
+                      "i18NLabel" : "Contact Name",
+                      "isSystemMandatory" : true,
+                      "type" : "LookUp",
+                      "isReadOnly" : false,
+                      "name" : "contactId",
                       "isEncryptedField" : false,
-                      "id" : "4000000000357",
-                      "type" : [ "LookUp" ],
+                      "id" : "1800000000006",
+                      "isRemovable" : false,
                       "maxLength" : 300,
                       "isMandatory" : true
-                    }, {
-                      "displayLabel" : "Account Name",
-                      "apiName" : "accountId",
-                      "isReadOnly" : false,
-                      "isCustomField" : false,
-                      "isEncryptedField" : false,
-                      "id" : "4000000000355",
-                      "type" : [ "LookUp" ],
-                      "maxLength" : 300,
-                      "isMandatory" : false
-                    }, {
-                      "displayLabel" : "Email",
-                      "apiName" : "email",
-                      "isReadOnly" : false,
-                      "isCustomField" : false,
-                      "isEncryptedField" : false,
-                      "id" : "4000000000359",
-                      "type" : [ "Email" ],
-                      "maxLength" : 120,
-                      "isMandatory" : false
-                    }, {
-                      "displayLabel" : "Phone",
-                      "apiName" : "phone",
-                      "isReadOnly" : false,
-                      "isCustomField" : false,
-                      "isEncryptedField" : false,
-                      "id" : "4000000000361",
-                      "type" : [ "Phone" ],
-                      "maxLength" : 120,
-                      "isMandatory" : false
-                    }, {
-                      "displayLabel" : "Education Type",
-                      "allowedValues" : [ "Education :: University :: Private", "Education :: University :: Public", "Education :: School :: Private", "Education :: School :: Public" ],
-                      "apiName" : "cf_education_type",
-                      "isCustomField" : true,
-                      "defaultValue" : "Education :: University :: Private",
-                      "isNested" : true,
-                      "isSystemMandatory" : false,
-                      "type" : [ "Picklist" ],
-                      "isEncryptedField" : false,
-                      "sortBy" : "userDefined",
-                      "id" : "4000000009999",
-                      "isRemovable" : true,
-                      "maxLength" : 120,
-                      "isMandatory" : false
-                    }, {
-                      "displayLabel" : "Sub Category",
-                      "allowedValues" : [ "Sub General", "Sub Defects" ],
-                      "apiName" : "subCategory",
-                      "isReadOnly" : false,
-                      "isCustomField" : false,
-                      "defaultValue" : "Sub General",
-                      "isNested" : false,
-                      "isEncryptedField" : false,
-                      "id" : "4000000000423",
-                      "type" : [ "Picklist" ],
-                      "maxLength" : 120,
-                      "isMandatory" : false
-                    }, {
-                      "displayLabel" : "Category",
-                      "allowedValues" : [ "General", "Defects", "ManojKumar" ],
-                      "apiName" : "category",
-                      "isCustomField" : false,
-                      "isReadOnly" : false,
-                      "defaultValue" : "General",
-                      "isNested" : false,
-                      "isEncryptedField" : false,
-                      "id" : "4000000000421",
-                      "type" : [ "Picklist" ],
-                      "maxLength" : 120,
-                      "isMandatory" : false
                     }, {
                       "displayLabel" : "Subject",
                       "apiName" : "subject",
-                      "isReadOnly" : false,
                       "isCustomField" : false,
+                      "i18NLabel" : "Subject",
+                      "isSystemMandatory" : true,
+                      "type" : "Text",
+                      "isReadOnly" : false,
+                      "name" : "subject",
                       "isEncryptedField" : false,
-                      "id" : "4000000000363",
-                      "type" : [ "Text" ],
+                      "isPHI" : false,
+                      "id" : "1800000000007",
+                      "isRemovable" : false,
                       "maxLength" : 255,
                       "isMandatory" : true
                     }, {
-                      "displayLabel" : "Description",
-                      "apiName" : "description",
-                      "isReadOnly" : false,
-                      "isCustomField" : false,
-                      "isEncryptedField" : false,
-                      "id" : "4000000000365",
-                      "type" : [ "Textarea" ],
-                      "maxLength" : 1000000,
-                      "isMandatory" : false
-                    }, {
                       "displayLabel" : "Status",
-                      "allowedValues" : [ "Open", "Open_july", "Open_newDept", "On Hold", "Escalated", "Closed1", "Closed", "newDeptClosed", "julyDeptClosed", "julyDeptClosed1" ],
                       "apiName" : "status",
                       "isCustomField" : false,
                       "defaultValue" : "Open",
                       "isNested" : false,
-                      "type" : [ "Picklist" ],
+                      "i18NLabel" : "Status",
+                      "isSystemMandatory" : true,
+                      "type" : "Picklist",
+                      "pickListValues" : [ {
+                        "value" : "Open"
+                      }, {
+                        "value" : "On Hold"
+                      }, {
+                        "value" : "Closed"
+                      } ],
                       "isReadOnly" : false,
-                      "restoreOnReplyValues" : [ "Open_july", "newDeptClosed", "Open_newDept", "Escalated", "On Hold", "Closed", "Closed1", "julyDeptClosed", "julyDeptClosed1", "Open" ],
+                      "restoreOnReplyValues" : [ "Open", "On Hold", "Closed" ],
+                      "name" : "status",
                       "isEncryptedField" : false,
-                      "id" : "4000000000367",
+                      "sortBy" : "userDefined",
+                      "subType" : "Plain",
+                      "id" : "1800000000008",
+                      "isRemovable" : false,
                       "maxLength" : 120,
                       "isMandatory" : true
                     }, {
-                      "displayLabel" : "Case Owner",
-                      "apiName" : "assigneeId",
-                      "isReadOnly" : false,
-                      "isCustomField" : false,
+                      "displayLabel" : "Name and Email",
+                      "apiName" : "cf_name_and_email",
+                      "isCustomField" : true,
+                      "expression" : "fn.Concat(${name}, ' ', ${email})",
+                      "i18NLabel" : "Name and Email",
+                      "isSystemMandatory" : false,
+                      "type" : "Formula",
+                      "isReadOnly" : true,
+                      "name" : "name_and_email",
                       "isEncryptedField" : false,
-                      "id" : "4000000000371",
-                      "type" : [ "LookUp" ],
-                      "maxLength" : 120,
-                      "isMandatory" : false
-                    }, {
-                      "displayLabel" : "Product Name",
-                      "apiName" : "productId",
-                      "isReadOnly" : false,
-                      "isCustomField" : false,
-                      "isEncryptedField" : false,
-                      "id" : "4000000000369",
-                      "type" : [ "LookUp" ],
-                      "maxLength" : 120,
+                      "id" : "1800000000009",
+                      "isRemovable" : true,
+                      "maxLength" : 250,
+                      "returnType" : "STRING",
                       "isMandatory" : false
                     } ]
                   }, {
                     "name" : "Additional Information",
+                    "i18NLabel" : "Additional Information",
                     "isCustomSection" : false,
                     "id" : 2,
                     "fields" : [ {
-                      "displayLabel" : "Due Date",
-                      "apiName" : "dueDate",
-                      "isReadOnly" : false,
-                      "isCustomField" : false,
-                      "isEncryptedField" : false,
-                      "id" : "4000000000405",
-                      "type" : [ "DateTime" ],
-                      "maxLength" : 300,
-                      "isMandatory" : false
-                    }, {
                       "displayLabel" : "Priority",
-                      "allowedValues" : [ "-None-", "High", "Medium", "Low" ],
                       "apiName" : "priority",
-                      "isReadOnly" : false,
                       "isCustomField" : false,
                       "defaultValue" : "-None-",
                       "isNested" : false,
-                      "isEncryptedField" : false,
-                      "id" : "4000000000407",
-                      "type" : [ "Picklist" ],
-                      "maxLength" : 120,
-                      "isMandatory" : false
-                    }, {
-                      "displayLabel" : "Mode",
-                      "allowedValues" : [ "Phone", "Email", "Web", "Twitter", "Facebook", "Chat", "Forums", "Feedback Widget" ],
-                      "apiName" : "channel",
-                      "isReadOnly" : false,
-                      "isCustomField" : false,
-                      "defaultValue" : "Phone",
-                      "isNested" : false,
-                      "isEncryptedField" : false,
-                      "id" : "4000000000409",
-                      "type" : [ "Picklist" ],
-                      "maxLength" : 120,
-                      "isMandatory" : false
-                    }, {
-                      "displayLabel" : "Is Overdue",
-                      "apiName" : "Is Overdue",
-                      "isReadOnly" : false,
-                      "isCustomField" : false,
-                      "defaultValue" : "true",
-                      "isEncryptedField" : false,
-                      "id" : "4000000000411",
-                      "type" : [ "Boolean" ],
-                      "maxLength" : 50,
-                      "isMandatory" : false
-                    }, {
-                      "displayLabel" : "Is Escalated",
-                      "apiName" : "Is Escalated",
-                      "isReadOnly" : false,
-                      "isCustomField" : false,
-                      "defaultValue" : "true",
-                      "isEncryptedField" : false,
-                      "id" : "4000000000413",
-                      "type" : [ "Boolean" ],
-                      "maxLength" : 50,
-                      "isMandatory" : false
-                    }, {
-                      "displayLabel" : "Classification",
-                      "allowedValues" : [ "-None-", "Question", "Problem", "Feature", "Others" ],
-                      "apiName" : "classification",
-                      "isReadOnly" : false,
-                      "isCustomField" : false,
-                      "defaultValue" : "-None-",
-                      "isNested" : false,
-                      "isEncryptedField" : false,
-                      "id" : "4000000000415",
-                      "type" : [ "Picklist" ],
-                      "maxLength" : 120,
-                      "isMandatory" : false
-                    }, {
-                      "displayLabel" : "Resolution",
-                      "apiName" : "resolution",
-                      "isReadOnly" : false,
-                      "isCustomField" : false,
-                      "isEncryptedField" : false,
-                      "id" : "4000000000417",
-                      "type" : [ "Textarea" ],
-                      "maxLength" : 1000000,
-                      "isMandatory" : false
-                    }, {
-                      "displayLabel" : "Sample TextArea",
-                      "apiName" : "cf_sample_textarea",
-                      "isCustomField" : true,
-                      "toolTipType" : "placeHolder",
-                      "isEncryptedField" : false,
-                      "toolTip" : "Sample Field",
-                      "id" : "4000000000447",
+                      "i18NLabel" : "Priority",
                       "isSystemMandatory" : false,
+                      "type" : "Picklist",
+                      "pickListValues" : [ {
+                        "value" : "-None-"
+                      }, {
+                        "value" : "High"
+                      }, {
+                        "value" : "Low"
+                      } ],
+                      "isReadOnly" : false,
+                      "name" : "priority",
+                      "isEncryptedField" : false,
+                      "sortBy" : "userDefined",
+                      "subType" : "Plain",
+                      "id" : "1800000000010",
                       "isRemovable" : false,
-                      "type" : [ "Textarea" ],
-                      "maxLength" : 1000000,
+                      "maxLength" : 120,
                       "isMandatory" : false
                     } ]
                   } ],
-                  "layoutName" : "Default Ticket Layout"
+                  "layoutName" : "Complaints",
+                  "skipDeptAccessValidation" : true,
+                  "photoURL" : null,
+                  "createdBy" : "3800000000010",
+                  "createdTime" : "2026-01-01T01:00:00.000Z",
+                  "modifiedBy" : "3800000000010",
+                  "id" : "4800000000010",
+                  "status" : "active"
                 }
               }
             }
@@ -3739,7 +4223,7 @@
                       "type" : [ "string", "null" ]
                     },
                     "sections" : {
-                      "$ref" : "#/components/schemas/sectionListForLayout"
+                      "$ref" : "#/components/schemas/createLayoutSectionList"
                     }
                   },
                   "required" : [ "module", "sections" ]
@@ -4060,7 +4544,7 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "object", "null" ],
+              "type" : "object",
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
@@ -4158,6 +4642,37 @@
             }
           }
         }
+      },
+      "cloneFieldsToOtherLayoutsJson" : {
+        "description" : "cloneFieldsToOtherLayouts template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "type" : [ "array", "null" ],
+                  "items" : {
+                    "$ref" : "./CommonMassActionResponse.json#/components/schemas/massActionResponse"
+                  }
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "data" : [ {
+                    "id" : "98000000027738",
+                    "success" : true,
+                    "errors" : null
+                  } ]
+                }
+              }
+            }
+          }
+        }
       }
     },
     "requestBodies" : {
@@ -4176,7 +4691,8 @@
                   "type" : [ "string" ],
                   "description" : "Display name of the cloned layout",
                   "maxLength" : 150,
-                  "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+"
+                  "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+",
+                  "x-unique" : true
                 },
                 "departmentId" : {
                   "type" : [ "integer" ],
@@ -4196,10 +4712,11 @@
                   "type" : [ "string" ],
                   "description" : "Name of the cloned layout",
                   "maxLength" : 150,
-                  "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+"
+                  "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+",
+                  "x-unique" : true
                 }
               },
-              "required" : [ "isDefaultLayout", "layoutDisplayName", "layoutName", "skipDeptAccessValidation" ]
+              "required" : [ "isDefaultLayout", "layoutDisplayName", "layoutName", "skipDeptAccessValidation", "layoutDesc" ]
             },
             "examples" : {
               "Valid requestBody Definitions" : {
@@ -4237,7 +4754,8 @@
                   "description" : "Display Name of the layout in HelpCenter",
                   "maxLength" : 150,
                   "minLength" : 0,
-                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+                  "x-unique" : true
                 },
                 "module" : {
                   "type" : [ "string" ],
@@ -4255,7 +4773,8 @@
                   "description" : "Name of the layout",
                   "maxLength" : 150,
                   "minLength" : 0,
-                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+                  "x-unique" : true
                 },
                 "layoutDesc" : {
                   "type" : [ "string" ],
@@ -4387,6 +4906,7 @@
             "schema" : {
               "type" : [ "object" ],
               "additionalProperties" : false,
+              "minProperties" : 1,
               "properties" : {
                 "skipDeptAccessValidation" : {
                   "type" : [ "boolean" ],
@@ -4545,7 +5065,8 @@
           }
         }
       },
-      "replaceValueRequestJson" : {
+      "replacePickListValueRequest" : {
+        "required" : true,
         "content" : {
           "application/json" : {
             "schema" : {
@@ -4554,16 +5075,19 @@
               "properties" : {
                 "newValue" : {
                   "type" : [ "string" ],
+                  "description" : "New picklist value to apply.",
                   "maxLength" : 100,
                   "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
                 },
                 "oldValue" : {
                   "type" : [ "string" ],
+                  "description" : "Existing picklist value to replace.",
                   "maxLength" : 100,
                   "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
                 },
                 "fieldId" : {
                   "type" : [ "string", "integer" ],
+                  "description" : "Unique ID of the picklist field.",
                   "pattern" : "([0-9]+)"
                 }
               },
@@ -4572,9 +5096,9 @@
             "examples" : {
               "Valid requestBody Definitions" : {
                 "value" : {
-                  "newValue" : "Sub Defects1235",
-                  "oldValue" : "Sub Defects",
-                  "fieldId" : "4000000000423"
+                  "newValue" : "General Inquiry",
+                  "oldValue" : "General",
+                  "fieldId" : "1000000000001"
                 }
               }
             }
@@ -4586,6 +5110,7 @@
           "application/json" : {
             "schema" : {
               "type" : [ "object" ],
+              "minProperties" : 1,
               "additionalProperties" : false,
               "properties" : {
                 "allowedValues" : {
@@ -4615,9 +5140,213 @@
                   "description" : "Whether the field is mandatory in the layout.",
                   "type" : [ "boolean" ]
                 },
+                "expression" : {
+                  "description" : "Formula expression configured for the field.",
+                  "type" : [ "string" ],
+                  "maxLength" : 1500
+                },
+                "pickListValues" : {
+                  "description" : "Pick list values configured for the field.",
+                  "type" : [ "array" ],
+                  "items" : {
+                    "type" : [ "object" ],
+                    "properties" : {
+                      "value" : {
+                        "type" : [ "string" ],
+                        "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+",
+                        "x-regex-name" : "picklistValue",
+                        "maxLength" : 120
+                      },
+                      "colorCode" : {
+                        "type" : [ "string" ],
+                        "pattern" : "^#?(([a-fA-F0-9]){3}){1,2}$",
+                        "x-regex-name" : "colorCode",
+                        "maxLength" : 30
+                      }
+                    },
+                    "required" : [ "value" ]
+                  },
+                  "minItems" : 1,
+                  "maxItems" : 20000
+                },
+                "lookup" : {
+                  "description" : "Lookup configuration for the field.",
+                  "type" : [ "object" ],
+                  "properties" : {
+                    "sortField" : {
+                      "type" : [ "string" ],
+                      "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+                    },
+                    "searchFields" : {
+                      "type" : [ "array" ],
+                      "items" : {
+                        "type" : [ "string" ],
+                        "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+",
+                        "maxLength" : 120
+                      },
+                      "maxLength" : 300,
+                      "minItems" : 1,
+                      "maxItems" : 6,
+                      "x-template" : "cleartextArray"
+                    },
+                    "selectFields" : {
+                      "type" : [ "array" ],
+                      "items" : {
+                        "type" : [ "string" ],
+                        "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+",
+                        "maxLength" : 120
+                      },
+                      "maxLength" : 300,
+                      "minItems" : 1,
+                      "maxItems" : 6,
+                      "x-template" : "cleartextArray"
+                    },
+                    "preFillFields" : {
+                      "type" : [ "array" ],
+                      "items" : {
+                        "type" : [ "object" ],
+                        "properties" : {
+                          "currentModuleField" : {
+                            "type" : [ "string" ],
+                            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+                          },
+                          "parentModuleField" : {
+                            "type" : [ "string" ],
+                            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+                          }
+                        }
+                      },
+                      "minItems" : 0,
+                      "maxItems" : 5,
+                      "x-template" : "lookupPreFillFieldsJSON"
+                    },
+                    "filter" : {
+                      "type" : [ "object" ],
+                      "properties" : {
+                        "filterDisplayPreference" : {
+                          "type" : [ "string" ],
+                          "enum" : [ "ALL", "FILTER", "ALL_AND_FILTER" ]
+                        },
+                        "filterName" : {
+                          "type" : [ "string" ],
+                          "maxLength" : 255
+                        },
+                        "messageIfLookupDataEmpty" : {
+                          "type" : [ "string" ],
+                          "maxLength" : 255
+                        },
+                        "criteriaPattern" : {
+                          "type" : [ "string" ],
+                          "pattern" : "[andor()0-9\\s]*",
+                          "x-regex-name" : "criPattern",
+                          "maxLength" : 500
+                        },
+                        "criteriaFields" : {
+                          "type" : [ "array" ],
+                          "items" : {
+                            "type" : [ "object" ],
+                            "properties" : {
+                              "field" : {
+                                "type" : [ "object" ],
+                                "properties" : {
+                                  "module" : {
+                                    "type" : [ "string" ],
+                                    "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+                                  },
+                                  "apiName" : {
+                                    "type" : [ "string" ],
+                                    "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+",
+                                    "maxLength" : 300
+                                  },
+                                  "fieldLabel" : {
+                                    "type" : [ "string" ],
+                                    "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+",
+                                    "maxLength" : 300,
+                                    "maxItems" : 1
+                                  },
+                                  "path" : {
+                                    "type" : [ "string" ],
+                                    "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+",
+                                    "maxLength" : 600,
+                                    "maxItems" : 1
+                                  }
+                                },
+                                "maxLength" : 40000,
+                                "x-template" : "criteriaField"
+                              },
+                              "condition" : {
+                                "type" : [ "string" ],
+                                "maxLength" : 50
+                              },
+                              "value" : {
+                                "type" : [ "object" ],
+                                "properties" : {
+                                  "type" : {
+                                    "type" : [ "string" ],
+                                    "enum" : [ "primitive", "field" ]
+                                  },
+                                  "primitive" : {
+                                    "type" : [ "array" ],
+                                    "items" : {
+                                      "type" : [ "string" ],
+                                      "maxLength" : 10000
+                                    },
+                                    "minItems" : 0,
+                                    "maxItems" : 50,
+                                    "x-template" : "primitiveRHS"
+                                  },
+                                  "field" : {
+                                    "type" : [ "object" ],
+                                    "x-template" : "criteriaField"
+                                  }
+                                },
+                                "maxLength" : 20000,
+                                "x-template" : "criteriaRHS"
+                              },
+                              "secondaryCondition" : {
+                                "type" : [ "string" ],
+                                "pattern" : "[<>]=?|==|!="
+                              },
+                              "unit" : {
+                                "type" : [ "string" ],
+                                "enum" : [ "MINUTES", "HOURS", "DAYS" ]
+                              }
+                            }
+                          },
+                          "minItems" : 0,
+                          "maxItems" : 5,
+                          "x-template" : "newCriteriaFields"
+                        }
+                      },
+                      "required" : [ "filterDisplayPreference" ],
+                      "x-template" : "lookupFieldFilterJSON"
+                    }
+                  },
+                  "required" : [ "sortField", "searchFields", "selectFields", "filter" ]
+                },
                 "isNested" : {
                   "description" : "Whether the field is a nested pick list field.",
                   "type" : [ "boolean" ]
+                },
+                "department" : {
+                  "description" : "Department-level configuration for the field.",
+                  "type" : [ "object" ],
+                  "properties" : {
+                    "id" : {
+                      "type" : [ "string", "integer" ],
+                      "pattern" : "([0-9]+)"
+                    },
+                    "name" : {
+                      "type" : [ "string" ],
+                      "pattern" : "(^([a-zA-Z0-9\\s\\.\\?\\_\\-\\,\\@\\:/+\\(\\)])*$|null|undefined)",
+                      "x-regex-name" : "String_null"
+                    }
+                  }
+                },
+                "scope" : {
+                  "description" : "Scope of the field. Accepted values: Organization, Department",
+                  "type" : [ "string" ],
+                  "enum" : [ "Organization", "Department" ]
                 }
               }
             },
@@ -4636,7 +5365,6 @@
         }
       },
       "layoutTransferJson" : {
-        "required" : true,
         "content" : {
           "application/json" : {
             "schema" : {
@@ -4663,7 +5391,11 @@
       },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "Layout"
 }

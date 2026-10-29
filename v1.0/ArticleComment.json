@@ -11,6 +11,7 @@
         "summary" : "Get Article Translation Comments",
         "description" : "Retrieves a list of comments on an article translation, with pagination support.",
         "operationId" : "getArticleTranslationComments",
+        "x-mcp-group" : [ "KB Admin", "Manage KB Moderation", "View KB Moderation", "Manage KB Recyclebin", "View KB Recyclebin", "Manage KB Articles", "View KB Articles", "View KB" ],
         "parameters" : [ {
           "name" : "articleId",
           "description" : "Unique ID of the article containing the comment",
@@ -103,6 +104,7 @@
         "summary" : "Create Article Translation Comment",
         "description" : "Adds a comment to a specific article translation.",
         "operationId" : "createArticleTranslationComment",
+        "x-mcp-group" : [ "KB Admin", "Manage KB Moderation", "Manage KB Articles" ],
         "parameters" : [ {
           "name" : "articleId",
           "description" : "Unique ID of the article containing the comment",
@@ -148,6 +150,7 @@
         "summary" : "Approve Article Translation Comments",
         "description" : "Approves the specified article translation comments.",
         "operationId" : "approveArticleTranslationComments",
+        "x-mcp-group" : [ "KnowledgeBase_Publishing", "KB Admin", "Manage KB Moderation" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -174,6 +177,7 @@
         "summary" : "Move KB Comments to Recycle Bin",
         "description" : "Moves the specified KB article translation comments to the Recycle Bin.",
         "operationId" : "moveKBCommentsToRecycleBin",
+        "x-mcp-group" : [ "KB Admin", "Manage KB Moderation", "Manage KB Recyclebin" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -200,6 +204,7 @@
         "summary" : "Get Moderated KB Comments",
         "description" : "Retrieves all available moderated comments from the knowledge base, with pagination support.",
         "operationId" : "getModeratedKBComments",
+        "x-mcp-group" : [ "KB Admin", "Manage KB Moderation", "View KB Moderation", "View KB" ],
         "parameters" : [ {
           "name" : "locale",
           "in" : "query",
@@ -286,6 +291,7 @@
         "summary" : "Get Moderated KB Comment Count",
         "description" : "Retrieves the total count of moderated comments from the knowledge base.",
         "operationId" : "getModeratedKBCommentsCount",
+        "x-mcp-group" : [ "KB Admin", "KB Dashboard", "Manage KB Moderation", "View KB Moderation", "View KB" ],
         "parameters" : [ {
           "name" : "locale",
           "in" : "query",
@@ -339,6 +345,7 @@
         "summary" : "Convert Article Translation Comment to Ticket",
         "description" : "Converts an article translation comment to a ticket and assigns it to the department configured for the root category.",
         "operationId" : "convertArticleTranslationCommentToTicket",
+        "x-mcp-group" : [ "KB Admin", "Manage KB Moderation", "Manage KB Articles" ],
         "parameters" : [ {
           "description" : "Unique ID of the article containing the comment",
           "$ref" : "#/components/parameters/articleId"
@@ -370,6 +377,7 @@
         "summary" : "Get Article Translation Comment",
         "description" : "Retrieves a specific comment on an article translation.",
         "operationId" : "getArticleTranslationComment",
+        "x-mcp-group" : [ "KB Admin", "Manage KB Moderation", "View KB Moderation", "Manage KB Recyclebin", "View KB Recyclebin", "Manage KB Articles", "View KB Articles", "View KB" ],
         "parameters" : [ {
           "name" : "articleId",
           "description" : "Unique ID of the article containing the comment",
@@ -417,6 +425,7 @@
         "summary" : "Delete Article Translation Comment",
         "description" : "Deletes a specific comment on an article translation.",
         "operationId" : "deleteArticleTranslationComment",
+        "x-mcp-group" : [ "KB Admin", "Manage KB Moderation", "Manage KB Recyclebin", "Manage KB Articles" ],
         "parameters" : [ {
           "name" : "articleId",
           "description" : "Unique ID of the article containing the comment",
@@ -464,6 +473,7 @@
         "summary" : "Update Article Translation Comment",
         "description" : "Updates an existing comment on an article translation.",
         "operationId" : "updateArticleTranslationComment",
+        "x-mcp-group" : [ "KB Admin", "Manage KB Moderation", "Manage KB Articles" ],
         "parameters" : [ {
           "name" : "articleId",
           "description" : "Unique ID of the article containing the comment",
@@ -1105,6 +1115,42 @@
           }
         }
       },
+      "commentListLiteResponse" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "status" : {
+            "description" : "Status of the comment. Possible values:PUBLISHED, AWAITING_APPROVAL",
+            "type" : [ "string", "null" ],
+            "enum" : [ "PUBLISHED", "AWAITINGAPPROVAL" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "ticketId" : {
+            "description" : "Unique ID of the ticket associated with the comment",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "id" : {
+            "description" : "Unique ID of the comment",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "isPublic" : {
+            "description" : "Indicates whether the comment is a public comment. Possible values: • true = public comment  • false = private comment",
+            "type" : [ "boolean", "null" ]
+          },
+          "ticket" : {
+            "$ref" : "#/components/schemas/ticketMetaResponse"
+          },
+          "isTrashed" : {
+            "description" : "Indicates whether the ticket is in the Recycle Bin",
+            "type" : [ "boolean", "null" ]
+          }
+        }
+      },
       "commentListResponse" : {
         "type" : [ "object", "null" ],
         "additionalProperties" : false,
@@ -1201,6 +1247,12 @@
           "$ref" : "#/components/schemas/commentListResponse"
         }
       },
+      "commentListLiteResponseArray" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/commentListLiteResponse"
+        }
+      },
       "localeSchema" : {
         "type" : [ "string", "null" ],
         "enum" : [ "en", "ja", "zh", "es", "de", "fr", "tr", "ru", "pt", "it", "nl", "da", "sv", "pl", "ar", "he", "af", "cs", "fr-ca", "bg", "fi", "el", "hu", "id", "nb", "ro", "th", "uk", "vi", "ur", "hi", "te", "kn", "ta", "mr", "ko", "fa", "bn", "gu", "ms", "ml", "en-gb", "sk", "hr", "sl", "zh_TW", "zh-tw", "ca", "ka", "kk", "my", "km", "pt-br" ],
@@ -1280,7 +1332,7 @@
                 "value" : {
                   "modifiedTime" : 1652101829000,
                   "attachments" : [ {
-                    "previewurl" : "https://desk.example.com/api/v1/articles/46582000006958052/translations/en/attachments/nmhny14ce774984eb4b15891e1cbe274e612c/content?orgId=1234567890",
+                    "previewurl" : "https://desk.zoho.com/api/v1/articles/46582000006958052/translations/en/attachments/nmhny14ce774984eb4b15891e1cbe274e612c/content?orgId=57044830",
                     "size" : "35594",
                     "name" : "Zoho desk introduction.jpg",
                     "id" : "4658200041001",
@@ -1289,7 +1341,7 @@
                   "tickets" : {
                     "ticketNumber" : "115",
                     "isTrashed" : "false",
-                    "webUrl" : "https://desk.example.com/agent/zylker/desk/tickets/details/5000000114001",
+                    "webUrl" : "https://desk.zoho.com/agent/zohocorp/desk/tickets/details/5000000114001",
                     "id" : "5000000114001"
                   },
                   "hashtags" : [ {
@@ -1300,13 +1352,13 @@
                   } ],
                   "commentedTime" : 1652072940000,
                   "commenterName" : "Jack",
-                  "content" : "<div>Changed Sample content zsu[@user:1234567890]zsu&nbsp; zsh[#sample_header:Introduction]zsh&nbsp;</div>",
+                  "content" : "<div>Changed Sample content zsu[@user:695624]zsu&nbsp; zsh[#sample_header:Introduction]zsh&nbsp;</div>",
                   "commenterId" : "4658200004039",
                   "commenter" : {
                     "firstName" : "",
                     "lastName" : "Jack",
-                    "photoURL" : "https://desk.example.com/api/v1/agents/4658200004039/photo?orgId=1234567890",
-                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#setup/users-control/agents/1000000000351",
+                    "photoURL" : "https://desk.zoho.com/api/v1/agents/4658200004039/photo?orgId=292828",
+                    "webUrl" : "https://desk.zoho.com/support/arunice/ShowHomePage.do#setup/users-control/agents/1000000000351",
                     "roleName" : "CEO",
                     "name" : "Jack",
                     "id" : "4658200004039",
@@ -1318,10 +1370,10 @@
                       },
                       "name" : "MVP",
                       "id" : "5000000081007",
-                      "logoUrl" : "https://desk.example.com/portal/api/publicImages/35531135311?portalId=3153815r1fnf113131rf31n9"
+                      "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/35531135311?portalId=3153815r1fnf113131rf31n9"
                     },
                     "type" : [ "AGENT" ],
-                    "email" : "jack@zylker.com",
+                    "email" : "Jack@gmail.com",
                     "kbRole" : "REVIEWER"
                   },
                   "mentions" : {
@@ -1330,15 +1382,15 @@
                       "name" : "MVP",
                       "length" : "28",
                       "id" : "5000000113025",
-                      "logoUrl" : "https://desk.example.com/portal/api/publicImages/4658200004039?portalId=292828341431fq"
+                      "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/4658200004039?portalId=292828341431fq"
                     } ],
                     "users" : [ {
                       "firstName" : "",
-                      "lastName" : "Christopher",
-                      "photoURL" : "https://desk.example.com/api/v1/agents/4658200044017/photo?orgId=1234567890",
-                      "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#setup/users-control/agents/5000000000347",
+                      "lastName" : "Cristiano",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4658200044017/photo?orgId=292828",
+                      "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#setup/users-control/agents/5000000000347",
                       "length" : "28",
-                      "name" : "Christopher",
+                      "name" : "Cristiano",
                       "id" : "4658200044017",
                       "label" : {
                         "preferences" : {
@@ -1348,19 +1400,19 @@
                         },
                         "name" : "Prime user",
                         "id" : "5000000081001",
-                        "logoUrl" : "https://desk.example.com/portal/api/publicImages/35531135311?portalId=3153815r1fnf113131rf31n8"
+                        "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/35531135311?portalId=3153815r1fnf113131rf31n8"
                       },
                       "type" : [ "AGENT" ],
-                      "email" : "christopher@zylker.com",
-                      "zuid" : "1234567890",
+                      "email" : "Cristiano@gmail.com",
+                      "zuid" : "695624",
                       "kbRole" : "REVIEWER"
                     }, {
                       "firstName" : "",
-                      "lastName" : "Christopher",
-                      "photoURL" : "https://desk.example.com/api/v1/agents/4658200044017/photo?orgId=1234567890",
-                      "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#setup/users-control/agents/5000000000347",
+                      "lastName" : "Cristiano",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4658200044017/photo?orgId=292828",
+                      "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#setup/users-control/agents/5000000000347",
                       "length" : "28",
-                      "name" : "Christopher",
+                      "name" : "Cristiano",
                       "id" : "4658200044017",
                       "label" : {
                         "preferences" : {
@@ -1370,11 +1422,11 @@
                         },
                         "name" : "Prime user",
                         "id" : "5000000081001",
-                        "logoUrl" : "https://desk.example.com/portal/api/publicImages/35531135311?portalId=3153815r1fnf113131rf31n8"
+                        "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/35531135311?portalId=3153815r1fnf113131rf31n8"
                       },
                       "type" : "AGENT",
-                      "email" : "christopher@zylker.com",
-                      "zuid" : "1234567890",
+                      "email" : "Cristiano@gmail.com",
+                      "zuid" : "695624",
                       "kbRole" : "REVIEWER"
                     } ]
                   },
@@ -1428,7 +1480,7 @@
                 "value" : {
                   "ticketNumber" : "115",
                   "isTrashed" : "false",
-                  "webUrl" : "https://desk.example.com/agent/zylker/desk/tickets/details/5000000114001",
+                  "webUrl" : "https://desk.zoho.com/agent/zohocorp/desk/tickets/details/5000000114001",
                   "id" : "5000000114001"
                 }
               }
@@ -1484,41 +1536,41 @@
                     "kbRole" : null,
                     "id" : "2000000101060",
                     "firstName" : "",
-                    "lastName" : "Christopher",
-                    "email" : "christopher@zylker.com",
+                    "lastName" : "christiano",
+                    "email" : "christiano@gmail.com",
                     "photoURL" : null,
                     "roleName" : "PortalUser",
-                    "webUrl" : "https://test.portal.com/support/zylker/ShowHomePage.do#Contacts/dv/2000000101022",
-                    "name" : "Christopher",
+                    "webUrl" : "https://test.portal.com/support/mac1/ShowHomePage.do#Contacts/dv/2000000101022",
+                    "name" : "christiano",
                     "label" : null,
                     "type" : [ "END_USER" ]
                   },
                   "mentions" : {
                     "users" : [ {
-                      "name" : "Christopher",
+                      "name" : "christiano",
                       "id" : "2000000101060",
-                      "webUrl" : "https://test.portal.com/support/zylker/ShowHomePage.do#Contacts/dv/2000000101022",
+                      "webUrl" : "https://test.portal.com/support/mac1/ShowHomePage.do#Contacts/dv/2000000101022",
                       "offSet" : "175",
                       "length" : "27",
                       "photoURL" : null,
                       "firstName" : "",
-                      "lastName" : "Christopher",
-                      "zuid" : "1234567890",
-                      "email" : "christopher@zylker.com",
+                      "lastName" : "christiano",
+                      "zuid" : "1029068935",
+                      "email" : "christiano@gmail.com",
                       "kbRole" : null,
                       "type" : [ "END_USER" ],
                       "label" : null
                     }, {
-                      "name" : "Christopher",
+                      "name" : "christiano",
                       "id" : "2000000101060",
-                      "webUrl" : "https://test.portal.com/support/zylker/ShowHomePage.do#Contacts/dv/2000000101022",
+                      "webUrl" : "https://test.portal.com/support/mac1/ShowHomePage.do#Contacts/dv/2000000101022",
                       "offSet" : "175",
                       "length" : "27",
                       "photoURL" : null,
                       "firstName" : "",
-                      "lastName" : "Christopher",
-                      "zuid" : "1234567890",
-                      "email" : "christopher@zylker.com",
+                      "lastName" : "christiano",
+                      "zuid" : "1029068935",
+                      "email" : "christiano@gmail.com",
                       "kbRole" : null,
                       "type" : "END_USER",
                       "label" : null
@@ -1657,7 +1709,7 @@
                   "data" : [ {
                     "modifiedTime" : 1652101829000,
                     "attachments" : [ {
-                      "previewurl" : "https://desk.example.com/api/v1/articles/46582000006958052/translations/en/attachments/nmhny14ce774984eb4b15891e1cbe274e612c/content?orgId=1234567890",
+                      "previewurl" : "https://desk.zoho.com/api/v1/articles/46582000006958052/translations/en/attachments/nmhny14ce774984eb4b15891e1cbe274e612c/content?orgId=57044830",
                       "size" : "35594",
                       "name" : "Zoho desk introduction.jpg",
                       "id" : "4658200041001",
@@ -1666,7 +1718,7 @@
                     "tickets" : {
                       "ticketNumber" : "115",
                       "isTrashed" : "false",
-                      "webUrl" : "https://desk.example.com/agent/zylker/desk/tickets/details/5000000114001",
+                      "webUrl" : "https://desk.zoho.com/agent/zohocorp/desk/tickets/details/5000000114001",
                       "id" : "5000000114001"
                     },
                     "hashtags" : [ {
@@ -1677,13 +1729,13 @@
                     } ],
                     "commentedTime" : 1652072940000,
                     "commenterName" : "Jack",
-                    "content" : "<div>Changed Sample content zsu[@user:1234567890]zsu&nbsp; zsh[#sample_header:Introduction]zsh&nbsp;</div>",
+                    "content" : "<div>Changed Sample content zsu[@user:695624]zsu&nbsp; zsh[#sample_header:Introduction]zsh&nbsp;</div>",
                     "commenterId" : "4658200004039",
                     "commenter" : {
                       "firstName" : "",
                       "lastName" : "Jack",
-                      "photoURL" : "https://desk.example.com/api/v1/agents/4658200004039/photo?orgId=1234567890",
-                      "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#setup/users-control/agents/1000000000351",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4658200004039/photo?orgId=292828",
+                      "webUrl" : "https://desk.zoho.com/support/arunice/ShowHomePage.do#setup/users-control/agents/1000000000351",
                       "roleName" : "CEO",
                       "name" : "Jack",
                       "id" : "4658200004039",
@@ -1695,10 +1747,10 @@
                         },
                         "name" : "MVP",
                         "id" : "5000000081007",
-                        "logoUrl" : "https://desk.example.com/portal/api/publicImages/35531135311?portalId=3153815r1fnf113131rf31n9"
+                        "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/35531135311?portalId=3153815r1fnf113131rf31n9"
                       },
                       "type" : [ "AGENT" ],
-                      "email" : "jack@zylker.com",
+                      "email" : "Jack@gmail.com",
                       "kbRole" : "REVIEWER"
                     },
                     "mentions" : {
@@ -1707,15 +1759,15 @@
                         "name" : "MVP",
                         "length" : "28",
                         "id" : "5000000113025",
-                        "logoUrl" : "https://desk.example.com/portal/api/publicImages/4658200004039?portalId=292828341431fq"
+                        "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/4658200004039?portalId=292828341431fq"
                       } ],
                       "users" : [ {
                         "firstName" : "",
-                        "lastName" : "Christopher",
-                        "photoURL" : "https://desk.example.com/api/v1/agents/4658200044017/photo?orgId=1234567890",
-                        "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#setup/users-control/agents/5000000000347",
+                        "lastName" : "Cristiano",
+                        "photoURL" : "https://desk.zoho.com/api/v1/agents/4658200044017/photo?orgId=292828",
+                        "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#setup/users-control/agents/5000000000347",
                         "length" : "28",
-                        "name" : "Christopher",
+                        "name" : "Cristiano",
                         "id" : "4658200044017",
                         "label" : {
                           "preferences" : {
@@ -1725,11 +1777,11 @@
                           },
                           "name" : "Prime user",
                           "id" : "5000000081001",
-                          "logoUrl" : "https://desk.example.com/portal/api/publicImages/35531135311?portalId=3153815r1fnf113131rf31n8"
+                          "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/35531135311?portalId=3153815r1fnf113131rf31n8"
                         },
                         "type" : [ "AGENT" ],
-                        "email" : "christopher@zylker.com",
-                        "zuid" : "1234567890",
+                        "email" : "Cristiano@gmail.com",
+                        "zuid" : "695624",
                         "kbRole" : "REVIEWER"
                       } ]
                     },
@@ -1741,7 +1793,7 @@
                   }, {
                     "modifiedTime" : 1652101829000,
                     "attachments" : [ {
-                      "previewurl" : "https://desk.example.com/api/v1/articles/46582000006958052/translations/en/attachments/nmhny14ce774984eb4b15891e1cbe274e612c/content?orgId=1234567890",
+                      "previewurl" : "https://desk.zoho.com/api/v1/articles/46582000006958052/translations/en/attachments/nmhny14ce774984eb4b15891e1cbe274e612c/content?orgId=57044830",
                       "size" : "35594",
                       "name" : "Zoho desk introduction.jpg",
                       "id" : "4658200041001",
@@ -1750,7 +1802,7 @@
                     "tickets" : {
                       "ticketNumber" : "115",
                       "isTrashed" : "false",
-                      "webUrl" : "https://desk.example.com/agent/zylker/desk/tickets/details/5000000114001",
+                      "webUrl" : "https://desk.zoho.com/agent/zohocorp/desk/tickets/details/5000000114001",
                       "id" : "5000000114001"
                     },
                     "hashtags" : [ {
@@ -1761,13 +1813,13 @@
                     } ],
                     "commentedTime" : 1652072940000,
                     "commenterName" : "Jack",
-                    "content" : "<div>Changed Sample content zsu[@user:1234567890]zsu&nbsp; zsh[#sample_header:Introduction]zsh&nbsp;</div>",
+                    "content" : "<div>Changed Sample content zsu[@user:695624]zsu&nbsp; zsh[#sample_header:Introduction]zsh&nbsp;</div>",
                     "commenterId" : "4658200004039",
                     "commenter" : {
                       "firstName" : "",
                       "lastName" : "Jack",
-                      "photoURL" : "https://desk.example.com/api/v1/agents/4658200004039/photo?orgId=1234567890",
-                      "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#setup/users-control/agents/1000000000351",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4658200004039/photo?orgId=292828",
+                      "webUrl" : "https://desk.zoho.com/support/arunice/ShowHomePage.do#setup/users-control/agents/1000000000351",
                       "roleName" : "CEO",
                       "name" : "Jack",
                       "id" : "4658200004039",
@@ -1779,10 +1831,10 @@
                         },
                         "name" : "MVP",
                         "id" : "5000000081007",
-                        "logoUrl" : "https://desk.example.com/portal/api/publicImages/35531135311?portalId=3153815r1fnf113131rf31n9"
+                        "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/35531135311?portalId=3153815r1fnf113131rf31n9"
                       },
                       "type" : "AGENT",
-                      "email" : "jack@zylker.com",
+                      "email" : "Jack@gmail.com",
                       "kbRole" : "REVIEWER"
                     },
                     "mentions" : {
@@ -1791,15 +1843,15 @@
                         "name" : "MVP",
                         "length" : "28",
                         "id" : "5000000113025",
-                        "logoUrl" : "https://desk.example.com/portal/api/publicImages/4658200004039?portalId=292828341431fq"
+                        "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/4658200004039?portalId=292828341431fq"
                       } ],
                       "users" : [ {
                         "firstName" : "",
-                        "lastName" : "Christopher",
-                        "photoURL" : "https://desk.example.com/api/v1/agents/4658200044017/photo?orgId=1234567890",
-                        "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#setup/users-control/agents/5000000000347",
+                        "lastName" : "Cristiano",
+                        "photoURL" : "https://desk.zoho.com/api/v1/agents/4658200044017/photo?orgId=292828",
+                        "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#setup/users-control/agents/5000000000347",
                         "length" : "28",
-                        "name" : "Christopher",
+                        "name" : "Cristiano",
                         "id" : "4658200044017",
                         "label" : {
                           "preferences" : {
@@ -1809,11 +1861,11 @@
                           },
                           "name" : "Prime user",
                           "id" : "5000000081001",
-                          "logoUrl" : "https://desk.example.com/portal/api/publicImages/35531135311?portalId=3153815r1fnf113131rf31n8"
+                          "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/35531135311?portalId=3153815r1fnf113131rf31n8"
                         },
                         "type" : "AGENT",
-                        "email" : "christopher@zylker.com",
-                        "zuid" : "1234567890",
+                        "email" : "Cristiano@gmail.com",
+                        "zuid" : "695624",
                         "kbRole" : "REVIEWER"
                       } ]
                     },
@@ -1914,7 +1966,7 @@
                   "isPublic" : "false",
                   "attachmentIds" : [ "4658200041001" ],
                   "contentType" : "html",
-                  "content" : "<div>Sample content zsu[@user:1234567890]zsu&nbsp; zsh[#sample_header:Introduction]zsh&nbsp;</div>"
+                  "content" : "<div>Sample content zsu[@user:695624]zsu&nbsp; zsh[#sample_header:Introduction]zsh&nbsp;</div>"
                 }
               }
             }
@@ -1993,7 +2045,7 @@
                   "isPublic" : true,
                   "attachmentIds" : [ "4658200041001" ],
                   "contentType" : "html",
-                  "content" : "<div>Changed Sample content zsu[@user:1234567890]zsu&nbsp; zsh[#sample_header:Introduction]zsh&nbsp;</div>"
+                  "content" : "<div>Changed Sample content zsu[@user:695624]zsu&nbsp; zsh[#sample_header:Introduction]zsh&nbsp;</div>"
                 }
               }
             }
@@ -2012,5 +2064,6 @@
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "ArticleComment"
 }

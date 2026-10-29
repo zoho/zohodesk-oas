@@ -176,7 +176,9 @@
                   "uniqueItems" : false
                 },
                 "type" : {
-                  "type" : [ "string", "null" ],
+                  "description" : "RHS value type. Use primitive for literal values, or placeholder for dynamic keys resolved at export time.",
+                  "type" : [ "string" ],
+                  "enum" : [ "primitive", "placeholder" ],
                   "maxLength" : 100,
                   "minLength" : 0
                 }
@@ -482,6 +484,29 @@
                   "departmentId" : "5000000031695",
                   "fields" : [ "email", "subject", "status", "isSpam" ]
                 }
+              },
+              "Request with placeholder criteria" : {
+                "value" : {
+                  "module" : "accounts",
+                  "departmentId" : "5000000031695",
+                  "criteria" : {
+                    "criteriaFields" : [ {
+                      "condition" : "is",
+                      "field" : {
+                        "apiName" : "createdBy",
+                        "module" : "accounts",
+                        "fieldLabel" : "Created By"
+                      },
+                      "value" : {
+                        "type" : "placeholder",
+                        "primitive" : [ {
+                          "key" : "currentUser"
+                        } ]
+                      }
+                    } ],
+                    "criteriaPattern" : "1"
+                  }
+                }
               }
             }
           }
@@ -499,5 +524,6 @@
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "Backup"
 }

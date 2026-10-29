@@ -19,7 +19,7 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "integer", "null" ],
+            "type" : "string",
             "format" : "int64",
             "pattern" : "allDepartment|[0-9]+",
             "description" : "Mandatory param to fetch the customer-happiness list for a given ID of the department. You can also provide department as @allDepartment@ to fetch customer happiness from all departments"
@@ -34,11 +34,11 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
+            "type" : "string",
             "description" : "Localization languageCode of Customer Happiness page to be displayed",
-            "enum" : [ "aa", "ab", "ae", "af-ZA", "ak", "am", "an", "ar-EG", "as-IN", "av", "ay", "az-AZ", "ba", "be-BY", "bg-BG", "bh-IN", "bi", "bm", "bn-IN", "bo", "br", "bs-BA", "ca-ES", "ce", "ch", "co", "cr", "cs-CZ", "cu", "cv", "cy", "da-DK", "de-DE", "dv-MV", "dz", "ee", "el-GR", "en-US", "eo", "es-ES", "et-EE", "eu-ES", "fa-IR", "ff", "fi-FI", "fj", "fo-FO", "fr-FR", "fy", "ga", "gd", "gl-ES", "gn", "gu-IN", "gv", "ha", "he-IL", "hi-IN", "ho", "hr-HR", "ht", "hu-HU", "hy-AM", "hz", "ia", "id-ID", "ie", "ig", "ii", "ik", "io", "is-IS", "it-IT", "iu", "ja-JP", "jv", "ka-GE", "kg", "ki", "kj", "kk-KZ", "kl", "km", "kn-IN", "ko-KR", "kr", "ks", "ku", "kv", "kw", "ky-KZ", "la", "lb", "lg", "li", "ln", "lo", "lt-LT", "lu", "lv-LV", "mg", "mh", "mi-NZ", "mk-MK", "ml-IN", "mn-MN", "mr-IN", "ms-MY", "mt-MT", "my-MM", "na", "nb-NO", "nd", "ne", "ng", "nl-NL", "nn-NO", "no", "nr", "nv", "ny", "oc", "oj", "om", "or", "os", "pa-IN", "pi", "pl-PL", "ps-AR", "pt-PT", "qu-BO", "rm", "rn", "ro-RO", "ru-RU", "rw", "sa-IN", "sc", "sd", "se-NO", "sg", "si", "sk-SK", "sl-SI", "sm", "sn", "so", "sq-AL", "sr-SP", "ss", "st", "su", "sv-SE", "sw-KE", "ta-IN", "te-IN", "tg", "th-TH", "ti", "tk", "tl-PH", "tn-ZA", "to", "tr-TR", "ts", "tt-RU", "tw", "ty", "ug", "uk-UA", "ur-PK", "uz-UZ", "ve", "vi-VN", "vo", "wa", "wo", "xh-ZA", "yi", "yo", "za", "zh-CN", "zu-ZA", "fr-CA", "en-GB", "zh-TW", "pt-BR" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "pattern" : "[a-zA-Z]{2,4}([-_][a-zA-Z]{2})?",
+            "x-regex-name" : "languageCode"
           }
         } ],
         "responses" : {
@@ -47,6 +47,43 @@
           },
           "200" : {
             "$ref" : "#/components/responses/LinkHolderResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.basic.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.tickets.READ" ]
+        } ]
+      }
+    },
+    "/api/v1/customerHappinessSetup" : {
+      "get" : {
+        "tags" : [ "CustomerHappiness" ],
+        "summary" : "Get customer happiness setup",
+        "description" : "Returns the survey option details for customer happiness.",
+        "operationId" : "getSurveyOptionDetails",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        }, {
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "Mandatory param to fetch the customer-happiness list for a given ID of the department. You can also provide department as @allDepartment@ to fetch customer happiness from all departments",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "int64",
+            "pattern" : "allDepartment|[0-9]+",
+            "description" : "Mandatory param to fetch the customer-happiness list for a given ID of the department. You can also provide department as @allDepartment@ to fetch customer happiness from all departments"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
           }
         },
         "security" : [ {
@@ -86,13 +123,12 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "object", "null" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "linkHolder" : {
                   "type" : [ "string", "null" ],
-                  "maxLength" : 10000,
-                  "minLength" : 0
+                  "maxLength" : 10000
                 }
               },
               "required" : [ "linkHolder" ]
@@ -117,7 +153,11 @@
       },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "CustomerHappiness"
 }

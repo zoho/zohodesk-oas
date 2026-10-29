@@ -1,0 +1,224 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Theme",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/themes" : {
+      "get" : {
+        "tags" : [ "Theme" ],
+        "summary" : "Get Themes",
+        "description" : "Retrieves the list of available base themes.",
+        "operationId" : "getAllTheme",
+        "x-mcp-group" : [ "Help Center Customization" ],
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/getAllTheme"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
+        } ]
+      }
+    },
+    "/api/v1/themesUpload" : {
+      "post" : {
+        "tags" : [ "Theme" ],
+        "summary" : "Upload Theme Image",
+        "description" : "Uploads an image file used in help center theme customization and returns the stored file's id, name, size, and URL. Accepts jpg, png, gif, or jpeg files up to 1 MB.",
+        "operationId" : "uploadThemeImage",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "multipart/form-data" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/uploadRequestJson"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/uploadResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.UPDATE" ]
+        } ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "themeListJson" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "name" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "description" : "Name of the theme"
+          },
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the theme"
+          }
+        },
+        "required" : [ "id", "name" ]
+      },
+      "themeListJsonArray" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/themeListJson"
+        }
+      },
+      "uploadResponseJson" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "size" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Size of the uploaded file in bytes"
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "description" : "Name of the uploaded file"
+          },
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the uploaded file"
+          },
+          "url" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 255,
+            "minLength" : 0,
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+            "description" : "URL of the uploaded file"
+          }
+        },
+        "required" : [ "id" ]
+      },
+      "uploadRequestJson" : {
+        "type" : [ "object" ],
+        "properties" : {
+          "file" : {
+            "type" : [ "string" ],
+            "format" : "binary",
+            "description" : "Image file to upload for theme customization. Allowed types: jpg, png, gif, jpeg. Maximum size 1 MB."
+          }
+        },
+        "required" : [ "file" ],
+        "additionalProperties" : false
+      }
+    },
+    "responses" : {
+      "getAllTheme" : {
+        "description" : "getAllTheme template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "#/components/schemas/themeListJsonArray",
+                  "description" : "List of available base themes"
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "data" : [ {
+                    "name" : "DEFAULT",
+                    "id" : "4000000000171"
+                  }, {
+                    "name" : "Materialize",
+                    "id" : "4000000000173"
+                  }, {
+                    "name" : "Flat",
+                    "id" : "4000000000175"
+                  }, {
+                    "name" : "Elegant",
+                    "id" : "4000000000177"
+                  }, {
+                    "name" : "Classic",
+                    "id" : "4000000014007"
+                  }, {
+                    "name" : "Creative",
+                    "id" : "4000000014009"
+                  }, {
+                    "name" : "Minimal",
+                    "id" : "4000000014011"
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "uploadResponse" : {
+        "description" : "uploadResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/uploadResponseJson"
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "size" : "48298",
+                  "name" : "theme_banner.png",
+                  "id" : "2029254000000178001",
+                  "url" : "https://desk.zoho.com/portal/api/publicImages/2029254000000178001"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "jwt-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/jwt-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "Theme"
+}

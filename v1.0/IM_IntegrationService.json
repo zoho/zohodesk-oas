@@ -71,7 +71,7 @@
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "requestBody" : {
-          "$ref" : "./IM_Channel.json#/components/requestBodies/getIntegrationConfigParamsComputedOptions_getConfigParamsComputedOptions_input"
+          "$ref" : "#/components/requestBodies/getIntegrationConfigParamsComputedOptionsRequestBody"
         },
         "responses" : {
           "404" : {
@@ -393,6 +393,36 @@
           }
         },
         "required" : [ "data", "hasMore", "kind" ]
+      },
+      "getIntegrationConfigParamsComputedOptionsRequestPayloadRequestPayloadRequestPayloadRequestPayloadRequest" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "properties" : {
+          "configParams" : {
+            "type" : "array",
+            "items" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "properties" : {
+                "id" : {
+                  "type" : "string",
+                  "format" : "int64"
+                },
+                "name" : {
+                  "type" : "string",
+                  "pattern" : "(^([a-zA-Z0-9\\-\\_])*$)",
+                  "maxLength" : 50
+                },
+                "value" : {
+                  "type" : "string",
+                  "maxLength" : 500
+                }
+              },
+              "required" : [ "value", "name" ],
+              "maxLength" : 5050
+            }
+          }
+        }
       }
     },
     "responses" : {
@@ -455,6 +485,19 @@
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }
+    },
+    "requestBodies" : {
+      "getIntegrationConfigParamsComputedOptionsRequestBody" : {
+        "required" : true,
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/getIntegrationConfigParamsComputedOptionsRequestPayloadRequestPayloadRequestPayloadRequestPayloadRequest"
+            }
+          }
+        }
+      }
     }
-  }
+  },
+  "x-entity" : "IM_IntegrationService"
 }

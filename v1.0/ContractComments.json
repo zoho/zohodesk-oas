@@ -12,6 +12,7 @@
         "summary" : "Get Contract Comments",
         "description" : "Retrieves comments recorded on a contract, with pagination support.",
         "operationId" : "getContractComments",
+        "x-mcp-group" : [ "Contracts" ],
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
@@ -25,8 +26,7 @@
             "items" : {
               "type" : "string",
               "enum" : [ "mentions" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "uniqueItems" : true,
             "maxItems" : 2
@@ -72,7 +72,6 @@
             "type" : "string",
             "description" : "Sorts comments by the specified attribute. Possible values: commentedTime. Default order is ascending. Prefix with '-' for descending order.",
             "maxLength" : 100,
-            "minLength" : 0,
             "pattern" : "-?(commentedTime)"
           }
         }, {
@@ -99,7 +98,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.contracts.READ" ]
+          "iam-oauth2-schema" : [ "Desk.contracts.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       },
       "post" : {
@@ -107,6 +108,7 @@
         "summary" : "Create Contract Comment",
         "description" : "Adds a comment to a specific contract.",
         "operationId" : "createContractComment",
+        "x-mcp-group" : [ "Contracts" ],
         "parameters" : [ {
           "name" : "contractId",
           "in" : "path",
@@ -137,7 +139,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE", "Desk.contracts.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.contracts.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
         } ]
       }
     },
@@ -147,6 +151,7 @@
         "summary" : "Get Contract Comment",
         "description" : "Retrieves a specific comment from a contract.",
         "operationId" : "getContractComment",
+        "x-mcp-group" : [ "Contracts" ],
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
@@ -160,8 +165,7 @@
             "items" : {
               "type" : "string",
               "enum" : [ "mentions" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "uniqueItems" : true,
             "maxItems" : 2
@@ -202,7 +206,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.contracts.READ" ]
+          "iam-oauth2-schema" : [ "Desk.contracts.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       },
       "put" : {
@@ -210,6 +216,7 @@
         "summary" : "Update Contract Comment",
         "description" : "Updates an existing comment on a specific contract.",
         "operationId" : "editContractComment",
+        "x-mcp-group" : [ "Contracts" ],
         "parameters" : [ {
           "name" : "contractId",
           "in" : "path",
@@ -252,7 +259,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE", "Desk.contracts.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.contracts.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
         } ]
       },
       "patch" : {
@@ -260,6 +269,7 @@
         "summary" : "Update Contract Comment",
         "description" : "Updates an existing comment on a specific contract.",
         "operationId" : "patchContractComment",
+        "x-mcp-group" : [ "Contracts" ],
         "parameters" : [ {
           "name" : "contractId",
           "in" : "path",
@@ -302,7 +312,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE", "Desk.contracts.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.contracts.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
         } ]
       },
       "delete" : {
@@ -348,7 +360,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE", "Desk.contracts.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.contracts.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
         } ]
       }
     },
@@ -412,6 +426,9 @@
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
+          "200" : {
+            "$ref" : "./Common.json#/components/responses/fileResponse"
+          },
           "204" : {
             "$ref" : "./Common.json#/components/responses/emptyResponse"
           }
@@ -435,14 +452,12 @@
                   "type" : "string",
                   "description" : "Content type of the comment. Possible values: html, plainText. Default is html. Maximum 100 characters.",
                   "enum" : [ "html", "plainText" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "maxLength" : 100
                 },
                 "content" : {
                   "type" : "string",
                   "description" : "Content of the comment. Maximum 32000 characters. To set user mentions, use the format zsu[user-zuid]zsu (replace user-zuid with the user's zuid).",
-                  "maxLength" : 32000,
-                  "minLength" : 0
+                  "maxLength" : 32000
                 },
                 "attachmentIds" : {
                   "type" : "array",
@@ -479,14 +494,12 @@
                   "type" : "string",
                   "description" : "Content type of the comment. Possible values: html, plainText. Default is html. Maximum 100 characters.",
                   "enum" : [ "html", "plainText" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "maxLength" : 100
                 },
                 "content" : {
                   "type" : "string",
                   "description" : "Content of the comment. Maximum 32000 characters. To set user mentions, use the format zsu[user-zuid]zsu (replace user-zuid with the user's zuid).",
-                  "maxLength" : 32000,
-                  "minLength" : 0
+                  "maxLength" : 32000
                 }
               }
             },
@@ -515,8 +528,7 @@
           "content" : {
             "type" : [ "string", "null" ],
             "description" : "Content of the comment. To retrieve or set user mentions, the format is zsu[user-zuid]zsu (where user-zuid is the mentioned user's zuid).",
-            "maxLength" : 32000,
-            "minLength" : 0
+            "maxLength" : 32000
           },
           "commenterId" : {
             "type" : "string",
@@ -537,8 +549,7 @@
             "type" : [ "string", "null" ],
             "description" : "Content type of the comment. Possible values: html, plainText. Default is html.",
             "enum" : [ "html", "plainText" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "isPublic" : {
             "type" : "boolean",
@@ -619,7 +630,7 @@
           },
           "photoURL" : {
             "type" : [ "string", "null" ],
-            "description" : "URL to access the profile photo of the user. Note: To access this resource, the OAuth scope ZohoContacts.userphoto.READ is mandatory."
+            "description" : "URL to access the profile photo of the user. Note: To access this resource, the OAuth scope zohoprofile.userphoto.READ is mandatory."
           },
           "type" : {
             "type" : [ "string", "null" ],
@@ -654,32 +665,27 @@
             "type" : "string",
             "description" : "Type of the mentioned entity. Possible values: AGENT, TEAM, TICKET.",
             "enum" : [ "AGENT", "TEAM", "TICKET" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "offSet" : {
             "type" : "string",
             "description" : "Character position offset of the mention in the content.",
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "length" : {
             "type" : "string",
             "description" : "Character length of the mention text in the content.",
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "firstName" : {
             "type" : [ "string", "null" ],
             "description" : "First name of the mentioned user. Applicable when type is AGENT.",
-            "maxLength" : 250,
-            "minLength" : 0
+            "maxLength" : 250
           },
           "lastName" : {
             "type" : [ "string", "null" ],
             "description" : "Last name of the mentioned user. Applicable when type is AGENT.",
-            "maxLength" : 250,
-            "minLength" : 0
+            "maxLength" : 250
           },
           "photoURL" : {
             "type" : [ "string", "null" ],
@@ -693,26 +699,22 @@
           "zuid" : {
             "type" : [ "string", "null" ],
             "description" : "Zoho user ID of the mentioned user. Applicable when type is AGENT.",
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "name" : {
             "type" : [ "string", "null" ],
             "description" : "Name of the mentioned entity. Applicable when type is TEAM or TICKET.",
-            "maxLength" : 250,
-            "minLength" : 0
+            "maxLength" : 250
           },
           "departmentId" : {
             "type" : [ "string", "null" ],
             "description" : "Unique ID of the department. Applicable when type is TICKET.",
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "entityNumber" : {
             "type" : [ "string", "null" ],
             "description" : "Entity number of the mentioned ticket. Applicable when type is TICKET.",
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           }
         }
       },
@@ -729,14 +731,12 @@
           "name" : {
             "type" : "string",
             "description" : "Name of the attachment file.",
-            "maxLength" : 250,
-            "minLength" : 0
+            "maxLength" : 250
           },
           "size" : {
             "type" : "string",
             "description" : "Size of the attachment, expressed in KB.",
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "previewurl" : {
             "type" : [ "string", "null" ],
@@ -769,12 +769,12 @@
                     "contentType" : "html",
                     "commenter" : {
                       "id" : "97000000000459",
-                      "name" : "Sample Agent",
-                      "email" : "agent.sample0@example.com",
-                      "photoURL" : "https://desk.example.com/api/v1/agents/97000000000459/photo?orgId=1234567890",
+                      "name" : "meikandamoorthi.n",
+                      "email" : "meikandamoorthi.n0@example.com",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/97000000000459/photo?orgId=16977218",
                       "type" : "AGENT",
-                      "firstName" : "Sample",
-                      "lastName" : "Smith",
+                      "firstName" : "meikandamoorthi.n",
+                      "lastName" : "k8spec1",
                       "roleName" : "CEO"
                     },
                     "impersonatedUser" : null,
@@ -805,12 +805,12 @@
                   "contentType" : "html",
                   "commenter" : {
                     "id" : "97000000000459",
-                    "name" : "Sample Agent",
-                    "email" : "agent.sample@example.com",
-                    "photoURL" : "https://desk.example.com/api/v1/agents/97000000000459/photo?orgId=1234567890",
+                    "name" : "meikandamoorthi.n k8spec1",
+                    "email" : "meikandamoorthi.n@example.com",
+                    "photoURL" : "https://desk.zoho.com/api/v1/agents/97000000000459/photo?orgId=16977218",
                     "type" : "AGENT",
-                    "firstName" : "Sample",
-                    "lastName" : "Smith",
+                    "firstName" : "meikandamoorthi.n",
+                    "lastName" : "k8spec1",
                     "roleName" : "CEO"
                   },
                   "impersonatedUser" : null,
@@ -841,12 +841,12 @@
                   "contentType" : "html",
                   "commenter" : {
                     "id" : "97000000000459",
-                    "name" : "Sample Agent",
-                    "email" : "agent.sample@example.com",
-                    "photoURL" : "https://desk.example.com/api/v1/agents/97000000000459/photo?orgId=1234567890",
+                    "name" : "meikandamoorthi.n k8spec1",
+                    "email" : "meikandamoorthi.n@example.com",
+                    "photoURL" : "https://desk.zoho.com/api/v1/agents/97000000000459/photo?orgId=16977218",
                     "type" : "AGENT",
-                    "firstName" : "Sample",
-                    "lastName" : "Smith",
+                    "firstName" : "meikandamoorthi.n",
+                    "lastName" : "k8spec1",
                     "roleName" : "CEO"
                   },
                   "impersonatedUser" : null,
@@ -877,12 +877,12 @@
                   "contentType" : "html",
                   "commenter" : {
                     "id" : "93000000000459",
-                    "name" : "Sample Agent",
-                    "email" : "agent.sample@example.com",
-                    "photoURL" : "https://desk.example.com/api/v1/agents/93000000000459/photo?orgId=1234567890",
+                    "name" : "meikandamoorthi.n k8spec1",
+                    "email" : "meikandamoorthi.n@example.com",
+                    "photoURL" : "https://desk.zoho.com/api/v1/agents/93000000000459/photo?orgId=16976726",
                     "type" : "AGENT",
-                    "firstName" : "Sample",
-                    "lastName" : "Smith",
+                    "firstName" : "meikandamoorthi.n",
+                    "lastName" : "k8spec1",
                     "roleName" : "CEO"
                   },
                   "impersonatedUser" : null,
@@ -904,7 +904,11 @@
       },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "ContractComments"
 }

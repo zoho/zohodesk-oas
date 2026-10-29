@@ -1,0 +1,289 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "RoundRobinTarget",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/roundRobinRules/{ruleId}/targets/{targetId}" : {
+      "get" : {
+        "tags" : [ "RoundRobinTarget" ],
+        "summary" : "Get Round Robin Rule Target",
+        "description" : "Retrieves a specific target in a round robin rule.",
+        "operationId" : "getRoundRobinRuleTarget",
+        "parameters" : [ {
+          "name" : "targetId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the target"
+        }, {
+          "name" : "ruleId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the round robin rule"
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/targetJson"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.automations.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
+        } ]
+      }
+    },
+    "/api/v1/roundRobinRules/{ruleId}/targets/reorder" : {
+      "post" : {
+        "tags" : [ "RoundRobinTarget" ],
+        "summary" : "Reorder Round Robin Rule Targets",
+        "description" : "Reorders all targets in a round robin rule.",
+        "operationId" : "reorderRoundRobinRuleTargets",
+        "parameters" : [ {
+          "name" : "ruleId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the round robin rule"
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/targetIdsToReorderPayload"
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.automations.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+        } ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "fieldConditionsArr" : {
+        "type" : "array",
+        "items" : {
+          "$ref" : "./Criteria.json#/components/schemas/automationCriteriaResponse"
+        }
+      },
+      "criteriaJson" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "properties" : {
+          "fieldConditions" : {
+            "$ref" : "#/components/schemas/fieldConditionsArr"
+          },
+          "pattern" : {
+            "type" : "string",
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "[andor()0-9\\s]*",
+            "description" : "Pattern used to evaluate the field conditions"
+          }
+        },
+        "required" : [ "fieldConditions", "pattern" ]
+      },
+      "targetJson" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "properties" : {
+          "agentIds" : {
+            "type" : "array",
+            "items" : {
+              "type" : [ "string", "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "uniqueItems" : false,
+            "description" : "List of agent IDs considered for assignment"
+          },
+          "targetId" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the round robin target"
+          },
+          "orderId" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "description" : "Display order of the round robin target"
+          },
+          "criteria" : {
+            "$ref" : "#/components/schemas/criteriaJson",
+            "description" : "Criteria configured for the round robin target"
+          },
+          "agentIdsToExclude" : {
+            "type" : "array",
+            "items" : {
+              "type" : [ "string", "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "uniqueItems" : false,
+            "description" : "List of agent IDs excluded from assignment in the specified team"
+          },
+          "teamId" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the team considered for assignment"
+          },
+          "assigneeType" : {
+            "type" : "string",
+            "enum" : [ "AGENT", "TEAM" ],
+            "description" : "Assignee type configured for the target. Possible values: AGENT, TEAM"
+          },
+          "assignmentType" : {
+            "type" : "string",
+            "enum" : [ "SkillBased", "LoadBalance", "SequentialAssignment" ],
+            "description" : "Assignment strategy used for the target. Possible values: LoadBalance, SkillBased, SequentialAssignment"
+          }
+        },
+        "required" : [ "agentIdsToExclude", "assigneeType", "assignmentType", "criteria", "orderId", "targetId" ],
+        "if" : {
+          "properties" : {
+            "assigneeType" : {
+              "const" : "TEAM"
+            }
+          }
+        },
+        "then" : {
+          "required" : [ "teamId" ]
+        },
+        "else" : {
+          "required" : [ "agentIds" ]
+        }
+      },
+      "targetList" : {
+        "type" : "array",
+        "items" : {
+          "$ref" : "#/components/schemas/targetJson"
+        }
+      }
+    },
+    "responses" : {
+      "targetJson" : {
+        "description" : "targetJson template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/targetJson"
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "agentIds" : [ 4000000007865 ],
+                  "targetId" : 4000000004876,
+                  "criteria" : {
+                    "fieldConditions" : [ {
+                      "condition" : "is",
+                      "fieldName" : "Priority",
+                      "fieldModule" : "tickets",
+                      "value" : [ "Low" ]
+                    } ],
+                    "pattern" : "(1)"
+                  },
+                  "agentIdsToExclude" : [ ],
+                  "assigneeType" : "AGENT",
+                  "assignmentType" : "LoadBalance"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "requestBodies" : {
+      "targetIdsToReorderPayload" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "targetIds" : {
+                  "type" : [ "array" ],
+                  "items" : {
+                    "type" : [ "string", "integer" ],
+                    "format" : "int64",
+                    "pattern" : "([0-9]+)"
+                  },
+                  "uniqueItems" : false,
+                  "description" : "ID(s) of the target(s) in the required order"
+                }
+              },
+              "required" : [ "targetIds" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "targetIds" : [ 4000000004076, 4000000004479, 4000000004506 ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "RoundRobinTarget"
+}

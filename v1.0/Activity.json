@@ -26,7 +26,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.activities.calls.DELETE", "Desk.activities.tasks.DELETE", "Desk.activities.events.DELETE" ]
+          "iam-oauth2-schema" : [ "Desk.activities.calls.DELETE", "Desk.activities.events.DELETE", "Desk.activities.tasks.DELETE" ]
         } ]
       }
     },
@@ -132,7 +132,176 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.activities.calls.READ", "Desk.activities.tasks.READ", "Desk.activities.events.READ", "Desk.calls.READ", "Desk.tasks.READ", "Desk.events.READ" ]
+          "iam-oauth2-schema" : [ "Desk.activities.calls.READ", "Desk.activities.events.READ", "Desk.activities.tasks.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.calls.READ", "Desk.events.READ", "Desk.tasks.READ" ]
+        } ]
+      }
+    },
+    "/api/v1/activities" : {
+      "get" : {
+        "tags" : [ "Activity" ],
+        "summary" : "List activities",
+        "description" : "This API lists activities based on the limit specified.",
+        "operationId" : "getActivitiesList",
+        "parameters" : [ {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number, starting from which the activities must be fetched",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of activities to list",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 100,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "Department from which the activities need to be queried",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "viewId",
+          "in" : "query",
+          "description" : "ID of the view to apply while fetching the resources",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "departmentIds",
+          "in" : "query",
+          "description" : "Departments from which the tasks need to be queried",
+          "required" : false,
+          "style" : "form",
+          "explode" : false,
+          "schema" : {
+            "type" : "array",
+            "maxItems" : 20,
+            "uniqueItems" : true,
+            "items" : {
+              "type" : [ "string", "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            }
+          }
+        }, {
+          "name" : "assignee",
+          "in" : "query",
+          "description" : "Key that filters tickets by assignee. Values allowed are any valid assignee ID or multiple assignee IDs separated by commas.",
+          "required" : false,
+          "style" : "form",
+          "explode" : false,
+          "schema" : {
+            "type" : "array",
+            "maxItems" : 20,
+            "uniqueItems" : true,
+            "items" : {
+              "type" : [ "string", "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            }
+          }
+        }, {
+          "name" : "activityTime",
+          "in" : "query",
+          "description" : "Activity time for completing the activity. Values allowed are Overdue, Tomorrow, CurrentWeek, CurrentMonth and Today. You can pass multiple values by separating them with commas.",
+          "required" : false,
+          "style" : "form",
+          "explode" : false,
+          "schema" : {
+            "type" : "array",
+            "maxItems" : 10,
+            "uniqueItems" : true,
+            "items" : {
+              "type" : "string",
+              "maxLength" : 100,
+              "enum" : [ "Overdue", "Today", "Tomorrow", "CurrentWeek", "CurrentMonth" ],
+              "pattern" : "(Overdue|Today|Tomorrow|CurrentWeek|CurrentMonth)"
+            }
+          }
+        }, {
+          "name" : "include",
+          "in" : "query",
+          "description" : "Allowed values are : contacts, assignee, tickets, teams, projects, integInfo.",
+          "required" : false,
+          "style" : "form",
+          "explode" : false,
+          "schema" : {
+            "type" : "array",
+            "maxItems" : 6,
+            "uniqueItems" : true,
+            "items" : {
+              "type" : "string",
+              "maxLength" : 100,
+              "enum" : [ "contacts", "assignee", "tickets", "teams", "projects", "integInfo" ],
+              "pattern" : "(contacts|assignee|tickets|teams|projects|integInfo)"
+            }
+          }
+        }, {
+          "name" : "isCompleted",
+          "in" : "query",
+          "description" : "Key that denotes whether the activity is completed or not",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "boolean" ]
+          }
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "description" : "Sort by a specific attribute: activityTime or createdTime. The default sorting order is ascending. A - prefix denotes descending order of sorting.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "maxLength" : 100,
+            "enum" : [ "category", "subject", "status", "createdTime", "modifiedTime", "priority", "activityTime", "activityType", "-category", "-subject", "-status", "-createdTime", "-modifiedTime", "-priority", "-activityTime", "-activityType" ],
+            "pattern" : "-?(category|subject|status|createdTime|modifiedTime|priority|activityTime|activityType)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/getActivitiesByRequestIdResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.activities.calls.READ", "Desk.activities.events.READ", "Desk.activities.tasks.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.calls.READ", "Desk.events.READ", "Desk.tasks.READ" ]
         } ]
       }
     }
@@ -148,7 +317,8 @@
           "properties" : {
             "activityType" : {
               "type" : [ "string", "null" ],
-              "enum" : [ "Calls", "Events", "Tasks" ]
+              "const" : "Events",
+              "description" : "Type of the activity. Always \"Events\" for event activities."
             }
           },
           "required" : [ "activityType" ],
@@ -164,7 +334,8 @@
           "properties" : {
             "activityType" : {
               "type" : [ "string", "null" ],
-              "enum" : [ "Calls", "Events", "Tasks" ]
+              "const" : "Calls",
+              "description" : "Type of the activity. Always \"Calls\" for call activities."
             }
           },
           "required" : [ "activityType" ],
@@ -180,7 +351,8 @@
           "properties" : {
             "activityType" : {
               "type" : [ "string", "null" ],
-              "enum" : [ "Calls", "Events", "Tasks" ]
+              "const" : "Tasks",
+              "description" : "Type of the activity. Always \"Tasks\" for task activities."
             }
           },
           "required" : [ "activityType" ],
@@ -190,6 +362,14 @@
       "data" : {
         "type" : [ "array", "null" ],
         "items" : {
+          "discriminator" : {
+            "propertyName" : "activityType",
+            "mapping" : {
+              "Events" : "#/components/schemas/eventjson",
+              "Calls" : "#/components/schemas/calljson",
+              "Tasks" : "#/components/schemas/taskjson"
+            }
+          },
           "oneOf" : [ {
             "$ref" : "#/components/schemas/eventjson"
           }, {
@@ -217,7 +397,7 @@
                         "ticket" : {
                           "type" : [ "object", "null" ],
                           "additionalProperties" : false,
-                          "maxProperties" : 13,
+                          "maxProperties" : 14,
                           "minProperties" : 13,
                           "properties" : {
                             "ticketNumber" : {
@@ -240,7 +420,8 @@
                               "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
                             },
                             "channel" : {
-                              "type" : [ "string", "null" ]
+                              "type" : [ "string", "null" ],
+                              "x-dynamic-enum" : true
                             },
                             "closedTime" : {
                               "type" : [ "string", "null" ],
@@ -304,7 +485,15 @@
                               "type" : [ "boolean", "null" ]
                             },
                             "status" : {
-                              "type" : [ "string", "null" ]
+                              "type" : [ "string", "null" ],
+                              "x-dynamic-enum" : true
+                            },
+                            "niceUrl" : {
+                              "type" : [ "string", "null" ],
+                              "maxLength" : 500,
+                              "minLength" : 0,
+                              "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+                              "description" : "URL to open the associated ticket in the Desk agent UI. Returned only when the featureFlags request header includes reactChanges."
                             }
                           },
                           "required" : [ "assignee", "channel", "closedTime", "createdTime", "dueDate", "id", "isArchived", "isSpam", "phone", "status", "subject", "teamId", "ticketNumber" ]
@@ -312,7 +501,7 @@
                         "contact" : {
                           "type" : [ "object", "null" ],
                           "additionalProperties" : false,
-                          "maxProperties" : 8,
+                          "maxProperties" : 9,
                           "minProperties" : 8,
                           "properties" : {
                             "firstName" : {
@@ -355,6 +544,13 @@
                               "maxLength" : 255,
                               "minLength" : 0,
                               "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'\\&\\~]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+                            },
+                            "niceUrl" : {
+                              "type" : [ "string", "null" ],
+                              "maxLength" : 500,
+                              "minLength" : 0,
+                              "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+                              "description" : "URL to open the associated contact in the Desk agent UI. Returned only when the featureFlags request header includes reactChanges."
                             }
                           },
                           "required" : [ "accountId", "email", "firstName", "id", "isSpam", "lastName", "mobile", "phone" ]
@@ -444,7 +640,7 @@
                   "data" : [ {
                     "ticket" : {
                       "ticketNumber" : "101",
-                      "phone" : "1 555 010 0000",
+                      "phone" : "1 888 900 9646",
                       "subject" : "Here's your first ticket.",
                       "dueDate" : 1553853086000,
                       "teamId" : null,
@@ -468,7 +664,7 @@
                     "ownerId" : "5000000015911",
                     "priority" : "High",
                     "isCommented" : false,
-                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Events/dv/9d4883f2d94d59e484b8a02355a7e402",
+                    "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Events/dv/9d4883f2d94d59e484b8a02355a7e402",
                     "createdTime" : 1555046481000,
                     "startTime" : 1577292731000,
                     "assignee" : {
@@ -487,7 +683,7 @@
                   }, {
                     "ticket" : {
                       "ticketNumber" : "101",
-                      "phone" : "1 555 010 0000",
+                      "phone" : "1 888 900 9646",
                       "subject" : "Here's your first ticket.",
                       "dueDate" : 1553853086000,
                       "teamId" : "3000000008763",
@@ -495,7 +691,7 @@
                       "team" : {
                         "name" : "Responsive Team",
                         "id" : "3000000008763",
-                        "logoUrl" : "https://desk.example.com/api/v1/teams/3000000008763/logo?orgId=1234567890"
+                        "logoUrl" : "https://desk.zoho.com/api/v1/teams/3000000008763/logo?orgId=11278831"
                       },
                       "assignee" : {
                         "photoURL" : null,
@@ -515,12 +711,12 @@
                     "team" : {
                       "name" : "Responsive Team",
                       "id" : "3000000008763",
-                      "logoUrl" : "https://desk.example.com/api/v1/teams/3000000008763/logo?orgId=1234567890"
+                      "logoUrl" : "https://desk.zoho.com/api/v1/teams/3000000008763/logo?orgId=11278831"
                     },
                     "ownerId" : "5000000015911",
                     "priority" : "High",
                     "isCommented" : true,
-                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Calls/dv/9d4883f2d94d59e4c0ddb2a7dd8a14ee",
+                    "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Calls/dv/9d4883f2d94d59e4c0ddb2a7dd8a14ee",
                     "teamId" : "3000000008763",
                     "createdTime" : 1554892255000,
                     "startTime" : 1554964200000,
@@ -540,7 +736,7 @@
                   }, {
                     "ticket" : {
                       "ticketNumber" : "101",
-                      "phone" : "1 555 010 0000",
+                      "phone" : "1 888 900 9646",
                       "subject" : "Here's your first ticket.",
                       "dueDate" : 1553853086000,
                       "teamId" : null,
@@ -564,7 +760,7 @@
                     "ownerId" : "5000000015911",
                     "priority" : "High",
                     "isCommented" : false,
-                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Tasks/dv/9d4883f2d94d59e40af0073cf7981c2f",
+                    "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Tasks/dv/9d4883f2d94d59e40af0073cf7981c2f",
                     "createdTime" : 1554890846000,
                     "startTime" : 1556087400000,
                     "assignee" : {
@@ -625,7 +821,11 @@
       },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "Activity"
 }

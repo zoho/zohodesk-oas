@@ -31,7 +31,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.CREATE", "Desk.basic.CREATE" ]
+          "iam-oauth2-schema" : [ "Desk.channels.email.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.basic.UPDATE", "Desk.settings.UPDATE" ]
         } ]
       }
     },
@@ -65,7 +67,7 @@
         }, {
           "name" : "from",
           "in" : "query",
-          "description" : "Starting index for fetching the mail addresses. The default value is 1",
+          "description" : "Starting index for fetching the mail addresses. The default value is 1. Values below 1 are treated as 1.",
           "required" : false,
           "style" : "form",
           "explode" : true,
@@ -73,7 +75,8 @@
             "default" : 1,
             "type" : "integer",
             "format" : "int32",
-            "minimum" : 1
+            "minimum" : 0,
+            "pattern" : "([0-9]+)"
           }
         }, {
           "name" : "limit",
@@ -104,7 +107,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.basic.READ" ]
+          "iam-oauth2-schema" : [ "Desk.channels.email.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.settings.READ" ]
         } ]
       },
       "post" : {
@@ -112,6 +117,10 @@
         "summary" : "Add a new From address",
         "description" : "This API adds a new From address to the specified department.",
         "operationId" : "addFromAddress",
+        "x-mcp-group" : [ "EmailChannel" ],
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
         "requestBody" : {
           "$ref" : "#/components/requestBodies/addFromAddressJSON"
         },
@@ -127,7 +136,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.CREATE" ]
+          "iam-oauth2-schema" : [ "Desk.channels.email.CREATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.CREATE" ]
         } ]
       }
     },
@@ -137,6 +148,7 @@
         "summary" : "Fetch a single From address",
         "description" : "Retrieves details of a specific From address",
         "operationId" : "getFromAddress",
+        "x-mcp-group" : [ "EmailChannel" ],
         "parameters" : [ {
           "name" : "mailReplyAddressId",
           "in" : "path",
@@ -157,7 +169,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.basic.READ" ]
+          "iam-oauth2-schema" : [ "Desk.channels.email.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.settings.READ" ]
         } ]
       },
       "patch" : {
@@ -165,6 +179,7 @@
         "summary" : "Update existing From address",
         "description" : "This API updates an existing From address with the specified data",
         "operationId" : "updateFromAddress",
+        "x-mcp-group" : [ "EmailChannel" ],
         "parameters" : [ {
           "name" : "mailReplyAddressId",
           "in" : "path",
@@ -191,7 +206,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.channels.email.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
         } ]
       },
       "delete" : {
@@ -219,7 +236,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.DELETE" ]
+          "iam-oauth2-schema" : [ "Desk.channels.email.DELETE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.DELETE" ]
         } ]
       }
     }
@@ -318,6 +337,35 @@
         },
         "required" : [ "email", "firstName", "id", "lastName", "photoURL" ]
       },
+      "issue" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "description" : "Unique identifier for the issue",
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "Status of the issue: BLOCKED or ISOLATED",
+            "enum" : [ "BLOCKED", "ISOLATED" ]
+          },
+          "type" : {
+            "type" : "string",
+            "description" : "Type of the issue: AUTHENTICATION_FAILURE or SLOWNESS",
+            "enum" : [ "AUTHENTICATION_FAILURE", "SLOWNESS" ]
+          },
+          "detectedTime" : {
+            "type" : "string",
+            "description" : "Timestamp when the issue was detected, in ISO 8601 format (UTC)",
+            "format" : "date-time",
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+          }
+        },
+        "required" : [ "id", "status", "type", "detectedTime" ]
+      },
       "fromAddressCreate" : {
         "type" : "object",
         "additionalProperties" : false,
@@ -327,7 +375,8 @@
             "description" : "Email address for the From address",
             "maxLength" : 100,
             "format" : "email",
-            "pattern" : "^(?=.{1,64}@.{4,255}$)[A-Za-z0-9]+([._+&!*'-][A-Za-z0-9]+)*@([A-Za-z0-9]+(-[A-Za-z0-9]+)*\\.)+[A-Za-z]{2,}$"
+            "pattern" : "^(?=.{1,64}@.{4,255}$)[A-Za-z0-9]+([._+&!*'-][A-Za-z0-9]+)*@([A-Za-z0-9]+(-[A-Za-z0-9]+)*\\.)+[A-Za-z]{2,}$",
+            "x-unique" : true
           },
           "displayName" : {
             "type" : "string",
@@ -496,9 +545,16 @@
           "isDepartmentDefault" : {
             "type" : "boolean",
             "description" : "true when this from address is set as the default From address for the department"
+          },
+          "issues" : {
+            "type" : "array",
+            "description" : "Array of issues each representing a problem with the From address. If the array is empty, there are no issues with the From address.",
+            "items" : {
+              "$ref" : "#/components/schemas/issue"
+            }
           }
         },
-        "required" : [ "id", "address", "displayName", "departmentId", "serviceProviderType", "isDepartmentDefault", "isActive", "isVerified", "createdBy", "createdTime", "modifiedBy", "modifiedTime" ]
+        "required" : [ "id", "address", "displayName", "departmentId", "serviceProviderType", "isDepartmentDefault", "isActive", "isVerified", "createdBy", "createdTime", "modifiedBy", "modifiedTime", "issues" ]
       },
       "data" : {
         "type" : "array",
@@ -541,7 +597,7 @@
                       "connectionType" : "SSL"
                     },
                     "createdBy" : {
-                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000028043/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000028043/photo?orgId=11171343",
                       "firstName" : "Sam",
                       "lastName" : "Steve",
                       "id" : "4000000028043",
@@ -549,7 +605,7 @@
                     },
                     "createdTime" : "2023-01-06T12:34:56Z",
                     "modifiedBy" : {
-                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000028043/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000028043/photo?orgId=11171343",
                       "firstName" : "Sam",
                       "lastName" : "Steve",
                       "id" : "4000000028043",
@@ -564,7 +620,7 @@
                     "isVerified" : true,
                     "isSmtpEnabled" : false,
                     "createdBy" : {
-                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000028043/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000028043/photo?orgId=11171343",
                       "firstName" : "Sam",
                       "lastName" : "Steve",
                       "id" : "4000000028043",
@@ -574,7 +630,7 @@
                     "departmentId" : "4000000007043",
                     "createdTime" : "2023-01-06T12:34:56Z",
                     "modifiedBy" : {
-                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000028043/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000028043/photo?orgId=11171343",
                       "firstName" : "Sam",
                       "lastName" : "Steve",
                       "id" : "4000000028043",
@@ -599,7 +655,7 @@
                       "connectionType" : "SSL"
                     },
                     "createdBy" : {
-                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000028043/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000028043/photo?orgId=11171343",
                       "firstName" : "Sam",
                       "lastName" : "Steve",
                       "id" : "4000000028043",
@@ -607,7 +663,7 @@
                     },
                     "createdTime" : "2023-01-06T12:34:56Z",
                     "modifiedBy" : {
-                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000028043/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000028043/photo?orgId=11171343",
                       "firstName" : "Sam",
                       "lastName" : "Steve",
                       "id" : "4000000028043",
@@ -655,17 +711,17 @@
                     "isDepartmentDefault" : true,
                     "createdBy" : {
                       "id" : "84322000000277001",
-                      "email" : "alex@zylker.com",
-                      "photoURL" : "https://desk.example.com/api/v1/agents/84322000000277001/photo?orgId=1234567890",
-                      "firstName" : "Alex",
-                      "lastName" : "Jones"
+                      "email" : "aravindth@zylker.com",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/84322000000277001/photo?orgId=61815772",
+                      "firstName" : "Aravindth",
+                      "lastName" : "Kumar"
                     },
                     "modifiedBy" : {
                       "id" : "84322000000210760",
-                      "email" : "kevin@zylker.com",
-                      "photoURL" : "https://desk.example.com/api/v1/agents/84322000000210760/photo?orgId=1234567890",
-                      "firstName" : "Kevin",
-                      "lastName" : "Stone"
+                      "email" : "karthick@zylker.com",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/84322000000210760/photo?orgId=61815772",
+                      "firstName" : "Karthick",
+                      "lastName" : "Selvam"
                     },
                     "address" : "zylker.support@zylker.com",
                     "isVerified" : true,
@@ -708,7 +764,11 @@
       },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "MailReplyAddress"
 }

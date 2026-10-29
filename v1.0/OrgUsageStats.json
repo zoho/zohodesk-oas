@@ -1,0 +1,173 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Organization Usage Stats",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/integration/orgUsageStats" : {
+      "get" : {
+        "tags" : [ "Organization Usage Stats" ],
+        "summary" : "Get Organization Usage Stats",
+        "description" : "Retrieve uniform organization usage and plan limits for a single Zoho service.\n\n**Authorization:** IAM SupportAdmin or SupportGuest, or a member of the service org identified by query zsoid.\n\n**Supported service:** flow (Desk proxies Zoho Flow GET /api/org/limits and returns a normalized usageLimits array).",
+        "operationId" : "getOrgUsageStats",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        }, {
+          "name" : "zsoid",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "description" : "IAM ZSOID of the org whose Zoho service limits are requested. Used as Flow Scope for /api/org/limits.",
+          "schema" : {
+            "type" : [ "string" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "maxLength" : 19
+          }
+        }, {
+          "name" : "service",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "description" : "Zoho service key for which limits are fetched. Supported value: flow. Other values return 400 Unsupported service.",
+          "schema" : {
+            "type" : [ "string" ],
+            "maxLength" : 50,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s\\^\\{\\}\\~\\[\\]\\*\\+~\\|\\\"]+",
+            "x-regex-name" : "cleartextpattern"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/getOrgUsageStatsResponse"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.integrations.READ" ]
+        } ]
+      }
+    }
+  },
+  "components" : {
+    "responses" : {
+      "getOrgUsageStatsResponse" : {
+        "description" : "Uniform organization usage statistics for the requested service.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "properties" : {
+                "service" : {
+                  "type" : [ "string" ],
+                  "description" : "Requested Zoho service key (e.g. flow)."
+                },
+                "orgId" : {
+                  "type" : [ "string" ],
+                  "description" : "IAM ZSOID echoed from the zsoid query parameter."
+                },
+                "usageLimits" : {
+                  "type" : [ "array" ],
+                  "items" : {
+                    "$ref" : "#/components/schemas/LimitDetail"
+                  },
+                  "description" : "Uniform usage/limit details adapted from the Zoho service response."
+                }
+              },
+              "required" : [ "service", "orgId", "usageLimits" ],
+              "additionalProperties" : false
+            },
+            "examples" : {
+              "getOrgUsageStatsExample" : {
+                "value" : {
+                  "service" : "flow",
+                  "orgId" : "1234567890",
+                  "usageLimits" : [ {
+                    "name" : "users",
+                    "maxLimit" : -1,
+                    "used" : 100,
+                    "type" : "plan_based",
+                    "editable" : false
+                  }, {
+                    "name" : "polling_frequency",
+                    "maxLimit" : "5 mins",
+                    "type" : "plan_based",
+                    "editable" : false
+                  }, {
+                    "name" : "invoke_url_api",
+                    "maxLimit" : 2500,
+                    "used" : 0,
+                    "reset" : "daily",
+                    "source" : "DRE"
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "schemas" : {
+      "LimitDetail" : {
+        "type" : [ "object" ],
+        "properties" : {
+          "name" : {
+            "type" : [ "string" ],
+            "description" : "Name of the usage limit metric."
+          },
+          "maxLimit" : {
+            "description" : "Maximum allowed limit. May be an integer or a descriptive string."
+          },
+          "used" : {
+            "type" : [ "integer", "null" ],
+            "description" : "Current usage count. Null if usage data is unavailable."
+          },
+          "type" : {
+            "type" : [ "string", "null" ],
+            "description" : "Category of the limit (e.g. plan_based, fixed)."
+          },
+          "editable" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Whether the limit can be edited."
+          },
+          "reset" : {
+            "type" : [ "string", "null" ],
+            "description" : "Reset schedule (e.g. daily, monthly). Null if not applicable."
+          },
+          "source" : {
+            "type" : [ "string" ],
+            "description" : "Optional Zoho subsystem (e.g. DRE)."
+          }
+        },
+        "required" : [ "name", "maxLimit" ],
+        "additionalProperties" : false
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "Organization Usage Stats"
+}

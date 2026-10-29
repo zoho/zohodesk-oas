@@ -11,6 +11,7 @@
         "summary" : "Get Support email address domain",
         "description" : "This API fetches the domain of the support email address.",
         "operationId" : "getSupportEmailAddressDomain",
+        "x-mcp-group" : [ "EmailChannel" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -23,7 +24,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.channels.email.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       },
       "put" : {
@@ -43,10 +46,15 @@
           },
           "200" : {
             "$ref" : "#/components/responses/updateSupportEmailDomainResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.channels.email.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
         } ]
       }
     }
@@ -104,7 +112,7 @@
         "properties" : {
           "updatedTime" : {
             "description" : "Timestamp when the domain was last updated, in ISO 8601 format (UTC)",
-            "type" : "string",
+            "type" : [ "string", "null" ],
             "format" : "date-time",
             "maxLength" : 100,
             "minLength" : 0,
@@ -112,7 +120,7 @@
           },
           "updatedBy" : {
             "description" : "ID of the user who last updated the domain",
-            "type" : "string",
+            "type" : [ "string", "null" ],
             "pattern" : "([0-9]+)"
           },
           "supportEmailDomain" : {
@@ -122,7 +130,7 @@
           },
           "oldDomain" : {
             "description" : "Previous support email domain name",
-            "type" : "string",
+            "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           }
@@ -199,7 +207,11 @@
       },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "SupportEmailDomain"
 }

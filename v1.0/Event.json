@@ -11,6 +11,7 @@
         "summary" : "List events",
         "description" : "This API lists a particular number of events, based on the limit specified.",
         "operationId" : "getEvents",
+        "x-mcp-group" : [ "Events" ],
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
@@ -188,7 +189,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.activities.events.READ", "Desk.events.READ" ]
+          "iam-oauth2-schema" : [ "Desk.activities.events.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.events.READ" ]
         } ]
       },
       "post" : {
@@ -196,6 +199,7 @@
         "summary" : "Create event",
         "description" : "This API adds an event entry to your help desk portal.",
         "operationId" : "createEvent",
+        "x-mcp-group" : [ "Events" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -211,7 +215,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.activities.events.CREATE", "Desk.events.CREATE" ]
+          "iam-oauth2-schema" : [ "Desk.activities.events.CREATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.events.CREATE" ]
         } ]
       }
     },
@@ -221,6 +227,7 @@
         "summary" : "Get event",
         "description" : "This API fetches the details of an event.",
         "operationId" : "getEvent",
+        "x-mcp-group" : [ "Events" ],
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
@@ -257,12 +264,15 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.activities.events.READ", "Desk.events.READ" ]
+          "iam-oauth2-schema" : [ "Desk.activities.events.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.events.READ" ]
         } ]
       },
       "patch" : {
         "tags" : [ "Event" ],
         "operationId" : "updateEvent",
+        "x-mcp-group" : [ "Events" ],
         "summary" : "Update an event",
         "description" : "This API updates the details of an event.",
         "parameters" : [ {
@@ -292,7 +302,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.activities.events.UPDATE", "Desk.events.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.activities.events.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.events.UPDATE" ]
         } ]
       }
     },
@@ -302,6 +314,7 @@
         "summary" : "Delete spam events",
         "description" : "This API deletes the given spam events",
         "operationId" : "deleteSpamEvents",
+        "x-mcp-group" : [ "Events" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -327,6 +340,7 @@
         "summary" : "Update many events",
         "description" : "This API updates multiple events at once.",
         "operationId" : "bulkUpdateEvents",
+        "x-mcp-group" : [ "Events" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -342,7 +356,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.activities.events.UPDATE", "Desk.events.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.activities.events.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.events.UPDATE" ]
         } ]
       }
     },
@@ -352,6 +368,7 @@
         "summary" : "Delete events",
         "description" : "This API moves event entries to the Recycle Bin of your help desk portal.",
         "operationId" : "deleteEvent",
+        "x-mcp-group" : [ "Events" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -367,7 +384,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.activities.events.DELETE", "Desk.events.DELETE" ]
+          "iam-oauth2-schema" : [ "Desk.activities.events.DELETE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.events.DELETE" ]
         } ]
       }
     },
@@ -377,6 +396,7 @@
         "summary" : "List events by ticket",
         "description" : "This API lists a particular number of events associated with a ticket, based on the limit specified.",
         "operationId" : "getEventsByTicket",
+        "x-mcp-group" : [ "Events" ],
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
@@ -474,7 +494,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.activities.events.READ", "Desk.events.READ", "Desk.tickets.READ" ]
+          "iam-oauth2-schema" : [ "Desk.activities.events.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.events.READ", "Desk.tickets.READ" ]
         } ]
       }
     },
@@ -484,6 +506,7 @@
         "summary" : "Empty spam events",
         "description" : "This API deletes all spam events.",
         "operationId" : "deleteAllSpamEvents",
+        "x-mcp-group" : [ "Events" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -582,7 +605,8 @@
           },
           "priority" : {
             "type" : [ "string", "null" ],
-            "description" : "Priority of the event"
+            "description" : "Priority of the event",
+            "x-dynamic-enum" : true
           },
           "category" : {
             "type" : [ "string", "null" ],
@@ -598,7 +622,8 @@
           },
           "status" : {
             "type" : [ "string", "null" ],
-            "description" : "Completion status of the event"
+            "description" : "Completion status of the event",
+            "x-dynamic-enum" : true
           }
         },
         "required" : [ "category", "contactId", "departmentId", "ownerId", "priority", "startTime", "status", "subject", "ticketId" ]
@@ -939,7 +964,8 @@
             "type" : [ "string" ],
             "description" : "Time when the event started. The value of this key must be recorded in the ISO date format of yyyy-MM-ddThh:mm:ss.SSSZ.",
             "maxLength" : 100,
-            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null"
+            "pattern" : "((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)",
+            "x-regex-name" : "APIDateTime"
           },
           "ownerId" : {
             "type" : [ "string", "integer" ],
@@ -950,6 +976,7 @@
           "priority" : {
             "type" : [ "string" ],
             "description" : "Priority of the event",
+            "x-dynamic-enum" : true,
             "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
           },
           "category" : {
@@ -967,6 +994,7 @@
           "status" : {
             "type" : [ "string" ],
             "description" : "Completion status of the event",
+            "x-dynamic-enum" : true,
             "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
           }
         },
@@ -995,6 +1023,191 @@
               }, {
                 "type" : [ "object", "null" ],
                 "properties" : {
+                  "ticket" : {
+                    "type" : [ "object", "null" ],
+                    "additionalProperties" : false,
+                    "maxProperties" : 14,
+                    "minProperties" : 13,
+                    "properties" : {
+                      "ticketNumber" : {
+                        "type" : [ "string", "integer", "null" ],
+                        "format" : "int32",
+                        "pattern" : "([0-9]+)",
+                        "description" : "Ticket number"
+                      },
+                      "subject" : {
+                        "type" : [ "string", "null" ],
+                        "maxLength" : 1000,
+                        "minLength" : 0,
+                        "description" : "Subject of the ticket"
+                      },
+                      "isArchived" : {
+                        "type" : [ "boolean", "null" ],
+                        "description" : "Indicates whether the ticket is archived"
+                      },
+                      "dueDate" : {
+                        "type" : [ "string", "null" ],
+                        "maxLength" : 100,
+                        "minLength" : 0,
+                        "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+                        "description" : "Due date of the ticket"
+                      },
+                      "channel" : {
+                        "type" : [ "string", "null" ],
+                        "x-dynamic-enum" : true,
+                        "description" : "Communication channel of the ticket"
+                      },
+                      "closedTime" : {
+                        "type" : [ "string", "null" ],
+                        "maxLength" : 100,
+                        "minLength" : 0,
+                        "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+                        "description" : "Time when the ticket was closed"
+                      },
+                      "phone" : {
+                        "type" : [ "string", "null" ],
+                        "maxLength" : 120,
+                        "minLength" : 0,
+                        "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\(\\)\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+",
+                        "description" : "Phone number in the ticket"
+                      },
+                      "teamId" : {
+                        "type" : [ "string", "integer", "null" ],
+                        "format" : "int64",
+                        "pattern" : "([0-9]+)",
+                        "description" : "Unique ID of the team assigned to the ticket"
+                      },
+                      "createdTime" : {
+                        "type" : [ "string", "null" ],
+                        "maxLength" : 100,
+                        "minLength" : 0,
+                        "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+                        "description" : "Time when the ticket was created"
+                      },
+                      "id" : {
+                        "type" : [ "string", "integer", "null" ],
+                        "format" : "int64",
+                        "pattern" : "([0-9]+)",
+                        "description" : "Unique ID of the ticket"
+                      },
+                      "assignee" : {
+                        "type" : [ "object", "null" ],
+                        "additionalProperties" : false,
+                        "maxProperties" : 4,
+                        "minProperties" : 4,
+                        "properties" : {
+                          "firstName" : {
+                            "type" : [ "string", "null" ],
+                            "maxLength" : 50,
+                            "minLength" : 0,
+                            "description" : "First name of the assignee"
+                          },
+                          "lastName" : {
+                            "type" : [ "string", "null" ],
+                            "maxLength" : 50,
+                            "minLength" : 0,
+                            "description" : "Last name of the assignee"
+                          },
+                          "photoURL" : {
+                            "type" : [ "string", "null" ],
+                            "maxLength" : 100,
+                            "minLength" : 0,
+                            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+                            "description" : "URL to access the profile photo of the assignee"
+                          },
+                          "id" : {
+                            "type" : [ "string", "integer", "null" ],
+                            "format" : "int64",
+                            "pattern" : "([0-9]+)",
+                            "description" : "Unique ID of the assignee"
+                          }
+                        },
+                        "required" : [ "firstName", "id", "lastName", "photoURL" ]
+                      },
+                      "isSpam" : {
+                        "type" : [ "boolean", "null" ],
+                        "description" : "Indicates whether the ticket is marked as spam"
+                      },
+                      "status" : {
+                        "type" : [ "string", "null" ],
+                        "x-dynamic-enum" : true,
+                        "description" : "Status of the ticket"
+                      },
+                      "niceUrl" : {
+                        "type" : [ "string", "null" ],
+                        "maxLength" : 500,
+                        "minLength" : 0,
+                        "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+                        "description" : "URL to open the associated ticket in the Desk agent UI. Returned only when the featureFlags request header includes reactChanges."
+                      }
+                    },
+                    "required" : [ "assignee", "channel", "closedTime", "createdTime", "dueDate", "id", "isArchived", "isSpam", "phone", "status", "subject", "teamId", "ticketNumber" ]
+                  },
+                  "contact" : {
+                    "type" : [ "object", "null" ],
+                    "additionalProperties" : false,
+                    "maxProperties" : 9,
+                    "minProperties" : 8,
+                    "properties" : {
+                      "firstName" : {
+                        "type" : [ "string", "null" ],
+                        "maxLength" : 40,
+                        "minLength" : 0,
+                        "description" : "First name of the contact"
+                      },
+                      "lastName" : {
+                        "type" : [ "string", "null" ],
+                        "maxLength" : 200,
+                        "minLength" : 0,
+                        "description" : "Last name of the contact"
+                      },
+                      "accountId" : {
+                        "type" : [ "string", "integer", "null" ],
+                        "format" : "int64",
+                        "pattern" : "([0-9]+)",
+                        "description" : "Unique ID of the associated account"
+                      },
+                      "phone" : {
+                        "type" : [ "string", "null" ],
+                        "maxLength" : 50,
+                        "minLength" : 0,
+                        "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\(\\)\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+",
+                        "description" : "Phone number of the contact"
+                      },
+                      "mobile" : {
+                        "type" : [ "string", "null" ],
+                        "maxLength" : 50,
+                        "minLength" : 0,
+                        "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\(\\)\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+",
+                        "description" : "Mobile number of the contact"
+                      },
+                      "id" : {
+                        "type" : [ "string", "integer", "null" ],
+                        "format" : "int64",
+                        "pattern" : "([0-9]+)",
+                        "description" : "Unique ID of the contact"
+                      },
+                      "isSpam" : {
+                        "type" : [ "boolean", "null" ],
+                        "description" : "Indicates whether the contact is marked as spam"
+                      },
+                      "email" : {
+                        "type" : [ "string", "null" ],
+                        "maxLength" : 255,
+                        "minLength" : 0,
+                        "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'\\&\\~]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$",
+                        "description" : "Email address of the contact"
+                      },
+                      "niceUrl" : {
+                        "type" : [ "string", "null" ],
+                        "maxLength" : 500,
+                        "minLength" : 0,
+                        "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+                        "description" : "URL to open the associated contact in the Desk agent UI. Returned only when the featureFlags request header includes reactChanges."
+                      }
+                    },
+                    "required" : [ "accountId", "email", "firstName", "id", "isSpam", "lastName", "mobile", "phone" ]
+                  },
                   "modifiedTime" : {
                     "type" : [ "string", "null" ],
                     "maxLength" : 100,
@@ -1112,7 +1325,24 @@
             },
             "examples" : {
               "Valid responses Definitions" : {
-                "value" : null
+                "value" : {
+                  "subject" : "Zoholics at Australia",
+                  "completedTime" : null,
+                  "departmentId" : "5000000012710",
+                  "creatorId" : "5000000015911",
+                  "ownerId" : "5000000015911",
+                  "createdTime" : "2019-04-04T06:48:36.000Z",
+                  "startTime" : "2019-04-18T06:30:00.000Z",
+                  "id" : "5000000065115",
+                  "contactId" : "5000000016252",
+                  "priority" : "High",
+                  "layoutId" : "5000000013470",
+                  "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Events/dv/9d4883f2d94d59e4McKinsonf5d2f01bbb8bd4",
+                  "isSpam" : false,
+                  "category" : "Meeting",
+                  "ticketId" : "5000000016294",
+                  "status" : "Not Started"
+                }
               }
             }
           }
@@ -1134,7 +1364,7 @@
                         "ticket" : {
                           "type" : [ "object", "null" ],
                           "additionalProperties" : false,
-                          "maxProperties" : 13,
+                          "maxProperties" : 14,
                           "minProperties" : 13,
                           "properties" : {
                             "ticketNumber" : {
@@ -1162,6 +1392,7 @@
                             },
                             "channel" : {
                               "type" : [ "string", "null" ],
+                              "x-dynamic-enum" : true,
                               "description" : "Communication channel of the ticket"
                             },
                             "closedTime" : {
@@ -1237,7 +1468,15 @@
                             },
                             "status" : {
                               "type" : [ "string", "null" ],
+                              "x-dynamic-enum" : true,
                               "description" : "Status of the ticket"
+                            },
+                            "niceUrl" : {
+                              "type" : [ "string", "null" ],
+                              "maxLength" : 500,
+                              "minLength" : 0,
+                              "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+                              "description" : "URL to open the associated ticket in the Desk agent UI. Returned only when the featureFlags request header includes reactChanges."
                             }
                           },
                           "required" : [ "assignee", "channel", "closedTime", "createdTime", "dueDate", "id", "isArchived", "isSpam", "phone", "status", "subject", "teamId", "ticketNumber" ]
@@ -1245,7 +1484,7 @@
                         "contact" : {
                           "type" : [ "object", "null" ],
                           "additionalProperties" : false,
-                          "maxProperties" : 8,
+                          "maxProperties" : 9,
                           "minProperties" : 8,
                           "properties" : {
                             "firstName" : {
@@ -1296,6 +1535,13 @@
                               "minLength" : 0,
                               "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'\\&\\~]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$",
                               "description" : "Email address of the contact"
+                            },
+                            "niceUrl" : {
+                              "type" : [ "string", "null" ],
+                              "maxLength" : 500,
+                              "minLength" : 0,
+                              "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+                              "description" : "URL to open the associated contact in the Desk agent UI. Returned only when the featureFlags request header includes reactChanges."
                             }
                           },
                           "required" : [ "accountId", "email", "firstName", "id", "isSpam", "lastName", "mobile", "phone" ]
@@ -1403,18 +1649,18 @@
                     "contact" : {
                       "firstName" : null,
                       "lastName" : "Lawrence",
-                      "phone" : "1 555 010 0000",
+                      "phone" : "1 888 900 9646",
                       "mobile" : null,
                       "id" : "5000000016252",
                       "secId" : "9d4883f2d94d59e42b7cc45393ad8ff8"
                     },
-                    "createdTime" : 1554360516000,
-                    "startTime" : 1555569000000,
+                    "createdTime" : "2019-04-04T06:48:36.000Z",
+                    "startTime" : "2019-04-18T06:30:00.000Z",
                     "id" : "5000000065115",
                     "direction" : "inbound",
                     "ticket" : {
                       "ticketNumber" : "101",
-                      "phone" : "1 555 010 0000",
+                      "phone" : "1 888 900 9646",
                       "subject" : "Here's your first ticket.",
                       "dueDate" : 1553853086000,
                       "teamId" : "3691000006805021",
@@ -1422,7 +1668,7 @@
                       "team" : {
                         "name" : "Desk Team",
                         "id" : "3691000006805021",
-                        "logoUrl" : "https://desk.example.com/api/v1/teams/3691000006805021/logo?orgId=1234567890"
+                        "logoUrl" : "https://desk.zoho.com/api/v1/teams/3691000006805021/logo?orgId=11278831"
                       },
                       "assignee" : {
                         "photoURL" : null,
@@ -1437,11 +1683,11 @@
                     "team" : {
                       "name" : "Desk Team",
                       "id" : "3691000006805021",
-                      "logoUrl" : "https://desk.example.com/api/v1/teams/3691000006805021/logo?orgId=1234567890"
+                      "logoUrl" : "https://desk.zoho.com/api/v1/teams/3691000006805021/logo?orgId=11278831"
                     },
                     "priority" : "High",
                     "layoutId" : "5000000013470",
-                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Events/dv/9d4883f2d94d59e4McKinsonf5d2f01bbb8bd4",
+                    "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Events/dv/9d4883f2d94d59e4McKinsonf5d2f01bbb8bd4",
                     "teamId" : "3691000006805021",
                     "assignee" : {
                       "firstName" : "George",
@@ -1466,18 +1712,18 @@
                     "contact" : {
                       "firstName" : null,
                       "lastName" : "Lawrence",
-                      "phone" : "1 555 010 0000",
+                      "phone" : "1 888 900 9646",
                       "mobile" : null,
                       "id" : "5000000016252",
                       "secId" : "9d4883f2d94d59e42b7cc45393ad8ff8"
                     },
-                    "createdTime" : 1555416147000,
-                    "startTime" : 1556173800000,
+                    "createdTime" : "2019-04-16T12:02:27.000Z",
+                    "startTime" : "2019-04-25T06:30:00.000Z",
                     "id" : "5000000084070",
                     "direction" : "inbound",
                     "ticket" : {
                       "ticketNumber" : "101",
-                      "phone" : "1 555 010 0000",
+                      "phone" : "1 888 900 9646",
                       "subject" : "Here's your first ticket.",
                       "dueDate" : 1553853086000,
                       "teamId" : null,
@@ -1495,7 +1741,7 @@
                     "team" : null,
                     "priority" : "High",
                     "layoutId" : "5000000013470",
-                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Events/dv/9d4883f2d94d59e41c8e46db1a43ba49",
+                    "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Events/dv/9d4883f2d94d59e41c8e46db1a43ba49",
                     "teamId" : null,
                     "assignee" : {
                       "firstName" : "George",
@@ -1587,6 +1833,7 @@
                             },
                             "channel" : {
                               "type" : [ "string", "null" ],
+                              "x-dynamic-enum" : true,
                               "description" : "Communication channel of the ticket"
                             },
                             "closedTime" : {
@@ -1662,6 +1909,7 @@
                             },
                             "status" : {
                               "type" : [ "string", "null" ],
+                              "x-dynamic-enum" : true,
                               "description" : "Status of the ticket"
                             }
                           },
@@ -1762,7 +2010,7 @@
                   "data" : [ {
                     "ticket" : {
                       "ticketNumber" : "101",
-                      "phone" : "1 555 010 0000",
+                      "phone" : "1 888 900 9646",
                       "subject" : "Here's your first ticket.",
                       "dueDate" : 1553853086000,
                       "teamId" : null,
@@ -1786,17 +2034,17 @@
                     "ownerId" : "5000000015911",
                     "priority" : "High",
                     "isCommented" : true,
-                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Events/dv/9d4883f2d94d59e4McKinsonf5d2f01bbb8bd4",
+                    "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Events/dv/9d4883f2d94d59e4McKinsonf5d2f01bbb8bd4",
                     "contact" : {
                       "firstName" : null,
                       "lastName" : "Lawrence",
-                      "phone" : "1 555 010 0000",
+                      "phone" : "1 888 900 9646",
                       "mobile" : null,
                       "id" : "5000000016252",
                       "isSpam" : false
                     },
-                    "createdTime" : 1554360516000,
-                    "startTime" : 1555569000000,
+                    "createdTime" : "2019-04-04T06:48:36.000Z",
+                    "startTime" : "2019-04-18T06:30:00.000Z",
                     "id" : "5000000065115",
                     "assignee" : {
                       "firstName" : "George",
@@ -1813,7 +2061,7 @@
                   }, {
                     "ticket" : {
                       "ticketNumber" : "101",
-                      "phone" : "1 555 010 0000",
+                      "phone" : "1 888 900 9646",
                       "subject" : "Here's your first ticket.",
                       "dueDate" : 1553853086000,
                       "teamId" : "3691000006805021",
@@ -1821,7 +2069,7 @@
                       "team" : {
                         "name" : "Desk Team",
                         "id" : "3691000006805021",
-                        "logoUrl" : "https://desk.example.com/api/v1/teams/3691000006805021/logo?orgId=1234567890"
+                        "logoUrl" : "https://desk.zoho.com/api/v1/teams/3691000006805021/logo?orgId=11278831"
                       },
                       "assignee" : {
                         "photoURL" : null,
@@ -1841,23 +2089,23 @@
                     "team" : {
                       "name" : "Desk Team",
                       "id" : "3691000006805021",
-                      "logoUrl" : "https://desk.example.com/api/v1/teams/3691000006805021/logo?orgId=1234567890"
+                      "logoUrl" : "https://desk.zoho.com/api/v1/teams/3691000006805021/logo?orgId=11278831"
                     },
                     "ownerId" : "5000000015911",
                     "priority" : "High",
                     "isCommented" : true,
-                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Events/dv/9d4883f2d94d59e41c8e46db1a43ba49",
+                    "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Events/dv/9d4883f2d94d59e41c8e46db1a43ba49",
                     "teamId" : "3691000006805021",
                     "contact" : {
                       "firstName" : null,
                       "lastName" : "Lawrence",
-                      "phone" : "1 555 010 0000",
+                      "phone" : "1 888 900 9646",
                       "mobile" : null,
                       "id" : "5000000016252",
                       "isSpam" : false
                     },
-                    "createdTime" : 1555416147000,
-                    "startTime" : 1556173800000,
+                    "createdTime" : "2019-04-16T12:02:27.000Z",
+                    "startTime" : "2019-04-25T06:30:00.000Z",
                     "id" : "5000000084070",
                     "assignee" : {
                       "firstName" : "George",
@@ -1951,6 +2199,7 @@
                     "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]*|null|undefined)",
+                    "x-regex-name" : "long_null",
                     "description" : "Unique ID of the team assigned to the event"
                   },
                   "layoutId" : {
@@ -1970,7 +2219,7 @@
                   "contactId" : "3000000001234",
                   "subject" : "Dubai startup meet",
                   "departmentId" : "3000000007043",
-                  "startTime" : 1468484846000,
+                  "startTime" : "2016-07-14T08:27:26.000Z",
                   "priority" : "High",
                   "category" : "Meeting",
                   "ticketId" : "3000000008753",
@@ -2024,6 +2273,7 @@
                 },
                 "fieldName" : {
                   "type" : [ "string" ],
+                  "x-dynamic-enum" : true,
                   "description" : "Name of the field to update"
                 },
                 "ids" : {
@@ -2035,7 +2285,7 @@
                   "description" : "Value to set in the field"
                 }
               },
-              "required" : [ "fieldName", "ids" ]
+              "required" : [ "fieldName", "ids", "fieldValue" ]
             },
             "examples" : {
               "Valid requestBody Definitions" : {
@@ -2121,6 +2371,7 @@
                     "type" : [ "string", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]*|null|undefined)",
+                    "x-regex-name" : "long_null",
                     "description" : "Unique ID of the team assigned to the event"
                   },
                   "layoutId" : {
@@ -2135,7 +2386,17 @@
             },
             "examples" : {
               "Valid requestBody Definitions" : {
-                "value" : null
+                "value" : {
+                  "contactId" : "3000000001234",
+                  "departmentId" : "3000000007043",
+                  "startTime" : "2016-07-14T08:27:26.000Z",
+                  "subject" : "Dubai startup meet",
+                  "priority" : "High",
+                  "category" : "Meeting",
+                  "ticketId" : "3000000008753",
+                  "status" : "In Progress",
+                  "duration" : "40"
+                }
               }
             }
           }
@@ -2207,7 +2468,11 @@
       },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "Event"
 }

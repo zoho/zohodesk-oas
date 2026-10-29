@@ -11,6 +11,7 @@
         "summary" : "Report Comment as Spam",
         "description" : "Marks a comment on a community topic as spam.",
         "operationId" : "markACommentAsSpam",
+        "x-mcp-group" : [ "Manage Community Moderation" ],
         "parameters" : [ {
           "$ref" : "#/components/parameters/topicId",
           "description" : "Unique ID of the topic containing the comment"
@@ -38,7 +39,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.basic.UPDATE", "Desk.community.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.community.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.basic.UPDATE" ]
         } ]
       }
     },
@@ -48,6 +51,7 @@
         "summary" : "Report Comments as Spam",
         "description" : "Marks multiple comments on community topics as spam.",
         "operationId" : "markAllCommentsAsSpam",
+        "x-mcp-group" : [ "Manage Community Moderation" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -69,15 +73,17 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.basic.UPDATE", "Desk.community.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.community.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.basic.UPDATE" ]
         } ]
       }
     },
     "/api/v1/communityComments/restore" : {
       "post" : {
         "tags" : [ "CommunityComment" ],
-        "summary" : "Restore community topic trashed comments",
-        "description" : "This API restores comments that were trashed from forum topics.",
+        "summary" : "Restore Comments",
+        "description" : "Restores community comments from the Recycle Bin.",
         "operationId" : "restoreCommunityTrashedComments",
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -90,11 +96,11 @@
             "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
           },
           "200" : {
-            "$ref" : "./MassActionResponse.json#/components/responses/massActionListResponse"
+            "$ref" : "#/components/responses/massActionListResponseForCommunityComments"
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.forums.UPDATE", "Desk.community.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.community.UPDATE", "Desk.forums.UPDATE" ]
         } ]
       }
     },
@@ -104,6 +110,7 @@
         "summary" : "Get Comments Pending Moderation",
         "description" : "Retrieves comments that are pending moderation, with pagination support.",
         "operationId" : "getCommunityTopicModerationComments",
+        "x-mcp-group" : [ "Manage Community Moderation", "Manage Community Recyclebin" ],
         "parameters" : [ {
           "name" : "limit",
           "in" : "query",
@@ -194,13 +201,13 @@
     "/api/v1/communityComments/count" : {
       "get" : {
         "tags" : [ "CommunityComment" ],
-        "summary" : "Get Comments Views Count",
-        "description" : "This API fetches the total count of the comments based on the selected view.",
+        "summary" : "Get Comments Count",
+        "description" : "Retrieves the total count of comments based on the selected view.",
         "operationId" : "getCommunityCommentViewCount",
         "parameters" : [ {
           "name" : "viewId",
           "in" : "query",
-          "description" : "ID of a view for which you need to get the count",
+          "description" : "Unique ID of the view for which the count must be fetched.",
           "required" : true,
           "style" : "form",
           "explode" : true,
@@ -212,7 +219,7 @@
         }, {
           "name" : "type",
           "in" : "query",
-          "description" : "Type of topics to list. Values allowed are: @ANNOUNCEMENT@, @DISCUSSION@, @IDEA@, @PROBLEM@, and @QUESTION@.",
+          "description" : "Type of topics whose comments must be counted. Possible values: ANNOUNCEMENT, DISCUSSION, IDEA, PROBLEM, QUESTION",
           "required" : false,
           "style" : "form",
           "explode" : true,
@@ -223,15 +230,13 @@
         }, {
           "name" : "categoryId",
           "in" : "query",
-          "description" : "ID of the community category from which the comments must be fetched",
           "required" : false,
-          "style" : "form",
-          "explode" : true,
+          "description" : "Unique ID of the community category from which comments must be counted.",
           "schema" : {
-            "type" : [ "string", "integer" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
-          }
+            "$ref" : "#/components/schemas/categoryIdSchema"
+          },
+          "style" : "form",
+          "explode" : true
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -257,6 +262,7 @@
         "summary" : "Get Comment",
         "description" : "Retrieves a comment posted on a community topic.",
         "operationId" : "getCommunityTopicComment",
+        "x-mcp-group" : [ "Manage Community Comments", "View Community Comments" ],
         "parameters" : [ {
           "$ref" : "#/components/parameters/topicId",
           "description" : "Unique ID of the topic from which the comment must be retrieved"
@@ -292,6 +298,7 @@
         "summary" : "Update Comment",
         "description" : "Updates a published comment on a community topic.",
         "operationId" : "updateCommunityTopicComment",
+        "x-mcp-group" : [ "Manage Community Comments" ],
         "parameters" : [ {
           "$ref" : "#/components/parameters/topicId",
           "description" : "Unique ID of the topic containing the comment"
@@ -332,6 +339,7 @@
         "summary" : "Move Comment to Recycle Bin",
         "description" : "Moves a comment on a community topic to the Recycle Bin.",
         "operationId" : "moveTopicCommentToRecyclebin",
+        "x-mcp-group" : [ "Manage Community Recyclebin" ],
         "parameters" : [ {
           "$ref" : "#/components/parameters/topicId",
           "description" : "Unique ID of the topic containing the comment"
@@ -363,8 +371,8 @@
     "/api/v1/communityComments/approve" : {
       "post" : {
         "tags" : [ "CommunityComment" ],
-        "summary" : "Approve community topic comments",
-        "description" : "This API approves comments that are pending moderation.",
+        "summary" : "Approve comments",
+        "description" : "Approves community comments that are pending moderation and publishes them.",
         "operationId" : "approveCommunityTopicComments",
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -377,7 +385,7 @@
             "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
           },
           "200" : {
-            "$ref" : "./MassActionResponse.json#/components/responses/massActionListResponse"
+            "$ref" : "#/components/responses/massActionListResponseForCommunityComments"
           }
         },
         "security" : [ {
@@ -391,6 +399,7 @@
         "summary" : "Create Reply",
         "description" : "Adds a reply to a comment on a community topic.",
         "operationId" : "addCommunityTopicReply",
+        "x-mcp-group" : [ "Manage Community Comments" ],
         "parameters" : [ {
           "$ref" : "#/components/parameters/topicId",
           "description" : "Unique ID of the topic containing the comment"
@@ -440,6 +449,7 @@
         "summary" : "Move Reply to Recycle Bin",
         "description" : "Moves a reply to a community topic comment to the Recycle Bin.",
         "operationId" : "moveTopicReplyToRecyclebin",
+        "x-mcp-group" : [ "Manage Community Recyclebin" ],
         "parameters" : [ {
           "$ref" : "#/components/parameters/topicId",
           "description" : "Unique ID of the topic containing the comment"
@@ -477,6 +487,7 @@
         "summary" : "Get Comments by User",
         "description" : "Retrieves comments posted by a community user, with pagination support.",
         "operationId" : "getCommunityTopicUserComments",
+        "x-mcp-group" : [ "View Community Comments", "Manage Community Users" ],
         "parameters" : [ {
           "name" : "limit",
           "in" : "query",
@@ -516,7 +527,8 @@
           "schema" : {
             "type" : [ "string" ],
             "maxLength" : 100,
-            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null"
+            "pattern" : "((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)",
+            "x-regex-name" : "APIDateTime"
           }
         }, {
           "name" : "endTime",
@@ -528,7 +540,8 @@
           "schema" : {
             "type" : [ "string" ],
             "maxLength" : 100,
-            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null"
+            "pattern" : "((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)",
+            "x-regex-name" : "APIDateTime"
           }
         }, {
           "name" : "categoryId",
@@ -580,6 +593,7 @@
         "summary" : "Update Reply",
         "description" : "Updates a published reply on a community topic comment.",
         "operationId" : "updateCommunityTopicReply",
+        "x-mcp-group" : [ "Manage Community Comments" ],
         "parameters" : [ {
           "$ref" : "#/components/parameters/topicId",
           "description" : "Unique ID of the topic containing the comment"
@@ -620,8 +634,8 @@
     "/api/v1/communityComments/moveToTrash" : {
       "post" : {
         "tags" : [ "CommunityComment" ],
-        "summary" : "Trash unmoderated community topic comments",
-        "description" : "This API trashes comments that are yet to be approved for publishing on a forum topic. ",
+        "summary" : "Move Unmoderated Comments to Recycle Bin",
+        "description" : "Moves community comments that are pending moderation to the Recycle Bin.",
         "operationId" : "deleteUnModeratedCommunityTopicComments",
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -634,7 +648,7 @@
             "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
           },
           "200" : {
-            "$ref" : "./MassActionResponse.json#/components/responses/massActionListResponse"
+            "$ref" : "#/components/responses/massActionListResponseForCommunityComments"
           }
         },
         "security" : [ {
@@ -648,6 +662,7 @@
         "summary" : "Get Comments",
         "description" : "Retrieves a list of comments on a community topic, with pagination support.",
         "operationId" : "getAllCommunityTopicComments",
+        "x-mcp-group" : [ "Manage Community Comments", "View Community Comments" ],
         "parameters" : [ {
           "name" : "latestCommentsFirst",
           "in" : "query",
@@ -696,7 +711,8 @@
           "schema" : {
             "type" : [ "string" ],
             "maxLength" : 100,
-            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null"
+            "pattern" : "((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)",
+            "x-regex-name" : "APIDateTime"
           }
         }, {
           "name" : "endTime",
@@ -708,7 +724,8 @@
           "schema" : {
             "type" : [ "string" ],
             "maxLength" : 100,
-            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null"
+            "pattern" : "((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)",
+            "x-regex-name" : "APIDateTime"
           }
         }, {
           "$ref" : "#/components/parameters/topicId",
@@ -742,6 +759,7 @@
         "summary" : "Create Comment",
         "description" : "Adds a comment to a community topic.",
         "operationId" : "addCommunityTopicComment",
+        "x-mcp-group" : [ "Manage Community Comments" ],
         "parameters" : [ {
           "$ref" : "#/components/parameters/topicId",
           "description" : "Unique ID of the topic to which the comment must be added"
@@ -1322,6 +1340,34 @@
         "type" : [ "string", "integer" ],
         "format" : "int64",
         "pattern" : "([0-9]+)"
+      },
+      "massActionResponseForCommunityComments" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "success" : {
+            "description" : "Indicates whether the operation succeeded for the comment.",
+            "type" : [ "boolean" ]
+          },
+          "id" : {
+            "description" : "Unique ID of the comment.",
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "errors" : {
+            "description" : "Error details if the operation failed.",
+            "$ref" : "./MassActionError.json#/components/schemas/massActionErrorResponse"
+          }
+        },
+        "required" : [ "errors", "id", "success" ]
+      },
+      "resultsForCommunityComments" : {
+        "type" : [ "array" ],
+        "items" : {
+          "$ref" : "#/components/schemas/massActionResponseForCommunityComments"
+        },
+        "description" : "List of bulk operation results."
       }
     },
     "responses" : {
@@ -1347,7 +1393,7 @@
                     "summary" : "Comment 1",
                     "topicPeramlink" : "zoho-desk-api",
                     "creator" : {
-                      "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015971/photo?orgId=1234567890",
+                      "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015971/photo?orgId=123456",
                       "name" : "user1",
                       "id" : "7000000015971",
                       "label" : {
@@ -1358,7 +1404,7 @@
                         },
                         "name" : "Admin",
                         "id" : "6000000158001",
-                        "logoUrl" : "https://desk.example.com/portal/api/publicImages/6000000158231?orgId=1234567890"
+                        "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/6000000158231?orgId=14132"
                       },
                       "type" : [ "END_USER" ]
                     },
@@ -1374,7 +1420,7 @@
                     "topicPeramlink" : "zoho-desk-api-features",
                     "modifiedTime" : 1539685739495,
                     "creator" : {
-                      "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015971/photo?orgId=1234567890",
+                      "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015971/photo?orgId=123456",
                       "name" : "user 1",
                       "id" : "7000000015971",
                       "label" : {
@@ -1385,7 +1431,7 @@
                         },
                         "name" : "Admin",
                         "id" : "6000000158001",
-                        "logoUrl" : "https://desk.example.com/portal/api/publicImages/6000000158231?orgId=1234567890"
+                        "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/6000000158231?orgId=14132"
                       },
                       "type" : [ "END_USER" ]
                     },
@@ -1412,6 +1458,7 @@
               "additionalProperties" : false,
               "properties" : {
                 "count" : {
+                  "description" : "Total count of comments matching the filter criteria.",
                   "type" : [ "string", "integer", "null" ],
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
@@ -1423,6 +1470,41 @@
               "Valid responses Definitions" : {
                 "value" : {
                   "count" : "10"
+                }
+              }
+            }
+          }
+        }
+      },
+      "massActionListResponseForCommunityComments" : {
+        "description" : "massActionListResponseForCommunityComments template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "results" : {
+                  "$ref" : "#/components/schemas/resultsForCommunityComments"
+                }
+              },
+              "required" : [ "results" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "results" : [ {
+                    "success" : true,
+                    "id" : "7000000027223",
+                    "errors" : null
+                  }, {
+                    "success" : false,
+                    "id" : "7000000043968",
+                    "errors" : {
+                      "errorCode" : "UNPROCESSABLE_ENTITY",
+                      "httpCode" : "422"
+                    }
+                  } ]
                 }
               }
             }
@@ -1454,7 +1536,7 @@
                 "value" : {
                   "modifiedTime" : 1539685260386,
                   "creator" : {
-                    "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015971/photo?orgId=1234567890",
+                    "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015971/photo?orgId=123456",
                     "name" : "user 2",
                     "id" : "7000000015971",
                     "label" : {
@@ -1465,7 +1547,7 @@
                       },
                       "name" : "Admin",
                       "id" : "6000000158001",
-                      "logoUrl" : "https://desk.example.com/portal/api/publicImages/6000000158231?orgId=1234567890"
+                      "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/6000000158231?orgId=14132"
                     },
                     "type" : [ "AGENT" ]
                   },
@@ -1473,7 +1555,7 @@
                     "size" : "1166",
                     "name" : "download.png",
                     "id" : "4000000019027",
-                    "href" : "https://desk.example.com/api/v1/communityTopics/4000000019003/comments/4000000019029/attachments/4000000019027/content?orgId=1234567890"
+                    "href" : "https://desk.zoho.com/api/v1/communityTopics/4000000019003/comments/4000000019029/attachments/4000000019027/content?orgId=123456"
                   } ],
                   "replies" : [ ],
                   "createdTime" : 1539685260386,
@@ -1543,7 +1625,7 @@
                 "value" : {
                   "modifiedTime" : 1539685260386,
                   "creator" : {
-                    "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015971/photo?orgId=1234567890",
+                    "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015971/photo?orgId=123456",
                     "name" : "user 2",
                     "id" : "7000000015971",
                     "label" : {
@@ -1554,14 +1636,14 @@
                       },
                       "name" : "Admin",
                       "id" : "6000000158001",
-                      "logoUrl" : "https://desk.example.com/portal/api/publicImages/6000000158231?orgId=1234567890"
+                      "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/6000000158231?orgId=14132"
                     }
                   },
                   "attachments" : [ {
                     "size" : "1166",
                     "name" : "download.png",
                     "id" : "4000000019027",
-                    "href" : "https://desk.example.com/api/v1/communityTopics/4000000019003/replies/4000000019031/attachments/4000000019027/content?orgId=1234567890"
+                    "href" : "https://desk.zoho.com/api/v1/communityTopics/4000000019003/replies/4000000019031/attachments/4000000019027/content?orgId=123456"
                   } ],
                   "createdTime" : 1539685260386,
                   "parentCommentId" : "4000000019029",
@@ -1595,7 +1677,7 @@
                     "summary" : "Comment 1",
                     "topicPeramlink" : "zoho-desk-api",
                     "creator" : {
-                      "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015971/photo?orgId=1234567890",
+                      "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015971/photo?orgId=123456",
                       "name" : "user2",
                       "id" : "7000000015972",
                       "label" : {
@@ -1606,7 +1688,7 @@
                         },
                         "name" : "Admin",
                         "id" : "6000000158001",
-                        "logoUrl" : "https://desk.example.com/portal/api/publicImages/6000000158231?orgId=1234567890"
+                        "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/6000000158231?orgId=14132"
                       },
                       "type" : [ "AGENT" ]
                     },
@@ -1622,7 +1704,7 @@
                     "summary" : "Comment 2",
                     "topicPeramlink" : "zoho-desk-api-features",
                     "creator" : {
-                      "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015971/photo?orgId=1234567890",
+                      "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015971/photo?orgId=123456",
                       "name" : "user2",
                       "id" : "7000000015972",
                       "type" : [ "AGENT" ]
@@ -1663,7 +1745,7 @@
                   "data" : [ {
                     "modifiedTime" : 1539685755219,
                     "creator" : {
-                      "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015971/photo?orgId=1234567890",
+                      "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015971/photo?orgId=123456",
                       "name" : "user1",
                       "id" : "7000000015971",
                       "label" : {
@@ -1674,14 +1756,14 @@
                         },
                         "name" : "Admin",
                         "id" : "6000000158001",
-                        "logoUrl" : "https://desk.example.com/portal/api/publicImages/6000000158231?orgId=1234567890"
+                        "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/6000000158231?orgId=14132"
                       }
                     },
                     "attachments" : [ {
                       "size" : "1166",
                       "name" : "download (1).png",
                       "id" : "4000000019033",
-                      "href" : "https://desk.example.com/api/v1/topics/4000000019003/comments/4000000019013/attachments/4000000019033/content?orgId=1234567890"
+                      "href" : "https://desk.zoho.com/api/v1/topics/4000000019003/comments/4000000019013/attachments/4000000019033/content?orgId=123456"
                     } ],
                     "replies" : [ ],
                     "createdTime" : 1539682900077,
@@ -1691,7 +1773,7 @@
                   }, {
                     "modifiedTime" : 1539685739495,
                     "creator" : {
-                      "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015971/photo?orgId=1234567890",
+                      "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015971/photo?orgId=123456",
                       "name" : "user 1",
                       "id" : "7000000015971",
                       "label" : {
@@ -1702,14 +1784,14 @@
                         },
                         "name" : "Admin",
                         "id" : "6000000158001",
-                        "logoUrl" : "https://desk.example.com/portal/api/publicImages/6000000158231?orgId=1234567890"
+                        "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/6000000158231?orgId=14132"
                       }
                     },
                     "attachments" : [ ],
                     "replies" : [ {
                       "modifiedTime" : 1539685366893,
                       "creator" : {
-                        "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015971/photo?orgId=1234567890",
+                        "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015971/photo?orgId=123456",
                         "name" : "user 1",
                         "id" : "7000000015971",
                         "label" : {
@@ -1720,7 +1802,7 @@
                           },
                           "name" : "Admin",
                           "id" : "6000000158001",
-                          "logoUrl" : "https://desk.example.com/portal/api/publicImages/6000000158231?orgId=1234567890"
+                          "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/6000000158231?orgId=14132"
                         }
                       },
                       "attachments" : [ ],
@@ -1766,7 +1848,7 @@
                 "value" : {
                   "modifiedTime" : 1539685260386,
                   "creator" : {
-                    "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015971/photo?orgId=1234567890",
+                    "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015971/photo?orgId=123456",
                     "name" : "user 2",
                     "id" : "7000000015971",
                     "label" : {
@@ -1777,7 +1859,7 @@
                       },
                       "name" : "Admin",
                       "id" : "6000000158001",
-                      "logoUrl" : "https://desk.example.com/portal/api/publicImages/6000000158231?orgId=1234567890"
+                      "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/6000000158231?orgId=14132"
                     },
                     "type" : [ "AGENT" ]
                   },
@@ -1785,7 +1867,7 @@
                     "size" : "1166",
                     "name" : "download.png",
                     "id" : "4000000019027",
-                    "href" : "https://desk.example.com/api/v1/communityTopics/4000000019003/comments/4000000019029/attachments/4000000019027/content?orgId=1234567890"
+                    "href" : "https://desk.zoho.com/api/v1/communityTopics/4000000019003/comments/4000000019029/attachments/4000000019027/content?orgId=123456"
                   } ],
                   "replies" : [ ],
                   "createdTime" : 1539685260386,
@@ -1823,7 +1905,7 @@
                 "value" : {
                   "modifiedTime" : 1539685260386,
                   "creator" : {
-                    "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015971/photo?orgId=1234567890",
+                    "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015971/photo?orgId=123456",
                     "name" : "user 2",
                     "id" : "7000000015971",
                     "label" : {
@@ -1834,7 +1916,7 @@
                       },
                       "name" : "Admin",
                       "id" : "6000000158001",
-                      "logoUrl" : "https://desk.example.com/portal/api/publicImages/6000000158231?orgId=1234567890"
+                      "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/6000000158231?orgId=14132"
                     },
                     "type" : [ "AGENT" ]
                   },
@@ -1842,7 +1924,7 @@
                     "size" : "1166",
                     "name" : "download.png",
                     "id" : "4000000019027",
-                    "href" : "https://desk.example.com/api/v1/communityTopics/4000000019003/comments/4000000019029/attachments/4000000019027/content?orgId=1234567890"
+                    "href" : "https://desk.zoho.com/api/v1/communityTopics/4000000019003/comments/4000000019029/attachments/4000000019027/content?orgId=123456"
                   } ],
                   "replies" : [ ],
                   "createdTime" : 1539685260386,
@@ -1958,6 +2040,7 @@
               "properties" : {
                 "commentIds" : {
                   "type" : [ "array" ],
+                  "description" : "ID(s) of the comment(s) to restore. Note: A maximum of 50 IDs is allowed.",
                   "items" : {
                     "type" : [ "string", "integer" ],
                     "format" : "int64",
@@ -2061,6 +2144,7 @@
               "properties" : {
                 "commentIds" : {
                   "type" : [ "array" ],
+                  "description" : "ID(s) of the comment(s) to approve. Note: A maximum of 50 IDs is allowed.",
                   "items" : {
                     "type" : [ "string", "integer" ],
                     "format" : "int64",
@@ -2170,6 +2254,7 @@
               "properties" : {
                 "commentIds" : {
                   "type" : [ "array" ],
+                  "description" : "ID(s) of the comment(s) to move to the Recycle Bin. Note: A maximum of 50 IDs is allowed.",
                   "items" : {
                     "type" : [ "string", "integer" ],
                     "format" : "int64",
@@ -2237,7 +2322,11 @@
       },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "CommunityComment"
 }

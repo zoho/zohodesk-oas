@@ -11,6 +11,7 @@
         "summary" : "Update Draft",
         "description" : "This API updates a draft thread created via the @EMAIL@, @FACEBOOK@, or @FORUM@ channel.",
         "operationId" : "updateDrafts",
+        "x-mcp-group" : [ "Tickets" ],
         "parameters" : [ {
           "name" : "threadId",
           "in" : "path",
@@ -146,6 +147,7 @@
         "summary" : "Get Original Mail Content",
         "description" : "This API get the orginal mail content including mail headers",
         "operationId" : "getOriginalMailContent",
+        "x-mcp-group" : [ "Ticket Threads", "Tickets" ],
         "parameters" : [ {
           "name" : "inline",
           "in" : "query",
@@ -199,6 +201,7 @@
         "summary" : "Send Email Reply",
         "description" : "This API sends an email reply. The from address in the email must be a from address configured in your help desk portal.",
         "operationId" : "sendReply",
+        "x-mcp-group" : [ "Tickets" ],
         "parameters" : [ {
           "name" : "isPrivate",
           "in" : "query",
@@ -234,6 +237,17 @@
             "description" : ""
           },
           "description" : ""
+        }, {
+          "name" : "parentConversationId",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         }, {
@@ -323,6 +337,7 @@
         "summary" : "Draft Email Reply",
         "description" : "This API drafts an email reply. The from address in the email must be a from address configured in your help desk portal.",
         "operationId" : "draftsReply",
+        "x-mcp-group" : [ "Tickets" ],
         "parameters" : [ {
           "name" : "ticketId",
           "in" : "path",
@@ -338,6 +353,17 @@
           "description" : ""
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
+        }, {
+          "name" : "parentConversationId",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
         } ],
         "requestBody" : {
           "content" : {
@@ -402,6 +428,7 @@
         "summary" : "List all threads ",
         "description" : "This API lists all threads in your helpdesk.",
         "operationId" : "getThreads",
+        "x-mcp-group" : [ "Ticket Threads", "Tickets" ],
         "parameters" : [ {
           "name" : "ticketId",
           "in" : "path",
@@ -428,7 +455,8 @@
             "type" : [ "string", "null", "integer" ],
             "format" : "int32",
             "description" : "Number of threads to fetch",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "default" : 100
           }
         }, {
           "name" : "from",
@@ -453,9 +481,8 @@
           "schema" : {
             "type" : [ "string", "null" ],
             "description" : "Key that sorts the threads by sendDateTime.<br>If the value of sortBy key is: <br> <ul><li> \"<b>sendDateTime</b>\" - sorting will be done in <b> ascending </b> order</li> <li> \"<b>-sendDateTime </b>\" - (prefix the value with a \"-\") sorting will be done in <b>descending</b> order</li></ul> <br> <b>Note:</b> If this sortBy key is not specified, the sorting will be done in descending order by default based on sendDateTime.",
-            "enum" : [ "sendDateTime" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "pattern" : "-?(sendDateTime)"
           }
         } ],
         "responses" : {
@@ -474,6 +501,7 @@
         "summary" : "Get Latest thread",
         "description" : "This API fetches the most recent thread of a ticket.<br/><br/>_Note_:<br/>The _API response_ for 'Get Latest Thread' will be _dynamic_, based on the channel from which the latest thread is received. For example, if the latest thread is received via the _Email_ channel, the API will return the keys _cc, to, and bcc_, along with other details. These keys will not be included in the response for threads received via other channels.",
         "operationId" : "getLastThreadMessage",
+        "x-mcp-group" : [ "Ticket Threads", "Tickets" ],
         "parameters" : [ {
           "name" : "ticketId",
           "in" : "path",
@@ -519,10 +547,12 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : "string",
-            "pattern" : "^(source|plainText)(,(source|plainText))?$",
-            "enum" : [ "source", "plainText", "source,plainText", "plainText,source" ],
-            "maxLength" : 100
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "enum" : [ "source", "plainText" ]
+            },
+            "maxItems" : 2
           }
         }, {
           "name" : "threadStatus",
@@ -583,6 +613,7 @@
           "schema" : {
             "type" : [ "string", "integer" ],
             "format" : "int64",
+            "maxLength" : 100,
             "description" : "Id of thread to be resend",
             "pattern" : "([0-9]+)"
           }
@@ -640,6 +671,7 @@
           "schema" : {
             "type" : [ "string", "integer" ],
             "format" : "int64",
+            "maxLength" : 100,
             "description" : "draft thread Id",
             "pattern" : "([0-9]+)"
           }
@@ -654,7 +686,8 @@
             "type" : [ "string" ],
             "description" : "Status of the ticket. Includes the custom statuses configured in your help desk portal.",
             "maxLength" : 120,
-            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:/\\!\\P{InBasicLatin}\\s()]+"
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:/\\!\\P{InBasicLatin}\\s()]+",
+            "x-regex-name" : "picklistValue"
           }
         }, {
           "name" : "sendImmediately",
@@ -732,6 +765,7 @@
         "summary" : "Send For Review",
         "description" : "This API saves drafts of agent's responses to customers and sends them to a manager/senior agent for review.",
         "operationId" : "sendForReview",
+        "x-mcp-group" : [ "Tickets" ],
         "parameters" : [ {
           "name" : "threadId",
           "in" : "path",
@@ -777,6 +811,7 @@
         "summary" : "Get a thread",
         "description" : "This API fetches a single thread from your help desk portal.",
         "operationId" : "getThread",
+        "x-mcp-group" : [ "Ticket Threads", "Tickets" ],
         "parameters" : [ {
           "name" : "threadId",
           "in" : "path",
@@ -811,8 +846,12 @@
           "description" : "Content of the thread in plain text format. Value allowed is plainText.",
           "required" : false,
           "schema" : {
-            "type" : [ "string" ],
-            "enum" : [ "plainText" ],
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "enum" : [ "source", "plainText" ]
+            },
+            "maxItems" : 2,
             "description" : "Content of the thread in plain text format. Value allowed is plainText."
           }
         } ],
@@ -832,6 +871,7 @@
     "/api/v1/tickets/{ticketId}/conversations" : {
       "get" : {
         "operationId" : "getTicketConversations",
+        "x-mcp-group" : [ "Ticket Threads", "Tickets" ],
         "summary" : "List conversations of a ticket",
         "description" : "This API lists a particular number of threads and comments recorded on a ticket, based on the limit specified.",
         "tags" : [ "Thread" ],
@@ -903,6 +943,7 @@
         "summary" : "Delete attachment",
         "description" : "This API deletes an attachment from a draft thread.",
         "operationId" : "deleteAttachment",
+        "x-mcp-group" : [ "Tickets" ],
         "parameters" : [ {
           "name" : "threadId",
           "in" : "path",
@@ -958,8 +999,8 @@
     "/api/v1/tickets/{ticketId}/threads/{threadId}/attachments/{attachmentId}/content" : {
       "get" : {
         "tags" : [ "Thread" ],
-        "summary" : "Delete attachment",
-        "description" : "This API deletes an attachment from a draft thread.",
+        "summary" : "Get Thread Attachment Content",
+        "description" : "This API retrieves the content of an attachment from a thread.",
         "operationId" : "getThreadAttachmentContent",
         "parameters" : [ {
           "name" : "threadId",
@@ -977,14 +1018,14 @@
         }, {
           "name" : "attachmentId",
           "in" : "path",
-          "description" : "ID of the attachment to be deleted",
+          "description" : "ID of the attachment whose content must be retrieved",
           "required" : true,
           "style" : "simple",
           "explode" : false,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
-            "description" : "ID of the attachment to be deleted",
+            "description" : "ID of the attachment whose content must be retrieved",
             "pattern" : "([0-9]+)"
           }
         }, {
@@ -1027,22 +1068,26 @@
             "type" : [ "string", "null" ],
             "maxLength" : 200,
             "minLength" : 0,
+            "description" : "URL of the author's profile photo",
             "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
           },
           "firstName" : {
             "type" : [ "string", "null" ],
             "maxLength" : 50,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "First name of the author"
           },
           "lastName" : {
             "type" : [ "string", "null" ],
             "maxLength" : 50,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Last name of the author"
           },
           "name" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Full name of the author"
           },
           "id" : {
             "type" : [ "string", "integer", "null" ],
@@ -1053,12 +1098,14 @@
             "type" : [ "string", "null" ],
             "enum" : [ "END_USER", "AGENT", "TEAM", "TICKET", "ACTIVITY" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Type of the author. Accepted values: END_USER, AGENT, TEAM, TICKET, ACTIVITY"
           },
           "email" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
+            "description" : "Email address of the author",
             "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&~]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
           }
         },
@@ -1217,7 +1264,8 @@
             "type" : [ "string", "null" ],
             "enum" : [ "NEUTRAL", "NEGATIVE", "POSITIVE", "null", null ],
             "maxLength" : 100,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Indicates whether the customer's overall tone in the thread is positive, negative, or neutral. Possible values: Positive - The customer expresses a positive or satisfied tone. Negative - The customer expresses a negative, dissatisfied, or frustrated tone. Neutral - The customer expresses neither a clearly positive nor negative tone. null - Returned when the ticket sentiment feature is disabled for the organization or the specific department."
           },
           "keyWords" : {
             "type" : [ "array", "null" ],
@@ -1337,7 +1385,8 @@
             "type" : [ "string", "null" ],
             "enum" : [ "NEUTRAL", "NEGATIVE", "POSITIVE", "null" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Indicates whether the customer's overall tone in the thread is positive, negative, or neutral. Possible values: Positive - The customer expresses a positive or satisfied tone. Negative - The customer expresses a negative, dissatisfied, or frustrated tone. Neutral - The customer expresses neither a clearly positive nor negative tone. null - Returned when the ticket sentiment feature is disabled for the organization or the specific department."
           },
           "keyWords" : {
             "type" : [ "array", "null" ],
@@ -1463,7 +1512,8 @@
             "type" : [ "string", "null" ],
             "enum" : [ "NEUTRAL", "NEGATIVE", "POSITIVE", "null" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Indicates whether the customer's overall tone in the thread is positive, negative, or neutral. Possible values: Positive - The customer expresses a positive or satisfied tone. Negative - The customer expresses a negative, dissatisfied, or frustrated tone. Neutral - The customer expresses neither a clearly positive nor negative tone. null - Returned when the ticket sentiment feature is disabled for the organization or the specific department."
           },
           "keyWords" : {
             "type" : [ "array", "null" ],
@@ -1583,7 +1633,8 @@
             "type" : [ "string", "null" ],
             "enum" : [ "NEUTRAL", "NEGATIVE", "POSITIVE", "null" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Indicates whether the customer's overall tone in the thread is positive, negative, or neutral. Possible values: Positive - The customer expresses a positive or satisfied tone. Negative - The customer expresses a negative, dissatisfied, or frustrated tone. Neutral - The customer expresses neither a clearly positive nor negative tone. null - Returned when the ticket sentiment feature is disabled for the organization or the specific department."
           },
           "isDescriptionThread" : {
             "type" : [ "boolean", "null" ]
@@ -1727,7 +1778,8 @@
             "type" : [ "string", "null" ],
             "enum" : [ "NEUTRAL", "NEGATIVE", "POSITIVE", null, "null" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Indicates whether the customer's overall tone in the thread is positive, negative, or neutral. Possible values: Positive - The customer expresses a positive or satisfied tone. Negative - The customer expresses a negative, dissatisfied, or frustrated tone. Neutral - The customer expresses neither a clearly positive nor negative tone. null - Returned when the ticket sentiment feature is disabled for the organization or the specific department."
           },
           "isDescriptionThread" : {
             "type" : [ "boolean", "null" ]
@@ -1906,6 +1958,13 @@
         "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
+          "status" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "VALID", "INVALID", null ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "description" : "Status of the thread attachment. Possible values: VALID, INVALID. When the status is INVALID, href and previewurl are returned as null."
+          },
           "previewurl" : {
             "type" : [ "string", "null" ],
             "maxLength" : 16000000,
@@ -2058,7 +2117,7 @@
             "type" : [ "string", "null" ],
             "maxLength" : 13000,
             "minLength" : 0,
-            "pattern" : "(^((.*?)((<)*?[a-zA-Z0-9]([\\w\\-.+]*)@([\\w\\-.]*)(\\.[a-zA-Z]{2,22}(.[a-zA-Z]{2}){0,2})(>)*?(\\s)*((,|;)\\s*)?))+|^$)"
+            "pattern" : "(^((.*?)((<)*?[\\p{L}\\p{M}\\p{N}\\_]([\\p{L}\\p{M}\\p{N}\\_\\-.+\\'\\/\\&]*)@([\\p{L}\\p{M}\\p{N}\\_\\-_.]*)(.[\\p{L}\\p{M}\\p{N}\\_]{2,22}(.[\\p{L}\\p{M}\\p{N}\\_]{2}){0,2})(>)*?(\\s)*((,|;)\\s*)?))+|^$)"
           },
           "attachments" : {
             "$ref" : "#/components/schemas/attachments"
@@ -2116,7 +2175,7 @@
             "type" : [ "string", "null" ],
             "maxLength" : 13000,
             "minLength" : 0,
-            "pattern" : "(^((.*?)((<)*?[a-zA-Z0-9]([\\w\\-.+]*)@([\\w\\-.]*)(\\.[a-zA-Z]{2,22}(.[a-zA-Z]{2}){0,2})(>)*?(\\s)*((,|;)\\s*)?))+|^$)"
+            "pattern" : "(^((.*?)((<)*?[\\p{L}\\p{M}\\p{N}\\_]([\\p{L}\\p{M}\\p{N}\\_\\-.+\\'\\/\\&]*)@([\\p{L}\\p{M}\\p{N}\\_\\-_.]*)(.[\\p{L}\\p{M}\\p{N}\\_]{2,22}(.[\\p{L}\\p{M}\\p{N}\\_]{2}){0,2})(>)*?(\\s)*((,|;)\\s*)?))+|^$)"
           },
           "summary" : {
             "type" : [ "string", "null" ],
@@ -2154,7 +2213,7 @@
             "type" : [ "string", "null" ],
             "maxLength" : 13000,
             "minLength" : 0,
-            "pattern" : "(^((.*?)((<)*?[a-zA-Z0-9]([\\w\\-.+]*)@([\\w\\-.]*)(\\.[a-zA-Z]{2,22}(.[a-zA-Z]{2}){0,2})(>)*?(\\s)*((,|;)\\s*)?))+|^$)"
+            "pattern" : "(^((.*?)((<)*?[\\p{L}\\p{M}\\p{N}\\_]([\\p{L}\\p{M}\\p{N}\\_\\-.+\\'\\/\\&]*)@([\\p{L}\\p{M}\\p{N}\\_\\-_.]*)(.[\\p{L}\\p{M}\\p{N}\\_]{2,22}(.[\\p{L}\\p{M}\\p{N}\\_]{2}){0,2})(>)*?(\\s)*((,|;)\\s*)?))+|^$)"
           },
           "attachmentCount" : {
             "type" : [ "string", "integer", "null" ],
@@ -2168,7 +2227,7 @@
             "type" : [ "string", "null" ],
             "maxLength" : 13000,
             "minLength" : 0,
-            "pattern" : "(^((.*?)((<)*?[a-zA-Z0-9]([\\w\\-.+]*)@([\\w\\-.]*)(\\.[a-zA-Z]{2,22}(.[a-zA-Z]{2}){0,2})(>)*?(\\s)*((,|;)\\s*)?))+|^$)"
+            "pattern" : "(^((.*?)((<)*?[\\p{L}\\p{M}\\p{N}\\_]([\\p{L}\\p{M}\\p{N}\\_\\-.+\\'\\/\\&]*)@([\\p{L}\\p{M}\\p{N}\\_\\-_.]*)(.[\\p{L}\\p{M}\\p{N}\\_]{2,22}(.[\\p{L}\\p{M}\\p{N}\\_]{2}){0,2})(>)*?(\\s)*((,|;)\\s*)?))+|^$)"
           },
           "fromEmailAddress" : {
             "type" : [ "string", "null" ],
@@ -2198,7 +2257,8 @@
             "type" : [ "string", "null" ]
           },
           "sentiment" : {
-            "type" : [ "string", "null" ]
+            "type" : [ "string", "null" ],
+            "description" : "Indicates whether the customer's overall tone in the thread is positive, negative, or neutral. Possible values: Positive - The customer expresses a positive or satisfied tone. Negative - The customer expresses a negative, dissatisfied, or frustrated tone. Neutral - The customer expresses neither a clearly positive nor negative tone. null - Returned when the ticket sentiment feature is disabled for the organization or the specific department."
           }
         },
         "required" : [ "actions", "attachmentCount", "attachments", "author", "bcc", "canReply", "cc", "channel", "channelRelatedInfo", "content", "contentType", "createdTime", "direction", "fromEmailAddress", "fullContentURL", "hasAttach", "id", "impersonatedUser", "isContentTruncated", "isDescriptionThread", "isForward", "readReceipts", "replyTo", "responderId", "source", "status", "summary", "to", "visibility" ]
@@ -2217,8 +2277,7 @@
           "content" : {
             "type" : [ "string", "null" ],
             "description" : "Content of the thread",
-            "maxLength" : 16000000,
-            "minLength" : 0
+            "maxLength" : 16000000
           },
           "contentType" : {
             "type" : [ "string", "null" ],
@@ -2252,13 +2311,13 @@
             "type" : [ "string", "null" ],
             "description" : "Email ID to be CC-ed. Applicable only for @EMAIL@ channel",
             "maxLength" : 13000,
-            "pattern" : "^[A-Za-z0-9._%+-]+@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$"
+            "pattern" : "^((.*?)((<)*?[\\p{L}\\p{M}\\p{N}\\_]([\\p{L}\\p{M}\\p{N}\\_\\-.+\\'\\/\\&]*)@([\\p{L}\\p{M}\\p{N}\\_\\-_.]*)(.[\\p{L}\\p{M}\\p{N}\\_]{2,22}(.[\\p{L}\\p{M}\\p{N}\\_]{2}){0,2})(>)*?(\\s)*((,|;)\\s*)?))+"
           },
           "bcc" : {
             "type" : [ "string", "null" ],
             "description" : "Email ID to be BCC-ed. Applicable only for @EMAIL@ channel",
             "maxLength" : 13000,
-            "pattern" : "^[A-Za-z0-9._%+-]+@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$"
+            "pattern" : "^((.*?)((<)*?[\\p{L}\\p{M}\\p{N}\\_]([\\p{L}\\p{M}\\p{N}\\_\\-.+\\'\\/\\&]*)@([\\p{L}\\p{M}\\p{N}\\_\\-_.]*)(.[\\p{L}\\p{M}\\p{N}\\_]{2,22}(.[\\p{L}\\p{M}\\p{N}\\_]{2}){0,2})(>)*?(\\s)*((,|;)\\s*)?))+"
           },
           "hasAttach" : {
             "type" : [ "boolean", "null" ],
@@ -2305,6 +2364,7 @@
             "ticketStatus" : {
               "type" : [ "string", "null" ],
               "description" : "Status of the ticket. Includes the custom statuses configured in your help desk portal.",
+              "x-dynamic-enum" : true,
               "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
             },
             "attachmentIds" : {
@@ -2429,7 +2489,7 @@
             "type" : [ "string", "null" ],
             "maxLength" : 13000,
             "minLength" : 0,
-            "pattern" : "(^([a-zA-Z0-9\\s\\.\\?\\_\\-\\,])*$|null|undefined)"
+            "pattern" : "(^((.*?)((<)*?[a-zA-Z0-9]([\\w\\-.+\\'\\/]*)@([\\w\\-.]*)(\\.[a-zA-Z]{2,22}(.[a-zA-Z]{2}){0,2})(>)*?(\\s)*((,|;)\\s*)?))+|^$)"
           },
           "hasAttach" : {
             "type" : [ "boolean", "null" ]
@@ -2481,9 +2541,18 @@
             "enum" : [ "in", "out" ],
             "maxLength" : 100,
             "minLength" : 0
+          },
+          "impersonatedUser" : {
+            "$ref" : "#/components/schemas/author"
+          },
+          "respondedIn" : {
+            "type" : [ "string", "null" ],
+            "description" : "Time taken by the agent to respond to the customer",
+            "maxLength" : 100,
+            "minLength" : 0
           }
         },
-        "required" : [ "actions", "attachmentCount", "attachments", "author", "canReply", "channel", "channelRelatedInfo", "content", "contentType", "createdTime", "direction", "facebookProfile", "fullContentURL", "hasAttach", "id", "isContentTruncated", "isDescriptionThread", "readReceipts", "responderId", "source", "status", "summary", "visibility" ]
+        "required" : [ "actions", "attachmentCount", "attachments", "author", "canReply", "channel", "channelRelatedInfo", "content", "contentType", "createdTime", "direction", "facebookProfile", "fullContentURL", "hasAttach", "id", "isContentTruncated", "isDescriptionThread", "readReceipts", "responderId", "source", "status", "summary", "visibility", "impersonatedUser" ]
       },
       "forumSendReply" : {
         "additionalProperties" : false,
@@ -2622,9 +2691,18 @@
             "enum" : [ "in", "out" ],
             "maxLength" : 100,
             "minLength" : 0
+          },
+          "impersonatedUser" : {
+            "$ref" : "#/components/schemas/author"
+          },
+          "respondedIn" : {
+            "type" : [ "string", "null" ],
+            "description" : "Time taken by the agent to respond to the customer",
+            "maxLength" : 100,
+            "minLength" : 0
           }
         },
-        "required" : [ "actions", "attachmentCount", "attachments", "author", "canReply", "channel", "channelRelatedInfo", "content", "contentType", "createdTime", "direction", "fromEmailAddress", "fullContentURL", "hasAttach", "id", "isContentTruncated", "isDescriptionThread", "readReceipts", "responderId", "source", "status", "summary", "visibility" ]
+        "required" : [ "actions", "attachmentCount", "attachments", "author", "canReply", "channel", "channelRelatedInfo", "content", "contentType", "createdTime", "direction", "fromEmailAddress", "fullContentURL", "hasAttach", "id", "isContentTruncated", "isDescriptionThread", "readReceipts", "responderId", "source", "status", "summary", "visibility", "impersonatedUser" ]
       },
       "twitterSendReply" : {
         "additionalProperties" : false,
@@ -2853,7 +2931,7 @@
                     "author" : {
                       "firstName" : "Jade",
                       "lastName" : "Tywin",
-                      "photoURL" : "https://desk.example.com/api/v1/user/176276372673/photo",
+                      "photoURL" : "https://desk.zoho.com/api/v1/user/176276372673/photo",
                       "name" : "Jade Tywin",
                       "type" : [ "END_USER" ],
                       "email" : "jade12tywin@zylker.com"
@@ -2892,7 +2970,7 @@
                     "author" : {
                       "firstName" : "Jade",
                       "lastName" : "Tywin",
-                      "photoURL" : "https://desk.example.com/api/v1/agents/1892000000042001/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/1892000000042001/photo?orgId=3983939",
                       "name" : "Jade Tywin",
                       "type" : [ "AGENT" ],
                       "email" : "jade12tywin@zylker.com"
@@ -2918,7 +2996,7 @@
                     "actions" : [ {
                       "method" : "POST",
                       "rel" : "send",
-                      "href" : "https://desk.example.com/api/v1/tickets/1892000000093205/resendFailedThread?threadId=1892000001083008"
+                      "href" : "https://desk.zoho.com/api/v1/tickets/1892000000093205/resendFailedThread?threadId=1892000001083008"
                     } ],
                     "contentType" : "text/html",
                     "status" : "FAILED",
@@ -2931,7 +3009,7 @@
                     "author" : {
                       "firstName" : "Jade",
                       "lastName" : "Tywin",
-                      "photoURL" : "https://desk.example.com/api/v1/agents/2150000000043591/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/2150000000043591/photo?orgId=3983939",
                       "name" : "Jade Tywin",
                       "type" : [ "AGENT" ],
                       "email" : "jade12tywin@zylker.com"
@@ -2944,7 +3022,7 @@
                       "permalink" : null,
                       "appPhotoURL" : null
                     },
-                    "lastRatingIconURL" : "https://desk.example.com/api/v1/ratingOptions/31138000005998227/logo?orgId=1234567890",
+                    "lastRatingIconURL" : "https://desk.zoho.com/api/v1/ratingOptions/31138000005998227/logo?orgId=54983163",
                     "hasAttach" : false,
                     "responderId" : "2150000000043591",
                     "channelRelatedInfo" : null,
@@ -2955,11 +3033,11 @@
                     "actions" : [ {
                       "method" : "POST",
                       "rel" : "send",
-                      "href" : "https://desk.example.com/api/v1/tickets/1892000000094004/sendDraft?draftThreadId=1892000001004072"
+                      "href" : "https://desk.zoho.com/api/v1/tickets/1892000000094004/sendDraft?draftThreadId=1892000001004072"
                     }, {
                       "method" : "DELETE",
                       "rel" : "delete",
-                      "href" : "https://desk.example.com/api/v1/tickets/1892000000094004/draftReply/1892000001004072"
+                      "href" : "https://desk.zoho.com/api/v1/tickets/1892000000094004/draftReply/1892000001004072"
                     } ],
                     "contentType" : "text/html",
                     "status" : "DRAFT",
@@ -2971,7 +3049,7 @@
                     "author" : {
                       "firstName" : "Jade",
                       "lastName" : "Tywin",
-                      "photoURL" : "https://desk.example.com/api/v1/user/176276372673/photo",
+                      "photoURL" : "https://desk.zoho.com/api/v1/user/176276372673/photo",
                       "name" : "Jade Tywin",
                       "type" : [ "END_USER" ],
                       "email" : "jade12tywin@zylker.com"
@@ -3003,7 +3081,7 @@
                     "author" : {
                       "firstName" : "Jade",
                       "lastName" : "Tywin",
-                      "photoURL" : "https://desk.example.com/api/v1/user/176276372673/photo",
+                      "photoURL" : "https://desk.zoho.com/api/v1/user/176276372673/photo",
                       "name" : "Jade Tywin",
                       "type" : "END_USER",
                       "email" : "jade12tywin@zylker.com"
@@ -3042,7 +3120,7 @@
                     "author" : {
                       "firstName" : "Jade",
                       "lastName" : "Tywin",
-                      "photoURL" : "https://desk.example.com/api/v1/agents/1892000000042001/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/1892000000042001/photo?orgId=3983939",
                       "name" : "Jade Tywin",
                       "type" : "AGENT",
                       "email" : "jade12tywin@zylker.com"
@@ -3068,7 +3146,7 @@
                     "actions" : [ {
                       "method" : "POST",
                       "rel" : "send",
-                      "href" : "https://desk.example.com/api/v1/tickets/1892000000093205/resendFailedThread?threadId=1892000001083008"
+                      "href" : "https://desk.zoho.com/api/v1/tickets/1892000000093205/resendFailedThread?threadId=1892000001083008"
                     } ],
                     "contentType" : "text/html",
                     "status" : "FAILED",
@@ -3081,7 +3159,7 @@
                     "author" : {
                       "firstName" : "Jade",
                       "lastName" : "Tywin",
-                      "photoURL" : "https://desk.example.com/api/v1/agents/2150000000043591/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/2150000000043591/photo?orgId=3983939",
                       "name" : "Jade Tywin",
                       "type" : "AGENT",
                       "email" : "jade12tywin@zylker.com"
@@ -3094,7 +3172,7 @@
                       "permalink" : null,
                       "appPhotoURL" : null
                     },
-                    "lastRatingIconURL" : "https://desk.example.com/api/v1/ratingOptions/31138000005998227/logo?orgId=1234567890",
+                    "lastRatingIconURL" : "https://desk.zoho.com/api/v1/ratingOptions/31138000005998227/logo?orgId=54983163",
                     "hasAttach" : false,
                     "responderId" : "2150000000043591",
                     "channelRelatedInfo" : null,
@@ -3105,11 +3183,11 @@
                     "actions" : [ {
                       "method" : "POST",
                       "rel" : "send",
-                      "href" : "https://desk.example.com/api/v1/tickets/1892000000094004/sendDraft?draftThreadId=1892000001004072"
+                      "href" : "https://desk.zoho.com/api/v1/tickets/1892000000094004/sendDraft?draftThreadId=1892000001004072"
                     }, {
                       "method" : "DELETE",
                       "rel" : "delete",
-                      "href" : "https://desk.example.com/api/v1/tickets/1892000000094004/draftReply/1892000001004072"
+                      "href" : "https://desk.zoho.com/api/v1/tickets/1892000000094004/draftReply/1892000001004072"
                     } ],
                     "contentType" : "text/html",
                     "status" : "DRAFT",
@@ -3121,7 +3199,7 @@
                     "author" : {
                       "firstName" : "Jade",
                       "lastName" : "Tywin",
-                      "photoURL" : "https://desk.example.com/api/v1/user/176276372673/photo",
+                      "photoURL" : "https://desk.zoho.com/api/v1/user/176276372673/photo",
                       "name" : "Jade Tywin",
                       "type" : "END_USER",
                       "email" : "jade12tywin@zylker.com"
@@ -3177,7 +3255,7 @@
                     "id" : "105000000000459",
                     "name" : "Lawrence",
                     "email" : "admin@zylker.com",
-                    "photoURL" : "https://desk.example.com/api/v1/agents/105000000000459/photo?orgId=1234567890",
+                    "photoURL" : "https://desk.zoho.com/api/v1/agents/105000000000459/photo?orgId=16978673",
                     "type" : "AGENT",
                     "firstName" : "",
                     "lastName" : "Lawrence"
@@ -3205,11 +3283,11 @@
                   "actions" : [ {
                     "method" : "DELETE",
                     "rel" : "delete",
-                    "href" : "https://desk.example.com/api/v1/tickets/105000003296136/draftReply/105000003296875"
+                    "href" : "https://desk.zoho.com/api/v1/tickets/105000003296136/draftReply/105000003296875"
                   }, {
                     "method" : "POST",
                     "rel" : "send",
-                    "href" : "https://desk.example.com/api/v1/tickets/105000003296136/sendDraft?draftThreadId=105000003296875"
+                    "href" : "https://desk.zoho.com/api/v1/tickets/105000003296136/sendDraft?draftThreadId=105000003296875"
                   } ],
                   "cc" : "",
                   "responderId" : "105000000000459",
@@ -3229,7 +3307,7 @@
           "image/png" : {
             "schema" : {
               "type" : "string",
-              "format" : "binary"
+              "contentMediaType" : "image/png"
             }
           }
         }
@@ -3249,5 +3327,6 @@
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "Thread"
 }

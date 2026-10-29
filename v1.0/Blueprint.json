@@ -5,12 +5,75 @@
     "version" : "1.0.0"
   },
   "paths" : {
+    "/api/v1/tickets/{ticket_id}/transitions/{transition_id}/validateFieldUpdates" : {
+      "post" : {
+        "tags" : [ "Blueprint" ],
+        "summary" : "Validate transition field updates",
+        "description" : "Validates the field updates provided for a specific ticket transition before performing it.",
+        "operationId" : "validateTransitionFieldUpdates",
+        "x-mcp-group" : [ "Blueprints" ],
+        "parameters" : [ {
+          "name" : "ticket_id",
+          "description" : "Unique ID of the ticket.",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "null", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "transition_id",
+          "description" : "Unique ID of the transition.",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "null", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/validateTransitionFieldUpdatesRequestBody"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/validateTransitionFieldUpdatesResponse"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/unprocessableEntityErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.tickets.UPDATE" ]
+        } ]
+      }
+    },
     "/api/v1/blueprints/criteriaFields" : {
       "get" : {
         "tags" : [ "Blueprint" ],
         "summary" : "Get Blueprint Criteria Fields",
         "description" : "Retrieves the fields allowed in blueprint and transition criteria for the specified module and layout. Use this before building blueprint or transition criteria rules. Available pre-defined values include @${EMPTY}@, @${NOTEMPTY}@, @${OPEN}@, @${CLOSED}@, and @${CURRENTTIME}@. Available field types are @Text@, @Date@, @DateTime@, @Boolean@, and @Arithmetic@.",
         "operationId" : "getBlueprintsCriteriaFields",
+        "x-mcp-group" : [ "Blueprints" ],
         "parameters" : [ {
           "name" : "module",
           "in" : "query",
@@ -21,9 +84,8 @@
           "schema" : {
             "type" : "string",
             "maxLength" : 100,
-            "minLength" : 0,
             "description" : "Module for which criteria fields must be retrieved. Required. Currently supported value: @tickets@.",
-            "enum" : [ "tickets" ]
+            "enum" : [ "tickets", "contacts", "accounts" ]
           }
         }, {
           "name" : "layoutId",
@@ -62,7 +124,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.automations.READ", "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.automations.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       }
     },
@@ -72,6 +136,7 @@
         "summary" : "Get Configurable Blueprint Fields",
         "description" : "Retrieves the field details that can be configured in blueprints for the specified layout and module. Use this before creating or editing a blueprint to discover which ticket fields can be mapped to the blueprint workflow.",
         "operationId" : "getBlueprintFieldsToConfigure",
+        "x-mcp-group" : [ "Blueprints" ],
         "parameters" : [ {
           "name" : "layoutId",
           "in" : "query",
@@ -95,9 +160,10 @@
           "schema" : {
             "type" : "string",
             "maxLength" : 100,
-            "minLength" : 0,
             "description" : "Module for which fields must be retrieved. Required. Currently supported value: @tickets@.",
-            "enum" : [ "tickets" ]
+            "enum" : [ "tickets" ],
+            "pattern" : "tickets",
+            "x-regex-name" : "bpModules"
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -123,13 +189,71 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.automations.READ", "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.automations.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       }
     }
   },
   "components" : {
     "responses" : {
+      "validateTransitionFieldUpdatesResponse" : {
+        "description" : "validateTransitionFieldUpdatesResponse response",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "null", "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "invalidFieldUpdates" : {
+                  "description" : "Field updates that failed validation",
+                  "type" : [ "null", "array" ],
+                  "items" : {
+                    "type" : [ "null", "object" ],
+                    "additionalProperties" : false,
+                    "properties" : {
+                      "fieldName" : {
+                        "description" : "Name of the invalid field",
+                        "type" : [ "string", "null" ],
+                        "maxLength" : 250
+                      },
+                      "fieldId" : {
+                        "description" : "Unique ID of the invalid field",
+                        "type" : [ "string", "null" ],
+                        "format" : "int64",
+                        "pattern" : "([0-9]+)"
+                      },
+                      "errorMsg" : {
+                        "description" : "Validation error message",
+                        "type" : [ "string", "null" ],
+                        "maxLength" : 250
+                      }
+                    },
+                    "required" : [ "errorMsg", "fieldId", "fieldName" ]
+                  }
+                }
+              },
+              "required" : [ "invalidFieldUpdates" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "invalidFieldUpdates" : [ {
+                    "fieldName" : "priority",
+                    "fieldId" : "4000000159817",
+                    "errorMsg" : "Priority can't be high"
+                  }, {
+                    "fieldName" : "customEmail",
+                    "fieldId" : "4000000159819",
+                    "errorMsg" : "Email is invalid"
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      },
       "getBlueprintsCriteriaFieldsResponse" : {
         "description" : "Returns groups of fields available for blueprint and transition criteria, including supported conditions and values for each field.",
         "content" : {
@@ -148,13 +272,11 @@
                       "displayLabel" : {
                         "type" : [ "string", "null" ],
                         "maxLength" : 250,
-                        "minLength" : 0,
                         "description" : "Human-readable label of the field group shown in the UI. Type: string, max 250 characters. Required. Example: \"Tickets\"."
                       },
                       "name" : {
                         "type" : [ "string", "null" ],
                         "maxLength" : 250,
-                        "minLength" : 0,
                         "description" : "API name of the field group used in criteria expressions. Type: string, max 250 characters. Required. Example: \"tickets\"."
                       },
                       "fieldDetails" : {
@@ -172,13 +294,11 @@
                                   "condition" : {
                                     "type" : [ "string", "null" ],
                                     "maxLength" : 250,
-                                    "minLength" : 0,
                                     "description" : "Machine-readable condition identifier. Type: string, max 250 characters. Required. Example: \"is\"."
                                   },
                                   "i18NCondition" : {
                                     "type" : [ "string", "null" ],
                                     "maxLength" : 250,
-                                    "minLength" : 0,
                                     "description" : "Localized display label for the condition. Type: string, max 250 characters. Required. Example: \"is\"."
                                   },
                                   "value" : {
@@ -194,19 +314,16 @@
                             "fieldLabel" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 250,
-                              "minLength" : 0,
                               "description" : "Display label of the criteria field. Type: string, max 250 characters. Required. Example: \"Account Name\"."
                             },
                             "i18NLabel" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 250,
-                              "minLength" : 0,
                               "description" : "Internationalized display label of the criteria field. Type: string, max 250 characters. Required. Example: \"Account Name\"."
                             },
                             "type" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 250,
-                              "minLength" : 0,
                               "description" : "Data type of the field used to determine valid criteria operators. Type: string, max 250 characters. Required. Examples: lookup, Text, Date, Boolean."
                             }
                           },
@@ -1094,16 +1211,14 @@
                     "properties" : {
                       "displayLabel" : {
                         "type" : [ "string", "null" ],
-                        "maxLength" : 250,
-                        "minLength" : 0
+                        "maxLength" : 250
                       },
                       "isCustomField" : {
                         "type" : [ "boolean", "null" ]
                       },
                       "name" : {
                         "type" : [ "string", "null" ],
-                        "maxLength" : 250,
-                        "minLength" : 0
+                        "maxLength" : 250
                       },
                       "id" : {
                         "type" : [ "string", "null", "integer" ],
@@ -1112,8 +1227,7 @@
                       },
                       "type" : {
                         "type" : [ "string", "null" ],
-                        "maxLength" : 250,
-                        "minLength" : 0
+                        "maxLength" : 250
                       },
                       "maxLength" : {
                         "type" : [ "string", "null", "integer" ],
@@ -1128,15 +1242,13 @@
                       },
                       "i18NLabel" : {
                         "type" : [ "string", "null" ],
-                        "maxLength" : 250,
-                        "minLength" : 0
+                        "maxLength" : 250
                       },
                       "allowedValues" : {
                         "type" : [ "null", "array" ],
                         "items" : {
                           "type" : [ "string", "null" ],
-                          "maxLength" : 250,
-                          "minLength" : 0
+                          "maxLength" : 250
                         }
                       },
                       "sortBy" : {
@@ -1147,15 +1259,13 @@
                       },
                       "defaultValue" : {
                         "type" : [ "string", "null" ],
-                        "maxLength" : 250,
-                        "minLength" : 0
+                        "maxLength" : 250
                       },
                       "restoreOnReplyValues" : {
                         "type" : [ "null", "array" ],
                         "items" : {
                           "type" : [ "string", "null" ],
-                          "maxLength" : 250,
-                          "minLength" : 0
+                          "maxLength" : 250
                         }
                       }
                     },
@@ -1242,6 +1352,49 @@
         }
       }
     },
+    "requestBodies" : {
+      "validateTransitionFieldUpdatesRequestBody" : {
+        "description" : "validateTransitionFieldUpdatesRequestBody request body",
+        "required" : true,
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "null", "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "customFields" : {
+                  "description" : "Custom fields to validate",
+                  "type" : [ "object" ],
+                  "additionalProperties" : false,
+                  "properties" : {
+                    "cleartextpattern" : {
+                      "type" : [ "string" ],
+                      "maxLength" : 65535
+                    }
+                  }
+                },
+                "cleartextpattern" : {
+                  "type" : [ "string" ],
+                  "maxLength" : 65535
+                }
+              }
+            },
+            "examples" : {
+              "Valid request Definitions" : {
+                "value" : {
+                  "channel" : "Facebook",
+                  "assigneeId" : 1000000012635,
+                  "priority" : "Medium",
+                  "customFields" : {
+                    "customEmail" : "zdesk@zylker.com"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "securitySchemes" : {
       "cookie-auth" : {
         "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
@@ -1251,7 +1404,11 @@
       },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "Blueprint"
 }

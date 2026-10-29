@@ -6,14 +6,104 @@
   },
   "paths" : {
     "/api/v1/calls/{callId}/attachments" : {
+      "get" : {
+        "tags" : [ "CallAttachment" ],
+        "summary" : "Get Call Attachments",
+        "description" : "Retrieves attachments in a call, with pagination support.",
+        "operationId" : "getCallAttachments",
+        "parameters" : [ {
+          "name" : "include",
+          "in" : "query",
+          "description" : "Secondary information related to the attachments. Possible values: creator. Note: Returns the details of users who added the attachments.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "enum" : [ "creator" ]
+            },
+            "uniqueItems" : true
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of attachments to fetch",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 100,
+            "minimum" : 1,
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Starting index from which attachments must be fetched",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "default" : 0
+          }
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "description" : "Sorts attachments by the createdTime attribute. Note: Default sorting order is ascending. Prefix the value with a hyphen (-) to sort in descending order.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "enum" : [ "createdTime" ],
+            "pattern" : "-?(createdTime)"
+          }
+        }, {
+          "name" : "callId",
+          "in" : "path",
+          "description" : "Unique ID of the call",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "null", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/listAllAttachmentResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.activities.calls.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.tasks.READ" ]
+        } ]
+      },
       "post" : {
         "tags" : [ "CallAttachment" ],
-        "summary" : "Create call attachment",
-        "description" : "This API attaches a file to a call.",
+        "summary" : "Create Call Attachment",
+        "description" : "Attaches a file to a call.",
         "operationId" : "createCallAttachment",
         "parameters" : [ {
           "name" : "callId",
           "in" : "path",
+          "description" : "Unique ID of the call",
           "required" : true,
           "style" : "simple",
           "explode" : false,
@@ -34,7 +124,7 @@
                   "file" : {
                     "type" : "string",
                     "format" : "binary",
-                    "description" : "The file to attach to the call"
+                    "description" : "File to be attached to the call"
                   }
                 },
                 "required" : [ "file" ]
@@ -51,19 +141,22 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.activities.calls.UPDATE", "Desk.tasks.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.activities.calls.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.tasks.UPDATE" ]
         } ]
       }
     },
     "/api/v1/calls/{callId}/attachments/{attachmentId}" : {
       "delete" : {
         "tags" : [ "CallAttachment" ],
-        "summary" : "Delete call attachment",
-        "description" : "This API deletes an attachment from a call.",
+        "summary" : "Delete Call Attachment",
+        "description" : "Deletes an attachment from a call.",
         "operationId" : "deleteCallAttachment",
         "parameters" : [ {
           "name" : "callId",
           "in" : "path",
+          "description" : "Unique ID of the call",
           "required" : true,
           "style" : "simple",
           "explode" : false,
@@ -75,14 +168,14 @@
         }, {
           "name" : "attachmentId",
           "in" : "path",
-          "description" : "ID of the attachment associated with the call",
+          "description" : "Unique ID of the attachment",
           "required" : true,
           "style" : "simple",
           "explode" : false,
           "schema" : {
             "type" : [ "string", "null", "integer" ],
             "format" : "int64",
-            "description" : "ID of the attachment associated with the call",
+            "description" : "Unique ID of the attachment",
             "pattern" : "([0-9]+)"
           }
         }, {
@@ -91,10 +184,15 @@
         "responses" : {
           "204" : {
             "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.activities.calls.UPDATE", "Desk.tasks.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.activities.calls.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.tasks.UPDATE" ]
         } ]
       }
     }
@@ -114,20 +212,24 @@
           "size" : {
             "type" : [ "string", "null", "integer" ],
             "format" : "int64",
+            "description" : "Size of the attachment",
             "pattern" : "([0-9]+)"
           },
           "creatorId" : {
             "type" : [ "string", "null", "integer" ],
             "format" : "int64",
+            "description" : "Unique ID of the user who attached the file",
             "pattern" : "([0-9]+)"
           },
           "name" : {
             "type" : [ "string", "null" ],
+            "description" : "Name of the attachment",
             "maxLength" : 100,
             "minLength" : 0
           },
           "createdTime" : {
             "type" : [ "string", "null" ],
+            "description" : "Time of attaching the file",
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
@@ -135,16 +237,25 @@
           "id" : {
             "type" : [ "string", "null", "integer" ],
             "format" : "int64",
+            "description" : "Unique ID of the attachment",
             "pattern" : "([0-9]+)"
           },
           "href" : {
             "type" : [ "string", "null" ],
+            "description" : "URL to download the attachment content",
             "maxLength" : 16000000,
             "minLength" : 0,
             "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
           }
         },
         "required" : [ "createdTime", "creatorId", "href", "id", "name", "previewurl", "size" ]
+      },
+      "data" : {
+        "type" : [ "array", "null" ],
+        "description" : "List of call attachment entries",
+        "items" : {
+          "$ref" : "#/components/schemas/attachmentResponse"
+        }
       }
     },
     "responses" : {
@@ -154,6 +265,86 @@
           "application/json" : {
             "schema" : {
               "$ref" : "#/components/schemas/attachmentResponse"
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : { }
+              }
+            }
+          }
+        }
+      },
+      "listAllAttachmentResponse" : {
+        "description" : "listAllAttachmentResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "allOf" : [ {
+                "type" : [ "object" ],
+                "properties" : {
+                  "data" : {
+                    "type" : [ "array" ],
+                    "items" : {
+                      "type" : [ "object" ],
+                      "properties" : {
+                        "creator" : {
+                          "type" : [ "object", "null" ],
+                          "description" : "Details of the user who attached the file",
+                          "additionalProperties" : false,
+                          "maxProperties" : 5,
+                          "minProperties" : 5,
+                          "properties" : {
+                            "firstName" : {
+                              "type" : [ "string", "null" ],
+                              "description" : "First name of the creator",
+                              "maxLength" : 40,
+                              "minLength" : 0
+                            },
+                            "lastName" : {
+                              "type" : [ "string", "null" ],
+                              "description" : "Last name of the creator",
+                              "maxLength" : 200,
+                              "minLength" : 0
+                            },
+                            "photoURL" : {
+                              "type" : [ "string", "null" ],
+                              "description" : "URL to access the profile photo of the creator",
+                              "maxLength" : 100,
+                              "minLength" : 0,
+                              "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+                            },
+                            "id" : {
+                              "type" : [ "string", "integer", "null" ],
+                              "format" : "int64",
+                              "description" : "Unique ID of the creator",
+                              "pattern" : "([0-9]+)"
+                            },
+                            "email" : {
+                              "type" : [ "string", "null" ],
+                              "description" : "Email address of the creator",
+                              "maxLength" : 255,
+                              "minLength" : 0,
+                              "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'\\&\\~]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+                            }
+                          },
+                          "required" : [ "email", "firstName", "id", "lastName", "photoURL" ]
+                        }
+                      },
+                      "additionalProperties" : false
+                    }
+                  }
+                },
+                "additionalProperties" : false
+              }, {
+                "type" : [ "object", "null" ],
+                "additionalProperties" : false,
+                "properties" : {
+                  "data" : {
+                    "$ref" : "#/components/schemas/data"
+                  }
+                },
+                "required" : [ "data" ]
+              } ]
             },
             "examples" : {
               "Valid responses Definitions" : {
@@ -173,7 +364,11 @@
       },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "CallAttachment"
 }

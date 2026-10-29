@@ -2,21 +2,188 @@
   "openapi" : "3.1.0",
   "info" : {
     "title" : "Saml",
+    "description" : "SAML (Security Assertion Markup Language) configuration allows you to set up and manage SAML-based single sign-on (SSO) for a help center.",
     "version" : "1.0.0"
   },
   "paths" : {
+    "/api/v1/helpCenters/{helpCenterId}/samlConfig" : {
+      "get" : {
+        "tags" : [ "Saml" ],
+        "summary" : "Get SAML Configuration",
+        "description" : "Retrieves configuration details of SAML mapped with the specified help center.",
+        "operationId" : "getsaml",
+        "parameters" : [ {
+          "name" : "helpCenterId",
+          "in" : "path",
+          "required" : true,
+          "description" : "Unique ID of the help center",
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/samlResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.READ" ]
+        } ]
+      },
+      "post" : {
+        "tags" : [ "Saml" ],
+        "summary" : "Create SAML Configuration",
+        "description" : "Configures SAML for the specified help center.",
+        "operationId" : "addsaml",
+        "parameters" : [ {
+          "name" : "helpCenterId",
+          "in" : "path",
+          "required" : true,
+          "description" : "Unique ID of the help center",
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/samlRequest"
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/samlResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.CREATE" ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "Saml" ],
+        "summary" : "Delete SAML Configuration",
+        "description" : "Deletes the SAML configuration mapped with the specified help center.",
+        "operationId" : "deletesaml",
+        "parameters" : [ {
+          "name" : "helpCenterId",
+          "in" : "path",
+          "required" : true,
+          "description" : "Unique ID of the help center",
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/emptyJsonObjectResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.DELETE" ]
+        } ]
+      }
+    },
+    "/api/v1/helpCenters/{helpCenterId}/samlSignupConfig/disable" : {
+      "post" : {
+        "tags" : [ "Saml" ],
+        "summary" : "Disable SAML User Registration",
+        "description" : "Disables new user registration via SAML for the specified help center.",
+        "operationId" : "disableRegister",
+        "parameters" : [ {
+          "name" : "helpCenterId",
+          "in" : "path",
+          "required" : true,
+          "description" : "Unique ID of the help center",
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.UPDATE" ]
+        } ]
+      }
+    },
+    "/api/v1/helpCenters/{helpCenterId}/samlSignupConfig/enable" : {
+      "post" : {
+        "tags" : [ "Saml" ],
+        "summary" : "Enable SAML User Registration",
+        "description" : "Enables new user registration via SAML for the specified help center.",
+        "operationId" : "enableRegister",
+        "parameters" : [ {
+          "name" : "helpCenterId",
+          "in" : "path",
+          "required" : true,
+          "description" : "Unique ID of the help center",
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.UPDATE" ]
+        } ]
+      }
+    },
     "/api/web/helpCenter/{helpCenterId}/samlConfigMetaData" : {
       "get" : {
         "tags" : [ "Saml" ],
+        "summary" : "Get SAML Configuration Metadata",
+        "description" : "TODO: add description",
         "operationId" : "getSamlConfigMetaData",
         "parameters" : [ {
           "name" : "helpCenterId",
           "in" : "path",
           "required" : true,
+          "description" : "Unique ID of the help center",
           "style" : "simple",
           "explode" : false,
           "schema" : {
-            "type" : [ "string", "null", "integer" ],
+            "type" : [ "string", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           }
@@ -38,51 +205,138 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       }
     }
   },
   "components" : {
     "responses" : {
+      "emptyJsonObjectResponse" : {
+        "description" : "Empty JSON object returned after a successful delete",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : { }
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : { }
+              }
+            }
+          }
+        }
+      },
+      "samlResponse" : {
+        "description" : "samlResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "isSignupEnabled" : {
+                  "description" : "Indicates whether new user registration via SAML is enabled.\n\nPossible values:\n • true = new user registration is enabled\n • false = new user registration is disabled",
+                  "type" : [ "boolean" ]
+                },
+                "samlLogoutURL" : {
+                  "description" : "SAML logout URL of the identity provider",
+                  "type" : [ "string" ],
+                  "maxLength" : 250,
+                  "minLength" : 0,
+                  "pattern" : "(^https\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+                },
+                "samlLoginURL" : {
+                  "description" : "SAML login URL of the identity provider",
+                  "type" : [ "string" ],
+                  "maxLength" : 250,
+                  "minLength" : 0,
+                  "pattern" : "(^https\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+                },
+                "issuer" : {
+                  "description" : "Issuer identifier for the SAML configuration",
+                  "type" : [ "string" ],
+                  "maxLength" : 100,
+                  "minLength" : 0
+                },
+                "algorithm" : {
+                  "description" : "Encryption algorithm used for SAML authentication",
+                  "type" : [ "string" ],
+                  "enum" : [ "RSA" ],
+                  "maxLength" : 100,
+                  "minLength" : 0
+                },
+                "status" : {
+                  "description" : "Current status of the SAML configuration.\n\nPossible values: ENABLED, DISABLED",
+                  "type" : [ "string" ],
+                  "enum" : [ "ENABLED", "DISABLED" ],
+                  "maxLength" : 100,
+                  "minLength" : 0
+                }
+              },
+              "required" : [ "algorithm", "isSignupEnabled", "issuer", "samlLoginURL", "samlLogoutURL", "status" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "isSignupEnabled" : "false",
+                  "samlLogoutURL" : "https://zylker.onelogin.com/trust/saml2/http-post/sso/9032",
+                  "samlLoginURL" : "https://zylker.onelogin.com/trust/saml2/http-post/sso/9032",
+                  "issuer" : "zoho.com",
+                  "algorithm" : "RSA",
+                  "status" : "ENABLED"
+                }
+              }
+            }
+          }
+        }
+      },
       "samlConfigMetaDataResponse" : {
         "description" : "samlConfigMetaDataResponse template definitions",
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "object", "null" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "responseURL" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
+                  "description" : "TODO: add description",
                   "maxLength" : 1000,
                   "minLength" : 0,
-                  "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+                  "pattern" : "(^https\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
                 },
                 "redirectURL" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
+                  "description" : "TODO: add description",
                   "maxLength" : 1000,
                   "minLength" : 0,
-                  "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+                  "pattern" : "(^https\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
                 },
                 "requestURL" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
+                  "description" : "TODO: add description",
                   "maxLength" : 1000,
                   "minLength" : 0,
-                  "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+                  "pattern" : "(^https\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
                 },
                 "issuer" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
+                  "description" : "TODO: add description",
                   "maxLength" : 100,
                   "minLength" : 0
                 },
                 "relayStateValue" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
+                  "description" : "TODO: add description",
                   "maxLength" : 100,
                   "minLength" : 0
                 },
                 "algorithm" : {
-                  "type" : [ "string", "null" ],
+                  "type" : [ "string" ],
+                  "description" : "Encryption algorithm used for SAML authentication",
                   "enum" : [ "RSA" ],
                   "maxLength" : 100,
                   "minLength" : 0
@@ -93,6 +347,63 @@
             "examples" : {
               "Valid responses Definitions" : {
                 "value" : null
+              }
+            }
+          }
+        }
+      }
+    },
+    "requestBodies" : {
+      "samlRequest" : {
+        "content" : {
+          "multipart/form-data" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "samlLoginURL" : {
+                  "description" : "SAML login URL of the identity provider",
+                  "type" : [ "string" ],
+                  "maxLength" : 100,
+                  "minLength" : 0,
+                  "pattern" : "(^https\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+                },
+                "samlLogoutURL" : {
+                  "description" : "SAML logout URL of the identity provider",
+                  "type" : [ "string" ],
+                  "maxLength" : 100,
+                  "minLength" : 0,
+                  "pattern" : "(^https\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+                },
+                "algorithm" : {
+                  "description" : "Encryption algorithm used for SAML authentication",
+                  "type" : [ "string" ],
+                  "enum" : [ "RSA" ],
+                  "maxLength" : 100,
+                  "minLength" : 0
+                },
+                "issuer" : {
+                  "description" : "Issuer identifier for the SAML configuration",
+                  "type" : [ "string" ],
+                  "maxLength" : 100,
+                  "minLength" : 0
+                },
+                "publicKey" : {
+                  "description" : "Public key file for SAML authentication",
+                  "type" : "string",
+                  "format" : "binary"
+                }
+              },
+              "required" : [ "algorithm", "issuer", "publicKey", "samlLoginURL", "samlLogoutURL" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "samlLogoutURL" : "https://zylker.onelogin.com/trust/saml2/http-post/sso/9032",
+                  "samlLoginURL" : "https://zylker.onelogin.com/trust/saml2/http-post/sso/9032",
+                  "issuer" : "zoho.com",
+                  "algorithm" : "RSA"
+                }
               }
             }
           }
@@ -110,5 +421,6 @@
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "Saml"
 }

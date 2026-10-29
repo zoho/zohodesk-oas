@@ -23,7 +23,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.events.READ", "Desk.settings.READ", "Desk.webhooks.READ" ]
+          "iam-oauth2-schema" : [ "Desk.webhooks.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.events.READ", "Desk.settings.READ" ]
         } ]
       },
       "post" : {
@@ -46,7 +48,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.events.CREATE", "Desk.settings.CREATE", "Desk.webhooks.CREATE" ]
+          "iam-oauth2-schema" : [ "Desk.webhooks.CREATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.events.CREATE", "Desk.settings.CREATE" ]
         } ]
       }
     },
@@ -76,7 +80,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.events.READ", "Desk.settings.READ", "Desk.webhooks.READ" ]
+          "iam-oauth2-schema" : [ "Desk.webhooks.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.events.READ", "Desk.settings.READ" ]
         } ]
       },
       "delete" : {
@@ -104,7 +110,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.events.DELETE", "Desk.settings.DELETE", "Desk.webhooks.DELETE" ]
+          "iam-oauth2-schema" : [ "Desk.webhooks.DELETE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.events.DELETE", "Desk.settings.DELETE" ]
         } ]
       },
       "patch" : {
@@ -138,7 +146,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.events.UPDATE", "Desk.settings.UPDATE", "Desk.webhooks.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.webhooks.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.events.UPDATE", "Desk.settings.UPDATE" ]
         } ]
       }
     }
@@ -150,7 +160,15 @@
         "additionalProperties" : false,
         "properties" : {
           "Account_Add" : {
-            "type" : [ "string", "null" ]
+            "type" : [ "object", "null" ],
+            "description" : "Pass null if no criteria is needed for this event",
+            "additionalProperties" : false,
+            "properties" : {
+              "criteria" : {
+                "type" : "object",
+                "description" : "Field-based criteria to conditionally trigger the webhook for this event"
+              }
+            }
           },
           "Event_Delete" : {
             "type" : [ "string", "null" ]
@@ -163,16 +181,42 @@
           },
           "Ticket_Attachment_Add" : {
             "type" : [ "object", "null" ],
-            "additionalProperties" : false
+            "additionalProperties" : false,
+            "properties" : {
+              "departmentIds" : {
+                "type" : [ "array", "null" ],
+                "items" : {
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "uniqueItems" : false,
+                "maxItems" : 100,
+                "minItems" : 0
+              }
+            }
           },
           "Ticket_Attachment_Update" : {
             "type" : [ "object", "null" ],
-            "additionalProperties" : false
+            "additionalProperties" : false,
+            "properties" : {
+              "departmentIds" : {
+                "type" : [ "array", "null" ],
+                "items" : {
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "uniqueItems" : false,
+                "maxItems" : 100,
+                "minItems" : 0
+              }
+            }
           },
           "Event_Update" : {
             "type" : [ "object", "null" ],
             "additionalProperties" : false,
-            "maxProperties" : 2,
+            "maxProperties" : 3,
             "minProperties" : 2,
             "properties" : {
               "departmentIds" : {
@@ -182,10 +226,16 @@
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
-                "uniqueItems" : false
+                "uniqueItems" : false,
+                "maxItems" : 100,
+                "minItems" : 0
               },
               "includePrevState" : {
                 "type" : [ "boolean", "null" ]
+              },
+              "criteria" : {
+                "type" : [ "object", "null" ],
+                "description" : "Field-based criteria to conditionally trigger the webhook for this event"
               }
             },
             "required" : [ "departmentIds", "includePrevState" ]
@@ -196,7 +246,7 @@
           "Ticket_Update" : {
             "type" : [ "object", "null" ],
             "additionalProperties" : false,
-            "maxProperties" : 4,
+            "maxProperties" : 5,
             "minProperties" : 4,
             "properties" : {
               "departmentId" : {
@@ -215,7 +265,9 @@
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
-                "uniqueItems" : false
+                "uniqueItems" : false,
+                "maxItems" : 100,
+                "minItems" : 0
               },
               "fields" : {
                 "type" : [ "array", "null" ],
@@ -225,12 +277,16 @@
                   "minLength" : 0,
                   "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                 },
-                "maxItems" : 5,
+                "maxItems" : 20,
                 "minItems" : 0,
                 "uniqueItems" : false
               },
               "includePrevState" : {
                 "type" : [ "boolean", "null" ]
+              },
+              "criteria" : {
+                "type" : [ "object", "null" ],
+                "description" : "Field-based criteria to conditionally trigger the webhook for this event"
               }
             },
             "required" : [ "departmentId", "departmentIds", "fields", "includePrevState" ]
@@ -241,7 +297,7 @@
           "Ticket_Comment_Update" : {
             "type" : [ "object", "null" ],
             "additionalProperties" : false,
-            "maxProperties" : 2,
+            "maxProperties" : 3,
             "minProperties" : 2,
             "properties" : {
               "departmentId" : {
@@ -260,7 +316,9 @@
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
-                "uniqueItems" : false
+                "uniqueItems" : false,
+                "maxItems" : 100,
+                "minItems" : 0
               }
             },
             "required" : [ "departmentId", "departmentIds" ]
@@ -268,7 +326,7 @@
           "Task_Add" : {
             "type" : [ "object", "null" ],
             "additionalProperties" : false,
-            "maxProperties" : 1,
+            "maxProperties" : 2,
             "minProperties" : 1,
             "properties" : {
               "departmentIds" : {
@@ -278,7 +336,9 @@
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
-                "uniqueItems" : false
+                "uniqueItems" : false,
+                "maxItems" : 100,
+                "minItems" : 0
               }
             },
             "required" : [ "departmentIds" ]
@@ -286,7 +346,7 @@
           "Ticket_Add" : {
             "type" : [ "object", "null" ],
             "additionalProperties" : false,
-            "maxProperties" : 2,
+            "maxProperties" : 3,
             "minProperties" : 2,
             "properties" : {
               "departmentId" : {
@@ -305,7 +365,9 @@
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
-                "uniqueItems" : false
+                "uniqueItems" : false,
+                "maxItems" : 100,
+                "minItems" : 0
               }
             },
             "required" : [ "departmentId", "departmentIds" ]
@@ -313,7 +375,7 @@
           "Task_Update" : {
             "type" : [ "object", "null" ],
             "additionalProperties" : false,
-            "maxProperties" : 2,
+            "maxProperties" : 3,
             "minProperties" : 2,
             "properties" : {
               "departmentIds" : {
@@ -323,10 +385,16 @@
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
-                "uniqueItems" : false
+                "uniqueItems" : false,
+                "maxItems" : 100,
+                "minItems" : 0
               },
               "includePrevState" : {
                 "type" : [ "boolean", "null" ]
+              },
+              "criteria" : {
+                "type" : [ "object", "null" ],
+                "description" : "Field-based criteria to conditionally trigger the webhook for this event"
               }
             },
             "required" : [ "departmentIds", "includePrevState" ]
@@ -349,7 +417,7 @@
           "Call_Add" : {
             "type" : [ "object", "null" ],
             "additionalProperties" : false,
-            "maxProperties" : 1,
+            "maxProperties" : 2,
             "minProperties" : 1,
             "properties" : {
               "departmentIds" : {
@@ -359,7 +427,9 @@
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
-                "uniqueItems" : false
+                "uniqueItems" : false,
+                "maxItems" : 100,
+                "minItems" : 0
               }
             },
             "required" : [ "departmentIds" ]
@@ -401,7 +471,15 @@
             "type" : [ "string", "null" ]
           },
           "Contact_Add" : {
-            "type" : [ "string", "null" ]
+            "type" : [ "object", "null" ],
+            "description" : "Pass null if no criteria is needed for this event",
+            "additionalProperties" : false,
+            "properties" : {
+              "criteria" : {
+                "type" : "object",
+                "description" : "Field-based criteria to conditionally trigger the webhook for this event"
+              }
+            }
           },
           "KBSection_Delete" : {
             "type" : [ "string", "null" ]
@@ -427,7 +505,7 @@
           "Event_Add" : {
             "type" : [ "object", "null" ],
             "additionalProperties" : false,
-            "maxProperties" : 1,
+            "maxProperties" : 2,
             "minProperties" : 1,
             "properties" : {
               "departmentIds" : {
@@ -437,7 +515,9 @@
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
-                "uniqueItems" : false
+                "uniqueItems" : false,
+                "maxItems" : 100,
+                "minItems" : 0
               }
             },
             "required" : [ "departmentIds" ]
@@ -445,7 +525,7 @@
           "Call_Update" : {
             "type" : [ "object", "null" ],
             "additionalProperties" : false,
-            "maxProperties" : 2,
+            "maxProperties" : 3,
             "minProperties" : 2,
             "properties" : {
               "departmentIds" : {
@@ -455,10 +535,16 @@
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
-                "uniqueItems" : false
+                "uniqueItems" : false,
+                "maxItems" : 100,
+                "minItems" : 0
               },
               "includePrevState" : {
                 "type" : [ "boolean", "null" ]
+              },
+              "criteria" : {
+                "type" : [ "object", "null" ],
+                "description" : "Field-based criteria to conditionally trigger the webhook for this event"
               }
             },
             "required" : [ "departmentIds", "includePrevState" ]
@@ -472,7 +558,7 @@
           "Ticket_Comment_Add" : {
             "type" : [ "object", "null" ],
             "additionalProperties" : false,
-            "maxProperties" : 2,
+            "maxProperties" : 3,
             "minProperties" : 2,
             "properties" : {
               "departmentId" : {
@@ -491,7 +577,9 @@
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
-                "uniqueItems" : false
+                "uniqueItems" : false,
+                "maxItems" : 100,
+                "minItems" : 0
               }
             },
             "required" : [ "departmentId", "departmentIds" ]
@@ -532,10 +620,10 @@
           "IM_Message_Add" : {
             "type" : [ "object", "null" ],
             "additionalProperties" : false,
-            "maxProperties" : 1,
+            "maxProperties" : 2,
             "minProperties" : 1,
             "properties" : {
-              "departmentIds" : {
+              "departmentId" : {
                 "type" : [ "array", "null" ],
                 "items" : {
                   "type" : [ "string", "integer", "null" ],
@@ -543,6 +631,17 @@
                   "pattern" : "([0-9]+)"
                 },
                 "uniqueItems" : false
+              },
+              "departmentIds" : {
+                "type" : [ "array", "null" ],
+                "items" : {
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "uniqueItems" : false,
+                "maxItems" : 100,
+                "minItems" : 0
               }
             },
             "required" : [ "departmentIds" ]
@@ -550,10 +649,10 @@
           "IM_Message_Status" : {
             "type" : [ "object", "null" ],
             "additionalProperties" : false,
-            "maxProperties" : 1,
+            "maxProperties" : 2,
             "minProperties" : 1,
             "properties" : {
-              "departmentIds" : {
+              "departmentId" : {
                 "type" : [ "array", "null" ],
                 "items" : {
                   "type" : [ "string", "integer", "null" ],
@@ -561,6 +660,17 @@
                   "pattern" : "([0-9]+)"
                 },
                 "uniqueItems" : false
+              },
+              "departmentIds" : {
+                "type" : [ "array", "null" ],
+                "items" : {
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "uniqueItems" : false,
+                "maxItems" : 100,
+                "minItems" : 0
               }
             },
             "required" : [ "departmentIds" ]
@@ -592,7 +702,7 @@
           "Ticket_Thread_Add" : {
             "type" : [ "object", "null" ],
             "additionalProperties" : false,
-            "maxProperties" : 3,
+            "maxProperties" : 4,
             "minProperties" : 3,
             "properties" : {
               "departmentId" : {
@@ -611,11 +721,17 @@
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
-                "uniqueItems" : false
+                "uniqueItems" : false,
+                "maxItems" : 100,
+                "minItems" : 0
               },
               "direction" : {
                 "type" : [ "string", "null" ],
                 "enum" : [ "in", "out" ]
+              },
+              "criteria" : {
+                "type" : [ "object", "null" ],
+                "description" : "Field-based criteria to conditionally trigger the webhook for this event"
               }
             },
             "required" : [ "departmentId", "departmentIds", "direction" ]
@@ -649,7 +765,9 @@
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
-                "uniqueItems" : false
+                "uniqueItems" : false,
+                "maxItems" : 100,
+                "minItems" : 0
               }
             },
             "required" : [ "departmentId", "departmentIds" ]
@@ -667,7 +785,9 @@
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
-                "uniqueItems" : false
+                "uniqueItems" : false,
+                "maxItems" : 100,
+                "minItems" : 0
               }
             },
             "required" : [ "departmentIds" ]
@@ -685,7 +805,9 @@
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
-                "uniqueItems" : false
+                "uniqueItems" : false,
+                "maxItems" : 100,
+                "minItems" : 0
               }
             },
             "required" : [ "departmentIds" ]
@@ -703,7 +825,9 @@
                   "format" : "int64",
                   "pattern" : "([0-9]+)"
                 },
-                "uniqueItems" : false
+                "uniqueItems" : false,
+                "maxItems" : 100,
+                "minItems" : 0
               }
             },
             "required" : [ "departmentIds" ]
@@ -1219,7 +1343,11 @@
       },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "Webhook"
 }

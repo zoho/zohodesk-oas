@@ -1,5 +1,6 @@
 {
   "openapi" : "3.1.0",
+  "x-mcp-group" : [ "IM Messages" ],
   "info" : {
     "title" : "IM_Message",
     "version" : "1.0.0"
@@ -60,6 +61,8 @@
         "summary" : "Initiate Session",
         "description" : "Initiates a session with a template message. This API is used only for WhatsApp Integration.",
         "operationId" : "initiateSessionUsingTemplate",
+        "x-mcp-group" : [ "Initiate Session" ],
+        "x-system-description" : "If the canned message contains placeholders, resolve them before calling this API. Use the Apply Canned Message API to replace placeholders with the correct values; a contactId and either a ticketId or sessionId is required for that step. If the user does not provide a sessionId, ask the user for the replacement values needed for the placeholders before proceeding.",
         "parameters" : [ {
           "name" : "channelId",
           "in" : "path",
@@ -108,6 +111,7 @@
         "summary" : "Start Facebook Messenger Session",
         "description" : "Starts a Facebook Messenger session outside the standard messaging window using the Facebook comment ID and Facebook user ID from a post where the user interacted. Prerequisites: In facebookMessengerPayload, facebookUserId and facebookCommentId must be provided. If they are not passed in the payload, the API throws an error. Note: A single message can be sent with a given comment ID. Send the request as application/json for text-only sessions, or as multipart/form-data with a file attachment and the session JSON in the payload query parameter.",
         "operationId" : "startSessionIM",
+        "x-mcp-group" : [ "Initiate Session" ],
         "parameters" : [ {
           "name" : "channelId",
           "in" : "path",
@@ -130,10 +134,9 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : "string",
-            "description" : "JSON string matching the application/json request body schema (integrationServiceId, facebookMessengerPayload, meta).",
-            "maxLength" : 7000,
-            "minLength" : 1
+            "type" : [ "object", "null" ],
+            "additionalProperties" : true,
+            "description" : "Session payload for Facebook Messenger"
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -268,8 +271,7 @@
             "format" : "int32",
             "description" : "Number of messages to fetch. Defaults to 50 when omitted or zero. Maximum value is 50.",
             "pattern" : "([0-9]+)",
-            "default" : 0,
-            "maximum" : 50
+            "default" : 0
           }
         }, {
           "name" : "modifiedAfter",
@@ -282,7 +284,6 @@
             "type" : "string",
             "description" : "After which date messages should be included. Enter a date in the ISO date format of yyyy-MM-ddThh:mm:ss.SSSZ.",
             "maxLength" : 100,
-            "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           }
         }, {
@@ -390,8 +391,7 @@
             "format" : "int32",
             "description" : "Number of attachments to fetch. Defaults to 50 when omitted or zero. Maximum value is 50.",
             "pattern" : "([0-9]+)",
-            "default" : 0,
-            "maximum" : 50
+            "default" : 0
           }
         }, {
           "name" : "modifiedAfter",
@@ -404,7 +404,6 @@
             "type" : "string",
             "description" : "After which date attachments should be included. Enter a date in the ISO date format of yyyy-MM-ddThh:mm:ss.SSSZ.",
             "maxLength" : 100,
-            "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           }
         }, {
@@ -469,8 +468,7 @@
           "schema" : {
             "type" : "string",
             "description" : "Caption for the attachment.",
-            "maxLength" : 2000,
-            "minLength" : 0
+            "maxLength" : 2000
           }
         } ],
         "requestBody" : {
@@ -593,154 +591,124 @@
           "properties" : {
             "BOT_REPLY_STATUS" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "GC_TRANSFERRED" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "COST" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "RATING_STAR" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "DESK_KB_ARTICLE_TRANSLATION_ID" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "REACTION" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "GC_SELECTED" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "GC_SKIPPED" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "UNKNOWN" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "GC_FETCH" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "SYSTEM_MESSAGE_TYPE" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "BROADCAST_ID" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "FAILED_REASON" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "CANNED_MESSAGE_ID" : {
               "description" : "Unique ID of the canned or template message used to create this message.",
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "BROADCAST_TRACKING_ID" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "CATALOG_ID" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "PRODUCT_ID" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "CTWA_CLID" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "SKIP_PAYMENT" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "FB_COMMENT_ID" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "IM_CALLS_ID" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "MESSAGE_SOURCE" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "DESK_PARENT_TICKET_ID" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "GC_PAYMENT_STATUS" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "EXTERNAL_SYSTEM_MESSAGE_TYPE" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "IM_CALLS_DURATION" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "CRM_RULE_ID" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "CRM_RULE_NAME" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "BIGIN_INTERNAL_MESSAGE" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "CRM_RULE_TYPE" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "CRM_MODULE_ID" : {
               "type" : [ "string", "null", "integer" ],
@@ -749,13 +717,11 @@
             },
             "CRM_MODULE_NAME" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "MODULE_NAME" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "MODULE_ID" : {
               "type" : [ "string", "null", "integer" ],
@@ -764,18 +730,15 @@
             },
             "PEOPLE_TRACKING_ID" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "SIGN_TRACKING_ID" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "FINANCE_TRACKING_ID" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             }
           },
           "required" : [ "BIGIN_INTERNAL_MESSAGE", "BOT_REPLY_STATUS", "BROADCAST_ID", "BROADCAST_TRACKING_ID", "CANNED_MESSAGE_ID", "CATALOG_ID", "COST", "CRM_MODULE_ID", "CRM_MODULE_NAME", "CRM_RULE_ID", "CRM_RULE_NAME", "CRM_RULE_TYPE", "CTWA_CLID", "DESK_KB_ARTICLE_TRANSLATION_ID", "DESK_PARENT_TICKET_ID", "EXTERNAL_SYSTEM_MESSAGE_TYPE", "FAILED_REASON", "FB_COMMENT_ID", "FINANCE_TRACKING_ID", "GC_FETCH", "GC_PAYMENT_STATUS", "GC_SELECTED", "GC_SKIPPED", "GC_TRANSFERRED", "IM_CALLS_DURATION", "IM_CALLS_ID", "MESSAGE_SOURCE", "MODULE_ID", "MODULE_NAME", "PEOPLE_TRACKING_ID", "PRODUCT_ID", "RATING_STAR", "REACTION", "SIGN_TRACKING_ID", "SKIP_PAYMENT", "SYSTEM_MESSAGE_TYPE", "UNKNOWN" ]
@@ -790,14 +753,12 @@
             "description" : "Size of the attachment in bytes.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
-            "minLength" : 0,
             "pattern" : "[0-9]+"
           },
           "name" : {
             "description" : "Name of the attachment file.",
             "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "id" : {
             "description" : "Unique ID of the attachment.",
@@ -808,14 +769,12 @@
           "type" : {
             "description" : "MIME type of the attachment.",
             "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "url" : {
             "description" : "URL to download the attachment.",
             "type" : [ "string", "null" ],
             "maxLength" : 200,
-            "minLength" : 0,
             "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
           }
         },
@@ -856,15 +815,13 @@
             "description" : "Status of the session at the time of the info message. Possible values: CREATED, OPEN, ON_PROGRESS, ON_HOLD, ENDED, BLOCKED, MISSED.",
             "type" : [ "string", "null" ],
             "enum" : [ "CREATED", "OPEN", "ON_PROGRESS", "ON_HOLD", "ENDED", "BLOCKED", "MISSED" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "action" : {
             "description" : "Action that triggered the info message. Possible values: UN_IDENTIFIED, END_SESSION, BLOCK_SESSION, UNBLOCK_SESSION, CHAT_ACCEPT, CHAT_REOPEN, CHAT_TRANSFER, ADD_PARTICIPANT, REMOVE_PARTICIPANT.",
             "type" : [ "string", "null" ],
             "enum" : [ "UN_IDENTIFIED", "END_SESSION", "BLOCK_SESSION", "UNBLOCK_SESSION", "CHAT_ACCEPT", "CHAT_REOPEN", "CHAT_TRANSFER", "ADD_PARTICIPANT", "REMOVE_PARTICIPANT" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "targets" : {
             "description" : "List of targets affected by the info message action.",
@@ -881,14 +838,12 @@
           "latitude" : {
             "description" : "Latitude coordinate of the location.",
             "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "longitude" : {
             "description" : "Longitude coordinate of the location.",
             "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           }
         },
         "required" : [ "latitude", "longitude" ]
@@ -901,14 +856,12 @@
           "latitude" : {
             "type" : "string",
             "description" : "Latitude coordinate of the location.",
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "longitude" : {
             "type" : "string",
             "description" : "Longitude coordinate of the location.",
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           }
         },
         "required" : [ "latitude", "longitude" ]
@@ -919,8 +872,7 @@
         "properties" : {
           "summary" : {
             "type" : [ "string", "null" ],
-            "maxLength" : 65553,
-            "minLength" : 0
+            "maxLength" : 65553
           },
           "owner" : {
             "$ref" : "./ArticleTranslation.json#/components/schemas/owner"
@@ -933,13 +885,11 @@
           "webUrl" : {
             "type" : [ "string", "null" ],
             "maxLength" : 500,
-            "minLength" : 0,
             "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
           },
           "createdTime" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
-            "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "id" : {
@@ -949,8 +899,7 @@
           },
           "title" : {
             "type" : [ "string", "null" ],
-            "maxLength" : 500,
-            "minLength" : 0
+            "maxLength" : 500
           }
         },
         "required" : [ "createdTime", "id", "owner", "summary", "title", "translationId", "webUrl" ]
@@ -966,20 +915,23 @@
           },
           "fullContentURL" : {
             "description" : "URL to retrieve the full content of the message. Null when content is inline or unavailable.",
+            "x-system-description" : "If fullContentURL is present, use the getMessageFullContent operation to fetch the full message content.",
             "type" : [ "string", "null" ],
             "maxLength" : 200,
-            "minLength" : 0,
             "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
           },
           "isRead" : {
             "description" : "Indicates whether the message has been read. true = read, false = not read.",
             "type" : [ "boolean", "null" ]
           },
+          "isMasked" : {
+            "description" : "Indicates whether the message content is masked. true = content is masked and cannot be viewed by the requesting service, false = content is visible.",
+            "type" : [ "boolean", "null" ]
+          },
           "index" : {
             "description" : "Position index of the message in the session conversation.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
-            "minLength" : 0,
             "pattern" : "[0-9]+"
           },
           "sessionId" : {
@@ -992,14 +944,12 @@
             "description" : "Type of the message. Possible values: TEXT, ATTACHMENT, LAYOUT, INFO, LOCATION, TEMPLATE, CAROUSEL, ACTION, EXTERNAL_INFO.",
             "type" : [ "string", "null" ],
             "enum" : [ "TEXT", "INFO", "ATTACHMENT", "LOCATION", "TEMPLATE", "CAROUSEL", "LAYOUT", "ACTION", "EXTERNAL_INFO" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "ticketWebUrl" : {
             "description" : "Web URL of the Desk ticket associated with the message.",
             "type" : [ "string", "null" ],
             "maxLength" : 500,
-            "minLength" : 0,
             "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
           },
           "actor" : {
@@ -1009,8 +959,7 @@
           "displayMessage" : {
             "description" : "Summary or preview text of the message content.",
             "type" : [ "string", "null" ],
-            "maxLength" : 300,
-            "minLength" : 0
+            "maxLength" : 300
           },
           "attachment" : {
             "description" : "File attachment associated with the message when type is ATTACHMENT.",
@@ -1024,14 +973,12 @@
             "description" : "Time when the message was created.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
-            "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "statusUpdatedTime" : {
             "description" : "Time when the message delivery status was last updated.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
-            "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
           },
           "location" : {
@@ -1048,22 +995,19 @@
             "description" : "MIME type of the message content. Possible values: text/html, text/plain, application/json.",
             "type" : [ "string", "null" ],
             "enum" : [ "text/html", "text/plain", "application/json" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "direction" : {
             "description" : "Direction of the message. Possible values: IN, OUT.",
             "type" : [ "string", "null" ],
             "enum" : [ "IN", "OUT" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "status" : {
             "description" : "Delivery status of the message. Possible values: SAVED, QUEUED, SENT, DELIVERED, READ, FAILED, DELETED, MISSED.",
             "type" : [ "string", "null" ],
             "enum" : [ "SAVED", "QUEUED", "SENT", "DELIVERED", "READ", "FAILED", "DELETED", "MISSED" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "info" : {
             "description" : "Informational details when the message type is INFO.",
@@ -1084,8 +1028,7 @@
                     "arrangement" : {
                       "description" : "Layout arrangement of the row. Possible values: list.",
                       "type" : [ "string", "null" ],
-                      "maxLength" : 100,
-                      "minLength" : 0
+                      "maxLength" : 100
                     },
                     "columns" : {
                       "description" : "List of columns in the template row.",
@@ -1098,14 +1041,12 @@
                             "description" : "Type of the template column. Possible values: TEXT, BUTTON, DOCUMENT, URL_BUTTON, IMAGE, VIDEO.",
                             "type" : [ "string", "null" ],
                             "enum" : [ "TEXT", "BUTTON", "DOCUMENT", "URL_BUTTON", "IMAGE", "VIDEO" ],
-                            "maxLength" : 100,
-                            "minLength" : 0
+                            "maxLength" : 100
                           },
                           "id" : {
                             "description" : "Unique ID of the template column or attachment.",
                             "type" : [ "string", "null" ],
-                            "maxLength" : 100,
-                            "minLength" : 0
+                            "maxLength" : 100
                           },
                           "text" : {
                             "description" : "Text content block in the template column.",
@@ -1116,14 +1057,12 @@
                                 "description" : "Text style in the template. Possible values: TITLE, SUB_TITLE, DESCRIPTION.",
                                 "type" : [ "string", "null" ],
                                 "enum" : [ "TITLE", "SUB_TITLE", "DESCRIPTION" ],
-                                "maxLength" : 100,
-                                "minLength" : 0
+                                "maxLength" : 100
                               },
                               "text" : {
                                 "description" : "Text content for the template block.",
                                 "type" : [ "string", "null" ],
-                                "maxLength" : 50000,
-                                "minLength" : 0
+                                "maxLength" : 50000
                               }
                             },
                             "required" : [ "style", "text" ]
@@ -1137,20 +1076,17 @@
                                 "description" : "Action triggered by the button. Possible values: REPLY, PHONE_NUMBER.",
                                 "type" : [ "string", "null" ],
                                 "enum" : [ "REPLY", "PHONE_NUMBER" ],
-                                "maxLength" : 100,
-                                "minLength" : 0
+                                "maxLength" : 100
                               },
                               "text" : {
                                 "description" : "Display label of the button.",
                                 "type" : [ "string", "null" ],
-                                "maxLength" : 500,
-                                "minLength" : 0
+                                "maxLength" : 500
                               },
                               "value" : {
                                 "description" : "Value associated with the button action, such as a phone number or payload.",
                                 "type" : [ "string", "null" ],
-                                "maxLength" : 500,
-                                "minLength" : 0
+                                "maxLength" : 500
                               }
                             },
                             "required" : [ "action", "text", "value" ]
@@ -1163,14 +1099,12 @@
                               "source" : {
                                 "description" : "URL or source reference of the document.",
                                 "type" : [ "string", "null" ],
-                                "maxLength" : 500,
-                                "minLength" : 0
+                                "maxLength" : 500
                               },
                               "text" : {
                                 "description" : "Display name or caption of the document.",
                                 "type" : [ "string", "null" ],
-                                "maxLength" : 500,
-                                "minLength" : 0
+                                "maxLength" : 500
                               }
                             },
                             "required" : [ "source", "text" ]
@@ -1184,20 +1118,17 @@
                                 "description" : "Action of the URL button. Possible value: REDIRECT.",
                                 "type" : [ "string", "null" ],
                                 "const" : "REDIRECT",
-                                "maxLength" : 100,
-                                "minLength" : 0
+                                "maxLength" : 100
                               },
                               "text" : {
                                 "description" : "Display label of the URL button.",
                                 "type" : [ "string", "null" ],
-                                "maxLength" : 500,
-                                "minLength" : 0
+                                "maxLength" : 500
                               },
                               "source" : {
                                 "description" : "Target URL of the URL button.",
                                 "type" : [ "string", "null" ],
-                                "maxLength" : 500,
-                                "minLength" : 0
+                                "maxLength" : 500
                               }
                             },
                             "required" : [ "action", "source", "text" ]
@@ -1227,11 +1158,10 @@
           "action" : {
             "description" : "Action details when the message type is ACTION.",
             "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           }
         },
-        "required" : [ "action", "actor", "attachment", "contentType", "createdTime", "direction", "displayMessage", "externalInfo", "fullContentURL", "id", "index", "info", "isRead", "kbArticle", "layout", "location", "meta", "sessionId", "status", "statusUpdatedTime", "template", "ticketWebUrl", "type" ]
+        "required" : [ "action", "actor", "attachment", "contentType", "createdTime", "direction", "displayMessage", "externalInfo", "fullContentURL", "id", "index", "info", "isMasked", "isRead", "kbArticle", "layout", "location", "meta", "sessionId", "status", "statusUpdatedTime", "template", "ticketWebUrl", "type" ]
       },
       "replyToMessage" : {
         "description" : "Message view that includes reply-to-message details.",
@@ -1256,18 +1186,22 @@
         "additionalProperties" : false,
         "description" : "Meta item for session initiation",
         "properties" : {
+          "id" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "ID of the meta parameter"
+          },
           "name" : {
             "type" : "string",
             "description" : "Name of the session meta parameter",
             "maxLength" : 50,
-            "minLength" : 0,
             "pattern" : "^[a-zA-Z0-9_]*$"
           },
           "value" : {
             "type" : "string",
             "description" : "Value of the session meta parameter",
-            "maxLength" : 7000,
-            "minLength" : 0
+            "maxLength" : 7000
           }
         },
         "required" : [ "name", "value" ]
@@ -1309,39 +1243,33 @@
           "name" : {
             "description" : "Name of the attachment file.",
             "type" : [ "string", "null" ],
-            "maxLength" : 250,
-            "minLength" : 0
+            "maxLength" : 250
           },
           "type" : {
             "description" : "MIME type of the attachment.",
             "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "createdTime" : {
             "description" : "Time when the attachment was created.",
             "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "size" : {
             "description" : "Size of the attachment in bytes.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
-            "minLength" : 0,
             "pattern" : "[0-9]+"
           },
           "status" : {
             "description" : "Status of the attachment. For example, VALID.",
             "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "url" : {
             "description" : "URL to download the attachment.",
             "type" : [ "string", "null" ],
             "maxLength" : 500,
-            "minLength" : 0,
             "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
           }
         },
@@ -1442,7 +1370,7 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : "object",
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
@@ -1491,15 +1419,13 @@
                 "receiverId" : {
                   "type" : "string",
                   "description" : "ID to which the message must be sent.",
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "maxLength" : 100
                 },
                 "receiverType" : {
                   "type" : "string",
                   "description" : "Type of the receiver ID. Possible values: PHONENUMBER, EXTERNALID.",
                   "enum" : [ "PHONENUMBER", "EXTERNALID" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "maxLength" : 100
                 },
                 "meta" : {
                   "description" : "Message metadata to add to the chat message.",
@@ -1515,29 +1441,25 @@
                   "type" : "string",
                   "description" : "Language of translation. Enter this input in ISO language code such as en, fr, de, bn, or ta.",
                   "maxLength" : 50,
-                  "minLength" : 0,
                   "pattern" : "af|sq|ar|az|bn|bg|ca|zh_CN|zh_HK|zh_TW|hr|cs|da|nl|en_GB|en_US|et|fil|fi|fr|ka|de|el|gu|ha|he|hi|hu|id|ga|it|ja|kn|kk|rw_RW|ko|ky_KG|lo|lv|lt|mk|ms|ml|mr|nb|fa|pl|pt_BR|pt_PT|pa|ro|ru|sr|sk|sl|es|es_AR|es_ES|es_MX|sw|sv|ta|te|th|tr|uk|ur|uz|vi|zu|en"
                 },
                 "message" : {
                   "type" : "string",
                   "description" : "Content of the message including the replaced value of message placeholders if present",
-                  "maxLength" : 1024,
-                  "minLength" : 0
+                  "maxLength" : 1024
                 },
                 "headerMessage" : {
                   "type" : "string",
                   "description" : "Content of the header message including the replaced value of header placeholder if present",
-                  "maxLength" : 60,
-                  "minLength" : 0
+                  "maxLength" : 60
                 },
                 "urlMessage" : {
                   "type" : "string",
                   "description" : "Content of the URL message including the replaced value of URL placeholder if present",
-                  "maxLength" : 2000,
-                  "minLength" : 0
+                  "maxLength" : 2000
                 }
               },
-              "required" : [ "cannedMessageId", "language", "message", "receiverId", "receiverType", "headerMessage", "urlMessage" ]
+              "required" : [ "cannedMessageId", "language", "message", "receiverId", "receiverType" ]
             },
             "examples" : {
               "InitiateSession_request_bodyAndUrl" : {
@@ -1559,9 +1481,13 @@
               "properties" : {
                 "file" : {
                   "type" : "string",
-                  "contentMediaType" : "application/octet-stream",
-                  "contentEncoding" : "binary",
+                  "format" : "binary",
                   "description" : "File attachment to send with the Facebook Messenger session. Maximum size 20 MB. When a file is attached, pass the session JSON in the payload query parameter and omit message in facebookMessengerPayload."
+                },
+                "payload" : {
+                  "type" : [ "object" ],
+                  "additionalProperties" : true,
+                  "description" : "Session payload for Facebook Messenger, sent as a form field alongside the file."
                 }
               },
               "required" : [ "file" ]
@@ -1580,9 +1506,9 @@
                 "integrationServiceId" : {
                   "type" : "string",
                   "description" : "Integration service of the channel. Possible values: FACEBOOKMESSENGER.",
-                  "const" : "FACEBOOKMESSENGER",
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "pattern" : "[a-zA-Z0-9\\_]*$",
+                  "x-regex-name" : "availIntegrationServices",
+                  "maxLength" : 100
                 },
                 "facebookMessengerPayload" : {
                   "type" : "object",
@@ -1592,8 +1518,7 @@
                     "message" : {
                       "type" : "string",
                       "description" : "Message content",
-                      "maxLength" : 15000,
-                      "minLength" : 0
+                      "maxLength" : 15000
                     },
                     "facebookUserId" : {
                       "type" : [ "string", "integer" ],
@@ -1604,14 +1529,12 @@
                     "facebookUserName" : {
                       "type" : "string",
                       "description" : "Facebook user Name",
-                      "maxLength" : 100,
-                      "minLength" : 0
+                      "maxLength" : 100
                     },
                     "facebookCommentId" : {
                       "type" : "string",
                       "description" : "Facebook comment id to send reply to",
-                      "maxLength" : 100,
-                      "minLength" : 0
+                      "maxLength" : 100
                     }
                   },
                   "required" : [ "facebookCommentId", "facebookUserId" ]
@@ -1620,7 +1543,7 @@
                   "$ref" : "./IM_Message.json#/components/schemas/startSessionMeta"
                 }
               },
-              "required" : [ "integrationServiceId", "facebookMessengerPayload" ]
+              "required" : [ "integrationServiceId" ]
             },
             "examples" : {
               "StartSession_request_textOnly" : {
@@ -1639,8 +1562,7 @@
               "properties" : {
                 "file" : {
                   "type" : "string",
-                  "contentMediaType" : "application/octet-stream",
-                  "contentEncoding" : "binary",
+                  "format" : "binary",
                   "description" : "File to attach. Maximum file size is 20 MB."
                 }
               },
@@ -1670,8 +1592,7 @@
                 "message" : {
                   "type" : "string",
                   "description" : "Content of the outgoing message.",
-                  "maxLength" : 5000,
-                  "minLength" : 0
+                  "maxLength" : 5000
                 },
                 "location" : {
                   "description" : "Location details to send as a location message. Includes latitude and longitude coordinates.",
@@ -1704,8 +1625,7 @@
                 "sessionIds" : {
                   "$ref" : "./IM_Message.json#/components/schemas/sessionIds"
                 }
-              },
-              "required" : [ "sessionIds" ]
+              }
             },
             "examples" : {
               "GetSessionsLastMessages_request" : {
@@ -1727,5 +1647,6 @@
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "IM_Message"
 }

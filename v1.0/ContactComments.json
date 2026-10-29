@@ -8,21 +8,22 @@
     "/api/v1/contacts/{contactId}/comments" : {
       "get" : {
         "tags" : [ "ContactComments" ],
-        "summary" : "List all contact comments",
-        "description" : "This API lists a particular number of comments recorded on a contact, based on the limit specified.",
+        "summary" : "Get Contact Comments",
+        "description" : "Retrieves a list of comments recorded on the specified contact, with pagination support.",
         "operationId" : "getContactComments",
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
-          "description" : "Secondary information related to the comments. Value allowed is @mentions@, which returns the details of users mentioned in the comments.",
+          "description" : "Additional information to include in the response. Possible values: mentions",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
             "type" : [ "array" ],
             "items" : {
-              "type" : [ "string" ],
-              "enum" : [ "mentions" ]
+              "type" : "string",
+              "enum" : [ "mentions" ],
+              "pattern" : "(mentions)"
             },
             "uniqueItems" : true
           }
@@ -34,12 +35,11 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "integer" ],
+            "type" : "integer",
             "format" : "int32",
             "maximum" : 100,
             "minimum" : 1,
-            "pattern" : "([0-9]+)",
-            "default" : 50
+            "default" : "50"
           }
         }, {
           "name" : "from",
@@ -49,21 +49,20 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "integer" ],
+            "type" : "integer",
             "format" : "int32",
-            "pattern" : "([0-9]+)",
             "minimum" : 0,
             "default" : 0
           }
         }, {
           "name" : "sortBy",
           "in" : "query",
-          "description" : "sortby can be @commentedTime@. default order : commentedTime in descending order , prefix @-@ denotes desc",
+          "description" : "Sorts comments by commentedTime. Possible values: commentedTime. Default order is commentedTime in descending order. Prefix - denotes descending order.",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string" ],
+            "type" : "string",
             "enum" : [ "commentedTime" ],
             "pattern" : "-?(commentedTime)"
           }
@@ -92,8 +91,8 @@
       },
       "post" : {
         "tags" : [ "ContactComments" ],
-        "summary" : "Create a contact comment",
-        "description" : "This API adds a comment to a contact.",
+        "summary" : "Create Contact Comment",
+        "description" : "Creates a comment for a contact.",
         "operationId" : "createContactComment",
         "parameters" : [ {
           "name" : "contactId",
@@ -128,21 +127,22 @@
     "/api/v1/contacts/{contactId}/comments/{commentId}" : {
       "get" : {
         "tags" : [ "ContactComments" ],
-        "summary" : "Get a contact comment",
-        "description" : "This API fetches a contact comment from the portal.",
+        "summary" : "Get Contact Comment",
+        "description" : "Retrieves a contact comment from the portal.",
         "operationId" : "getContactComment",
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
-          "description" : "Secondary information related to the comments. Value allowed is @mentions@, which returns the details of users mentioned in the comments.",
+          "description" : "Additional information to include in the response. Possible values: mentions",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
             "type" : [ "array" ],
             "items" : {
-              "type" : [ "string" ],
-              "enum" : [ "mentions" ]
+              "type" : "string",
+              "enum" : [ "mentions" ],
+              "pattern" : "(mentions)"
             },
             "uniqueItems" : true
           }
@@ -182,8 +182,8 @@
       },
       "put" : {
         "tags" : [ "ContactComments" ],
-        "summary" : "Update a contact comment",
-        "description" : "This API updates an existing contact comment.",
+        "summary" : "Update Contact Comment",
+        "description" : "Updates an existing contact comment.",
         "operationId" : "updateContactComment",
         "parameters" : [ {
           "name" : "contactId",
@@ -276,48 +276,57 @@
             "firstName" : {
               "type" : [ "string", "null" ],
               "maxLength" : 50,
-              "minLength" : 0
+              "minLength" : 0,
+              "description" : "First name of the mentioned user"
             },
             "lastName" : {
               "type" : [ "string", "null" ],
               "maxLength" : 50,
-              "minLength" : 0
+              "minLength" : 0,
+              "description" : "Last name of the mentioned user"
             },
             "photoURL" : {
               "type" : [ "string", "null" ],
               "maxLength" : 100,
               "minLength" : 0,
-              "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+              "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+              "description" : "URL of the mentioned entity's profile photo"
             },
             "offset" : {
               "type" : [ "string", "integer", "null" ],
               "format" : "int32",
-              "pattern" : "([0-9]+)"
+              "pattern" : "([0-9]+)",
+              "description" : "Start position of the mention in the comment content"
             },
             "length" : {
               "type" : [ "string", "integer", "null" ],
               "format" : "int32",
-              "pattern" : "([0-9]+)"
+              "pattern" : "([0-9]+)",
+              "description" : "Length of the mention in the comment content"
             },
             "id" : {
               "type" : [ "string", "integer", "null" ],
               "format" : "int64",
-              "pattern" : "([0-9]+)"
+              "pattern" : "([0-9]+)",
+              "description" : "Unique ID of the mentioned entity"
             },
             "type" : {
               "type" : [ "string", "null" ],
-              "enum" : [ "AGENT", "TEAM" ]
+              "enum" : [ "AGENT", "TEAM" ],
+              "description" : "Type of the mentioned entity. Possible values: AGENT, TEAM"
             },
             "email" : {
               "type" : [ "string", "null" ],
               "maxLength" : 100,
               "minLength" : 0,
-              "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+              "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$",
+              "description" : "Email address of the mentioned user"
             },
             "zuid" : {
               "type" : [ "string", "integer", "null" ],
               "format" : "int32",
-              "pattern" : "([0-9]+)"
+              "pattern" : "([0-9]+)",
+              "description" : "ZUID of the mentioned user"
             }
           },
           "required" : [ "email", "firstName", "id", "lastName", "length", "offset", "photoURL", "type", "zuid" ]
@@ -332,42 +341,50 @@
             "type" : [ "string", "null" ],
             "maxLength" : 200,
             "minLength" : 0,
-            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)",
+            "description" : "URL to access the profile photo of the user"
           },
           "firstName" : {
             "type" : [ "string", "null" ],
             "maxLength" : 50,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "First name of the user"
           },
           "lastName" : {
             "type" : [ "string", "null" ],
             "maxLength" : 50,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Last name of the user"
           },
           "name" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Name of the user"
           },
           "roleName" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Name of the role assigned to the user"
           },
           "id" : {
             "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the commenter"
           },
           "type" : {
             "type" : [ "string", "null" ],
-            "enum" : [ "END_USER", "AGENT", "TEAM", "TICKET", "ACTIVITY" ]
+            "enum" : [ "END_USER", "AGENT", "TEAM", "TICKET", "ACTIVITY" ],
+            "description" : "Type of the user. Possible values: END_USER, AGENT, TEAM, TICKET, ACTIVITY"
           },
           "email" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
+            "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$",
+            "description" : "Email address of the user"
           }
         },
         "required" : [ "email", "firstName", "id", "lastName", "name", "photoURL", "roleName", "type" ]
@@ -380,43 +397,52 @@
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+            "description" : "Time when the comment was last modified"
           },
           "encodedContent" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Encoded content of the comment"
           },
           "commentedTime" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+            "description" : "Time when the comment was created"
           },
           "id" : {
             "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the comment"
           },
           "contentType" : {
             "type" : [ "string", "null" ],
-            "enum" : [ "plainText", "html" ]
+            "enum" : [ "plainText", "html" ],
+            "description" : "Type of comment content. Possible values: html, plainText"
           },
           "commenterId" : {
             "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the user who made the comment"
           },
           "content" : {
             "type" : [ "string", "null" ],
             "maxLength" : 32000,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Content of the comment"
           },
           "commenter" : {
-            "$ref" : "#/components/schemas/commenter"
+            "$ref" : "#/components/schemas/commenter",
+            "description" : "Details of the user who made the comment"
           },
           "impersonatedUser" : {
-            "$ref" : "./TicketComment.json#/components/schemas/impersonatedUser"
+            "$ref" : "./TicketComment.json#/components/schemas/impersonatedUser",
+            "description" : "Details of the impersonated user"
           }
         },
         "required" : [ "commentedTime", "commenter", "commenterId", "content", "contentType", "encodedContent", "id", "impersonatedUser", "modifiedTime" ]
@@ -434,13 +460,15 @@
         "content" : {
           "application/json" : {
             "schema" : {
+              "type" : "object",
               "allOf" : [ {
                 "$ref" : "#/components/schemas/contactCommentCommonResponse"
               }, {
                 "type" : [ "object" ],
                 "properties" : {
                   "mention" : {
-                    "$ref" : "#/components/schemas/mentions"
+                    "$ref" : "#/components/schemas/mentions",
+                    "description" : "List of entities mentioned in the comment"
                   }
                 },
                 "additionalProperties" : false
@@ -458,7 +486,7 @@
                   "commenter" : {
                     "firstName" : "Jade",
                     "lastName" : "Tywin",
-                    "photoURL" : "https://desk.example.com/api/v1/agents/4000000008692/photo?orgId=1234567890",
+                    "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000008692/photo?orgId=292828",
                     "name" : "Jade Tywin",
                     "roleName" : "LightAgent",
                     "type" : [ "AGENT" ],
@@ -489,7 +517,7 @@
                   "commenter" : {
                     "firstName" : "Jade",
                     "lastName" : "Tywin",
-                    "photoURL" : "https://desk.example.com/api/v1/agents/4000000008692/photo?orgId=1234567890",
+                    "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000008692/photo?orgId=292828",
                     "name" : "Jade Tywin",
                     "roleName" : "LightAgent",
                     "type" : [ "AGENT" ],
@@ -506,16 +534,19 @@
         "content" : {
           "application/json" : {
             "schema" : {
+              "type" : "object",
               "allOf" : [ {
                 "type" : [ "object" ],
                 "properties" : {
                   "data" : {
                     "type" : [ "array" ],
+                    "description" : "List of comment entries for the contact",
                     "items" : {
                       "type" : [ "object" ],
                       "properties" : {
                         "mention" : {
-                          "$ref" : "#/components/schemas/mentions"
+                          "$ref" : "#/components/schemas/mentions",
+                          "description" : "List of entities mentioned in the comment"
                         }
                       },
                       "additionalProperties" : false
@@ -528,7 +559,8 @@
                 "additionalProperties" : false,
                 "properties" : {
                   "data" : {
-                    "$ref" : "#/components/schemas/dataArr"
+                    "$ref" : "#/components/schemas/dataArr",
+                    "description" : "List of comment entries for the contact"
                   }
                 },
                 "required" : [ "data" ]
@@ -548,7 +580,7 @@
                     "commenter" : {
                       "firstName" : "Jade",
                       "lastName" : "Tywin",
-                      "photoURL" : "https://desk.example.com/api/v1/portalUser/4000000008692/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/portalUser/4000000008692/photo?orgId=292828",
                       "name" : "Jade Tywin",
                       "roleName" : "PortalUser",
                       "type" : [ "END_USER" ],
@@ -565,7 +597,7 @@
                     "commenter" : {
                       "firstName" : "Jade",
                       "lastName" : "Tywin",
-                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000008692/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000008692/photo?orgId=292828",
                       "name" : "Jade Tywin",
                       "roleName" : "CEO",
                       "type" : [ "AGENT" ],
@@ -588,13 +620,15 @@
               "additionalProperties" : false,
               "properties" : {
                 "contentType" : {
-                  "type" : [ "string" ],
-                  "enum" : [ "plainText", "html" ],
-                  "default" : "html"
+                  "type" : "string",
+                  "enum" : [ "html", "plainText" ],
+                  "default" : "html",
+                  "description" : "Type of comment content. Possible values: html, plainText"
                 },
                 "content" : {
-                  "type" : [ "string" ],
-                  "maxLength" : 32000
+                  "type" : "string",
+                  "maxLength" : 32000,
+                  "description" : "Content of the comment"
                 }
               },
               "required" : [ "content" ]
@@ -620,11 +654,13 @@
                 "content" : {
                   "type" : [ "string" ],
                   "maxLength" : 32000,
-                  "minLength" : 0
+                  "minLength" : 0,
+                  "description" : "Content of the comment"
                 },
                 "contentType" : {
                   "type" : [ "string" ],
-                  "enum" : [ "html", "plainText" ]
+                  "enum" : [ "html", "plainText" ],
+                  "description" : "Type of comment content. Possible values: html, plainText"
                 }
               }
             },
@@ -650,5 +686,6 @@
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "ContactComments"
 }

@@ -1,5 +1,6 @@
 {
   "openapi" : "3.1.0",
+  "x-mcp-group" : [ "IM Sessions" ],
   "info" : {
     "title" : "IM_Session",
     "version" : "1.0.0"
@@ -11,6 +12,7 @@
         "summary" : "Get Session Metrics",
         "description" : "Returns session counts grouped by assignee filter and session status. Use optional query parameters to narrow results by department, channel, or integration service.",
         "operationId" : "getSessionMetrics",
+        "x-mcp-group" : [ "IM Metrics" ],
         "parameters" : [ {
           "name" : "departmentId",
           "in" : "query",
@@ -19,10 +21,9 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "integer" ],
+            "type" : "string",
             "format" : "int64",
-            "description" : "Filter conversations of all channels in given department",
-            "pattern" : "([0-9]+)"
+            "description" : "Filter conversations of all channels in given department"
           }
         }, {
           "name" : "integrationServiceId",
@@ -35,22 +36,22 @@
             "type" : "string",
             "description" : "Integration service ID to filter session metrics. Possible values: TELEGRAM, TWILIO, IM_TALK, LINE, WECHAT, WECOM, WHATSAPP, FACEBOOKMESSENGER, INSTAGRAM.",
             "enum" : [ "TELEGRAM", "TWILIO", "IM_TALK", "LINE", "WECHAT", "WECOM", "WHATSAPP", "FACEBOOKMESSENGER", "INSTAGRAM" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "pattern" : "[a-zA-Z0-9\\_]*$",
+            "x-regex-name" : "availIntegrationServices",
+            "maxLength" : 100
           }
         }, {
           "name" : "channelId",
           "in" : "query",
-          "description" : "Filter conversations of a channel",
+          "description" : "Filter session metrics of a channel",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : "string",
-            "description" : "Filter conversations of a channel",
-            "pattern" : "^([0-9]+)(,([0-9]+)){0,49}$",
-            "maxLength" : 1000,
-            "minLength" : 0
+            "type" : [ "string", "integer" ],
+            "description" : "Filter session metrics of a channel",
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
           }
         }, {
           "name" : "excludeSyncingChannels",
@@ -121,8 +122,7 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 0,
-            "minimum" : 0
+            "default" : "0"
           }
         }, {
           "name" : "limit",
@@ -134,9 +134,7 @@
           "schema" : {
             "type" : "integer",
             "format" : "int32",
-            "default" : 50,
-            "minimum" : 0,
-            "maximum" : 50
+            "default" : "0"
           }
         }, {
           "name" : "include",
@@ -144,13 +142,15 @@
           "description" : "Additional information to include in the response. This is a list-based parameter; pass one or more comma-separated values. Possible values: contacts, products, isRead, departments, team, assignee, source, ability.",
           "required" : false,
           "style" : "form",
-          "explode" : true,
+          "explode" : false,
           "schema" : {
-            "type" : "string",
-            "pattern" : "^(contacts|products|isRead|departments|team|assignee|source|ability)(,(contacts|products|isRead|departments|team|assignee|source|ability))*$",
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "enum" : [ "contacts", "products", "isRead", "departments", "team", "assignee", "source", "ability" ]
+            },
             "example" : "assignee,team",
-            "maxLength" : 200,
-            "minLength" : 0
+            "maxItems" : 8
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -177,6 +177,8 @@
         "summary" : "List Sessions",
         "description" : "This API lists all sessions",
         "operationId" : "getSessions",
+        "x-mcp-group" : [ "Initiate Session", "IM Messages" ],
+        "x-system-description" : "If assigneeFilter is not set, MINE is applied by default and returns sessions assigned to the current agent; use agentId to filter by a specific agent. Set assigneeFilter to NONE to fetch all sessions, UNASSIGNED for sessions with no agent assigned, or BOT for bot-assigned sessions. When both channelId and contactExtId are provided, assignment filtering is ignored and all matching sessions are returned.",
         "parameters" : [ {
           "name" : "modifiedAfter",
           "in" : "query",
@@ -188,8 +190,7 @@
             "type" : "string",
             "description" : "After which modified date conversations should be included. Enter a date in the ISO date format of yyyy-MM-ddThh:mm:ss.SSSZ.",
             "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+            "pattern" : "((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)"
           }
         }, {
           "name" : "agentId",
@@ -199,10 +200,9 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "integer" ],
+            "type" : "string",
             "format" : "int64",
-            "description" : "Filter conversations assigned to an agent",
-            "pattern" : "([0-9]+)"
+            "description" : "Filter conversations assigned to an agent"
           }
         }, {
           "name" : "contactId",
@@ -212,10 +212,9 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "integer" ],
+            "type" : "string",
             "format" : "int64",
-            "description" : "Filter conversations of a contact",
-            "pattern" : "([0-9]+)"
+            "description" : "Filter conversations of a contact"
           }
         }, {
           "name" : "profileId",
@@ -225,10 +224,9 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "integer" ],
+            "type" : "string",
             "format" : "int64",
-            "description" : "Filter conversations of a profile",
-            "pattern" : "([0-9]+)"
+            "description" : "Filter conversations of a profile"
           }
         }, {
           "name" : "departmentId",
@@ -238,10 +236,9 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "integer" ],
+            "type" : "string",
             "format" : "int64",
-            "description" : "Filter conversations of all channels in given department",
-            "pattern" : "([0-9]+)"
+            "description" : "Filter conversations of all channels in given department"
           }
         }, {
           "name" : "limit",
@@ -251,10 +248,11 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "integer" ],
+            "type" : "string",
             "format" : "int32",
             "description" : "Number of tickets to fetch",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "default" : 0
           }
         }, {
           "name" : "from",
@@ -264,10 +262,11 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "integer" ],
+            "type" : "string",
             "format" : "int32",
             "description" : "Index number, starting from which the tickets must be fetched",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "default" : 0
           }
         }, {
           "name" : "assigneeFilter",
@@ -280,9 +279,7 @@
             "type" : "string",
             "description" : "Assignment status filter for the conversations. Allowed values: MINE, UNASSIGNED, NONE, BOT",
             "enum" : [ "MINE", "UNASSIGNED", "NONE", "BOT" ],
-            "pattern" : "(MINE|UNASSIGNED|NONE|BOT)",
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           }
         }, {
           "name" : "createdBefore",
@@ -295,8 +292,7 @@
             "type" : "string",
             "description" : "Before which date conversations should be included. Enter a date in the ISO date format of yyyy-MM-ddThh:mm:ss.SSSZ.",
             "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+            "pattern" : "((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)"
           }
         }, {
           "name" : "createdAfter",
@@ -309,8 +305,7 @@
             "type" : "string",
             "description" : "After which date conversations should be included. Enter a date in the ISO date format of yyyy-MM-ddThh:mm:ss.SSSZ.",
             "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+            "pattern" : "((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)"
           }
         }, {
           "name" : "channelId",
@@ -320,11 +315,14 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : "string",
+            "type" : [ "array" ],
             "description" : "Filter conversations of a channel",
-            "pattern" : "^([0-9]+)(,([0-9]+)){0,49}$",
-            "maxLength" : 1000,
-            "minLength" : 0
+            "items" : {
+              "type" : [ "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "maxItems" : 50
           }
         }, {
           "name" : "botIds",
@@ -334,11 +332,13 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : "string",
+            "type" : "array",
             "description" : "IM bot IDs of bots whose sessions should be returned.",
-            "pattern" : "^([0-9]+)(,([0-9]+)){0,49}$",
-            "maxLength" : 1000,
-            "minLength" : 0
+            "maxItems" : 50,
+            "items" : {
+              "type" : "string",
+              "format" : "int64"
+            }
           }
         }, {
           "name" : "status",
@@ -348,12 +348,13 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : "string",
+            "type" : "array",
             "description" : "Status filter for the conversations. Allowed values: OPEN, ENDED, ON_PROGRESS, ON_HOLD, BLOCKED",
-            "pattern" : "^(OPEN|ENDED|ON_PROGRESS|ON_HOLD|BLOCKED)(,(OPEN|ENDED|ON_PROGRESS|ON_HOLD|BLOCKED)){0,4}$",
-            "example" : "OPEN,ENDED,ON_PROGRESS,ON_HOLD,BLOCKED",
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxItems" : 5,
+            "items" : {
+              "type" : "string",
+              "enum" : [ "OPEN", "ENDED", "ON_PROGRESS", "ON_HOLD", "BLOCKED" ]
+            }
           }
         }, {
           "name" : "excludeSyncingChannels",
@@ -394,6 +395,7 @@
         "summary" : "Get a session",
         "description" : "This API fetches details of an session.",
         "operationId" : "getSession",
+        "x-mcp-group" : [ "Initiate Session", "IM Messages" ],
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -434,6 +436,7 @@
         "summary" : "Update a session",
         "description" : "This API updates details of a session, including its status and assignee. Use it to assign the session to yourself or another agent by passing agentId with an appropriate status value. To assign a bot, pass botId with deskBotId from List IM Bots. Status changes must follow allowed transitions from the current session status. From any status, you can transition to BLOCKED or ENDED. Additional transitions are allowed based on the current status: from BLOCKED to OPEN; from OPEN to ON_HOLD; from ON_PROGRESS to ENDED; from ENDED to ON_HOLD. An invalid status transition returns a validation error.",
         "operationId" : "updateSession",
+        "x-mcp-group" : [ "IM Messages" ],
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -830,7 +833,7 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
@@ -856,7 +859,7 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
@@ -903,23 +906,20 @@
               "additionalProperties" : false,
               "properties" : {
                 "agentId" : {
-                  "type" : [ "string", "integer" ],
+                  "type" : "string",
                   "format" : "int64",
-                  "description" : "Zoho Desk user ID of the agent to assign as the current session assignee.",
-                  "pattern" : "([0-9]+)"
+                  "description" : "Zoho Desk user ID of the agent to assign as the current session assignee."
                 },
                 "botId" : {
-                  "type" : [ "string", "integer" ],
+                  "type" : "string",
                   "format" : "int64",
-                  "description" : "Desk bot ID of the bot to assign as the current session assignee.",
-                  "pattern" : "([0-9]+)"
+                  "description" : "Desk bot ID of the bot to assign as the current session assignee."
                 },
                 "status" : {
                   "type" : "string",
                   "description" : "Current status of the session to be set. Possible values: OPEN, ENDED, ON_HOLD, BLOCKED",
-                  "enum" : [ "OPEN", "ON_HOLD", "ENDED", "BLOCKED" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "enum" : [ "OPEN", "ENDED", "ON_PROGRESS", "ON_HOLD", "BLOCKED" ],
+                  "maxLength" : 100
                 }
               }
             },
@@ -946,5 +946,6 @@
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "IM_Session"
 }

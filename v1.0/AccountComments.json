@@ -8,8 +8,8 @@
     "/api/v1/accounts/{accountId}/comments/{commentId}" : {
       "get" : {
         "tags" : [ "AccountComments" ],
-        "summary" : "Get an account comment",
-        "description" : "This API fetches an account comment from the portal.",
+        "summary" : "Get Account Comment",
+        "description" : "Retrieves a comment on the specified account.",
         "operationId" : "getAccountComment",
         "parameters" : [ {
           "name" : "include",
@@ -20,7 +20,7 @@
           "explode" : true,
           "schema" : {
             "type" : [ "array" ],
-            "description" : "Secondary information related to the comments. Value allowed is @mentions@, which returns the details of users mentioned in the comments.",
+            "description" : "Secondary information related to the comments. Value allowed is mentions, which returns the details of users mentioned in the comments.",
             "items" : {
               "type" : [ "string" ],
               "enum" : [ "mentions" ]
@@ -58,13 +58,15 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.contacts.READ" ]
+          "iam-oauth2-schema" : [ "Desk.accounts.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.contacts.READ" ]
         } ]
       },
       "put" : {
         "tags" : [ "AccountComments" ],
-        "summary" : "Update an account comment",
-        "description" : "This API updates an existing account comment.",
+        "summary" : "Update Account Comment",
+        "description" : "Updates an existing comment on the specified account.",
         "operationId" : "updateAccountComment",
         "parameters" : [ {
           "name" : "accountId",
@@ -100,13 +102,15 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.contacts.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.accounts.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.contacts.UPDATE" ]
         } ]
       },
       "delete" : {
         "tags" : [ "AccountComments" ],
-        "summary" : "Delete an account comment",
-        "description" : "This API deletes an existing account comment.",
+        "summary" : "Delete Account Comment",
+        "description" : "Deletes a comment from the specified account.",
         "operationId" : "deleteAccountComment",
         "parameters" : [ {
           "name" : "accountId",
@@ -139,15 +143,17 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.contacts.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.accounts.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.contacts.UPDATE" ]
         } ]
       }
     },
     "/api/v1/accounts/{accountId}/comments" : {
       "get" : {
         "tags" : [ "AccountComments" ],
-        "summary" : "List all account comments",
-        "description" : "This API lists a particular number of comments recorded on an account, based on the limit specified.",
+        "summary" : "Get Account Comments",
+        "description" : "Retrieves comments on the specified account, with pagination support.",
         "operationId" : "getAccountComments",
         "parameters" : [ {
           "name" : "include",
@@ -158,7 +164,7 @@
           "explode" : true,
           "schema" : {
             "type" : [ "array" ],
-            "description" : "Secondary information related to the comments. Value allowed is @mentions@, which returns the details of users mentioned in the comments.",
+            "description" : "Secondary information related to the comments. Value allowed is mentions, which returns the details of users mentioned in the comments.",
             "items" : {
               "type" : [ "string" ],
               "enum" : [ "mentions" ]
@@ -197,7 +203,7 @@
         }, {
           "name" : "sortBy",
           "in" : "query",
-          "description" : "sortby can be @commentedTime@. default order : commentedTime in descending order , prefix @-@ denotes desc",
+          "description" : "Sorts comments by the commentedTime attribute. Default sorting order is descending. Prefix with - for descending order.",
           "required" : false,
           "style" : "form",
           "explode" : true,
@@ -226,13 +232,15 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.contacts.READ" ]
+          "iam-oauth2-schema" : [ "Desk.accounts.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.contacts.READ" ]
         } ]
       },
       "post" : {
         "tags" : [ "AccountComments" ],
-        "summary" : "Create an account comment",
-        "description" : "This API adds a comment to an account.",
+        "summary" : "Create Account Comment",
+        "description" : "Adds a comment to the specified account.",
         "operationId" : "createAccountComment",
         "parameters" : [ {
           "name" : "accountId",
@@ -260,7 +268,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.contacts.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.accounts.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.contacts.UPDATE" ]
         } ]
       }
     }
@@ -447,6 +457,27 @@
                 },
                 "additionalProperties" : false
               } ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "modifiedTime" : null,
+                  "commentedTime" : 1485287121000,
+                  "id" : "4000000530047",
+                  "contentType" : "plainText",
+                  "commenterId" : "4000000008692",
+                  "content" : "second account comment edit",
+                  "commenter" : {
+                    "firstName" : "Jade",
+                    "lastName" : "Tywin",
+                    "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000008692/photo?orgId=292828",
+                    "name" : "Jade Tywin",
+                    "roleName" : "LightAgent",
+                    "type" : [ "AGENT" ],
+                    "email" : "jade12tywin@zylker.com"
+                  }
+                }
+              }
             }
           }
         }
@@ -470,7 +501,7 @@
                   "commenter" : {
                     "firstName" : "Jade",
                     "lastName" : "Tywin",
-                    "photoURL" : "https://desk.example.com/api/v1/agents/4000000008692/photo?orgId=1234567890",
+                    "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000008692/photo?orgId=292828",
                     "name" : "Jade Tywin",
                     "roleName" : "LightAgent",
                     "type" : [ "AGENT" ],
@@ -524,17 +555,17 @@
                     "id" : "4000000530049",
                     "contentType" : "plainText",
                     "commenterId" : "4000000008692",
-                    "content" : "Sample zsu[@user:1234567890]zsu and zsu[@team:31138000001254025_new team]zsu testing",
+                    "content" : "Sample zsu[@user:55616589]zsu and zsu[@team:31138000001254025_new team]zsu testing",
                     "mention" : [ {
                       "firstName" : "",
-                      "lastName" : "Parker",
+                      "lastName" : "pandees",
                       "photoURL" : null,
                       "offSet" : "7",
                       "length" : "28",
                       "id" : "31138000000573164",
                       "type" : [ "AGENT" ],
                       "email" : "jade15tywin@zylker.com",
-                      "zuid" : "1234567890"
+                      "zuid" : "55616589"
                     }, {
                       "offSet" : "39",
                       "length" : "46",
@@ -551,7 +582,7 @@
                     "commenter" : {
                       "firstName" : "Jade",
                       "lastName" : "Tywin",
-                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000008692/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000008692/photo?orgId=292828",
                       "name" : "Jade Tywin",
                       "roleName" : "LightAgent",
                       "type" : [ "AGENT" ],
@@ -563,17 +594,17 @@
                     "id" : "4000000530047",
                     "contentType" : "html",
                     "commenterId" : "4000000008692",
-                    "content" : "Sample zsu[@user:1234567890]zsu and zsu[@team:31138000001254025_new team]zsu testing",
+                    "content" : "Sample zsu[@user:55616589]zsu and zsu[@team:31138000001254025_new team]zsu testing",
                     "mention" : [ {
                       "firstName" : "",
-                      "lastName" : "Parker",
+                      "lastName" : "pandees",
                       "photoURL" : null,
                       "offSet" : "7",
                       "length" : "28",
                       "id" : "31138000000573164",
                       "type" : [ "AGENT" ],
                       "email" : "jade15tywin@zylker.com",
-                      "zuid" : "1234567890"
+                      "zuid" : "55616589"
                     }, {
                       "offSet" : "39",
                       "length" : "46",
@@ -592,7 +623,7 @@
                     "commenter" : {
                       "firstName" : "Jade",
                       "lastName" : "Tywin",
-                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000008692/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000008692/photo?orgId=292828",
                       "name" : "Jade Tywin",
                       "roleName" : "LightAgent",
                       "type" : [ "AGENT" ],
@@ -616,11 +647,13 @@
               "properties" : {
                 "contentType" : {
                   "type" : [ "string" ],
+                  "description" : "Indicates the content type of the comment. Accepted values: plainText, html",
                   "enum" : [ "plainText", "html" ],
                   "default" : "html"
                 },
                 "content" : {
                   "type" : [ "string" ],
+                  "description" : "Content of the comment",
                   "maxLength" : 32000
                 }
               },
@@ -646,11 +679,13 @@
               "properties" : {
                 "content" : {
                   "type" : [ "string" ],
+                  "description" : "Content of the comment",
                   "maxLength" : 32000,
                   "minLength" : 0
                 },
                 "contentType" : {
                   "type" : [ "string" ],
+                  "description" : "Indicates the content type of the comment. Accepted values: html, plainText",
                   "enum" : [ "html", "plainText" ]
                 }
               }
@@ -675,7 +710,11 @@
       },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "AccountComments"
 }

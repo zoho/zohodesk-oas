@@ -34,6 +34,34 @@
           "$ref" : "#/components/schemas/massActionResponse"
         },
         "description" : "List of bulk operation results"
+      },
+      "massActionSuccessNull" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "success" : {
+            "description" : "Indicates whether the operation succeeded. Possible values: true, false",
+            "type" : [ "boolean", "null" ]
+          },
+          "id" : {
+            "description" : "Unique ID of the entity",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "errors" : {
+            "description" : "Error details if the operation failed; null if successful",
+            "$ref" : "./MassActionError.json#/components/schemas/massActionErrorResponse"
+          }
+        },
+        "required" : [ "errors", "id", "success" ]
+      },
+      "resultsSuccessNullResponse" : {
+        "type" : [ "array" ],
+        "items" : {
+          "$ref" : "#/components/schemas/massActionSuccessNull"
+        },
+        "description" : "List of bulk operation results"
       }
     },
     "responses" : {
@@ -72,6 +100,42 @@
             }
           }
         }
+      },
+      "massActionListSuccessNullResponse" : {
+        "description" : "massActionListView template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "results" : {
+                  "$ref" : "#/components/schemas/resultsSuccessNullResponse",
+                  "description" : "List of bulk operation results"
+                }
+              },
+              "required" : [ "results" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "results" : [ {
+                    "success" : null,
+                    "id" : "7000000027223",
+                    "errors" : null
+                  }, {
+                    "success" : null,
+                    "id" : "7000000043968",
+                    "errors" : {
+                      "errorCode" : "UNPROCESSABLE_ENTITY",
+                      "httpCode" : "422"
+                    }
+                  } ]
+                }
+              }
+            }
+          }
+        }
       }
     },
     "securitySchemes" : {
@@ -85,5 +149,6 @@
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "MassActionResponse"
 }

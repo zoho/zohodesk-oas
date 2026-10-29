@@ -11,6 +11,7 @@
         "summary" : "Get articles for manual sorting",
         "description" : "This API lists the positions of help articles to enable manual sorting. Only leaf categories that have a maximum of 1000 articles can be repositioned.",
         "operationId" : "getArticlesForRepositioning",
+        "x-mcp-group" : [ "KB Admin", "Manage KB Category", "View KB Category", "Manage KB Articles", "View KB Articles", "View KB" ],
         "parameters" : [ {
           "name" : "categoryId",
           "in" : "path",
@@ -44,6 +45,7 @@
         "summary" : "Update article position",
         "description" : "This API helps you manually sort articles in your knowledge base. Only leaf categories that have a maximum of 1000 articles can be repositioned.",
         "operationId" : "updateKBArticlesRepositioning",
+        "x-mcp-group" : [ "KB Admin", "Manage KB Category", "Manage KB Articles" ],
         "parameters" : [ {
           "name" : "categoryId",
           "in" : "path",
@@ -61,7 +63,7 @@
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "requestBody" : {
-          "$ref" : "./Article.json#/components/requestBodies/articleIdsJson"
+          "$ref" : "#/components/requestBodies/articleIdsJson"
         },
         "responses" : {
           "422" : {
@@ -120,6 +122,14 @@
   },
   "components" : {
     "schemas" : {
+      "articleIdsData" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "type" : [ "string", "integer", "null" ],
+          "format" : "int64",
+          "pattern" : "([0-9]+)"
+        }
+      },
       "groupJson" : {
         "type" : [ "object", "null" ],
         "additionalProperties" : false,
@@ -151,6 +161,31 @@
         }
       }
     },
+    "requestBodies" : {
+      "articleIdsJson" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "ids" : {
+                  "$ref" : "#/components/schemas/articleIdsData"
+                }
+              },
+              "required" : [ "ids" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "ids" : [ "4000000083313", "4000000082105" ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "securitySchemes" : {
       "cookie-auth" : {
         "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
@@ -162,5 +197,6 @@
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "KbCategory"
 }

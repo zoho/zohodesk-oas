@@ -1,5 +1,6 @@
 {
   "openapi" : "3.1.0",
+  "x-mcp-group" : [ "Modules, Fields and Layouts" ],
   "info" : {
     "title" : "FieldOld",
     "version" : "1.0.0"
@@ -30,8 +31,12 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string" ],
-            "enum" : [ "DirectAssignment", "RoundRobin", "WorkFlow", "SLA", "Supervise", "BluePrint", "BluePrintTransition", "CustomView", "Report", "GameTrophy", "GameBadge", "LayoutRules", "ValidationRules" ]
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "enum" : [ "DirectAssignment", "RoundRobin", "WorkFlow", "SLA", "Supervise", "BluePrint", "BluePrintTransition", "CustomView", "Report", "GameTrophy", "GameBadge", "LayoutRules", "ValidationRules" ]
+            },
+            "maxItems" : 5
           }
         }, {
           "name" : "from",
@@ -51,7 +56,7 @@
           "name" : "limit",
           "in" : "query",
           "description" : "Number of references to fetch",
-          "required" : true,
+          "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
@@ -74,7 +79,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.fields.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       }
     },
@@ -194,7 +201,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.fields.READ", "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.fields.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ],
         "deprecated" : true,
         "x-deprecated" : true,
@@ -374,7 +383,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.fields.UPDATE", "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.fields.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
         } ],
         "deprecated" : true,
         "x-deprecated" : true,
@@ -408,7 +419,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.fields.DELETE", "Desk.settings.DELETE" ]
+          "iam-oauth2-schema" : [ "Desk.fields.DELETE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.DELETE" ]
         } ],
         "deprecated" : true,
         "x-deprecated" : true,
@@ -419,31 +432,11 @@
       "get" : {
         "tags" : [ "FieldOld" ],
         "summary" : "Get Custom Field Count",
-        "description" : "This API returns the custom field count allowed and available in a module.",
+        "description" : "Retrieves the custom field count allowed and available for the specified module.",
         "operationId" : "getCustomFieldCount",
         "parameters" : [ {
-          "name" : "departmentId",
-          "in" : "query",
-          "required" : false,
-          "schema" : {
-            "type" : [ "string", "integer" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
-          },
-          "style" : "form",
-          "explode" : true,
-          "description" : "ID of the department in which the layout is configured."
-        }, {
-          "name" : "module",
-          "in" : "query",
-          "description" : "the module name with in which search to be done. Value may be tickets, contacts , accounts  ,tasks , timeEntry,products, contracts",
-          "required" : true,
-          "style" : "form",
-          "explode" : true,
-          "schema" : {
-            "type" : [ "string" ],
-            "enum" : [ "tickets", "contacts", "accounts", "tasks", "calls", "events", "contracts", "products" ]
-          }
+          "$ref" : "./Field.json#/components/parameters/moduleAPIName",
+          "description" : "Name of the module whose allowed and available custom fields must be fetched. Standard values: tickets, contacts, accounts, tasks, calls, events, timeEntry, products, contracts. Custom modules are also supported."
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -451,8 +444,14 @@
           "200" : {
             "$ref" : "#/components/responses/getCustomFieldCountResponse"
           },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/licenseErrorResponse"
+          },
           "422" : {
-            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+            "$ref" : "./Common.json#/components/responses/unprocessableEntityErrorResponse"
           }
         },
         "security" : [ {
@@ -484,13 +483,15 @@
         }, {
           "name" : "module",
           "in" : "query",
-          "description" : "the module name with in which search to be done. Value may be tickets, contacts , accounts  ,tasks , timeEntry,products, contracts",
+          "description" : "Name of the module. Common values are tickets, contacts, accounts, tasks, calls, events, products, and contracts; custom module API names are also accepted.",
           "required" : true,
           "style" : "form",
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
-            "enum" : [ "tickets", "contacts", "accounts", "tasks", "calls", "events", "contracts", "products" ]
+            "enum" : [ "tickets", "contacts", "accounts", "tasks", "calls", "events", "contracts", "products" ],
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s\\^\\{\\}\\~\\[\\]\\*\\+~\\|\\\"]+",
+            "x-regex-name" : "cleartextpattern"
           }
         }, {
           "name" : "departmentId",
@@ -503,6 +504,17 @@
             "type" : [ "string", "integer" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "featureFlags",
+          "in" : "header",
+          "description" : "Comma-separated feature flags. autonumber,ticketNumber includes auto-number fields and the tickets ticketNumber field in the list. When omitted, auto-number fields are excluded.",
+          "required" : false,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "autonumber,ticketNumber" ]
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -530,13 +542,15 @@
         "parameters" : [ {
           "name" : "module",
           "in" : "query",
-          "description" : "the module name with in which search to be done. Value may be tickets, contacts , accounts  ,tasks , timeEntry,products, contracts",
+          "description" : "Name of the module. Common values are tickets, contacts, accounts, tasks, calls, events, products, and contracts; custom module API names are also accepted.",
           "required" : true,
           "style" : "form",
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
-            "enum" : [ "tickets", "contacts", "accounts", "tasks", "calls", "events", "contracts", "products" ]
+            "enum" : [ "tickets", "contacts", "accounts", "tasks", "calls", "events", "contracts", "products" ],
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s\\^\\{\\}\\~\\[\\]\\*\\+~\\|\\\"]+",
+            "x-regex-name" : "cleartextpattern"
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -556,7 +570,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.fields.CREATE", "Desk.settings.CREATE" ]
+          "iam-oauth2-schema" : [ "Desk.fields.CREATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.CREATE" ]
         } ],
         "deprecated" : true,
         "x-deprecated" : true,
@@ -572,6 +588,7 @@
         "properties" : {
           "displayLabel" : {
             "type" : [ "string", "null" ],
+            "x-unique" : true,
             "maxLength" : 200,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
@@ -1645,23 +1662,27 @@
         "additionalProperties" : false,
         "properties" : {
           "maximumLimit" : {
-            "type" : [ "string", "integer", "null" ],
+            "type" : [ "string", "integer" ],
             "format" : "int32",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Maximum number of custom fields allowed for the type"
           },
           "available" : {
-            "type" : [ "string", "integer", "null" ],
+            "type" : [ "string", "integer" ],
             "format" : "int32",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Number of custom fields still available for the type"
           },
           "type" : {
-            "type" : [ "string", "null" ],
-            "enum" : [ "Varchar", "Integer", "Double", "Text", "Date", "DateTime", "Boolean", "DESK_SEARCHABLE_CTEXT_OEK", "Formula", "BigInt_WF" ]
+            "type" : [ "string" ],
+            "enum" : [ "Varchar", "Integer", "Double", "Text", "Date", "DateTime", "Boolean", "LookUp", "DESK_SEARCHABLE_CTEXT_OEK", "Formula", "BigInt_WF", "LargeText" ],
+            "description" : "Internal data type category. Accepted values: Varchar, Integer, Double, Text, Date, DateTime, Boolean, LookUp, DESK_SEARCHABLE_CTEXT_OEK, Formula, BigInt_WF, LargeText."
           }
         },
         "required" : [ "available", "maximumLimit", "type" ]
       },
       "customFieldCountJson" : {
+        "type" : "object",
         "additionalProperties" : false,
         "allOf" : [ {
           "$ref" : "#/components/schemas/basicCustomFieldCountJson"
@@ -1669,12 +1690,13 @@
           "type" : [ "object", "null" ],
           "properties" : {
             "types" : {
-              "type" : [ "array", "null" ],
+              "type" : [ "array" ],
               "items" : {
-                "type" : [ "string", "null" ],
+                "type" : [ "string" ],
                 "enum" : [ "Text", "PickList", "Email", "Phone", "Website", "Textarea", "Multiselect", "Number", "Percent", "Decimal", "Currency", "Date", "DateTime", "Checkbox" ]
               },
-              "uniqueItems" : false
+              "uniqueItems" : false,
+              "description" : "Field types included in the group"
             }
           },
           "required" : [ "types" ],
@@ -1691,12 +1713,128 @@
           } ]
         }
       },
+      "orgLevelCustomFieldCountProperties" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "maxCountForOrg" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "description" : "Maximum number of custom fields allowed for the type at organization level"
+          },
+          "availableCountForOrg" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "description" : "Number of custom fields still available for the type at organization level"
+          }
+        },
+        "required" : [ "availableCountForOrg", "maxCountForOrg" ]
+      },
+      "deptLevelCustomFieldCountProperties" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "maxCountForDept" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "description" : "Maximum number of custom fields allowed for the type at department level. Present when departmentId is provided."
+          },
+          "availableCountForDept" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "description" : "Number of custom fields still available for the type at department level. Present when departmentId is provided."
+          }
+        }
+      },
+      "basicfieldCountNewJson" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/basicCustomFieldCountJson"
+        }, {
+          "$ref" : "#/components/schemas/orgLevelCustomFieldCountProperties"
+        }, {
+          "$ref" : "#/components/schemas/deptLevelCustomFieldCountProperties"
+        } ]
+      },
+      "fieldCountNewJson" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/customFieldCountJson"
+        }, {
+          "$ref" : "#/components/schemas/orgLevelCustomFieldCountProperties"
+        }, {
+          "$ref" : "#/components/schemas/deptLevelCustomFieldCountProperties"
+        } ]
+      },
+      "customFieldCountsNewArr" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "anyOf" : [ {
+            "$ref" : "#/components/schemas/fieldCountNewJson"
+          }, {
+            "$ref" : "#/components/schemas/basicfieldCountNewJson"
+          } ]
+        }
+      },
+      "getCustomFieldCountLegacyResponseBody" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "customFieldCounts" : {
+            "$ref" : "#/components/schemas/customFieldCountsArr",
+            "description" : "List of custom field count entries grouped by data type"
+          },
+          "totalAvailableCount" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Total number of custom fields available across all types"
+          }
+        },
+        "required" : [ "customFieldCounts", "totalAvailableCount" ]
+      },
+      "getCustomFieldCountNewResponseBody" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "customFieldCounts" : {
+            "$ref" : "#/components/schemas/customFieldCountsNewArr",
+            "description" : "List of custom field count entries grouped by data type with organization- and department-level limits"
+          },
+          "totalAvailableCount" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Total number of custom fields available across all types at organization level. Mirrors totalAvailableCountForOrg."
+          },
+          "totalAvailableCountForOrg" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Total number of custom fields available across all types at organization level"
+          },
+          "totalAvailableCountForDept" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Total number of custom fields available across all types at department level. Present when departmentId is provided."
+          }
+        },
+        "required" : [ "customFieldCounts", "totalAvailableCount", "totalAvailableCountForOrg" ]
+      },
       "textFieldJson" : {
         "type" : [ "object" ],
         "additionalProperties" : false,
         "properties" : {
           "displayLabel" : {
             "type" : [ "string" ],
+            "x-unique" : true,
             "maxLength" : 200,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
@@ -1742,6 +1880,7 @@
         "properties" : {
           "displayLabel" : {
             "type" : [ "string" ],
+            "x-unique" : true,
             "maxLength" : 200,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
@@ -1787,6 +1926,7 @@
         "properties" : {
           "displayLabel" : {
             "type" : [ "string" ],
+            "x-unique" : true,
             "maxLength" : 200,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
@@ -1825,6 +1965,7 @@
         "properties" : {
           "displayLabel" : {
             "type" : [ "string" ],
+            "x-unique" : true,
             "maxLength" : 200,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
@@ -1877,6 +2018,7 @@
         "properties" : {
           "displayLabel" : {
             "type" : [ "string" ],
+            "x-unique" : true,
             "maxLength" : 200,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
@@ -1936,6 +2078,7 @@
         "properties" : {
           "displayLabel" : {
             "type" : [ "string" ],
+            "x-unique" : true,
             "maxLength" : 200,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
@@ -1970,6 +2113,7 @@
         "properties" : {
           "displayLabel" : {
             "type" : [ "string" ],
+            "x-unique" : true,
             "maxLength" : 200,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
@@ -2004,6 +2148,7 @@
         "properties" : {
           "displayLabel" : {
             "type" : [ "string" ],
+            "x-unique" : true,
             "maxLength" : 200,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
@@ -2042,6 +2187,7 @@
         "properties" : {
           "displayLabel" : {
             "type" : [ "string" ],
+            "x-unique" : true,
             "maxLength" : 200,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
@@ -2087,6 +2233,7 @@
         "properties" : {
           "displayLabel" : {
             "type" : [ "string" ],
+            "x-unique" : true,
             "maxLength" : 200,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
@@ -2125,6 +2272,7 @@
         "properties" : {
           "displayLabel" : {
             "type" : [ "string" ],
+            "x-unique" : true,
             "maxLength" : 200,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
@@ -2163,6 +2311,7 @@
         "properties" : {
           "displayLabel" : {
             "type" : [ "string" ],
+            "x-unique" : true,
             "maxLength" : 200,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
@@ -2197,6 +2346,7 @@
         "properties" : {
           "displayLabel" : {
             "type" : [ "string" ],
+            "x-unique" : true,
             "maxLength" : 200,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
@@ -2235,6 +2385,7 @@
         "properties" : {
           "displayLabel" : {
             "type" : [ "string" ],
+            "x-unique" : true,
             "maxLength" : 200,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
@@ -2273,6 +2424,7 @@
         "properties" : {
           "displayLabel" : {
             "type" : [ "string" ],
+            "x-unique" : true,
             "maxLength" : 200,
             "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
@@ -2441,23 +2593,57 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "object", "null" ],
-              "additionalProperties" : false,
-              "properties" : {
-                "customFieldCounts" : {
-                  "$ref" : "#/components/schemas/customFieldCountsArr"
-                },
-                "totalAvailableCount" : {
-                  "type" : [ "string", "integer", "null" ],
-                  "format" : "int64",
-                  "pattern" : "([0-9]+)"
-                }
-              },
-              "required" : [ "customFieldCounts", "totalAvailableCount" ]
+              "oneOf" : [ {
+                "$ref" : "#/components/schemas/getCustomFieldCountLegacyResponseBody"
+              }, {
+                "$ref" : "#/components/schemas/getCustomFieldCountNewResponseBody"
+              } ]
             },
             "examples" : {
               "Valid responses Definitions" : {
-                "value" : { }
+                "value" : {
+                  "customFieldCounts" : [ {
+                    "types" : [ "Text", "PickList", "Email", "Phone", "Website" ],
+                    "maximumLimit" : 100,
+                    "available" : 90,
+                    "type" : "Varchar"
+                  }, {
+                    "types" : [ "Textarea", "Multiselect" ],
+                    "maximumLimit" : 30,
+                    "available" : 30,
+                    "type" : "Text"
+                  }, {
+                    "types" : [ "Number" ],
+                    "maximumLimit" : 20,
+                    "available" : 15,
+                    "type" : "Integer"
+                  }, {
+                    "types" : [ "Percent", "Decimal", "Currency" ],
+                    "maximumLimit" : 20,
+                    "available" : 20,
+                    "type" : "Double"
+                  }, {
+                    "types" : [ "Date" ],
+                    "maximumLimit" : 20,
+                    "available" : 20,
+                    "type" : "Date"
+                  }, {
+                    "types" : [ "DateTime" ],
+                    "maximumLimit" : 20,
+                    "available" : 20,
+                    "type" : "DateTime"
+                  }, {
+                    "types" : [ "Checkbox" ],
+                    "maximumLimit" : 20,
+                    "available" : 19,
+                    "type" : "Boolean"
+                  }, {
+                    "maximumLimit" : 5,
+                    "available" : 4,
+                    "type" : "LookUp"
+                  } ],
+                  "totalAvailableCount" : 239
+                }
               }
             }
           }
@@ -2662,7 +2848,11 @@
       },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "FieldOld"
 }

@@ -1,0 +1,376 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "JWT",
+    "version" : "1.0.0",
+    "description" : "JWT Configuration allows you to set up and manage JSON Web Token (JWT) based authentication for a help center."
+  },
+  "paths" : {
+    "/api/v1/helpCenters/{helpcenterId}/jwt/secret" : {
+      "get" : {
+        "tags" : [ "JWT" ],
+        "summary" : "Get JWT Secret Key",
+        "description" : "Retrieves the JWT secret key mapped with the specified help center.",
+        "operationId" : "getSecretKey",
+        "parameters" : [ {
+          "name" : "helpcenterId",
+          "description" : "Unique ID of the help center",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/secretKey"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.READ" ]
+        } ]
+      }
+    },
+    "/api/v1/helpCenters/{helpcenterId}/jwt" : {
+      "get" : {
+        "tags" : [ "JWT" ],
+        "summary" : "Get JWT Configuration",
+        "description" : "Retrieves configuration details of JWT authentication mapped with the specified help center.",
+        "operationId" : "getJWTDetails",
+        "parameters" : [ {
+          "name" : "helpcenterId",
+          "description" : "Unique ID of the help center",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/jwtResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.READ" ]
+        } ]
+      },
+      "post" : {
+        "tags" : [ "JWT" ],
+        "summary" : "Create JWT Configuration",
+        "description" : "Creates JWT authentication for the specified help center.",
+        "operationId" : "createJWTConfiguration",
+        "parameters" : [ {
+          "name" : "helpcenterId",
+          "description" : "Unique ID of the help center",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/jwtRequest",
+          "required" : true
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/jwtResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.CREATE" ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "JWT" ],
+        "summary" : "Delete JWT Configuration",
+        "description" : "Deletes the JWT authentication mapped with the specified help center.",
+        "operationId" : "deleteJWTConfiguration",
+        "parameters" : [ {
+          "name" : "helpcenterId",
+          "description" : "Unique ID of the help center",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.DELETE" ]
+        } ]
+      },
+      "patch" : {
+        "tags" : [ "JWT" ],
+        "summary" : "Update JWT Configuration",
+        "description" : "Updates JWT authentication for the specified help center.",
+        "operationId" : "updateJWTConfiguration",
+        "parameters" : [ {
+          "name" : "helpcenterId",
+          "description" : "Unique ID of the help center",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/update_jwtRequest",
+          "required" : true
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/jwtResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.UPDATE" ]
+        } ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "secretKeySchema" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "secretKey" : {
+            "description" : "JWT secret key associated with the help center",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "secretKey" ]
+      },
+      "jwtResponseSchema" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "helpcenterId" : {
+            "description" : "Unique ID of the help center associated with the JWT configuration",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "loginURL" : {
+            "description" : "Login URL used for JWT authentication",
+            "type" : [ "string", "null" ],
+            "maxLength" : 1000,
+            "minLength" : 0,
+            "pattern" : "^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&%\\$#_@]*)?$"
+          },
+          "logoutURL" : {
+            "description" : "Logout URL used for JWT authentication",
+            "type" : [ "string", "null" ],
+            "maxLength" : 1000,
+            "minLength" : 0,
+            "pattern" : "^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&%\\$#_@]*)?$"
+          },
+          "zaId" : {
+            "description" : "Zoho account ID associated with the JWT configuration",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "status" : {
+            "description" : "Activation status of the JWT configuration. Possible values: ACTIVE, DISABLED",
+            "type" : [ "string", "null" ],
+            "enum" : [ "ACTIVE", "DISABLED" ]
+          }
+        },
+        "required" : [ "helpcenterId", "loginURL", "logoutURL", "status", "zaId" ]
+      },
+      "jwtRequestSchema" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "maxLength" : 2000,
+        "minProperties" : 1,
+        "properties" : {
+          "loginURL" : {
+            "description" : "Login URL used for JWT authentication",
+            "type" : [ "string" ],
+            "maxLength" : 1000,
+            "pattern" : "^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&%\\$#_@]*)?$"
+          },
+          "logoutURL" : {
+            "description" : "Logout URL used for JWT authentication",
+            "type" : [ "string" ],
+            "maxLength" : 1000,
+            "pattern" : "^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&%\\$#_@]*)?$"
+          }
+        },
+        "required" : [ "loginURL", "logoutURL" ]
+      },
+      "updateJwtRequestSchema" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "maxLength" : 2050,
+        "minProperties" : 1,
+        "properties" : {
+          "loginURL" : {
+            "description" : "Login URL used for JWT authentication",
+            "type" : [ "string" ],
+            "maxLength" : 1000,
+            "pattern" : "^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&%\\$#_@]*)?$"
+          },
+          "logoutURL" : {
+            "description" : "Logout URL used for JWT authentication",
+            "type" : [ "string" ],
+            "maxLength" : 1000,
+            "pattern" : "^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&%\\$#_@]*)?$"
+          },
+          "status" : {
+            "description" : "Activation status of the JWT configuration. Possible values: ACTIVE, DISABLED",
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "enum" : [ "ACTIVE", "DISABLED" ]
+          }
+        }
+      }
+    },
+    "responses" : {
+      "secretKey" : {
+        "description" : "secretKey template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/secretKeySchema"
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "secretKey" : "4dbf95459b1e8b767bc4800e1240c171a5ae5b7c2c6e924abec3c93e448631e1"
+                }
+              }
+            }
+          }
+        }
+      },
+      "jwtResponse" : {
+        "description" : "jwtResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/jwtResponseSchema"
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "helpcenterId" : "99000000042017",
+                  "loginURL" : " https://www.zylker.com/login.html",
+                  "logoutURL" : "https://www.zylker.com/logout.html",
+                  "zaId" : "1025941680",
+                  "status" : "ACTIVE"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "requestBodies" : {
+      "jwtRequest" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/jwtRequestSchema"
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "loginURL" : " https://www.zylker.com/login.html",
+                  "logoutURL" : "https://www.zylker.com/logout.html"
+                }
+              }
+            }
+          }
+        }
+      },
+      "update_jwtRequest" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/updateJwtRequestSchema"
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "loginURL" : " https://www.zylker.com/signup.html",
+                  "logoutURL" : "https://www.zylker.com/signout.html",
+                  "status" : "ACTIVE"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "JWT"
+}

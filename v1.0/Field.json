@@ -1,5 +1,6 @@
 {
   "openapi" : "3.1.0",
+  "x-mcp-group" : [ "Modules, Fields and Layouts" ],
   "info" : {
     "title" : "Field",
     "version" : "1.0.0"
@@ -38,7 +39,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.fields.READ", "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.fields.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       },
       "patch" : {
@@ -76,7 +79,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.fields.UPDATE", "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.fields.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
         } ]
       },
       "delete" : {
@@ -111,7 +116,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.fields.DELETE", "Desk.settings.DELETE" ]
+          "iam-oauth2-schema" : [ "Desk.fields.DELETE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.DELETE" ]
         } ]
       }
     },
@@ -149,7 +156,7 @@
         }, {
           "name" : "module",
           "in" : "query",
-          "description" : "API name of the module in which the field must be created.Possible values: System-defined modules such as tickets, contacts, accounts, tasks, timeEntry, products, calls, events, contracts, and agents. Custom modules are also supported.",
+          "description" : "Name of the module. Standard values: tickets, contacts, accounts, tasks, calls, events, timeEntry, products, contracts. Custom modules are also supported.",
           "required" : true,
           "style" : "form",
           "explode" : false,
@@ -196,7 +203,7 @@
         "parameters" : [ {
           "name" : "module",
           "in" : "query",
-          "description" : "API name of the module in which the field must be created.Possible values: System-defined modules such as tickets, contacts, accounts, tasks, timeEntry, products, calls, events, contracts, and agents. Custom modules are also supported.",
+          "description" : "Name of the module. Standard values: tickets, contacts, accounts, tasks, calls, events, timeEntry, products, contracts. Custom modules are also supported.",
           "required" : true,
           "style" : "form",
           "explode" : false,
@@ -223,7 +230,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.fields.CREATE", "Desk.settings.CREATE" ]
+          "iam-oauth2-schema" : [ "Desk.fields.CREATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.CREATE" ]
         } ]
       }
     }
@@ -1045,6 +1054,10 @@
         "type" : [ "boolean" ],
         "description" : "Specifies whether the field value should be encrypted. Supported field types are Text, Number, Percent, Decimal, Email, Phone, and URL."
       },
+      "isPHIProperty" : {
+        "type" : [ "boolean" ],
+        "description" : "Specifies whether the field contains protected health information (PHI). Supported field types are Text, Number, Percent, Decimal, Email, Phone, and URL."
+      },
       "textFieldJsonNew" : {
         "type" : "object",
         "additionalProperties" : false,
@@ -1068,6 +1081,9 @@
             },
             "isEncryptedField" : {
               "$ref" : "#/components/schemas/isEncryptedFieldProperty"
+            },
+            "isPHI" : {
+              "$ref" : "#/components/schemas/isPHIProperty"
             }
           },
           "required" : [ "maxLength", "type" ]
@@ -1096,6 +1112,9 @@
             },
             "isEncryptedField" : {
               "$ref" : "#/components/schemas/isEncryptedFieldProperty"
+            },
+            "isPHI" : {
+              "$ref" : "#/components/schemas/isPHIProperty"
             }
           },
           "required" : [ "maxLength", "type" ]
@@ -1116,6 +1135,9 @@
             },
             "isEncryptedField" : {
               "$ref" : "#/components/schemas/isEncryptedFieldProperty"
+            },
+            "isPHI" : {
+              "$ref" : "#/components/schemas/isPHIProperty"
             }
           },
           "required" : [ "type" ]
@@ -1152,6 +1174,9 @@
             },
             "isEncryptedField" : {
               "$ref" : "#/components/schemas/isEncryptedFieldProperty"
+            },
+            "isPHI" : {
+              "$ref" : "#/components/schemas/isPHIProperty"
             }
           },
           "required" : [ "decimalPlaces", "maxLength", "type" ]
@@ -1252,6 +1277,9 @@
             },
             "isEncryptedField" : {
               "$ref" : "#/components/schemas/isEncryptedFieldProperty"
+            },
+            "isPHI" : {
+              "$ref" : "#/components/schemas/isPHIProperty"
             }
           },
           "required" : [ "type" ]
@@ -1280,6 +1308,9 @@
             },
             "isEncryptedField" : {
               "$ref" : "#/components/schemas/isEncryptedFieldProperty"
+            },
+            "isPHI" : {
+              "$ref" : "#/components/schemas/isPHIProperty"
             }
           },
           "required" : [ "maxLength", "type" ]
@@ -1322,6 +1353,9 @@
             },
             "isEncryptedField" : {
               "$ref" : "#/components/schemas/isEncryptedFieldProperty"
+            },
+            "isPHI" : {
+              "$ref" : "#/components/schemas/isPHIProperty"
             }
           },
           "required" : [ "type" ]
@@ -1680,7 +1714,7 @@
                       "id" : "100000000000000022"
                     } ],
                     "hasMore" : false,
-                    "href" : "https://desk.example.com/api/v1/fields/100000000000000011/associatedDepartments"
+                    "href" : "https://desk.zoho.com/api/v1/fields/100000000000000011/associatedDepartments"
                   },
                   "createdBy" : "100000000000000003",
                   "sourceType" : "USERDEFINED",
@@ -1884,6 +1918,21 @@
         }
       }
     },
+    "parameters" : {
+      "moduleAPIName" : {
+        "name" : "module",
+        "in" : "query",
+        "description" : "Name of the module. Standard values: tickets, contacts, accounts, tasks, calls, events, timeEntry, products, contracts. Custom modules are also supported.",
+        "required" : true,
+        "style" : "form",
+        "explode" : false,
+        "schema" : {
+          "type" : [ "string" ],
+          "maxLength" : 100,
+          "pattern" : "([a-zA-Z0-9_]+)"
+        }
+      }
+    },
     "securitySchemes" : {
       "cookie-auth" : {
         "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
@@ -1893,7 +1942,11 @@
       },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "Field"
 }

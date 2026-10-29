@@ -5,19 +5,47 @@
     "version" : "1.0.0"
   },
   "paths" : {
+    "/api/v1/articles/updateMany" : {
+      "post" : {
+        "tags" : [ "Article" ],
+        "summary" : "Update Articles",
+        "description" : "Simultaneously updates certain properties of multiple articles. _Note_: The properties that can be bulk updated are: categoryId and, status.",
+        "operationId" : "updateManyArticles",
+        "x-mcp-group" : [ "KB Admin", "Manage KB Moderation", "Manage KB Templates", "Manage KB Articles" ],
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/articleUpdateJson"
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "200" : {
+            "$ref" : "./MassActionResponse.json#/components/responses/massActionListResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.UPDATE" ]
+        } ]
+      }
+    },
     "/api/v1/articleTags" : {
       "get" : {
         "tags" : [ "Article" ],
         "summary" : "Get Tags Associated with Articles",
         "description" : "Retrieves tags associated with articles, with pagination support.",
         "operationId" : "getArticleTags",
+        "x-mcp-group" : [ "Tags Management", "KB Admin", "KB Dashboard", "Manage KB Templates", "View KB Templates", "Manage KB Articles", "View KB Articles", "View KB" ],
         "parameters" : [ {
           "name" : "searchString",
           "in" : "query",
           "required" : false,
           "schema" : {
             "type" : [ "string" ],
-            "pattern" : "[a-z0-9\\_\\-\\+\\%\\P{InBasicLatin}\\s]+"
+            "pattern" : "[a-z0-9\\_\\-\\+\\%\\P{InBasicLatin}\\s]+",
+            "x-regex-name" : "vaildtag"
           },
           "style" : "form",
           "explode" : true,
@@ -103,6 +131,7 @@
         "summary" : "List articles",
         "description" : "This API fetches a specific number of articles from your knowledge base, based on the limit defined.",
         "operationId" : "getArticles",
+        "x-mcp-group" : [ "KB Admin", "KB Dashboard", "Manage KB Category", "View KB Category", "Manage KB Moderation", "View KB Moderation", "Manage KB Recyclebin", "View KB Recyclebin", "Manage KB Templates", "View KB Templates", "Manage KB Articles", "View KB Articles", "Manage KB Feedbacks", "View KB Feedbacks", "View KB" ],
         "parameters" : [ {
           "name" : "permission",
           "in" : "query",
@@ -233,6 +262,18 @@
             "minLength" : 0,
             "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)),(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null"
           }
+        }, {
+          "name" : "isTemplate",
+          "in" : "query",
+          "description" : "Is it a template",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "boolean",
+            "default" : false,
+            "description" : "To search the article template"
+          }
         } ],
         "responses" : {
           "422" : {
@@ -251,6 +292,7 @@
         "summary" : "Create article",
         "description" : "Creates a new article in the knowledge base.",
         "operationId" : "createArticle",
+        "x-mcp-group" : [ "KB Admin", "Manage KB Templates", "Manage KB Articles" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         }, {
@@ -288,6 +330,7 @@
         "summary" : "Get article",
         "description" : "This API fetches an article from your knowledge base.",
         "operationId" : "getArticle",
+        "x-mcp-group" : [ "KB Admin", "KB Dashboard", "Manage KB Category", "View KB Category", "Manage KB Moderation", "View KB Moderation", "Manage KB Recyclebin", "View KB Recyclebin", "Manage KB Templates", "View KB Templates", "Manage KB Articles", "View KB Articles", "Manage KB Feedbacks", "View KB Feedbacks", "View KB" ],
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -301,6 +344,21 @@
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
+        }, {
+          "name" : "include",
+          "in" : "query",
+          "description" : "Additional information to include in the response. Possible values: secondaryTitles, quickEdit, followersCount, articleSummary",
+          "required" : false,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : [ "string", "null" ],
+              "enum" : [ "secondaryTitles", "quickEdit", "followersCount", "articleSummary" ]
+            },
+            "uniqueItems" : true
+          }
         }, {
           "name" : "version",
           "in" : "query",
@@ -329,6 +387,7 @@
         "summary" : "Update Article",
         "description" : "Updates an existing article in the knowledge base.",
         "operationId" : "updateArticle",
+        "x-mcp-group" : [ "KB Admin", "Manage KB Moderation", "Manage KB Templates", "Manage KB Articles" ],
         "parameters" : [ {
           "description" : "Unique ID of the article to be updated",
           "name" : "id",
@@ -376,6 +435,7 @@
         "summary" : "Validate permalink",
         "description" : "This API validates if a permalink is available for a help article.",
         "operationId" : "checkArticlePermalinkAvailability",
+        "x-mcp-group" : [ "KnowledgeBase_Publishing", "KB Admin", "Manage KB Templates", "Manage KB Articles" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -401,6 +461,7 @@
         "summary" : "Get article count",
         "description" : "This API returns the number of articles published in the knowledge base of your help desk portal.",
         "operationId" : "getArticleCount",
+        "x-mcp-group" : [ "KB Admin", "KB Dashboard", "Manage KB Category", "View KB Category", "Manage KB Templates", "View KB Templates", "Manage KB Articles", "View KB Articles", "View KB" ],
         "parameters" : [ {
           "name" : "permission",
           "in" : "query",
@@ -461,6 +522,18 @@
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
+        }, {
+          "name" : "isTemplate",
+          "in" : "query",
+          "description" : "Is it a template",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "boolean",
+            "default" : false,
+            "description" : "To search the article template"
+          }
         } ],
         "responses" : {
           "200" : {
@@ -478,6 +551,7 @@
         "summary" : "Import File from Cloud",
         "description" : "Imports files from a cloud storage provider and converts them into HTML for publishing as articles.",
         "operationId" : "importFileFromCloudAndConvertToHtml",
+        "x-mcp-group" : [ "KB Admin", "Manage KB Templates", "Manage KB Articles" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -503,6 +577,7 @@
         "summary" : "Preview article",
         "description" : "This API shows a preview of help articles, through which you can check the content for formatting, alignment, and grammar/spelling errors and get the look and feel of the help article even before publishing it.",
         "operationId" : "previewArticle",
+        "x-mcp-group" : [ "KB Admin", "Manage KB Templates", "Manage KB Articles" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -528,6 +603,7 @@
         "summary" : "Migrate External Images to KB Gallery",
         "description" : "Migrates external image URLs embedded in the provided article HTML content to the knowledge base gallery. Note: Images matching the specified class name can be excluded from migration.",
         "operationId" : "migrateExternalImagesToKbGallery",
+        "x-mcp-group" : [ "KB Admin", "Manage KB Templates", "Manage KB Articles" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -553,6 +629,7 @@
         "summary" : "Move articles to trash",
         "description" : "This API moves articles to the Recycle Bin",
         "operationId" : "deleteArticle",
+        "x-mcp-group" : [ "KB Admin", "Manage KB Recyclebin", "Manage KB Templates", "Manage KB Articles" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -578,6 +655,7 @@
         "summary" : "Get Suggested Articles for Ticket",
         "description" : "Retrieves help articles relevant to resolving a ticket, with pagination support.",
         "operationId" : "suggestArticlesForTicket",
+        "x-mcp-group" : [ "KB Admin", "Manage KB Articles", "View KB Articles", "View KB" ],
         "parameters" : [ {
           "name" : "limit",
           "in" : "query",
@@ -654,6 +732,7 @@
         "summary" : "Stop Article Auto-Translation",
         "description" : "Stops auto-translation jobs that are currently in progress for one or more articles.",
         "operationId" : "stopArticleAutoTranslation",
+        "x-mcp-group" : [ "KB Admin", "Manage KB Articles" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -679,6 +758,7 @@
         "summary" : "Restart Article Auto-Translation",
         "description" : "Restarts auto-translation jobs that have previously failed for one or more articles.",
         "operationId" : "restartArticleAutoTranslation",
+        "x-mcp-group" : [ "KnowledgeBase_Publishing", "KB Admin", "Manage KB Articles" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -704,6 +784,7 @@
         "summary" : "Get Article History",
         "description" : "Retrieves the event history of an article, with pagination support.",
         "operationId" : "getArticleHistory",
+        "x-mcp-group" : [ "KB Admin", "Manage KB Articles", "View KB Articles", "View KB" ],
         "parameters" : [ {
           "name" : "from",
           "in" : "query",
@@ -826,6 +907,7 @@
         "summary" : "Get Article Insights",
         "description" : "Retrieves basic insight metrics for a specific article.",
         "operationId" : "getArticleInsights",
+        "x-mcp-group" : [ "KnowledgeBase_Publishing", "KB Admin", "KB Dashboard", "Manage KB Articles", "View KB Articles", "View KB" ],
         "parameters" : [ {
           "name" : "articleId",
           "in" : "path",
@@ -887,7 +969,182 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.articles.CREATE" ]
+          "iam-oauth2-schema" : [ "Desk.articles.UPDATE" ]
+        } ]
+      }
+    },
+    "/api/v1/articles/countByCategoryIds" : {
+      "get" : {
+        "tags" : [ "Article" ],
+        "summary" : "Get Article Count By Category IDs",
+        "description" : "This API retrieves the count of articles grouped by specified category IDs.",
+        "operationId" : "getArticleCountByCategoryIds",
+        "parameters" : [ {
+          "name" : "rootCategoryIds",
+          "in" : "query",
+          "description" : "Comma-separated list of root category IDs to fetch article counts for",
+          "required" : false,
+          "style" : "form",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string", "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "maxItems" : 50
+          }
+        }, {
+          "name" : "categoryIds",
+          "in" : "query",
+          "description" : "Category ids",
+          "required" : false,
+          "style" : "form",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string", "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "maxItems" : 50
+          }
+        }, {
+          "name" : "permission",
+          "in" : "query",
+          "description" : "Access permission for the article. Values allowed are: ALL_USERS, REGISTERED_USERS, AGENTS_ONLY",
+          "required" : false,
+          "style" : "form",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : "string",
+              "enum" : [ "ALL_USERS", "REGISTERED_USERS", "AGENTS_ONLY", "ALL", "REGISTEREDUSERS", "AGENTS" ]
+            },
+            "maxItems" : 3
+          }
+        }, {
+          "name" : "status",
+          "in" : "query",
+          "description" : "Publishing status of the article. Values allowed are: Draft, Published, Review, Expired",
+          "required" : false,
+          "style" : "form",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : "string",
+              "enum" : [ "DRAFT", "PUBLISH", "REVIEW", "EXPIRED", "Draft", "Published", "Review", "Expired" ]
+            },
+            "maxItems" : 4
+          }
+        }, {
+          "name" : "groupIds",
+          "in" : "query",
+          "description" : "Group category ids",
+          "required" : false,
+          "style" : "form",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string", "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "maxItems" : 10
+          }
+        }, {
+          "name" : "locale",
+          "in" : "query",
+          "description" : "Locale of the translation",
+          "required" : false,
+          "style" : "form",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : "string",
+              "pattern" : "([a-zA-Z]{2,4}([-_][a-zA-Z]{2})?)"
+            },
+            "maxItems" : 5
+          }
+        }, {
+          "name" : "categoryPresence",
+          "in" : "query",
+          "description" : "Is category present / not trashed flag",
+          "required" : false,
+          "schema" : {
+            "type" : "boolean"
+          }
+        }, {
+          "name" : "articlePresence",
+          "in" : "query",
+          "description" : "Is article present / not trashed flag",
+          "required" : false,
+          "schema" : {
+            "type" : "boolean"
+          }
+        }, {
+          "name" : "categoryStatus",
+          "in" : "query",
+          "description" : "Status of category. Values allowed are: SHOW_IN_HELPCENTER, HIDE_IN_HELPCENTER, DISABLED",
+          "required" : false,
+          "style" : "form",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : "string",
+              "enum" : [ "SHOW_IN_HELPCENTER", "HIDE_IN_HELPCENTER", "DISABLED" ]
+            },
+            "maxItems" : 3
+          }
+        }, {
+          "name" : "translationOwnerIds",
+          "in" : "query",
+          "description" : "Translation owner ids",
+          "required" : false,
+          "style" : "form",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string", "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "maxItems" : 5
+          }
+        }, {
+          "name" : "articleOwnerIds",
+          "in" : "query",
+          "description" : "Article owner ids",
+          "required" : false,
+          "style" : "form",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string", "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "maxItems" : 5
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/articleCountByCategoryIdsResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.READ" ]
         } ]
       }
     }
@@ -1310,6 +1567,10 @@
           "isFollowing" : {
             "type" : [ "boolean", "null" ]
           },
+          "isArticleSummaryPresent" : {
+            "description" : "Indicates whether an article summary is present. Possible values: • true = summary is present • false = summary is not present",
+            "type" : [ "boolean", "null" ]
+          },
           "myVote" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
@@ -1375,7 +1636,7 @@
             "$ref" : "./ArticleTranslation.json#/components/schemas/articleNumber"
           }
         },
-        "required" : [ "answer", "attachmentCount", "attachments", "author", "authorId", "availableLocaleTranslations", "category", "categoryId", "commentCount", "createdBy", "createdTime", "creatorId", "currentVersion", "departmentId", "dislikeCount", "expiryDate", "feedbackCount", "id", "isFollowing", "isLocked", "isTemplate", "isTrashed", "latestPublishedVersion", "latestVersion", "latestVersionModifiedBy", "latestVersionModifierId", "latestVersionStatus", "likeCount", "locale", "metrics", "modifiedBy", "modifiedTime", "modifierId", "myVote", "owner", "ownerId", "permalink", "permission", "portalUrl", "position", "reviewedBy", "reviewedTime", "rootCategoryId", "seo", "sourceLocale", "status", "summary", "tags", "templateLastUpdatedTime", "templateUsageCount", "templateUsedUsersCount", "title", "translationId", "translationSource", "translationState", "usageCount", "viewCount", "webUrl", "articleNumber" ]
+        "required" : [ "answer", "attachmentCount", "attachments", "author", "authorId", "availableLocaleTranslations", "category", "categoryId", "commentCount", "createdBy", "createdTime", "creatorId", "currentVersion", "departmentId", "dislikeCount", "expiryDate", "feedbackCount", "id", "isFollowing", "isArticleSummaryPresent", "isLocked", "isTemplate", "isTrashed", "latestPublishedVersion", "latestVersion", "latestVersionModifiedBy", "latestVersionModifierId", "latestVersionStatus", "likeCount", "locale", "metrics", "modifiedBy", "modifiedTime", "modifierId", "myVote", "owner", "ownerId", "permalink", "permission", "portalUrl", "position", "reviewedBy", "reviewedTime", "rootCategoryId", "seo", "sourceLocale", "status", "summary", "tags", "templateLastUpdatedTime", "templateUsageCount", "templateUsedUsersCount", "title", "translationId", "translationSource", "translationState", "usageCount", "viewCount", "webUrl", "articleNumber" ]
       },
       "articleCommonJson" : {
         "type" : [ "object", "null" ],
@@ -2028,6 +2289,40 @@
           }
         },
         "required" : [ "attachmentCount", "commentCount", "dislikeCount", "feedbackCount", "lastActivityTime", "likeCount", "usageCount", "viewCount" ]
+      },
+      "articleCountByCategoryIdsObj" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "rootCategoryId" : {
+            "description" : "Unique ID of the root category",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "categories" : {
+            "description" : "List of categories with article counts under the root category",
+            "type" : [ "array", "null" ],
+            "items" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "id" : {
+                  "description" : "Unique ID of the category",
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "articlesCount" : {
+                  "description" : "Number of articles in the category",
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int32",
+                  "pattern" : "([0-9]+)"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "responses" : {
@@ -2049,13 +2344,13 @@
               "Valid responses Definitions" : {
                 "value" : {
                   "data" : [ {
-                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Solutions/dv/22372000000281023",
+                    "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Solutions/dv/22372000000281023",
                     "id" : "22372000000281023",
                     "articleNumber" : "106",
                     "title" : "Importance of a Knowledge Base",
                     "authorId" : "4000000012931"
                   }, {
-                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Solutions/dv/22372000000209871",
+                    "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Solutions/dv/22372000000209871",
                     "id" : "22372000000209871",
                     "articleNumber" : "107",
                     "title" : "Importance of a Knowledge Base",
@@ -2122,21 +2417,21 @@
                     "name" : "Hill",
                     "id" : "4000000000059",
                     "status" : "ACTIVE",
-                    "zuid" : "1234567890"
+                    "zuid" : "234543"
                   },
                   "reviewedBy" : {
                     "photoURL" : null,
                     "name" : "Hill",
                     "id" : "4000000000059",
                     "status" : "ACTIVE",
-                    "zuid" : "1234567890"
+                    "zuid" : "234543"
                   },
                   "currentVersion" : "1.0",
                   "commentCount" : "0",
                   "tags" : [ "first ticket" ],
                   "sourceLocale" : "en",
                   "translationId" : "4000000017294",
-                  "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Solutions/dv/4000000019059/en",
+                  "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Solutions/dv/4000000019059/en",
                   "feedbackCount" : "0",
                   "latestPublishedVersion" : "1.0",
                   "metrics" : {
@@ -2156,7 +2451,7 @@
                     "name" : "will smith",
                     "id" : "4000000000060",
                     "status" : "ACTIVE",
-                    "zuid" : "1234567890"
+                    "zuid" : "234544"
                   },
                   "status" : "Draft",
                   "attachments" : [ ],
@@ -2170,7 +2465,7 @@
                     "name" : "Hill",
                     "id" : "4000000000059",
                     "status" : "ACTIVE",
-                    "zuid" : "1234567890"
+                    "zuid" : "234543"
                   },
                   "viewCount" : "0",
                   "seo" : {
@@ -2184,10 +2479,11 @@
                     "name" : "Hill",
                     "id" : "4000000000059",
                     "status" : "ACTIVE",
-                    "zuid" : "1234567890"
+                    "zuid" : "234543"
                   },
                   "summary" : "Zoho Desk packs a bunch of features that are expressly there to help you respond to tickets smartly. The first of these, you've already discovered: Auto-Suggest Articles. Zoho Desk pulls up relevant articles on the ticket's content—so you can save ...",
                   "isFollowing" : true,
+                  "isArticleSummaryPresent" : true,
                   "myVote" : null,
                   "permission" : "AGENTS",
                   "authorId" : "22372000000094004",
@@ -2199,10 +2495,10 @@
                     "name" : "Hill",
                     "id" : "4000000000059",
                     "status" : "ACTIVE",
-                    "zuid" : "1234567890"
+                    "zuid" : "234543"
                   },
                   "latestVersion" : "1.0",
-                  "portalUrl" : "https://desk.example.com/portal/zylker/en/kb/articles/answering-your-first-ticket",
+                  "portalUrl" : "https://desk.zoho.com/portal/zylker/en/kb/articles/answering-your-first-ticket",
                   "attachmentCount" : "0",
                   "availableLocaleTranslations" : [ {
                     "latestVersionStatus" : "Published",
@@ -2211,7 +2507,7 @@
                     "latestVersion" : "1.0",
                     "isLocked" : false,
                     "latestPublishedVersion" : "1.0",
-                    "href" : "https://desk.example.com/api/v1/articles/24073000007814013/translations/en?orgId=1234567890",
+                    "href" : "https://desk.zoho.com/api/v1/articles/24073000007814013/translations/en?orgId=54325703",
                     "authorId" : "24073000000095005",
                     "locale" : "en",
                     "translationState" : "UP-TO-DATE",
@@ -2333,6 +2629,10 @@
                     "type" : [ "string", "integer", "null" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
+                  },
+                  "articleSummary" : {
+                    "description" : "Details of the article summary",
+                    "$ref" : "./ArticleTranslation.json#/components/schemas/articleSummary"
                   }
                 },
                 "additionalProperties" : false
@@ -2548,6 +2848,10 @@
                   "isFollowing" : {
                     "type" : [ "boolean", "null" ]
                   },
+                  "isArticleSummaryPresent" : {
+                    "description" : "Indicates whether an article summary is present. Possible values: • true = summary is present • false = summary is not present",
+                    "type" : [ "boolean", "null" ]
+                  },
                   "myVote" : {
                     "type" : [ "string", "null" ],
                     "maxLength" : 100,
@@ -2608,7 +2912,7 @@
                     "pattern" : "([0-9]+)"
                   }
                 },
-                "required" : [ "answer", "attachmentCount", "attachmentCount", "attachments", "author", "authorId", "availableLocaleTranslations", "category", "categoryId", "commentCount", "commentCount", "createdBy", "createdTime", "creatorId", "currentVersion", "departmentId", "dislikeCount", "expiryDate", "feedbackCount", "id", "isFollowing", "isLocked", "isTemplate", "isTrashed", "latestPublishedVersion", "latestVersion", "latestVersionModifiedBy", "latestVersionModifierId", "latestVersionStatus", "likeCount", "locale", "metrics", "modifiedBy", "modifiedTime", "modifierId", "myVote", "owner", "ownerId", "permalink", "permission", "portalUrl", "position", "reviewedBy", "reviewedTime", "rootCategoryId", "seo", "sourceLocale", "status", "summary", "tags", "templateLastUpdatedTime", "templateUsageCount", "templateUsedUsersCount", "title", "translationId", "translationSource", "translationState", "translationState", "usageCount", "viewCount", "webUrl" ]
+                "required" : [ "answer", "attachmentCount", "attachmentCount", "attachments", "author", "authorId", "availableLocaleTranslations", "category", "categoryId", "commentCount", "commentCount", "createdBy", "createdTime", "creatorId", "currentVersion", "departmentId", "dislikeCount", "expiryDate", "feedbackCount", "id", "isFollowing", "isArticleSummaryPresent", "isLocked", "isTemplate", "isTrashed", "latestPublishedVersion", "latestVersion", "latestVersionModifiedBy", "latestVersionModifierId", "latestVersionStatus", "likeCount", "locale", "metrics", "modifiedBy", "modifiedTime", "modifierId", "myVote", "owner", "ownerId", "permalink", "permission", "portalUrl", "position", "reviewedBy", "reviewedTime", "rootCategoryId", "seo", "sourceLocale", "status", "summary", "tags", "templateLastUpdatedTime", "templateUsageCount", "templateUsedUsersCount", "title", "translationId", "translationSource", "translationState", "translationState", "usageCount", "viewCount", "webUrl" ]
               }, {
                 "type" : "object",
                 "properties" : {
@@ -2675,6 +2979,10 @@
                     "type" : [ "string", "null", "integer" ],
                     "format" : "int64",
                     "pattern" : "([0-9]+)"
+                  },
+                  "articleSummary" : {
+                    "description" : "Details of the article summary",
+                    "$ref" : "./ArticleTranslation.json#/components/schemas/articleSummary"
                   }
                 }
               }, {
@@ -2899,6 +3207,10 @@
                   "isFollowing" : {
                     "type" : [ "boolean", "null" ]
                   },
+                  "isArticleSummaryPresent" : {
+                    "description" : "Indicates whether an article summary is present. Possible values: • true = summary is present • false = summary is not present",
+                    "type" : [ "boolean", "null" ]
+                  },
                   "myVote" : {
                     "type" : [ "string", "null" ],
                     "maxLength" : 100,
@@ -2961,7 +3273,7 @@
                     "pattern" : "([0-9]+)"
                   }
                 },
-                "required" : [ "answer", "attachmentCount", "attachmentCount", "attachments", "author", "authorId", "availableLocaleTranslations", "category", "categoryId", "commentCount", "commentCount", "createdBy", "createdTime", "creatorId", "currentVersion", "departmentId", "dislikeCount", "expiryDate", "feedbackCount", "id", "isFollowing", "isLocked", "isTemplate", "isTrashed", "latestPublishedVersion", "latestVersion", "latestVersionModifiedBy", "latestVersionModifierId", "latestVersionStatus", "likeCount", "locale", "metrics", "modifiedBy", "modifiedTime", "modifierId", "myVote", "owner", "ownerId", "permalink", "permission", "portalUrl", "position", "reviewedBy", "reviewedTime", "rootCategoryId", "seo", "sourceLocale", "status", "summary", "tags", "templateLastUpdatedTime", "templateUsageCount", "templateUsedUsersCount", "title", "translationId", "translationSource", "translationState", "translationState", "usageCount", "viewCount", "webUrl" ]
+                "required" : [ "answer", "attachmentCount", "attachmentCount", "attachments", "author", "authorId", "availableLocaleTranslations", "category", "categoryId", "commentCount", "commentCount", "createdBy", "createdTime", "creatorId", "currentVersion", "departmentId", "dislikeCount", "expiryDate", "feedbackCount", "id", "isFollowing", "isArticleSummaryPresent", "isLocked", "isTemplate", "isTrashed", "latestPublishedVersion", "latestVersion", "latestVersionModifiedBy", "latestVersionModifierId", "latestVersionStatus", "likeCount", "locale", "metrics", "modifiedBy", "modifiedTime", "modifierId", "myVote", "owner", "ownerId", "permalink", "permission", "portalUrl", "position", "reviewedBy", "reviewedTime", "rootCategoryId", "seo", "sourceLocale", "status", "summary", "tags", "templateLastUpdatedTime", "templateUsageCount", "templateUsedUsersCount", "title", "translationId", "translationSource", "translationState", "translationState", "usageCount", "viewCount", "webUrl" ]
               } ]
             },
             "examples" : {
@@ -2980,11 +3292,11 @@
                   "quickEdit" : {
                     "modifierId" : "24073000007464062",
                     "modifiedBy" : {
-                      "photoURL" : "https://desk.example.com/api/v1/agents/24073000007464062/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/24073000007464062/photo?orgId=54325703",
                       "name" : "Tony Stark",
                       "id" : "24073000007464062",
                       "status" : "ACTIVE",
-                      "zuid" : "1234567890"
+                      "zuid" : "70425988"
                     }
                   },
                   "createdTime" : 1592999203000,
@@ -2996,21 +3308,21 @@
                     "name" : "Hill",
                     "id" : "4000000000059",
                     "status" : "ACTIVE",
-                    "zuid" : "1234567890"
+                    "zuid" : "234543"
                   },
                   "reviewedBy" : {
                     "photoURL" : null,
                     "name" : "Hill",
                     "id" : "4000000000059",
                     "status" : "ACTIVE",
-                    "zuid" : "1234567890"
+                    "zuid" : "234543"
                   },
                   "currentVersion" : "1.0",
                   "commentCount" : "0",
                   "tags" : [ "first ticket" ],
                   "sourceLocale" : "en",
                   "translationId" : "4000000017294",
-                  "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Solutions/dv/4000000019059/en",
+                  "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Solutions/dv/4000000019059/en",
                   "feedbackCount" : "0",
                   "latestPublishedVersion" : "1.0",
                   "position" : "6",
@@ -3034,7 +3346,7 @@
                     "name" : "will smith",
                     "id" : "4000000000060",
                     "status" : "ACTIVE",
-                    "zuid" : "1234567890"
+                    "zuid" : "234544"
                   },
                   "status" : "Published",
                   "attachments" : [ {
@@ -3042,8 +3354,8 @@
                     "extension" : "jpg",
                     "size" : "3028238",
                     "name" : "bird_2.jpg",
-                    "downloadUrl" : "https://desk.example.com/api/v1/articles/24073000005321222/translations/en/attachments/mvfyda9fcc4df229b4065a04fba88a5b81b33/content?orgId=1234567890&inline=false",
-                    "viewUrl" : "https://desk.example.com/api/v1/articles/24073000005321222/translations/en/attachments/mvfyda9fcc4df229b4065a04fba88a5b81b33/content?orgId=1234567890",
+                    "downloadUrl" : "https://desk.zoho.com/api/v1/articles/24073000005321222/translations/en/attachments/mvfyda9fcc4df229b4065a04fba88a5b81b33/content?orgId=54325703&inline=false",
+                    "viewUrl" : "https://desk.zoho.com/api/v1/articles/24073000005321222/translations/en/attachments/mvfyda9fcc4df229b4065a04fba88a5b81b33/content?orgId=54325703",
                     "createdTime" : 1635829881000
                   } ],
                   "reviewedTime" : 1592999203000,
@@ -3056,7 +3368,7 @@
                     "name" : "Hill",
                     "id" : "4000000000059",
                     "status" : "ACTIVE",
-                    "zuid" : "1234567890"
+                    "zuid" : "234543"
                   },
                   "viewCount" : "0",
                   "seo" : {
@@ -3070,10 +3382,11 @@
                     "name" : "Hill",
                     "id" : "4000000000059",
                     "status" : "ACTIVE",
-                    "zuid" : "1234567890"
+                    "zuid" : "234543"
                   },
                   "summary" : "Zoho Desk packs a bunch of features that are expressly there to help you respond to tickets smartly. The first of these, you've already discovered: Auto-Suggest Articles. Zoho Desk pulls up relevant articles on the ticket's content—so you can save ...",
                   "isFollowing" : true,
+                  "isArticleSummaryPresent" : true,
                   "myVote" : null,
                   "permission" : "AGENTS",
                   "authorId" : "4000000000059",
@@ -3085,10 +3398,10 @@
                     "name" : "Hill",
                     "id" : "4000000000059",
                     "status" : "ACTIVE",
-                    "zuid" : "1234567890"
+                    "zuid" : "234543"
                   },
                   "latestVersion" : "1.0",
-                  "portalUrl" : "https://desk.example.com/portal/zylker/en/kb/articles/answering-your-first-ticket",
+                  "portalUrl" : "https://desk.zoho.com/portal/zylker/en/kb/articles/answering-your-first-ticket",
                   "attachmentCount" : "0",
                   "availableLocaleTranslations" : [ {
                     "latestVersionStatus" : "Published",
@@ -3097,7 +3410,7 @@
                     "latestVersion" : "19.0",
                     "isLocked" : false,
                     "latestPublishedVersion" : "19.0",
-                    "href" : "https://desk.example.com/api/v1/articles/24073000005321222/translations/en?orgId=1234567890",
+                    "href" : "https://desk.zoho.com/api/v1/articles/24073000005321222/translations/en?orgId=54325703",
                     "authorId" : "24073000000095005",
                     "locale" : "en",
                     "translationState" : "UP-TO-DATE",
@@ -3109,7 +3422,7 @@
                     "latestVersion" : "0.1",
                     "isLocked" : false,
                     "latestPublishedVersion" : null,
-                    "href" : "https://desk.example.com/api/v1/articles/24073000005321222/translations/zh?orgId=1234567890",
+                    "href" : "https://desk.zoho.com/api/v1/articles/24073000005321222/translations/zh?orgId=54325703",
                     "authorId" : "24073000000095005",
                     "locale" : "zh",
                     "translationState" : "OUTDATED",
@@ -3264,11 +3577,11 @@
                     "isTemplate" : false,
                     "createdTime" : 1592999203000,
                     "modifiedBy" : {
-                      "photoURL" : "https://desk.example.com/api/v1/agents/24073000000095005/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/24073000000095005/photo?orgId=54325703",
                       "name" : "Hill",
                       "id" : "4000000000059",
                       "status" : "ACTIVE",
-                      "zuid" : "1234567890"
+                      "zuid" : "234543"
                     },
                     "id" : "4000000019059",
                     "viewCount" : "0",
@@ -3278,7 +3591,7 @@
                       "name" : "Hill",
                       "id" : "4000000000059",
                       "status" : "ACTIVE",
-                      "zuid" : "1234567890"
+                      "zuid" : "234543"
                     },
                     "summary" : "Zoho Desk packs a bunch of features that are expressly there to help you respond to tickets smartly. The first of these, you've already discovered: Auto-Suggest Articles. Zoho Desk pulls up relevant articles on the ticket's content—so you can save ...",
                     "latestVersionStatus" : "Published",
@@ -3287,7 +3600,7 @@
                       "name" : "Hill",
                       "id" : "4000000000059",
                       "status" : "ACTIVE",
-                      "zuid" : "1234567890"
+                      "zuid" : "234543"
                     },
                     "permission" : "AGENTS",
                     "authorId" : "4000000000059",
@@ -3304,12 +3617,12 @@
                       "name" : "Hill",
                       "id" : "4000000000059",
                       "status" : "ACTIVE",
-                      "zuid" : "1234567890"
+                      "zuid" : "234543"
                     },
                     "latestVersion" : "1.0",
-                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Solutions/dv/4000000019059/en",
+                    "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Solutions/dv/4000000019059/en",
                     "feedbackCount" : "0",
-                    "portalUrl" : "https://desk.example.com/portal/zylker/en/kb/articles/answering-your-first-ticket",
+                    "portalUrl" : "https://desk.zoho.com/portal/zylker/en/kb/articles/answering-your-first-ticket",
                     "attachmentCount" : "0",
                     "latestPublishedVersion" : "1.0",
                     "position" : "1",
@@ -3320,7 +3633,7 @@
                       "latestVersion" : "1.0",
                       "isLocked" : false,
                       "latestPublishedVersion" : "1.0",
-                      "href" : "https://desk.example.com/api/v1/articles/24073000002823830/translations/en?orgId=1234567890",
+                      "href" : "https://desk.zoho.com/api/v1/articles/24073000002823830/translations/en?orgId=54325703",
                       "authorId" : "24073000000095005",
                       "locale" : "en",
                       "translationState" : "UP-TO-DATE",
@@ -3338,7 +3651,7 @@
                       "name" : "will smith",
                       "id" : "4000000000060",
                       "status" : "ACTIVE",
-                      "zuid" : "1234567890"
+                      "zuid" : "234544"
                     },
                     "status" : "Published",
                     "expiryDate" : "2023-12-31T09:45:52.000Z"
@@ -3426,7 +3739,7 @@
             "examples" : {
               "Valid responses Definitions" : {
                 "value" : {
-                  "externalImageUrls" : [ "https://desk.example.com/support/ImageDisplay?downloadType=uploadedFile&fileName=158137256.png&blockId=5685asdf05f4cbfca985d3565adf29e7ca&zgId=1234567890abcdef1234567890abcdefzdf8da2397dfe6316f581e074ce98&mode=view", "https://images.example.com/profile_images/1253792323051204608/QiaT93TQ_400x400.jpg" ]
+                  "externalImageUrls" : [ "https://desk.zoho.com/support/ImageDisplay?downloadType=uploadedFile&fileName=158137256.png&blockId=5685asdf05f4cbfca985d3565adf29e7ca&zgId=78f6ezdf8da2397dfe6316f581e074ce98&mode=view", "https://pbs.twimg.com/profile_images/1253792323051204608/QiaT93TQ_400x400.jpg" ]
                 }
               }
             }
@@ -3491,18 +3804,18 @@
                 "value" : {
                   "urlResponse" : [ {
                     "responseMessage" : "Success",
-                    "url" : "https://www.example.com/Sample/imgs/animation.gif",
+                    "url" : "https://www.aoaophoto.com/Sample/imgs/animation.gif",
                     "responseCode" : "200"
                   }, {
                     "responseMessage" : "Not Found",
-                    "url" : "https://images.example.com/profile/12351204608/demo.jpg",
+                    "url" : "https://twimg.com/profile/12351204608/demo.jpg",
                     "responseCode" : "404"
                   }, {
                     "responseMessage" : "Success",
-                    "url" : "https://desk.example.com/support/ImageDisplay?downloadType=uploadedFile&fileName=158137256.png&blockId=5685asdf05f4cbfca985d3565adf29e7ca&zgId=1234567890abcdef1234567890abcdefzdf8da2397dfe6316f581e074ce98&mode=view",
+                    "url" : "https://desk.zoho.com/support/ImageDisplay?downloadType=uploadedFile&fileName=158137256.png&blockId=5685asdf05f4cbfca985d3565adf29e7ca&zgId=78f6ezdf8da2397dfe6316f581e074ce98&mode=view",
                     "responseCode" : "200"
                   } ],
-                  "content" : "<div>The knowledge base is a key component of a good help center. <img src='https://desk.example.com/DocsDisplay?zgId=1234567890abcdef1234567890abcdef&mode=inline&blockId=a7iyy3224732494aa6d1c7499b0efd84'/> <br> <img src='https://images.example.com/profile/12351204608/demo.jpg'/> This is where you can share the basics of using your products or services to your customers. <br> Help articles and FAQs are great assets when it comes to answering the most fundamental questions your customers might have regarding your offerings <img class='ignoreExternalImageMigration answer-content' src='https://desk.example.com/support/ImageDisplay?downloadType=uploadedFile&fileName=158137256.png&blockId=5685asdf05f4cbfca985d3565adf29e7ca&zgId=1234567890abcdef1234567890abcdefzdf8da2397dfe6316f581e074ce98&mode=view' />. Help articles also ease the burden of your customer support agents by enabling self-service.<img src='https://desk.example.com/DocsDisplay?zgId=1234567890abcdef1234567890abcdef&mode=inline&blockId=a7iyy05501b73224732494aa6d1c7499b0efd84'/></div>"
+                  "content" : "<div>The knowledge base is a key component of a good help center. <img src='https://desk.zoho.com/DocsDisplay?zgId=2389290&mode=inline&blockId=a7iyy3224732494aa6d1c7499b0efd84'/> <br> <img src='https://twimg.com/profile/12351204608/demo.jpg'/> This is where you can share the basics of using your products or services to your customers. <br> Help articles and FAQs are great assets when it comes to answering the most fundamental questions your customers might have regarding your offerings <img class='ignoreExternalImageMigration answer-content' src='https://desk.zoho.com/support/ImageDisplay?downloadType=uploadedFile&fileName=158137256.png&blockId=5685asdf05f4cbfca985d3565adf29e7ca&zgId=78f6ezdf8da2397dfe6316f581e074ce98&mode=view' />. Help articles also ease the burden of your customer support agents by enabling self-service.<img src='https://desk.zoho.com/DocsDisplay?zgId=2389290&mode=inline&blockId=a7iyy05501b73224732494aa6d1c7499b0efd84'/></div>"
                 }
               }
             }
@@ -3528,6 +3841,39 @@
             }
           }
         }
+      },
+      "articleCountByCategoryIdsResponse" : {
+        "description" : "Article count grouped by category IDs",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "type" : [ "array", "null" ],
+                  "items" : {
+                    "$ref" : "#/components/schemas/articleCountByCategoryIdsObj"
+                  }
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "articleCountByCategoryIdsResponse" : {
+                "value" : {
+                  "data" : [ {
+                    "rootCategoryId" : "5000000066427",
+                    "categories" : [ {
+                      "id" : "5000000194003",
+                      "articlesCount" : "8"
+                    } ]
+                  } ]
+                }
+              }
+            }
+          }
+        }
       }
     },
     "parameters" : {
@@ -3546,29 +3892,6 @@
       }
     },
     "requestBodies" : {
-      "articleIdsJson" : {
-        "content" : {
-          "application/json" : {
-            "schema" : {
-              "type" : [ "object", "null" ],
-              "additionalProperties" : false,
-              "properties" : {
-                "ids" : {
-                  "$ref" : "#/components/schemas/articleIdsData"
-                }
-              },
-              "required" : [ "ids" ]
-            },
-            "examples" : {
-              "Valid requestBody Definitions" : {
-                "value" : {
-                  "ids" : [ "4000000083313", "4000000082105" ]
-                }
-              }
-            }
-          }
-        }
-      },
       "associateArticlesUsage_articleIdsJson" : {
         "content" : {
           "application/json" : {
@@ -3586,6 +3909,48 @@
               "Valid requestBody Definitions" : {
                 "value" : {
                   "ids" : [ "1000000022005", "1000000034567" ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "articleUpdateJson" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "fieldName" : {
+                  "type" : [ "string", "null" ],
+                  "description" : "Property to update. Possible values: categoryId, status . Note: The categoryId must correspond to the most specific (lowest-level) category in the hierarchy. If the root category contains sections or sub-sections, provide the ID of the lowest-level sub-category.Articles cannot be created directly under categories that have child sections",
+                  "enum" : [ "categoryId", "status" ],
+                  "maxLength" : 100,
+                  "minLength" : 0
+                },
+                "ids" : {
+                  "description" : "ID(s) of the articles to update",
+                  "$ref" : "#/components/schemas/articleIdsData",
+                  "minItems" : 1,
+                  "maxItems" : 50
+                },
+                "fieldValue" : {
+                  "type" : [ "string", "null" ],
+                  "description" : "New value for the specified property",
+                  "maxLength" : 70,
+                  "pattern" : "[a-zA-Z0-9_\\-+%.:\\P{InBasicLatin}\\s]+",
+                  "minLength" : 0
+                }
+              },
+              "required" : [ "fieldName", "fieldValue", "ids" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "fieldName" : "tag",
+                  "ids" : [ "10000000220345", "1200000022015" ],
+                  "fieldValue" : "new"
                 }
               }
             }
@@ -3637,6 +4002,21 @@
                   "description" : "SEO-specific keywords of the article",
                   "maxLength" : 200,
                   "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+",
+                  "minLength" : 0
+                },
+                "locale" : {
+                  "type" : [ "string", "null" ],
+                  "description" : "Language code of the article translation ",
+                  "enum" : [ "en", "ja", "zh", "es", "de", "fr", "tr", "ru", "pt", "it", "nl", "da", "sv", "pl", "ar", "he", "af", "cs", "fr-ca", "bg", "fi", "el", "hu", "id", "nb", "ro", "th", "uk", "vi", "ur", "hi", "te", "kn", "ta", "mr", "ko", "fa", "bn", "gu", "ms", "ml", "en-gb", "sk", "hr", "sl", "zh_TW", "zh-tw", "ca", "ka", "kk", "my", "km", "pt-br" ],
+                  "pattern" : "[a-zA-Z]{2,4}([-_][a-zA-Z]{2})?",
+                  "maxLength" : 100,
+                  "minLength" : 0
+                },
+                "translationState" : {
+                  "type" : [ "string", "null" ],
+                  "description" : "State of the translated article. Possible values: OUTDATED, UP-TO-DATE",
+                  "enum" : [ "OUTDATED", "UP-TO-DATE" ],
+                  "maxLength" : 100,
                   "minLength" : 0
                 },
                 "tags" : {
@@ -3786,6 +4166,13 @@
                   "description" : "SEO Keywords of the article",
                   "maxLength" : 200,
                   "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+",
+                  "minLength" : 0
+                },
+                "translationState" : {
+                  "type" : [ "string", "null" ],
+                  "description" : "State of the translated article. Possible values: OUTDATED, UP-TO-DATE",
+                  "enum" : [ "OUTDATED", "UP-TO-DATE" ],
+                  "maxLength" : 100,
                   "minLength" : 0
                 },
                 "tags" : {
@@ -4069,7 +4456,7 @@
               "Valid requestBody Definitions" : {
                 "value" : {
                   "ignoreClassName" : "ignoreExternalImageMigration",
-                  "content" : "<div>The knowledge base is a key component of a good help center. <img src='https://www.example.com/Sample/imgs/animation.gif'/> <br> <img src='https://images.example.com/profile/12351204608/demo.jpg'/> This is where you can share the basics of using your products or services to your customers. <br> Help articles and FAQs are great assets when it comes to answering the most fundamental questions your customers might have regarding your offerings <img src='https://desk.example.com/support/ImageDisplay?downloadType=uploadedFile&fileName=158137256.png&blockId=5685asdf05f4cbfca985d3565adf29e7ca&zgId=1234567890abcdef1234567890abcdefzdf8da2397dfe6316f581e074ce98&mode=view' />. Help articles also ease the burden of your customer support agents by enabling self-service.<img src='https://desk.example.com/DocsDisplay?zgId=1234567890abcdef1234567890abcdef&mode=inline&blockId=a7iyy05501b73224732494aa6d1c7499b0efd84' /></div>",
+                  "content" : "<div>The knowledge base is a key component of a good help center. <img src='https://www.aoaophoto.com/Sample/imgs/animation.gif'/> <br> <img src='https://twimg.com/profile/12351204608/demo.jpg'/> This is where you can share the basics of using your products or services to your customers. <br> Help articles and FAQs are great assets when it comes to answering the most fundamental questions your customers might have regarding your offerings <img src='https://desk.zoho.com/support/ImageDisplay?downloadType=uploadedFile&fileName=158137256.png&blockId=5685asdf05f4cbfca985d3565adf29e7ca&zgId=78f6ezdf8da2397dfe6316f581e074ce98&mode=view' />. Help articles also ease the burden of your customer support agents by enabling self-service.<img src='https://desk.zoho.com/DocsDisplay?zgId=2389290&mode=inline&blockId=a7iyy05501b73224732494aa6d1c7499b0efd84' /></div>",
                   "workspaceId" : "a7iyy1dfbdfae106147a7b678e53939690d57"
                 }
               }
@@ -4109,7 +4496,7 @@
               "properties" : {
                 "ids" : {
                   "type" : [ "array" ],
-                  "description" : "ID(s) of the articles for which auto-translation must be stopped",
+                  "description" : "ID(s) of the articles for which auto-translation scheduled/stopped",
                   "items" : {
                     "type" : [ "string", "integer" ],
                     "format" : "int64",
@@ -4120,7 +4507,7 @@
                 },
                 "locales" : {
                   "type" : [ "array" ],
-                  "description" : "Locale(s) for which auto-translation must be stopped. If not provided, the action is performed for all configured languages",
+                  "description" : "Locale(s) for which auto-translation scheduled/stopped. If not provided, the action is performed for all configured languages",
                   "items" : {
                     "type" : [ "string" ],
                     "enum" : [ "en", "ja", "zh", "es", "de", "fr", "tr", "ru", "pt", "it", "nl", "da", "sv", "pl", "ar", "he", "af", "cs", "fr-ca", "bg", "fi", "el", "hu", "id", "nb", "ro", "th", "uk", "vi", "ur", "hi", "te", "kn", "ta", "mr", "ko", "fa", "bn", "gu", "ms", "ml", "en-gb", "sk", "hr", "sl", "zh_TW", "zh-tw", "ca", "ka", "kk", "my", "km", "pt-br" ],
@@ -4162,5 +4549,6 @@
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "Article"
 }

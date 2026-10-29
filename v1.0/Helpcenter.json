@@ -6,10 +6,53 @@
   },
   "paths" : {
     "/api/v1/helpCenters/{helpcenterId}/sitemaps" : {
+      "get" : {
+        "tags" : [ "Helpcenter" ],
+        "summary" : "Get Help Center Sitemaps",
+        "description" : "Retrieves the sitemap details for the specified help center.",
+        "operationId" : "getSiteMaps",
+        "parameters" : [ {
+          "name" : "helpcenterId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/getSiteMapDatawrapper"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.READ" ]
+        } ]
+      },
       "post" : {
         "tags" : [ "Helpcenter" ],
-        "summary" : "Update Helpcenter sitemaps",
-        "description" : "This API will generate sitemaps for the given Helpcenter",
+        "summary" : "Generate Help Center Sitemaps",
+        "description" : "Generates sitemaps for the specified help center.",
         "operationId" : "createSiteMaps",
         "parameters" : [ {
           "name" : "helpcenterId",
@@ -43,16 +86,60 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.UPDATE" ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "Helpcenter" ],
+        "summary" : "Delete Help Center Sitemaps",
+        "description" : "Deletes the sitemaps for the specified help center.",
+        "operationId" : "deleteSiteMaps",
+        "parameters" : [ {
+          "name" : "helpcenterId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          },
+          "200" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.DELETE" ]
         } ]
       }
     },
     "/api/v1/helpCenters" : {
       "get" : {
         "tags" : [ "Helpcenter" ],
-        "summary" : "List help centers",
-        "description" : "This API lists the help centers configured in your Zoho Desk portal.",
+        "summary" : "Get Help Centers",
+        "description" : "Retrieves a list of help centers configured in the portal, with pagination support.",
         "operationId" : "getAllHelpCenters",
+        "x-mcp-group" : [ "Help Center Customization" ],
         "parameters" : [ {
           "name" : "from",
           "in" : "query",
@@ -65,7 +152,7 @@
           },
           "style" : "form",
           "explode" : true,
-          "description" : "Index number starting from which the helpcenters must be listed"
+          "description" : "Index number starting from which the help centers must be listed"
         }, {
           "name" : "limit",
           "in" : "query",
@@ -78,13 +165,23 @@
           },
           "style" : "form",
           "explode" : true,
-          "description" : "Number of helpcenters to list"
+          "description" : "Number of help centers to list"
+        }, {
+          "name" : "skipPermissionCheck",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "boolean" ]
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Bypass permission validation for the request"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         }, {
           "name" : "include",
           "in" : "query",
-          "description" : "Include params are translateSettings",
+          "description" : "Additional information to include in the response. Possible values: translateSettings",
           "required" : false,
           "style" : "form",
           "explode" : false,
@@ -106,16 +203,61 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.channels.helpcenter.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
+        } ]
+      }
+    },
+    "/api/v1/helpCenters/{helpcenterId}/sitemaps/download" : {
+      "get" : {
+        "tags" : [ "Helpcenter" ],
+        "summary" : "Download Help Center Sitemaps",
+        "description" : "Downloads the sitemaps for the specified help center in zip format.",
+        "operationId" : "downloadSiteMaps",
+        "parameters" : [ {
+          "name" : "helpcenterId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          },
+          "200" : {
+            "$ref" : "./Common.json#/components/responses/fileResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.READ" ]
         } ]
       }
     },
     "/api/v1/helpCenters/{helpcenterId}" : {
       "get" : {
         "tags" : [ "Helpcenter" ],
-        "summary" : "Get details of help center",
-        "description" : "This API fetches the details of a particular help center.",
+        "summary" : "Get Help Center",
+        "description" : "Retrieves details of a specific help center.",
         "operationId" : "getHelpCenter",
+        "x-mcp-group" : [ "Help Center Customization" ],
         "parameters" : [ {
           "name" : "helpcenterId",
           "in" : "path",
@@ -145,34 +287,68 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.channels.helpcenter.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       }
     }
   },
   "components" : {
     "schemas" : {
+      "getSiteMapResponse" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "generatedTime" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+          },
+          "isGenerated" : {
+            "type" : [ "boolean", "null" ]
+          },
+          "downloadUrl" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+          },
+          "url" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+          }
+        },
+        "required" : [ "downloadUrl", "generatedTime", "isGenerated", "url" ]
+      },
       "helpcenterLocaleObj" : {
         "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "name" : {
-            "type" : [ "string", "null" ],
+            "description" : "Display name of the help center as shown to end users in that specific locale.",
+            "type" : [ "string" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "^[0-9a-zA-Z\\!\\$\\|\\%&amp;\\#\\-\\*\\+\\,\\^\\_\\`\\~\\s\\.\\P{InBasicLatin}]+$"
           },
           "locale" : {
-            "type" : [ "string", "null" ],
+            "description" : "Locale code of the Help Center. Possible values: en, fr, de, es, ja, zh, pt, nl",
+            "type" : [ "string" ],
             "enum" : [ "en", "ja", "zh", "es", "de", "fr", "tr", "ru", "pt", "it", "nl", "da", "sv", "pl", "ar", "he", "af", "cs", "fr-ca", "bg", "fi", "el", "hu", "id", "nb", "ro", "th", "uk", "vi", "ur", "hi", "te", "kn", "ta", "mr", "ko", "fa", "bn", "gu", "ms", "ml", "en-gb", "sk", "hr", "sl", "zh_TW", "zh-tw", "ca", "ka", "kk", "my", "km", "pt-br" ],
             "pattern" : "([a-zA-Z]{2,4}([-_][a-zA-Z]{2})?)"
           },
           "type" : {
-            "type" : [ "string", "null" ],
+            "description" : "Type of the locale. Possible values: DEFAULT, OTHER",
+            "type" : [ "string" ],
             "enum" : [ "DEFAULT", "OTHER" ]
           },
           "status" : {
-            "type" : [ "string", "null" ],
+            "description" : "Status of the locale. Visibility state of the locale. Possible values: ACCESIBLE_IN_HELPCENTER: Visible in Help Center, DISABLED_IN_HELPCENTER: Restricted in Help Center, DISABLED: Restricted in both Help Center and Desk",
+            "type" : [ "string" ],
             "enum" : [ "ACCESIBLE_IN_HELPCENTER", "DISABLED_IN_HELPCENTER", "DISABLED" ]
           }
         },
@@ -189,9 +365,11 @@
         "additionalProperties" : false,
         "properties" : {
           "isDefault" : {
-            "type" : [ "boolean", "null" ]
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the help center is the default one. Possible values: true = default help center, false = not the default help center"
           },
           "locales" : {
+            "description" : "List of locales supported by the help center",
             "type" : [ "array", "null" ],
             "items" : {
               "type" : [ "string", "null" ],
@@ -201,20 +379,24 @@
             "uniqueItems" : false
           },
           "name" : {
+            "description" : "Name of the help center",
             "type" : [ "string", "null" ],
             "maxLength" : 200,
             "minLength" : 0,
             "pattern" : "^[0-9a-zA-Z\\!\\$\\|\\%&amp;\\#\\-\\*\\+\\,\\^\\_\\`\\~\\s\\.\\P{InBasicLatin}]+$"
           },
           "isEncodedPermalinkAllowed" : {
-            "type" : [ "boolean", "null" ]
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether other language permalink setting is enabled. Possible values: true = enabled, false = disabled"
           },
           "id" : {
+            "description" : "Unique ID of the help center",
             "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "departmentIds" : {
+            "description" : "Department IDs associated with the help center",
             "type" : [ "array", "null" ],
             "items" : {
               "type" : [ "string", "integer", "null" ],
@@ -224,30 +406,36 @@
             "uniqueItems" : false
           },
           "isMultilingualEnabled" : {
-            "type" : [ "boolean", "null" ]
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether multilingual settings are enabled. Possible values: true = multilingual enabled, false = multilingual disabled"
           },
           "helpCenterLocales" : {
+            "description" : "Locale configuration entries for the help center",
             "$ref" : "#/components/schemas/helpcenterLocaleList"
           },
           "primaryLocale" : {
+            "description" : "Primary locale of the help center",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "[a-zA-Z]{2,4}([-_][a-zA-Z]{2})?"
           },
           "url" : {
+            "description" : "URL of the help center portal",
             "type" : [ "string", "null" ],
             "maxLength" : 200,
             "minLength" : 0,
             "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
           },
           "logoUrl" : {
+            "description" : "URL of the help center logo",
             "type" : [ "string", "null" ],
             "maxLength" : 200,
             "minLength" : 0,
             "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
           },
           "status" : {
+            "description" : "Status of the help center. Possible values: ACTIVE, DISABLED",
             "type" : [ "string", "null" ],
             "enum" : [ "ACTIVE", "DISABLED" ]
           }
@@ -259,12 +447,14 @@
         "additionalProperties" : false,
         "properties" : {
           "name" : {
+            "description" : "Domain name",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
             "pattern" : "^([a-zA-Z0-9]([a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])?\\.)+([a-zA-Z]{2,22})|([a-zA-Z]{2,22}:([0-9]{3,6})?)$"
           },
           "type" : {
+            "description" : "Type of the domain. Possible values: PRIMARY, SECONDARY",
             "type" : [ "string", "null" ],
             "enum" : [ "PRIMARY" ]
           }
@@ -279,6 +469,33 @@
       }
     },
     "responses" : {
+      "getSiteMapDatawrapper" : {
+        "description" : "getSiteMapDatawrapper template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "#/components/schemas/getSiteMapResponse"
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "generatedTime" : 1628748759000,
+                  "isGenerated" : true,
+                  "downloadUrl" : "https://desk.zoho.com/api/v1/helpCenters/2000000073511/sitemaps/download?orgId=123456",
+                  "url" : "https://support.osamabilden.com/portal/sitemapindex.xml"
+                }
+              }
+            }
+          }
+        }
+      },
       "helpcenterListViewResponse" : {
         "description" : "helpcenterListViewResponse template definitions",
         "content" : {
@@ -325,7 +542,7 @@
                     "departmentIds" : [ "24073000000102043" ],
                     "isMultilingualEnabled" : true,
                     "helpCenterLocales" : [ {
-                      "name" : "ZohoCorp Portal",
+                      "name" : "Zylker Portal",
                       "locale" : "en",
                       "type" : [ "DEFAULT" ],
                       "status" : "ACCESIBLE_IN_HELPCENTER"
@@ -372,25 +589,30 @@
                 "type" : [ "object", "null" ],
                 "properties" : {
                   "translateMode" : {
+                    "description" : "Translation mode. Possible values: MANUAL, AUTO",
                     "type" : [ "string", "null" ],
                     "enum" : [ "MANUAL", "AUTO" ]
                   },
                   "siteMapUpdatedTime" : {
+                    "description" : "Time when the sitemap was last updated",
                     "type" : [ "string", "null" ],
                     "maxLength" : 100,
                     "minLength" : 0,
                     "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
                   },
                   "domains" : {
+                    "description" : "Domain list associated with the help center",
                     "$ref" : "#/components/schemas/helpcenterDomainsList"
                   },
                   "favIconUrl" : {
+                    "description" : "URL of the help center favicon",
                     "type" : [ "string", "null" ],
                     "maxLength" : 200,
                     "minLength" : 0,
                     "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
                   },
                   "logoLinkBackUrl" : {
+                    "description" : "URL invoked when clicking the help center logo",
                     "type" : [ "string", "null" ],
                     "maxLength" : 200,
                     "minLength" : 0,
@@ -432,13 +654,13 @@
                   "logoLinkBackUrl" : "https://zoho.com/desk",
                   "departmentIds" : [ "24073000002579221" ],
                   "isMultilingualEnabled" : true,
-                  "logoUrl" : "https://desk.example.com/api/v1/helpCenter/24073000002579275/logo/24073000002572232?orgId=1234567890",
+                  "logoUrl" : "https://desk.zoho.com/api/v1/helpCenter/24073000002579275/logo/24073000002572232?orgId=123456",
                   "url" : "https://partners.zoho.com/portal/",
                   "locales" : [ "en" ],
                   "isDefault" : false,
                   "siteMapUpdatedTime" : 1577350089000,
                   "name" : "Zoho Cares",
-                  "favIconUrl" : "https://desk.example.com/api/v1/helpCenter/24073000002579275/favIcon/2407300000257912?orgId=1234567890",
+                  "favIconUrl" : "https://desk.zoho.com/api/v1/helpCenter/24073000002579275/favIcon/2407300000257912?orgId=123456",
                   "id" : "24073000002579275",
                   "helpCenterLocales" : [ {
                     "name" : "Zoho Cares",
@@ -470,7 +692,11 @@
       },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "Helpcenter"
 }

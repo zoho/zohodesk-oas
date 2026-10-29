@@ -1,5 +1,6 @@
 {
   "openapi" : "3.1.0",
+  "x-mcp-group" : [ "IM Metrics" ],
   "info" : {
     "title" : "IM_TimeSeriesMetrics",
     "version" : "1.0.0"
@@ -22,8 +23,8 @@
             "type" : "string",
             "description" : "Start date for metrics. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the start time as a Unix timestamp in milliseconds.",
             "pattern" : "[0-9\\-]+",
-            "maxLength" : 100,
-            "minLength" : 0
+            "x-regex-name" : "reportCustomTime",
+            "maxLength" : 100
           }
         }, {
           "name" : "endDate",
@@ -36,8 +37,8 @@
             "type" : "string",
             "description" : "End date for metrics. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the end time as a Unix timestamp in milliseconds.",
             "pattern" : "[0-9\\-]+",
-            "maxLength" : 100,
-            "minLength" : 0
+            "x-regex-name" : "reportCustomTime",
+            "maxLength" : 100
           }
         }, {
           "name" : "duration",
@@ -48,10 +49,8 @@
           "explode" : true,
           "schema" : {
             "type" : "string",
-            "enum" : [ "LAST24HOURS", "TODAY", "YESTERDAY", "LAST_7_DAYS", "LAST_30_DAYS", "THIS_WEEK", "LAST_WEEK", "THIS_MONTH", "LAST_MONTH", "CUSTOM_IN_DATE", "CUSTOM_IN_MILLIS", "LAST_1_HOUR" ],
-            "pattern" : "(LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR)",
-            "maxLength" : 100,
-            "minLength" : 0
+            "pattern" : "([1-8]{1}|LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR|LAST12MONTHS)",
+            "maxLength" : 100
           }
         }, {
           "name" : "granularity",
@@ -64,8 +63,7 @@
             "type" : "string",
             "enum" : [ "HOURLY", "DAY" ],
             "pattern" : "HOURLY|DAY",
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           }
         }, {
           "name" : "dimension",
@@ -78,7 +76,7 @@
             "type" : "string",
             "const" : "DIRECTION",
             "maxLength" : 100,
-            "minLength" : 0
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s\\^\\{\\}\\~\\[\\]\\*\\+~\\|\\\"]+"
           }
         }, {
           "name" : "dimensionValue",
@@ -89,10 +87,8 @@
           "explode" : true,
           "schema" : {
             "type" : "string",
-            "pattern" : "^(TOTAL|INCOMING|OUTGOING)(,(TOTAL|INCOMING|OUTGOING))*$",
             "example" : "TOTAL,INCOMING",
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           }
         }, {
           "name" : "integrationService",
@@ -104,20 +100,19 @@
           "schema" : {
             "type" : "string",
             "enum" : [ "TELEGRAM", "TWILIO", "IM_TALK", "LINE", "WECHAT", "WECOM", "WHATSAPP", "FACEBOOKMESSENGER", "INSTAGRAM" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "pattern" : "[a-zA-Z0-9_]*$",
+            "maxLength" : 100
           }
         }, {
           "name" : "departmentId",
           "in" : "query",
           "description" : "Filter message metrics for channels in the given department.",
-          "required" : true,
+          "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "integer" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "type" : "string",
+            "format" : "int64"
           }
         }, {
           "name" : "channelIds",
@@ -128,7 +123,6 @@
           "explode" : true,
           "schema" : {
             "type" : "string",
-            "pattern" : "^([0-9]+)(,([0-9]+))*$",
             "maxLength" : 1000
           }
         }, {
@@ -167,8 +161,8 @@
             "type" : "string",
             "description" : "Start date for metrics. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the start time as a Unix timestamp in milliseconds.",
             "pattern" : "[0-9\\-]+",
-            "maxLength" : 100,
-            "minLength" : 0
+            "x-regex-name" : "reportCustomTime",
+            "maxLength" : 100
           }
         }, {
           "name" : "endDate",
@@ -181,8 +175,8 @@
             "type" : "string",
             "description" : "End date for metrics. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the end time as a Unix timestamp in milliseconds.",
             "pattern" : "[0-9\\-]+",
-            "maxLength" : 100,
-            "minLength" : 0
+            "x-regex-name" : "reportCustomTime",
+            "maxLength" : 100
           }
         }, {
           "name" : "duration",
@@ -193,10 +187,8 @@
           "explode" : true,
           "schema" : {
             "type" : "string",
-            "enum" : [ "LAST24HOURS", "TODAY", "YESTERDAY", "LAST_7_DAYS", "LAST_30_DAYS", "THIS_WEEK", "LAST_WEEK", "THIS_MONTH", "LAST_MONTH", "CUSTOM_IN_DATE", "CUSTOM_IN_MILLIS", "LAST_1_HOUR" ],
-            "pattern" : "(LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR)",
-            "maxLength" : 100,
-            "minLength" : 0
+            "pattern" : "([1-8]{1}|LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR|LAST12MONTHS)",
+            "maxLength" : 100
           }
         }, {
           "name" : "granularity",
@@ -209,8 +201,7 @@
             "type" : "string",
             "enum" : [ "HOURLY", "DAY" ],
             "pattern" : "HOURLY|DAY",
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           }
         }, {
           "name" : "dimension",
@@ -222,8 +213,7 @@
           "schema" : {
             "type" : "string",
             "enum" : [ "STATUS", "CONTACT_TYPE" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           }
         }, {
           "name" : "dimensionValue",
@@ -234,10 +224,8 @@
           "explode" : true,
           "schema" : {
             "type" : "string",
-            "pattern" : "^(TOTAL|ATTENDED|UNASSIGNED|NEW|EXISTING)(,(TOTAL|ATTENDED|UNASSIGNED|NEW|EXISTING))*$",
             "example" : "ATTENDED,UNASSIGNED,TOTAL",
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           }
         }, {
           "name" : "basedOn",
@@ -249,8 +237,7 @@
           "schema" : {
             "type" : "string",
             "enum" : [ "CONTACT_LASTACTIVE", "AGENT_LASTACTIVE" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           }
         }, {
           "name" : "integrationService",
@@ -262,20 +249,19 @@
           "schema" : {
             "type" : "string",
             "enum" : [ "TELEGRAM", "TWILIO", "IM_TALK", "LINE", "WECHAT", "WECOM", "WHATSAPP", "FACEBOOKMESSENGER", "INSTAGRAM" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "pattern" : "[a-zA-Z0-9_]*$",
+            "maxLength" : 100
           }
         }, {
           "name" : "departmentId",
           "in" : "query",
           "description" : "Filter conversation metrics for channels in the given department.",
-          "required" : true,
+          "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "integer" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "type" : "string",
+            "format" : "int64"
           }
         }, {
           "name" : "channelIds",
@@ -286,7 +272,6 @@
           "explode" : true,
           "schema" : {
             "type" : "string",
-            "pattern" : "^([0-9]+)(,([0-9]+))*$",
             "maxLength" : 1000
           }
         }, {
@@ -298,7 +283,6 @@
           "explode" : true,
           "schema" : {
             "type" : "string",
-            "pattern" : "^([0-9]+)(,([0-9]+))*$",
             "maxLength" : 1000
           }
         }, {
@@ -337,8 +321,8 @@
             "type" : "string",
             "description" : "Start date for metrics. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the start time as a Unix timestamp in milliseconds.",
             "pattern" : "[0-9\\-]+",
-            "maxLength" : 100,
-            "minLength" : 0
+            "x-regex-name" : "reportCustomTime",
+            "maxLength" : 100
           }
         }, {
           "name" : "endDate",
@@ -351,8 +335,8 @@
             "type" : "string",
             "description" : "End date for metrics. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the end time as a Unix timestamp in milliseconds.",
             "pattern" : "[0-9\\-]+",
-            "maxLength" : 100,
-            "minLength" : 0
+            "x-regex-name" : "reportCustomTime",
+            "maxLength" : 100
           }
         }, {
           "name" : "duration",
@@ -363,10 +347,8 @@
           "explode" : true,
           "schema" : {
             "type" : "string",
-            "enum" : [ "LAST24HOURS", "TODAY", "YESTERDAY", "LAST_7_DAYS", "LAST_30_DAYS", "THIS_WEEK", "LAST_WEEK", "THIS_MONTH", "LAST_MONTH", "CUSTOM_IN_DATE", "CUSTOM_IN_MILLIS", "LAST_1_HOUR" ],
-            "pattern" : "(LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR)",
-            "maxLength" : 100,
-            "minLength" : 0
+            "pattern" : "([1-8]{1}|LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR|LAST12MONTHS)",
+            "maxLength" : 100
           }
         }, {
           "name" : "granularity",
@@ -379,8 +361,7 @@
             "type" : "string",
             "enum" : [ "HOURLY", "DAY" ],
             "pattern" : "HOURLY|DAY",
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           }
         }, {
           "name" : "dimension",
@@ -393,7 +374,7 @@
             "type" : "string",
             "const" : "WA_CREDIT_USAGE",
             "maxLength" : 100,
-            "minLength" : 0
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s\\^\\{\\}\\~\\[\\]\\*\\+~\\|\\\"]+"
           }
         }, {
           "name" : "dimensionValue",
@@ -404,22 +385,19 @@
           "explode" : true,
           "schema" : {
             "type" : "string",
-            "pattern" : "^(TOTAL|WA_BUSINESS_INITIATED|WA_USER_INITIATED|WA_MARKETING|WA_UTILITY|WA_AUTHENTICATION|WA_SERVICE)(,(TOTAL|WA_BUSINESS_INITIATED|WA_USER_INITIATED|WA_MARKETING|WA_UTILITY|WA_AUTHENTICATION|WA_SERVICE))*$",
             "example" : "WA_UTILITY,WA_AUTHENTICATION,WA_MARKETING",
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           }
         }, {
           "name" : "departmentId",
           "in" : "query",
           "description" : "Filter payment metrics for channels in the given department.",
-          "required" : true,
+          "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "integer" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "type" : "string",
+            "format" : "int64"
           }
         }, {
           "name" : "channelIds",
@@ -430,7 +408,6 @@
           "explode" : true,
           "schema" : {
             "type" : "string",
-            "pattern" : "^([0-9]+)(,([0-9]+))*$",
             "maxLength" : 1000
           }
         }, {
@@ -706,5 +683,6 @@
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "IM_TimeSeriesMetrics"
 }

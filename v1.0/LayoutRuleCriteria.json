@@ -1,5 +1,6 @@
 {
   "openapi" : "3.1.0",
+  "x-mcp-group" : [ "Modules, Fields and Layouts" ],
   "info" : {
     "title" : "LayoutRuleCriteria",
     "version" : "1.0.0"
@@ -8,23 +9,25 @@
     "/api/v1/layouts/{layoutId}/layoutRules/criteriaFields" : {
       "get" : {
         "tags" : [ "LayoutRuleCriteria" ],
-        "summary" : "Get Layout Rule Criteria",
-        "description" : "This API lists the fields that can be used in criteria of a specified module in layout rules. Available pre-defined values may contain ${EMPTY}, ${NOTEMPTY}, ${OPEN}, ${CLOSED}, ${CURRENTTIME}. Available types are Text, Date, DateTime, Text, Boolean and Arithmetic.",
+        "summary" : "Get Criteria Fields for Layout Rules",
+        "description" : "Retrieves the fields that can be used in rule criteria for the specified layout. Note: Available predefined values can include ${EMPTY}, ${NOTEMPTY}, ${OPEN}, ${CLOSED}, ${CURRENTTIME}, and ${CUSTOM}. Available types can include text, date, dateTime, boolean, and lookup.",
         "operationId" : "getLayoutRuleCriteria",
         "parameters" : [ {
           "name" : "category",
           "in" : "query",
-          "description" : "Category for getting the field criteria for primary or secondary fields",
+          "description" : "Category used to fetch criteria fields. Possible values: primary, secondary",
           "required" : true,
           "style" : "form",
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
-            "enum" : [ "primary", "secondary" ]
+            "enum" : [ "primary", "secondary" ],
+            "maxLength" : 100
           }
         }, {
           "name" : "layoutId",
           "in" : "path",
+          "description" : "Unique ID of the layout",
           "required" : true,
           "style" : "simple",
           "explode" : false,
@@ -37,6 +40,9 @@
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
           "422" : {
             "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
           },
@@ -45,7 +51,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.layouts.READ", "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       }
     }
@@ -59,15 +67,18 @@
           "condition" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Condition available for the field"
           },
           "i18NCondition" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Localized condition available for the field"
           },
           "value" : {
             "type" : [ "array", "null" ],
+            "description" : "Value token(s) supported by the condition",
             "items" : { },
             "uniqueItems" : false
           }
@@ -85,28 +96,33 @@
         "additionalProperties" : false,
         "properties" : {
           "availableConditions" : {
-            "$ref" : "#/components/schemas/availableConditionArr"
+            "$ref" : "#/components/schemas/availableConditionArr",
+            "description" : "List of conditions available for the field"
           },
           "fieldName" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Name of the field available for criteria"
           },
           "fieldLabel" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "Display label of the field available for criteria"
           },
           "i18NLabel" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "Localized label of the field available for criteria"
           },
           "type" : {
             "type" : [ "string", "null" ],
-            "enum" : [ "ischeck", "emptycheck", "text", "date", "integer", "dateTime", "user", "team", "boolean", "lookup", "picklist", "currency" ]
+            "enum" : [ "text", "date", "integer", "dateTime", "boolean", "lookup", "picklist", "currency", "user" ],
+            "description" : "Type of the field available for criteria"
           }
         },
         "required" : [ "availableConditions", "fieldLabel", "fieldName", "i18NLabel", "type" ]
@@ -117,34 +133,37 @@
           "$ref" : "#/components/schemas/criteriaJson"
         }
       },
-      "fieldJson" : {
+      "criteriaFields" : {
         "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "displayLabel" : {
             "type" : [ "string", "null" ],
-            "enum" : [ "Tickets", "Contacts", "Accounts", "Tasks", "Solutions", "Products", "Contracts", "Calls - Call Information", "Events - Event Information", "Activities", "TimeEntry", "Cases", "Calls", "Events" ]
+            "enum" : [ "Tickets", "Contacts", "Accounts", "Tasks", "Solutions", "Products", "Contracts", "Calls - Call Information", "Events - Event Information", "Activities", "TimeEntry", "Cases", "Calls", "Events" ],
+            "description" : "Display label of the criteria field group"
           },
           "name" : {
             "type" : [ "string", "null" ],
-            "enum" : [ "tickets", "contacts", "products", "accounts", "tasks", "social", "articles", "community", "timeEntry", "contracts", "topics", "departments", "agents", "category", "attachments", "solutions", "reports", "kbCategory", "dashboards", "chat", "calls", "events", "activities" ]
+            "enum" : [ "tickets", "contacts", "products", "accounts", "tasks", "social", "articles", "community", "timeEntry", "contracts", "topics", "departments", "agents", "category", "attachments", "solutions", "reports", "kbCategory", "dashboards", "chat", "calls", "events", "activities" ],
+            "description" : "Name of the criteria field group"
           },
           "fieldDetails" : {
-            "$ref" : "#/components/schemas/criteriaArray"
+            "$ref" : "#/components/schemas/criteriaArray",
+            "description" : "List of fields available for criteria"
           }
         },
         "required" : [ "displayLabel", "fieldDetails", "name" ]
       },
-      "fieldDetailList" : {
+      "criteriaFieldList" : {
         "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "#/components/schemas/fieldJson"
+          "$ref" : "#/components/schemas/criteriaFields"
         }
       }
     },
     "responses" : {
       "getCriteriaResponse" : {
-        "description" : "getCriteriaResponse template definitions",
+        "description" : "Successfully retrieved the criteria fields",
         "content" : {
           "application/json" : {
             "schema" : {
@@ -152,7 +171,8 @@
               "additionalProperties" : false,
               "properties" : {
                 "criteriaFields" : {
-                  "$ref" : "#/components/schemas/fieldDetailList"
+                  "$ref" : "#/components/schemas/criteriaFieldList",
+                  "description" : "List of criteria field groups"
                 }
               },
               "required" : [ "criteriaFields" ]
@@ -166,243 +186,277 @@
                     "fieldDetails" : [ {
                       "availableConditions" : [ {
                         "condition" : "is",
+                        "i18NCondition" : "is",
                         "value" : [ "${CUSTOM}" ]
                       }, {
                         "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
                         "value" : [ "${CUSTOM}" ]
                       }, {
                         "condition" : "is empty",
+                        "i18NCondition" : "is empty",
                         "value" : [ "${EMPTY}" ]
                       }, {
                         "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
                         "value" : [ "${NOTEMPTY}" ]
                       } ],
                       "fieldName" : "accountId",
                       "fieldLabel" : "Account Name",
                       "i18NLabel" : "Account Name",
-                      "type" : [ "lookup" ]
+                      "type" : "lookup"
                     }, {
                       "availableConditions" : [ {
                         "condition" : "is",
+                        "i18NCondition" : "is",
                         "value" : [ "${CUSTOM}" ]
                       }, {
                         "condition" : "isn't",
-                        "value" : [ "${CUSTOM}" ]
-                      }, {
-                        "condition" : "is empty",
-                        "value" : [ "${EMPTY}" ]
-                      }, {
-                        "condition" : "is not empty",
-                        "value" : [ "${NOTEMPTY}" ]
-                      } ],
-                      "fieldName" : "contactId",
-                      "fieldLabel" : "Contact Name",
-                      "i18NLabel" : "Contact Name",
-                      "type" : [ "lookup" ]
-                    }, {
-                      "availableConditions" : [ {
-                        "condition" : "is",
-                        "value" : [ "${CUSTOM}" ]
-                      }, {
-                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
                         "value" : [ "${CUSTOM}" ]
                       }, {
                         "condition" : "starts with",
+                        "i18NCondition" : "starts with",
                         "value" : [ "${CUSTOM}" ]
                       }, {
                         "condition" : "contains",
+                        "i18NCondition" : "contains",
                         "value" : [ "${CUSTOM}" ]
                       }, {
                         "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
                         "value" : [ "${CUSTOM}" ]
                       }, {
                         "condition" : "ends with",
+                        "i18NCondition" : "ends with",
                         "value" : [ "${CUSTOM}" ]
                       }, {
                         "condition" : "is empty",
+                        "i18NCondition" : "is empty",
                         "value" : [ "${EMPTY}" ]
                       }, {
                         "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
                         "value" : [ "${NOTEMPTY}" ]
                       } ],
                       "fieldName" : "phone",
                       "fieldLabel" : "Phone",
                       "i18NLabel" : "Phone",
-                      "type" : [ "text" ]
+                      "type" : "text"
                     }, {
                       "availableConditions" : [ {
                         "condition" : "is OPEN",
+                        "i18NCondition" : "is OPEN",
                         "value" : [ "${OPEN}" ]
                       }, {
                         "condition" : "is CLOSED",
+                        "i18NCondition" : "is CLOSED",
                         "value" : [ "${CLOSED}" ]
                       }, {
                         "condition" : "is",
+                        "i18NCondition" : "is",
                         "value" : [ "${CUSTOM}" ]
                       }, {
                         "condition" : "isn't",
+                        "i18NCondition" : "isn't",
                         "value" : [ "${CUSTOM}" ]
                       }, {
                         "condition" : "starts with",
+                        "i18NCondition" : "starts with",
                         "value" : [ "${CUSTOM}" ]
                       }, {
                         "condition" : "contains",
+                        "i18NCondition" : "contains",
                         "value" : [ "${CUSTOM}" ]
                       }, {
                         "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
                         "value" : [ "${CUSTOM}" ]
                       }, {
                         "condition" : "ends with",
+                        "i18NCondition" : "ends with",
                         "value" : [ "${CUSTOM}" ]
                       }, {
                         "condition" : "is empty",
+                        "i18NCondition" : "is empty",
                         "value" : [ "${EMPTY}" ]
                       }, {
                         "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
                         "value" : [ "${NOTEMPTY}" ]
                       } ],
                       "fieldName" : "status",
                       "fieldLabel" : "Status",
                       "i18NLabel" : "Status",
-                      "type" : [ "text" ]
+                      "type" : "text"
                     }, {
                       "availableConditions" : [ {
                         "condition" : "is",
+                        "i18NCondition" : "is",
                         "value" : [ "${CUSTOM}" ]
                       }, {
                         "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
                         "value" : [ "${CUSTOM}" ]
                       }, {
                         "condition" : "is empty",
+                        "i18NCondition" : "is empty",
                         "value" : [ "${EMPTY}" ]
                       }, {
                         "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
                         "value" : [ "${NOTEMPTY}" ]
                       } ],
                       "fieldName" : "productId",
                       "fieldLabel" : "Product Name",
                       "i18NLabel" : "Product Name",
-                      "type" : [ "lookup" ]
+                      "type" : "lookup"
                     }, {
                       "availableConditions" : [ {
                         "condition" : "is",
+                        "i18NCondition" : "is",
                         "value" : [ "${CURRENTTIME}", "${CUSTOM}" ]
                       }, {
                         "condition" : "isn't",
+                        "i18NCondition" : "isn't",
                         "value" : [ "${CURRENTTIME}", "${CUSTOM}" ]
                       }, {
                         "condition" : "is after",
+                        "i18NCondition" : "is after",
                         "value" : [ "${CURRENTTIME}", "${CUSTOM}" ]
                       }, {
                         "condition" : "is before",
+                        "i18NCondition" : "is before",
                         "value" : [ "${CURRENTTIME}", "${CUSTOM}" ]
                       }, {
                         "condition" : "between",
+                        "i18NCondition" : "between",
                         "value" : [ [ "${CURRENTTIME}", "${CUSTOM}" ], [ "${CURRENTTIME}", "${CUSTOM}" ] ]
                       }, {
                         "condition" : "not between",
+                        "i18NCondition" : "not between",
                         "value" : [ [ "${CURRENTTIME}", "${CUSTOM}" ], [ "${CURRENTTIME}", "${CUSTOM}" ] ]
                       }, {
                         "condition" : "is empty",
+                        "i18NCondition" : "is empty",
                         "value" : [ "${EMPTY}" ]
                       }, {
                         "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
                         "value" : [ "${NOTEMPTY}" ]
                       } ],
                       "fieldName" : "dueDate",
                       "fieldLabel" : "Due Date",
                       "i18NLabel" : "Due Date",
-                      "type" : [ "dateTime" ]
+                      "type" : "dateTime"
                     }, {
                       "availableConditions" : [ {
                         "condition" : "is",
+                        "i18NCondition" : "is",
                         "value" : [ "${CUSTOM}" ]
                       }, {
                         "condition" : "isn't",
+                        "i18NCondition" : "isn't",
                         "value" : [ "${CUSTOM}" ]
                       }, {
                         "condition" : "starts with",
+                        "i18NCondition" : "starts with",
                         "value" : [ "${CUSTOM}" ]
                       }, {
                         "condition" : "contains",
+                        "i18NCondition" : "contains",
                         "value" : [ "${CUSTOM}" ]
                       }, {
                         "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
                         "value" : [ "${CUSTOM}" ]
                       }, {
                         "condition" : "ends with",
+                        "i18NCondition" : "ends with",
                         "value" : [ "${CUSTOM}" ]
                       }, {
                         "condition" : "is empty",
+                        "i18NCondition" : "is empty",
                         "value" : [ "${EMPTY}" ]
                       }, {
                         "condition" : "is not empty",
-                        "value" : [ "${NOTEMPTY}" ]
-                      } ],
-                      "fieldName" : "priority",
-                      "fieldLabel" : "Priority",
-                      "i18NLabel" : "Priority",
-                      "type" : [ "text" ]
-                    }, {
-                      "availableConditions" : [ {
-                        "condition" : "is",
-                        "value" : [ "${CUSTOM}" ]
-                      }, {
-                        "condition" : "isn't",
-                        "value" : [ "${CUSTOM}" ]
-                      }, {
-                        "condition" : "starts with",
-                        "value" : [ "${CUSTOM}" ]
-                      }, {
-                        "condition" : "contains",
-                        "value" : [ "${CUSTOM}" ]
-                      }, {
-                        "condition" : "doesn't contain",
-                        "value" : [ "${CUSTOM}" ]
-                      }, {
-                        "condition" : "ends with",
-                        "value" : [ "${CUSTOM}" ]
-                      }, {
-                        "condition" : "is empty",
-                        "value" : [ "${EMPTY}" ]
-                      }, {
-                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
                         "value" : [ "${NOTEMPTY}" ]
                       } ],
                       "fieldName" : "channel",
                       "fieldLabel" : "Mode",
                       "i18NLabel" : "Mode",
-                      "type" : [ "text" ]
+                      "type" : "text"
                     }, {
                       "availableConditions" : [ {
                         "condition" : "is",
+                        "i18NCondition" : "is",
                         "value" : [ "${CUSTOM}" ]
                       }, {
                         "condition" : "isn't",
+                        "i18NCondition" : "isn't",
                         "value" : [ "${CUSTOM}" ]
                       }, {
                         "condition" : "starts with",
+                        "i18NCondition" : "starts with",
                         "value" : [ "${CUSTOM}" ]
                       }, {
                         "condition" : "contains",
+                        "i18NCondition" : "contains",
                         "value" : [ "${CUSTOM}" ]
                       }, {
                         "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
                         "value" : [ "${CUSTOM}" ]
                       }, {
                         "condition" : "ends with",
+                        "i18NCondition" : "ends with",
                         "value" : [ "${CUSTOM}" ]
                       }, {
                         "condition" : "is empty",
+                        "i18NCondition" : "is empty",
                         "value" : [ "${EMPTY}" ]
                       }, {
                         "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
                         "value" : [ "${NOTEMPTY}" ]
                       } ],
                       "fieldName" : "classification",
                       "fieldLabel" : "Classification",
                       "i18NLabel" : "Classification",
-                      "type" : [ "text" ]
+                      "type" : "text"
                     } ]
                   } ]
                 }
@@ -421,7 +475,11 @@
       },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "LayoutRuleCriteria"
 }

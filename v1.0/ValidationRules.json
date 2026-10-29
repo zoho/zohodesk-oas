@@ -1,5 +1,6 @@
 {
   "openapi" : "3.1.0",
+  "x-mcp-group" : [ "Modules, Fields and Layouts" ],
   "info" : {
     "title" : "ValidationRules",
     "version" : "1.0.0"
@@ -8,8 +9,8 @@
     "/api/v1/layouts/{layoutId}/validationRules/{validationRuleId}" : {
       "get" : {
         "tags" : [ "ValidationRules" ],
-        "summary" : "Get Validation Rule",
-        "description" : "This API fetches a validation rule configured for your layout.",
+        "summary" : "Get Layout Validation Rule",
+        "description" : "Retrieves a validation rule configured for the specified layout.",
         "operationId" : "getValidationRule",
         "parameters" : [ {
           "name" : "include",
@@ -24,87 +25,112 @@
             "maxItems" : 2
           },
           "style" : "form",
-          "explode" : true,
-          "description" : "Additional information related to rules. Values allowed are: @creator@, @modifier@"
+          "explode" : false,
+          "description" : "Additional information related to the rules. Possible values: creator, modifier"
         }, {
           "name" : "validationRuleId",
           "in" : "path",
+          "description" : "Unique ID of the validation rule",
           "required" : true,
           "style" : "simple",
           "explode" : false,
           "schema" : {
             "type" : [ "string", "integer" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "maxLength" : 100
           }
         }, {
           "name" : "layoutId",
           "in" : "path",
-          "description" : "Get the rules of the layout",
+          "description" : "Unique ID of the layout",
           "required" : true,
           "style" : "simple",
           "explode" : false,
           "schema" : {
             "type" : [ "string", "integer" ],
             "format" : "int64",
+            "maxLength" : 100,
             "pattern" : "([0-9]+)"
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
+          "400" : {
+            "$ref" : "#/components/responses/validationRuleBadRequestResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
           "200" : {
-            "$ref" : "#/components/responses/validationrulejson"
+            "$ref" : "#/components/responses/validationRuleResponse"
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.layouts.READ", "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       },
       "delete" : {
         "tags" : [ "ValidationRules" ],
         "summary" : "Delete Validation Rule",
-        "description" : "This API deletes a validation rule created for a field from a layout.",
+        "description" : "Deletes a validation rule from a layout.",
         "operationId" : "deleteValidationRule",
         "parameters" : [ {
           "name" : "validationRuleId",
           "in" : "path",
+          "description" : "Unique ID of the validation rule",
           "required" : true,
           "style" : "simple",
           "explode" : false,
           "schema" : {
             "type" : [ "string", "integer" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "maxLength" : 100
           }
         }, {
           "name" : "layoutId",
           "in" : "path",
-          "description" : "Get the rules of the layout",
+          "description" : "Unique ID of the layout",
           "required" : true,
           "style" : "simple",
           "explode" : false,
           "schema" : {
             "type" : [ "string", "integer" ],
             "format" : "int64",
+            "maxLength" : 100,
             "pattern" : "([0-9]+)"
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
+          "400" : {
+            "$ref" : "#/components/responses/validationRuleBadRequestResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
           "200" : {
             "$ref" : "./Common.json#/components/responses/emptyResponse"
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.layouts.DELETE", "Desk.settings.DELETE" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.DELETE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.DELETE" ]
         } ]
       },
       "patch" : {
         "tags" : [ "ValidationRules" ],
-        "summary" : "Update Validation Rule",
-        "description" : "This API updates the details of an existing validation rule in a particular layout.",
+        "summary" : "Update Layout Validation Rule",
+        "description" : "Updates the details of an existing validation rule in a layout.",
         "operationId" : "updateValidationRule",
         "parameters" : [ {
           "name" : "include",
@@ -119,47 +145,58 @@
             "maxItems" : 2
           },
           "style" : "form",
-          "explode" : true,
-          "description" : "Additional information related to rules. Values allowed are: @creator@, @modifier@"
+          "explode" : false,
+          "description" : "Additional information related to the rules. Possible values: creator, modifier"
         }, {
           "name" : "validationRuleId",
           "in" : "path",
+          "description" : "Unique ID of the validation rule",
           "required" : true,
           "style" : "simple",
           "explode" : false,
           "schema" : {
             "type" : [ "string", "integer" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "maxLength" : 100
           }
         }, {
           "name" : "layoutId",
           "in" : "path",
-          "description" : "Get the rules of the layout",
+          "description" : "Unique ID of the layout",
           "required" : true,
           "style" : "simple",
           "explode" : false,
           "schema" : {
             "type" : [ "string", "integer" ],
             "format" : "int64",
+            "maxLength" : 100,
             "pattern" : "([0-9]+)"
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/editValidationRule_validationrulejsonPayload"
+          "$ref" : "#/components/requestBodies/updateValidationRuleRequest"
         },
         "responses" : {
+          "400" : {
+            "$ref" : "#/components/responses/validationRuleBadRequestResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
           "422" : {
-            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+            "$ref" : "./Common.json#/components/responses/unprocessableEntityErrorResponse"
           },
           "200" : {
-            "$ref" : "#/components/responses/validationrulejson"
+            "$ref" : "#/components/responses/validationRuleResponse"
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.layouts.UPDATE", "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
         } ]
       }
     },
@@ -167,7 +204,7 @@
       "post" : {
         "tags" : [ "ValidationRules" ],
         "summary" : "Create Validation Rule",
-        "description" : "This API creates a validation rule for a field in a layout.",
+        "description" : "Creates a validation rule for a field in a layout.",
         "operationId" : "createValidationRule",
         "parameters" : [ {
           "name" : "include",
@@ -182,44 +219,53 @@
             "maxItems" : 2
           },
           "style" : "form",
-          "explode" : true,
-          "description" : "Additional information related to rules. Values allowed are: @creator@, @modifier@"
+          "explode" : false,
+          "description" : "Additional information related to the rules. Possible values: creator, modifier"
         }, {
           "name" : "layoutId",
           "in" : "path",
-          "description" : "Get the rules of the layout",
+          "description" : "Unique ID of the layout",
           "required" : true,
           "style" : "simple",
           "explode" : false,
           "schema" : {
             "type" : [ "string", "integer" ],
             "format" : "int64",
+            "maxLength" : 100,
             "pattern" : "([0-9]+)"
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/validationrulejsonPayload"
+          "$ref" : "#/components/requestBodies/createValidationRuleRequest"
         },
         "responses" : {
+          "400" : {
+            "$ref" : "#/components/responses/validationRuleBadRequestResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
           "422" : {
-            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+            "$ref" : "./Common.json#/components/responses/unprocessableEntityErrorResponse"
           },
           "200" : {
-            "$ref" : "#/components/responses/validationrulejson"
+            "$ref" : "#/components/responses/validationRuleResponse"
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.layouts.CREATE", "Desk.settings.CREATE" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.CREATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.CREATE" ]
         } ]
       }
     },
     "/api/v1/validationRules" : {
       "get" : {
         "tags" : [ "ValidationRules" ],
-        "summary" : "Get Validation Rules",
-        "description" : "This API fetches all the validation rules configured for your department/layout.",
+        "summary" : "Get Layout Validation Rules for Department or Layout",
+        "description" : "Retrieves all validation rules configured for a department or layout, with pagination support.",
         "operationId" : "getValidationRules",
         "parameters" : [ {
           "name" : "activeLayouts",
@@ -227,22 +273,26 @@
           "required" : false,
           "schema" : {
             "type" : [ "string" ],
-            "pattern" : "true|false"
+            "pattern" : "true|false",
+            "maxLength" : 100,
+            "enum" : [ "true", "false" ]
           },
           "style" : "form",
           "explode" : true,
-          "description" : "Get the rules for active layouts"
+          "description" : "Indicates whether only validation rules from active layouts must be returned. Possible values: true = returns rules from active layouts only; false = returns rules from all applicable layouts"
         }, {
           "name" : "activeRules",
           "in" : "query",
           "required" : false,
           "schema" : {
             "type" : [ "string" ],
-            "pattern" : "true|false"
+            "pattern" : "true|false",
+            "maxLength" : 100,
+            "enum" : [ "true", "false" ]
           },
           "style" : "form",
           "explode" : true,
-          "description" : "Get the rules that are active in the layout"
+          "description" : "Indicates whether only active validation rules must be returned. Possible values: true = returns only active validation rules; false = returns all applicable validation rules"
         }, {
           "name" : "include",
           "in" : "query",
@@ -256,12 +306,12 @@
             "maxItems" : 2
           },
           "style" : "form",
-          "explode" : true,
-          "description" : "Additional information related to the rules. Values allowed are: creator and modifier."
+          "explode" : false,
+          "description" : "Additional information related to the rules. Possible values: creator, modifier"
         }, {
           "name" : "searchString",
           "in" : "query",
-          "description" : "Get the rules that have this search term",
+          "description" : "Search term used to filter validation rules",
           "required" : false,
           "style" : "form",
           "explode" : true,
@@ -273,42 +323,46 @@
         }, {
           "name" : "executeInHelpCentre",
           "in" : "query",
-          "description" : "Get the rules that can be executed in help centre",
+          "description" : "Indicates whether only validation rules executable in Help Centre must be returned. Possible values: true = returns validation rules executable in Help Centre; false = returns validation rules regardless of Help Centre execution",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
-            "pattern" : "true|false"
+            "pattern" : "true|false",
+            "maxLength" : 100,
+            "enum" : [ "true", "false" ]
           }
         }, {
           "name" : "departmentId",
           "in" : "query",
-          "description" : "Get the rules of the department",
+          "description" : "Unique ID of the department whose validation rules must be fetched",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
             "type" : [ "string", "integer" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "maxLength" : 100
           }
         }, {
           "name" : "module",
           "in" : "query",
-          "description" : "Name of the module for which you want to fetch the layout rules. Allowed values are tickets, contacts, accounts, tasks, timeEntry, contracts, products, calls, events",
+          "description" : "Name of the module for which validation rules must be fetched. Standard values: tickets, contacts, accounts, tasks, timeEntry, contracts, products, calls, events. Custom modules are also supported.",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
-            "enum" : [ "tickets", "contacts", "contracts", "accounts", "products", "timeEntry", "tasks", "calls", "events" ],
-            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+            "examples" : [ "tickets", "contacts", "contracts", "accounts", "products", "timeEntry", "tasks", "calls", "events" ],
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+",
+            "maxLength" : 100
           }
         }, {
           "name" : "limit",
           "in" : "query",
-          "description" : "Number of rules to be fetched. Default is 50",
+          "description" : "Number of validation rules to fetch",
           "required" : false,
           "style" : "form",
           "explode" : true,
@@ -323,7 +377,7 @@
         }, {
           "name" : "from",
           "in" : "query",
-          "description" : "Index number, starting from which the rules must be fetched",
+          "description" : "Index number from which the validation rules must be fetched",
           "required" : false,
           "style" : "form",
           "explode" : true,
@@ -337,28 +391,59 @@
         }, {
           "name" : "layoutId",
           "in" : "query",
-          "description" : "Get the rules of the layout",
+          "description" : "Unique ID of the layout whose validation rules must be fetched",
           "required" : false,
           "style" : "form",
-          "explode" : false,
+          "explode" : true,
           "schema" : {
             "type" : [ "string", "integer" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "maxLength" : 100
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
+        "x-dependent-required" : [ {
+          "if" : {
+            "not" : {
+              "required" : [ "module" ]
+            }
+          },
+          "then" : {
+            "required" : [ "layoutId" ]
+          }
+        }, {
+          "if" : {
+            "not" : {
+              "required" : [ "layoutId" ]
+            }
+          },
+          "then" : {
+            "required" : [ "module" ]
+          }
+        } ],
         "responses" : {
+          "400" : {
+            "$ref" : "#/components/responses/validationRuleBadRequestResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
           "422" : {
-            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+            "$ref" : "./Common.json#/components/responses/unprocessableEntityErrorResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
           },
           "200" : {
             "$ref" : "#/components/responses/validationRuleListArray"
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.layouts.READ", "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.layouts.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       }
     }
@@ -366,246 +451,427 @@
   "components" : {
     "schemas" : {
       "conditions" : {
-        "type" : [ "object", "null" ],
+        "type" : [ "object" ],
         "additionalProperties" : false,
         "properties" : {
           "displayValue" : {
-            "type" : [ "array", "null" ],
+            "type" : [ "array" ],
             "items" : {
-              "type" : [ "string", "null" ],
-              "maxLength" : 100,
+              "type" : [ "string" ],
+              "maxLength" : 1000,
               "minLength" : 0
             },
-            "uniqueItems" : false
+            "maxItems" : 50,
+            "uniqueItems" : false,
+            "description" : "Display value(s) used for the condition"
           },
           "displayLabel" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 200,
+            "type" : [ "string" ],
+            "maxLength" : 250,
             "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "Display label of the field used in the condition"
           },
           "condition" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0
-          },
-          "fieldName" : {
-            "type" : [ "string", "null" ],
+            "type" : [ "string" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "description" : "Operator used for the condition. Valid operators depend on the field type: text, picklist, and lookup support is, isn't, starts with, contains, doesn't contain, ends with, is empty, is not empty; date supports is, isn't, is after, is before, is empty, is not empty; dateTime additionally supports between and not between; integer and currency support =, <>, <, <=, >, >=, is empty, is not empty; boolean supports is. Call Get Criteria Fields for Validation Rules to get the exact operators allowed for a specific field."
+          },
+          "fieldName" : {
+            "type" : [ "string" ],
+            "maxLength" : 255,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "API name of a module field used in the condition. The field must exist on the module. For lookups, use the flat field API name."
           },
           "value" : {
-            "type" : [ "array", "null" ],
+            "type" : [ "array" ],
             "items" : {
-              "type" : [ "string", "null" ],
-              "maxLength" : 100,
+              "type" : [ "string" ],
+              "maxLength" : 1000,
               "minLength" : 0
             },
-            "uniqueItems" : false
+            "maxItems" : 50,
+            "uniqueItems" : false,
+            "description" : "Value(s) used for the condition. For lookup fields, pass the related record display name, not the record ID. For is empty and is not empty, the value is the ${EMPTY} or ${NOTEMPTY} token. dateTime conditions may use ${CURRENTTIME} in place of a timestamp. Boolean fields use true or false."
           }
         },
-        "required" : [ "condition", "displayLabel", "displayValue", "fieldName", "value" ]
+        "required" : [ "condition", "fieldName", "value" ]
       },
       "conditionsArr" : {
-        "type" : [ "array", "null" ],
+        "type" : [ "array" ],
         "items" : {
           "$ref" : "#/components/schemas/conditions"
-        }
+        },
+        "maxItems" : 1000
       },
       "actions" : {
-        "type" : [ "object", "null" ],
+        "type" : [ "object" ],
         "additionalProperties" : false,
         "properties" : {
           "alert" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "type" : [ "string" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "description" : "Alert message shown when the condition block matches"
           }
         },
         "required" : [ "alert" ]
       },
       "fieldConditions" : {
-        "type" : [ "object", "null" ],
+        "type" : [ "object" ],
         "additionalProperties" : false,
         "properties" : {
           "pattern" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 100,
+            "type" : [ "string" ],
+            "maxLength" : 250,
             "minLength" : 0,
-            "pattern" : "[andor()0-9\\s]*"
+            "pattern" : "[andor()0-9\\s]*",
+            "description" : "Expression that combines this branch's conditions by index (1 is the first condition). Criterion 1 must be ANDed at the root -- for example (1 and 2) or (1 and (2 or 3)). A single condition may be just 1. Root OR patterns such as (1 or 2) are invalid; use multiple fieldConditions branches instead."
           },
           "name" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "type" : [ "string" ],
+            "maxLength" : 250,
+            "minLength" : 0,
+            "description" : "Name of the field condition block"
           },
           "conditions" : {
-            "$ref" : "#/components/schemas/conditionsArr"
+            "$ref" : "#/components/schemas/conditionsArr",
+            "description" : "Conditions in this branch. The first condition must use the rule primary field (fieldName)."
           },
           "actions" : {
-            "$ref" : "#/components/schemas/actions"
+            "$ref" : "#/components/schemas/actions",
+            "description" : "Actions executed when the condition block matches"
           }
         },
         "required" : [ "actions", "conditions", "name", "pattern" ]
       },
       "fieldConditionsArr" : {
-        "type" : [ "array", "null" ],
+        "type" : [ "array" ],
         "items" : {
           "$ref" : "#/components/schemas/fieldConditions"
-        }
+        },
+        "maxItems" : 1000
       },
-      "validationrulejsonPayload" : {
-        "type" : [ "object", "null" ],
+      "conditionsRequest" : {
+        "type" : [ "object" ],
         "additionalProperties" : false,
         "properties" : {
+          "condition" : {
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "description" : "Operator used for the condition. Valid operators depend on the field type: text, picklist, and lookup support is, isn't, starts with, contains, doesn't contain, ends with, is empty, is not empty; date supports is, isn't, is after, is before, is empty, is not empty; dateTime additionally supports between and not between; integer and currency support =, <>, <, <=, >, >=, is empty, is not empty; boolean supports is. Call Get Criteria Fields for Validation Rules to get the exact operators allowed for a specific field."
+          },
+          "fieldName" : {
+            "type" : [ "string" ],
+            "maxLength" : 255,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "API name of a module field used in the condition. The field must exist on the module. For lookups, use the flat field API name."
+          },
+          "value" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "maxLength" : 1000,
+              "minLength" : 0
+            },
+            "maxItems" : 50,
+            "uniqueItems" : false,
+            "description" : "Value(s) used for the condition. For lookup fields, pass the related record display name, not the record ID. For is empty and is not empty, the value is the ${EMPTY} or ${NOTEMPTY} token. dateTime conditions may use ${CURRENTTIME} in place of a timestamp. Boolean fields use true or false."
+          }
+        },
+        "required" : [ "condition", "fieldName", "value" ]
+      },
+      "conditionsRequestArr" : {
+        "type" : [ "array" ],
+        "items" : {
+          "$ref" : "#/components/schemas/conditionsRequest"
+        },
+        "maxItems" : 1000
+      },
+      "fieldConditionsRequest" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "pattern" : {
+            "type" : [ "string" ],
+            "maxLength" : 250,
+            "minLength" : 0,
+            "pattern" : "[andor()0-9\\s]*",
+            "description" : "Expression that combines this branch's conditions by index (1 is the first condition). Criterion 1 must be ANDed at the root -- for example (1 and 2) or (1 and (2 or 3)). A single condition may be just 1. Root OR patterns such as (1 or 2) are invalid; use multiple fieldConditions branches instead.",
+            "example" : [ "(1 and 2)", "(1 and (2 or 3))" ]
+          },
+          "name" : {
+            "type" : [ "string" ],
+            "maxLength" : 250,
+            "minLength" : 0,
+            "description" : "Name of the field condition block"
+          },
+          "conditions" : {
+            "$ref" : "#/components/schemas/conditionsRequestArr",
+            "description" : "Conditions in this branch. The first condition must use the rule primary field (fieldName)."
+          },
+          "actions" : {
+            "$ref" : "#/components/schemas/actions",
+            "description" : "Actions executed when the condition block matches"
+          }
+        },
+        "required" : [ "actions", "conditions", "name", "pattern" ]
+      },
+      "fieldConditionsRequestArr" : {
+        "type" : [ "array" ],
+        "items" : {
+          "$ref" : "#/components/schemas/fieldConditionsRequest"
+        },
+        "maxItems" : 1000
+      },
+      "validationRuleRequestSchema" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "fieldName" : {
+            "type" : [ "string" ],
+            "maxLength" : 255,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "API name of the primary module field for this rule. Every fieldConditions[].conditions[0].fieldName must equal this value."
+          },
+          "fieldConditions" : {
+            "$ref" : "#/components/schemas/fieldConditionsRequestArr",
+            "description" : "Independent branch conditions. Each entry is evaluated separately and runs its own actions when matched. Use multiple branches for alternate criterion trees; combine conditions within a branch only via that branch's pattern."
+          },
+          "displayLabel" : {
+            "type" : [ "string" ],
+            "description" : "Display Label of the primary field to be used for creating the rule",
+            "maxLength" : 250,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "executeInHelpCentre" : {
+            "type" : "boolean",
+            "description" : "Indicates whether the validation rule can be executed in Help Centre. Possible values: true = validation rule can be executed in Help Centre; false = validation rule cannot be executed in Help Centre."
+          },
+          "status" : {
+            "type" : [ "string" ],
+            "enum" : [ "active", "deactive" ],
+            "description" : "Activation status of the validation rule. Possible values: active, deactive."
+          }
+        },
+        "required" : [ "fieldName", "fieldConditions" ]
+      },
+      "validationRuleActor" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the user"
+          },
+          "firstName" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "minLength" : 0,
+            "description" : "First name of the user"
+          },
+          "lastName" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "minLength" : 0,
+            "description" : "Last name of the user"
+          },
+          "email" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$",
+            "description" : "Email address of the user"
+          },
+          "photoURL" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "URL of the user's profile photo"
+          }
+        }
+      },
+      "validationRuleResponseSchema" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the validation rule"
+          },
           "displayLabel" : {
             "type" : [ "string", "null" ],
-            "maxLength" : 200,
+            "maxLength" : 250,
             "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "Display label of the primary field used to create the validation rule"
           },
           "modifiedTime" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+            "description" : "Time at which the validation rule was modified"
           },
           "fieldConditions" : {
-            "$ref" : "#/components/schemas/fieldConditionsArr"
+            "$ref" : "#/components/schemas/fieldConditionsArr",
+            "description" : "Independent branch conditions. Each entry is evaluated separately and runs its own actions when matched. Use multiple branches for alternate criterion trees; combine conditions within a branch only via that branch's pattern."
           },
           "fieldName" : {
             "type" : [ "string", "null" ],
-            "maxLength" : 100,
+            "maxLength" : 255,
             "minLength" : 0,
-            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "API name of the primary module field for this rule. Every fieldConditions[].conditions[0].fieldName must equal this value."
           },
           "executeInHelpCentre" : {
-            "type" : [ "boolean", "null" ]
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the validation rule can be executed in Help Centre. Possible values: true = validation rule can be executed in Help Centre; false = validation rule cannot be executed in Help Centre."
           },
           "createdBy" : {
             "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the user who created the validation rule"
           },
           "createdTime" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0,
-            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+            "description" : "Time at which the validation rule was created"
           },
           "modifiedBy" : {
             "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the user who modified the validation rule"
           },
           "systemGenerated" : {
-            "type" : [ "boolean", "null" ]
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the validation rule is system-generated. Possible values: true = system-generated rule; false = user-defined rule."
           },
           "layoutId" : {
             "type" : [ "string", "integer", "null" ],
             "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the layout associated with the validation rule"
           },
           "status" : {
             "type" : [ "string", "null" ],
-            "enum" : [ "active", "deactive" ]
+            "enum" : [ "active", "deactive" ],
+            "description" : "Activation status of the validation rule. Possible values: active, deactive."
+          },
+          "creator" : {
+            "$ref" : "#/components/schemas/validationRuleActor",
+            "description" : "Details of the user who created the validation rule. Returned only when creator is passed in the include query parameter."
+          },
+          "modifier" : {
+            "$ref" : "#/components/schemas/validationRuleActor",
+            "description" : "Details of the user who last modified the validation rule. Returned only when modifier is passed in the include query parameter."
           }
         },
-        "required" : [ "createdBy", "createdTime", "displayLabel", "executeInHelpCentre", "fieldConditions", "fieldName", "layoutId", "modifiedBy", "modifiedTime", "status", "systemGenerated" ]
+        "required" : [ "id", "createdBy", "createdTime", "displayLabel", "executeInHelpCentre", "fieldConditions", "fieldName", "layoutId", "modifiedBy", "modifiedTime", "status", "systemGenerated" ]
       },
-      "validationrulejson" : {
-        "additionalProperties" : false,
-        "allOf" : [ {
-          "$ref" : "#/components/schemas/validationrulejsonPayload"
-        }, {
-          "type" : [ "object", "null" ],
-          "properties" : {
-            "id" : {
-              "type" : [ "string", "integer", "null" ],
-              "format" : "int64",
-              "pattern" : "([0-9]+)"
-            }
-          },
-          "required" : [ "id" ],
-          "additionalProperties" : false
-        } ]
-      },
-      "data" : {
+      "validationRuleList" : {
         "type" : [ "array", "null" ],
         "items" : {
-          "$ref" : "#/components/schemas/validationrulejson"
+          "$ref" : "#/components/schemas/validationRuleResponseSchema"
         }
+      },
+      "validationRuleErrorJson" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "errorCode" : {
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "description" : "Domain-specific error code identifying the validation rule failure. Example values: FieldNotExistInLayout, FieldNotVisible, NameAlreadyExists, PickListValueNotExistInLayout, RuleLimitExceeded, RuleExistsWithPrimaryField, InvalidPrimaryFieldForRuleUpdate, BranchConditionLimitExceeded, ConditionNameAlreadyExists, CriteriaPerBranchConditionExceeded, PrimaryFieldNotExistsInBranchCondition, ActionNotExists, CriteriaValidationError, InvalidPattern, LicenseTypeNotAllowed."
+          },
+          "message" : {
+            "type" : [ "string" ],
+            "maxLength" : 1000,
+            "description" : "Human-readable description of the error."
+          },
+          "additionalInfo" : {
+            "type" : [ "object", "null" ],
+            "additionalProperties" : true,
+            "description" : "Additional context about the error, when available."
+          }
+        },
+        "required" : [ "errorCode", "message" ]
       }
     },
     "responses" : {
-      "validationrulejson" : {
+      "validationRuleResponse" : {
         "description" : "validationrulejson template definitions",
         "content" : {
           "application/json" : {
             "schema" : {
-              "additionalProperties" : false,
-              "allOf" : [ {
-                "$ref" : "#/components/schemas/validationrulejsonPayload"
-              }, {
-                "type" : [ "object", "null" ],
-                "properties" : {
-                  "id" : {
-                    "type" : [ "string", "integer", "null" ],
-                    "format" : "int64",
-                    "pattern" : "([0-9]+)"
-                  }
-                },
-                "required" : [ "id" ],
-                "additionalProperties" : false
-              } ]
+              "$ref" : "#/components/schemas/validationRuleResponseSchema"
             },
             "examples" : {
               "Valid responses Definitions" : {
                 "value" : {
+                  "id" : "288099000001065001",
+                  "fieldName" : "priority",
+                  "displayLabel" : "Priority",
                   "fieldConditions" : [ {
-                    "name" : "condition 2",
-                    "pattern" : "(1and2)",
+                    "name" : "High priority requires a phone number",
+                    "pattern" : "(1 and 2)",
                     "conditions" : [ {
+                      "fieldName" : "priority",
+                      "displayLabel" : "Priority",
                       "condition" : "is",
-                      "fieldName" : "email",
-                      "value" : [ "carol@zylker.com" ]
+                      "value" : [ "High" ],
+                      "displayValue" : [ "High" ]
                     }, {
-                      "condition" : "is",
                       "fieldName" : "phone",
-                      "value" : [ "9994219718" ]
+                      "displayLabel" : "Phone",
+                      "condition" : "is empty",
+                      "value" : [ ],
+                      "displayValue" : [ ]
                     } ],
                     "actions" : {
-                      "alert" : "Sample Alert"
+                      "alert" : "Add a contact phone number before setting the priority to High."
                     }
                   }, {
-                    "name" : "condition 3",
-                    "pattern" : "(1and2)",
+                    "name" : "Urgent requests cannot be Low priority",
+                    "pattern" : "(1 and 2)",
                     "conditions" : [ {
+                      "fieldName" : "priority",
+                      "displayLabel" : "Priority",
                       "condition" : "is",
-                      "fieldName" : "email",
-                      "value" : [ "carol@zylker.com" ]
+                      "value" : [ "Low" ],
+                      "displayValue" : [ "Low" ]
                     }, {
-                      "condition" : "is",
-                      "fieldName" : "phone",
-                      "value" : [ "99922299922" ]
+                      "fieldName" : "subject",
+                      "displayLabel" : "Subject",
+                      "condition" : "contains",
+                      "value" : [ "urgent" ],
+                      "displayValue" : [ "urgent" ]
                     } ],
                     "actions" : {
-                      "alert" : "Sample Alert1"
+                      "alert" : "Tickets that mention urgent in the subject cannot be set to Low priority."
                     }
                   } ],
-                  "modifiedTime" : 1536303048697,
-                  "fieldName" : "email",
-                  "description" : "Rule 1 for layout",
+                  "layoutId" : "288099000000093011",
+                  "executeInHelpCentre" : true,
+                  "status" : "active",
                   "systemGenerated" : false,
-                  "layoutId" : "4000000007723",
-                  "executeInHelpCentre" : false,
-                  "createdBy" : "4000000015963",
-                  "name" : "Rule 11",
-                  "createdTime" : 1536303048697,
-                  "modifiedBy" : "4000000015963",
-                  "id" : "4000000021001",
-                  "status" : "active"
+                  "createdBy" : "288099000000190001",
+                  "createdTime" : "2026-07-20T09:15:00.000Z",
+                  "modifiedBy" : "288099000000212005",
+                  "modifiedTime" : "2026-07-24T11:42:00.000Z"
                 }
               }
             }
@@ -617,11 +883,12 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "object", "null" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "#/components/schemas/data"
+                  "$ref" : "#/components/schemas/validationRuleList",
+                  "description" : "List of validation rules"
                 }
               },
               "required" : [ "data" ]
@@ -630,14 +897,19 @@
               "Valid responses Definitions" : {
                 "value" : {
                   "data" : [ {
+                    "displayLabel" : "Email",
                     "fieldConditions" : [ {
                       "name" : "condition 2",
-                      "pattern" : "(1and2)",
+                      "pattern" : "(1 and 2)",
                       "conditions" : [ {
+                        "displayValue" : [ "carol@zylker.com" ],
+                        "displayLabel" : "Email",
                         "condition" : "is",
                         "fieldName" : "email",
                         "value" : [ "carol@zylker.com" ]
                       }, {
+                        "displayValue" : [ "9994259718" ],
+                        "displayLabel" : "Phone",
                         "condition" : "is",
                         "fieldName" : "phone",
                         "value" : [ "9994259718" ]
@@ -646,24 +918,30 @@
                         "alert" : "Sample Alert"
                       }
                     } ],
-                    "modifiedTime" : 1536887322000,
+                    "modifiedTime" : "2018-09-14T01:08:42.000Z",
                     "fieldName" : "email",
                     "executeInHelpCentre" : true,
                     "createdBy" : "4000000015963",
-                    "createdTime" : 1536801406000,
+                    "createdTime" : "2018-09-13T01:16:46.000Z",
                     "modifiedBy" : "4000000015963",
                     "id" : "4000000017001",
                     "systemGenerated" : false,
-                    "layoutId" : "4000000013564"
+                    "layoutId" : "4000000013564",
+                    "status" : "active"
                   }, {
+                    "displayLabel" : "Phone",
                     "fieldConditions" : [ {
                       "name" : "condition 1",
-                      "pattern" : "(1and2)",
+                      "pattern" : "(1 and 2)",
                       "conditions" : [ {
+                        "displayValue" : [ "9994259718" ],
+                        "displayLabel" : "Phone",
                         "condition" : "is",
                         "fieldName" : "phone",
                         "value" : [ "9994259718" ]
                       }, {
+                        "displayValue" : [ "carol@zylker.com" ],
+                        "displayLabel" : "Email",
                         "condition" : "is",
                         "fieldName" : "email",
                         "value" : [ "carol@zylker.com" ]
@@ -672,11 +950,11 @@
                         "alert" : "Sample Alert"
                       }
                     } ],
-                    "modifiedTime" : 1536887322000,
+                    "modifiedTime" : "2018-09-14T01:08:42.000Z",
                     "fieldName" : "phone",
                     "executeInHelpCentre" : false,
                     "createdBy" : "4000000015963",
-                    "createdTime" : 1536803343000,
+                    "createdTime" : "2018-09-13T01:49:03.000Z",
                     "modifiedBy" : "4000000015963",
                     "id" : "4000000018001",
                     "systemGenerated" : false,
@@ -688,198 +966,155 @@
             }
           }
         }
-      }
-    },
-    "requestBodies" : {
-      "validationrulejsonPayload" : {
+      },
+      "validationRuleBadRequestResponse" : {
+        "description" : "This errorCode value appears when the validation rule request is invalid. For example, a referenced field does not exist in the layout or is not visible to the user, the rule name already exists, the rule creation limit is exceeded, or a condition or action configured in the rule is invalid.",
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "object" ],
-              "additionalProperties" : false,
-              "properties" : {
-                "displayLabel" : {
-                  "type" : [ "string" ],
-                  "maxLength" : 250,
-                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
-                },
-                "modifiedTime" : {
-                  "type" : [ "string" ],
-                  "maxLength" : 100,
-                  "minLength" : 0,
-                  "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
-                },
-                "fieldConditions" : {
-                  "$ref" : "#/components/schemas/fieldConditionsArr"
-                },
-                "fieldName" : {
-                  "type" : [ "string" ],
-                  "maxLength" : 255,
-                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
-                },
-                "executeInHelpCentre" : {
-                  "pattern" : "true|false",
-                  "type" : [ "string" ]
-                },
-                "createdBy" : {
-                  "type" : [ "string", "integer" ],
-                  "format" : "int64",
-                  "pattern" : "([0-9]+)"
-                },
-                "createdTime" : {
-                  "type" : [ "string" ],
-                  "maxLength" : 100,
-                  "minLength" : 0,
-                  "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
-                },
-                "modifiedBy" : {
-                  "type" : [ "string", "integer" ],
-                  "format" : "int64",
-                  "pattern" : "([0-9]+)"
-                },
-                "systemGenerated" : {
-                  "type" : [ "boolean" ]
-                },
-                "layoutId" : {
-                  "type" : [ "string", "integer" ],
-                  "format" : "int64",
-                  "pattern" : "([0-9]+)"
-                },
-                "status" : {
-                  "type" : [ "string" ],
-                  "enum" : [ "active", "deactive" ]
+              "$ref" : "#/components/schemas/validationRuleErrorJson"
+            },
+            "examples" : {
+              "Validation Rule Bad Request Response" : {
+                "value" : {
+                  "errorCode" : "FieldNotExistInLayout",
+                  "message" : "Field name does not exists in the layout"
                 }
-              },
-              "required" : [ "fieldConditions", "fieldName", "layoutId" ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "parameters" : {
+      "layoutId" : {
+        "name" : "layoutId",
+        "in" : "path",
+        "description" : "Unique ID of the layout",
+        "required" : true,
+        "style" : "simple",
+        "explode" : false,
+        "schema" : {
+          "type" : [ "string", "integer" ],
+          "format" : "int64",
+          "maxLength" : 100,
+          "pattern" : "([0-9]+)"
+        }
+      }
+    },
+    "requestBodies" : {
+      "createValidationRuleRequest" : {
+        "required" : true,
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/validationRuleRequestSchema"
             },
             "examples" : {
               "Valid requestBody Definitions" : {
                 "value" : {
+                  "fieldName" : "priority",
                   "fieldConditions" : [ {
-                    "name" : "condition 2",
-                    "pattern" : "(1and2)",
+                    "name" : "High priority requires a phone number",
+                    "pattern" : "(1 and 2)",
                     "conditions" : [ {
+                      "fieldName" : "priority",
                       "condition" : "is",
-                      "fieldName" : "email",
-                      "value" : [ "carol@zylker.com" ]
+                      "value" : [ "High" ]
                     }, {
-                      "condition" : "is",
                       "fieldName" : "phone",
-                      "value" : [ "9994219718" ]
+                      "condition" : "is empty",
+                      "value" : [ ]
                     } ],
                     "actions" : {
-                      "alert" : "Sample Alert"
+                      "alert" : "Add a contact phone number before setting the priority to High."
+                    }
+                  }, {
+                    "name" : "Urgent requests cannot be Low priority",
+                    "pattern" : "(1 and 2)",
+                    "conditions" : [ {
+                      "fieldName" : "priority",
+                      "condition" : "is",
+                      "value" : [ "Low" ]
+                    }, {
+                      "fieldName" : "subject",
+                      "condition" : "contains",
+                      "value" : [ "urgent" ]
+                    } ],
+                    "actions" : {
+                      "alert" : "Tickets that mention urgent in the subject cannot be set to Low priority."
                     }
                   } ],
-                  "executeInHelpCentre" : true,
-                  "fieldName" : "email",
-                  "name" : "Validation Rule 1",
-                  "description" : "Rule 1 for layout"
+                  "executeInHelpCentre" : true
                 }
               }
             }
           }
         }
       },
-      "editValidationRule_validationrulejsonPayload" : {
+      "updateValidationRuleRequest" : {
+        "required" : true,
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "object" ],
-              "additionalProperties" : false,
-              "properties" : {
-                "displayLabel" : {
-                  "type" : [ "string" ],
-                  "maxLength" : 250,
-                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
-                },
-                "modifiedTime" : {
-                  "type" : [ "string" ],
-                  "maxLength" : 100,
-                  "minLength" : 0,
-                  "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
-                },
-                "fieldConditions" : {
-                  "$ref" : "#/components/schemas/fieldConditionsArr"
-                },
-                "fieldName" : {
-                  "type" : [ "string" ],
-                  "maxLength" : 255,
-                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
-                },
-                "executeInHelpCentre" : {
-                  "pattern" : "true|false",
-                  "type" : [ "string" ]
-                },
-                "createdBy" : {
-                  "type" : [ "string", "integer" ],
-                  "format" : "int64",
-                  "pattern" : "([0-9]+)"
-                },
-                "createdTime" : {
-                  "type" : [ "string" ],
-                  "maxLength" : 100,
-                  "minLength" : 0,
-                  "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
-                },
-                "modifiedBy" : {
-                  "type" : [ "string", "integer" ],
-                  "format" : "int64",
-                  "pattern" : "([0-9]+)"
-                },
-                "systemGenerated" : {
-                  "type" : [ "boolean" ]
-                },
-                "layoutId" : {
-                  "type" : [ "string", "integer" ],
-                  "format" : "int64",
-                  "pattern" : "([0-9]+)"
-                },
-                "status" : {
-                  "type" : [ "string" ],
-                  "enum" : [ "active", "deactive" ]
-                }
-              },
-              "required" : [ "fieldConditions", "fieldName", "layoutId" ]
+              "$ref" : "#/components/schemas/validationRuleRequestSchema"
             },
             "examples" : {
               "Valid requestBody Definitions" : {
                 "value" : {
+                  "fieldName" : "priority",
                   "fieldConditions" : [ {
-                    "name" : "condition 2",
-                    "pattern" : "(1and2)",
+                    "name" : "High priority requires a phone number",
+                    "pattern" : "(1 and 2)",
                     "conditions" : [ {
+                      "fieldName" : "priority",
                       "condition" : "is",
-                      "fieldName" : "email",
-                      "value" : [ "carol@zylker.com" ]
+                      "value" : [ "High" ]
                     }, {
-                      "condition" : "is",
                       "fieldName" : "phone",
-                      "value" : [ "9994219718" ]
+                      "condition" : "is empty",
+                      "value" : [ ]
                     } ],
                     "actions" : {
-                      "alert" : "Sample Alert"
+                      "alert" : "Add a contact phone number before setting the priority to High."
                     }
                   }, {
-                    "name" : "condition 3",
-                    "pattern" : "(1and2)",
+                    "name" : "Kingsley tickets must have an owner and a due date",
+                    "pattern" : "( 1 and ( 2 and 3 ) )",
                     "conditions" : [ {
+                      "fieldName" : "priority",
                       "condition" : "is",
-                      "fieldName" : "email",
-                      "value" : [ "carol@zylker.com" ]
+                      "value" : [ "High" ]
                     }, {
+                      "fieldName" : "contactId",
                       "condition" : "is",
-                      "fieldName" : "phone",
-                      "value" : [ "99922299922" ]
+                      "value" : [ "4000000015963" ]
+                    }, {
+                      "fieldName" : "dueDate",
+                      "condition" : "is empty",
+                      "value" : [ ]
                     } ],
                     "actions" : {
-                      "alert" : "Sample Alert1"
+                      "alert" : "Set a due date for high priority tickets raised by Kingsley."
+                    }
+                  }, {
+                    "name" : "Urgent requests cannot be Low priority",
+                    "pattern" : "(1 and 2)",
+                    "conditions" : [ {
+                      "fieldName" : "priority",
+                      "condition" : "is",
+                      "value" : [ "Low" ]
+                    }, {
+                      "fieldName" : "subject",
+                      "condition" : "contains",
+                      "value" : [ "urgent" ]
+                    } ],
+                    "actions" : {
+                      "alert" : "Tickets that mention urgent in the subject cannot be set to Low priority."
                     }
                   } ],
-                  "fieldName" : "email",
-                  "executeInHelpCentre" : false,
-                  "name" : "Validation Rule 1",
-                  "description" : "Rule 1 for layout"
+                  "executeInHelpCentre" : true,
+                  "status" : "active"
                 }
               }
             }
@@ -896,7 +1131,11 @@
       },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "ValidationRules"
 }

@@ -1,0 +1,249 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "FederatedLogin",
+    "version" : "1.0.0",
+    "description" : "Federated Login Configuration allows you to set up and manage federated login (social sign-in) for help centers."
+  },
+  "paths" : {
+    "/api/v1/helpCenters/{helpCenterId}/federatedLogins" : {
+      "get" : {
+        "tags" : [ "FederatedLogin" ],
+        "summary" : "Get Federated Login Configuration",
+        "description" : "Retrieves configuration details of federated logins for the specified help center.",
+        "operationId" : "getFederatedLogin",
+        "parameters" : [ {
+          "name" : "helpCenterId",
+          "in" : "path",
+          "description" : "Unique ID of the help center",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/federatedLoginResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.READ" ]
+        } ]
+      }
+    },
+    "/api/v1/helpCenters/{helpCenterId}/federatedLogins/{provider}" : {
+      "post" : {
+        "tags" : [ "FederatedLogin" ],
+        "summary" : "Update Federated Login Configuration",
+        "description" : "Configures federated login for the specified provider on the given help center.\n\nNote: For provider @Zoho@, values for @clientId@ and @clientSecret@ are @null@.",
+        "operationId" : "updateFederatedLogin",
+        "parameters" : [ {
+          "name" : "provider",
+          "in" : "path",
+          "description" : "Name of the federated login provider. _Possible values_: @Zoho@, @Google@, @Facebook@, @LinkedIn@",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "Zoho", "Google", "Facebook", "LinkedIn", "Microsoft" ],
+            "pattern" : "(Zoho|Google|Facebook|LinkedIn|Microsoft)"
+          }
+        }, {
+          "name" : "helpCenterId",
+          "in" : "path",
+          "description" : "Unique ID of the help center",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/federatedLoginRequest"
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.UPDATE" ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "FederatedLogin" ],
+        "summary" : "Delete Federated Login Configuration",
+        "description" : "Deletes the federated login configuration for the specified provider on the given help center.",
+        "operationId" : "deleteFederatedLogin",
+        "parameters" : [ {
+          "name" : "provider",
+          "in" : "path",
+          "description" : "Name of the federated login provider. _Possible values_: @Zoho@, @Google@, @Facebook@, @LinkedIn@",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "Zoho", "Google", "Facebook", "LinkedIn", "Microsoft" ],
+            "pattern" : "(Zoho|Google|Facebook|LinkedIn|Microsoft)"
+          }
+        }, {
+          "name" : "helpCenterId",
+          "in" : "path",
+          "description" : "Unique ID of the help center",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.DELETE" ]
+        } ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "metaObj" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "name" : {
+            "type" : [ "string" ],
+            "description" : "Name of the metadata property",
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "value" : {
+            "type" : [ "string" ],
+            "description" : "Value of the metadata property",
+            "pattern" : "((^(ht|f)tp(s?)\\:\\/\\/[0-9a-zA-Z][-.\\w]*(:[0-9])*(\\/?)([a-zA-Z0-9\\-\\.\\?\\,|\\:\\'\\/\\\\\\+=&amp;%\\$#_\\[\\]@!\\(\\)\\*;~]*)?$)|[*]|([0-9]+))"
+          }
+        },
+        "required" : [ "name", "value" ]
+      },
+      "metaDataArr" : {
+        "type" : [ "array" ],
+        "description" : "List of metadata entries associated with the federated login configuration",
+        "items" : {
+          "$ref" : "#/components/schemas/metaObj"
+        }
+      }
+    },
+    "responses" : {
+      "federatedLoginResponse" : {
+        "description" : "federatedLoginResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "metaData" : {
+                  "$ref" : "#/components/schemas/metaDataArr"
+                },
+                "providers" : {
+                  "type" : [ "array" ],
+                  "description" : "List of enabled federated login providers",
+                  "items" : {
+                    "type" : [ "string" ],
+                    "enum" : [ "Zoho", "Google", "Facebook", "LinkedIn", "Microsoft" ]
+                  },
+                  "uniqueItems" : false
+                }
+              },
+              "required" : [ "metaData", "providers" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "metaData" : [ {
+                    "name" : "ZAID",
+                    "value" : "1025414718"
+                  } ],
+                  "providers" : [ "Zoho", "Google", "Facebook", "LinkedIn", "Microsoft" ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "requestBodies" : {
+      "federatedLoginRequest" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "clientId" : {
+                  "type" : [ "string" ],
+                  "description" : "Client ID of the federated login provider",
+                  "maxLength" : 100,
+                  "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+                },
+                "clientSecret" : {
+                  "type" : [ "string" ],
+                  "description" : "Client secret of the federated login provider",
+                  "maxLength" : 100,
+                  "pattern" : "[0-9a-zA-Z_\\-\\.\\~\\$@\\?\\,\\:\\'\\/\\!\\=\\P{InBasicLatin}\\s]+"
+                }
+              },
+              "required" : [ ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "clientId" : "123456789.apps.googleusercontent.com",
+                  "clientSecret" : "aBcDeFgHiJkLmNoPqRsTuVwXyZ"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "jwt-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/jwt-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "FederatedLogin"
+}

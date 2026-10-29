@@ -11,6 +11,7 @@
         "summary" : "Get Tags in a Ticket",
         "description" : "Retrieves tags associated with the specified ticket.",
         "operationId" : "getTagsByTicket",
+        "x-mcp-group" : [ "Tags Management", "Ticket Tag" ],
         "parameters" : [ {
           "name" : "ticketId",
           "in" : "path",
@@ -36,12 +37,79 @@
         } ]
       }
     },
+    "/api/v1/tags/{id}" : {
+      "put" : {
+        "tags" : [ "TicketTag" ],
+        "summary" : "Rename Tag",
+        "description" : "Renames an existing tag. Path param: id. Request body must include name (max 50 characters). This does not replace one tag with another; use the replace tag API for that.",
+        "operationId" : "renameTag",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Required. Unique ID of the tag"
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/renameTag"
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/tagJson"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.tickets.UPDATE" ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "TicketTag" ],
+        "summary" : "Delete Tag",
+        "description" : "Permanently deletes the tag identified by id. Tickets are not deleted. This does not remove a tag from a ticket; use dissociate tag for that.",
+        "operationId" : "deleteTag",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Required. Unique ID of the tag"
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.tickets.DELETE" ]
+        } ]
+      }
+    },
     "/api/v1/tickets/{ticketId}/dissociateTag" : {
       "post" : {
         "tags" : [ "TicketTag" ],
         "summary" : "Dissociate Tag",
         "description" : "Removes one or more tags from a ticket.",
         "operationId" : "dissociateTagsFromTicket",
+        "x-mcp-group" : [ "Tags Management", "Ticket Tag" ],
         "parameters" : [ {
           "name" : "ticketId",
           "in" : "path",
@@ -79,6 +147,7 @@
         "summary" : "Get Recent Tags",
         "description" : "Retrieves the five most recent tags associated with tickets for the specified department.",
         "operationId" : "getRecentTags",
+        "x-mcp-group" : [ "Tags Management", "Ticket Tag" ],
         "parameters" : [ {
           "name" : "departmentId",
           "in" : "query",
@@ -113,6 +182,7 @@
         "summary" : "Update Recent Tags",
         "description" : "Adds a tag to the list of recently viewed tags.",
         "operationId" : "addRecentTag",
+        "x-mcp-group" : [ "Tags Management", "Ticket Tag" ],
         "parameters" : [ {
           "name" : "tagId",
           "in" : "path",
@@ -124,7 +194,7 @@
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
-          "description" : "Unique ID of the tag"
+          "description" : "Required. Unique ID of the tag"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -138,12 +208,47 @@
         } ]
       }
     },
+    "/api/v1/tags/{tagId}/ticketsCount" : {
+      "get" : {
+        "tags" : [ "TicketTag" ],
+        "summary" : "Get Ticket Count by Tag",
+        "description" : "Returns how many tickets are associated with the given tag. Path param: tagId. This does not list the tickets; use get tickets by tag for that. This is not the module-level ticketsCount API.",
+        "operationId" : "getTicketCountByTag",
+        "parameters" : [ {
+          "name" : "tagId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Required. Unique ID of the tag"
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/getCountResponse"
+          },
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.tickets.READ" ]
+        } ]
+      }
+    },
     "/api/v1/tags/{currentTagId}/replace" : {
       "patch" : {
         "tags" : [ "TicketTag" ],
         "summary" : "Replace Tag",
         "description" : "Replaces an existing tag with another specified tag.",
         "operationId" : "replaceTag",
+        "x-mcp-group" : [ "Tags Management", "Ticket Tag" ],
         "parameters" : [ {
           "name" : "currentTagId",
           "in" : "path",
@@ -184,6 +289,7 @@
         "summary" : "Get Ticket Tags",
         "description" : "Retrieves ticket tags in the help desk portal for the specified department, with pagination support.",
         "operationId" : "listTicketTags",
+        "x-mcp-group" : [ "Tags Management", "Ticket Tag" ],
         "parameters" : [ {
           "name" : "departmentId",
           "in" : "query",
@@ -256,6 +362,7 @@
         "summary" : "Associate Tag",
         "description" : "Adds one or more tags to a ticket.",
         "operationId" : "associateTagsToTicket",
+        "x-mcp-group" : [ "Tags Management", "Ticket Tag" ],
         "parameters" : [ {
           "name" : "ticketId",
           "in" : "path",
@@ -293,6 +400,7 @@
         "summary" : "Search Tags",
         "description" : "Searches for tags in the help desk portal for the specified department, with pagination support.",
         "operationId" : "searchTags",
+        "x-mcp-group" : [ "Tags Management", "Ticket Tag" ],
         "parameters" : [ {
           "name" : "searchVal",
           "in" : "query",
@@ -365,6 +473,7 @@
         "summary" : "Get Tickets by Tag",
         "description" : "Retrieves tickets associated with a specific tag, with pagination support.",
         "operationId" : "getTicketsByTag",
+        "x-mcp-group" : [ "Tags Management", "Ticket Tag" ],
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
@@ -418,7 +527,8 @@
             "type" : [ "array" ],
             "items" : {
               "type" : [ "string" ],
-              "pattern" : "^([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s()]+|\\$\\{OPEN\\}|\\$\\{ONHOLD\\}|\\$\\{CLOSED\\})$"
+              "pattern" : "^([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s()]+|\\$\\{OPEN\\}|\\$\\{ONHOLD\\}|\\$\\{CLOSED\\})$",
+              "x-regex-name" : "ticketStatusPicklistAPI"
             },
             "maxItems" : 20
           },
@@ -444,7 +554,8 @@
             "type" : [ "array" ],
             "items" : {
               "type" : [ "string" ],
-              "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
+              "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+",
+              "x-regex-name" : "picklistValue"
             },
             "maxItems" : 20
           },
@@ -500,7 +611,7 @@
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
-          "description" : "Unique ID of the tag"
+          "description" : "Required. Unique ID of the tag"
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -662,6 +773,33 @@
           }
         }
       },
+      "getCountResponse" : {
+        "description" : "getCountResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "count" : {
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)",
+                  "description" : "Number of tickets associated with the tag"
+                }
+              },
+              "required" : [ "count" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "count" : "10"
+                }
+              }
+            }
+          }
+        }
+      },
       "commonTagResponse" : {
         "description" : "commonTagResponse template definitions",
         "content" : {
@@ -688,6 +826,47 @@
                     "tagType" : "SYSTEM",
                     "id" : 123234324
                   } ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "tagJson" : {
+        "description" : "tagJson template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "name" : {
+                  "type" : [ "string", "null" ],
+                  "description" : "Name of the tag",
+                  "maxLength" : 100,
+                  "minLength" : 3,
+                  "pattern" : "^(?!^null$)[a-zA-Z0-9\\_\\.\\-\\+\\%\\P{InBasicLatin}\\s]{3,}$"
+                },
+                "tagType" : {
+                  "type" : [ "string", "null" ],
+                  "enum" : [ "SYSTEM", "MANUAL" ],
+                  "description" : "Type of the tag. Possible values: MANUAL, SYSTEM"
+                },
+                "id" : {
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)",
+                  "description" : "Unique ID of the tag"
+                }
+              },
+              "required" : [ "id", "name", "tagType" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "id" : "123234324",
+                  "name" : "sample",
+                  "tagType" : "SYSTEM"
                 }
               }
             }
@@ -769,6 +948,7 @@
                             },
                             "type" : {
                               "type" : [ "string", "null" ],
+                              "x-dynamic-enum" : true,
                               "description" : "Type of the contact"
                             },
                             "email" : {
@@ -943,8 +1123,8 @@
                     "contact" : {
                       "lastName" : "Carol",
                       "firstName" : "Lucas",
-                      "phone" : "1 555 010 0000",
-                      "mobile" : "5550100004",
+                      "phone" : "+1 5550100123",
+                      "mobile" : "+1 5550100123",
                       "id" : "1892000000042032",
                       "isSpam" : false,
                       "type" : [ "paid" ],
@@ -969,19 +1149,19 @@
                     "team" : {
                       "name" : "kjsdfjks",
                       "id" : "8920000000069071",
-                      "logoUrl" : "https://desk.example.com/api/v1/teams/8920000000069071/logo?orgId=1234567890"
+                      "logoUrl" : "https://desk.zoho.com/api/v1/teams/8920000000069071/logo?orgId=123456"
                     },
                     "priority" : "High",
                     "assigneeId" : "1892000000056007",
                     "commentCount" : "1",
                     "accountId" : "189200000005345",
                     "phone" : null,
-                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Cases/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
+                    "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Cases/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
                     "teamId" : "8920000000069071",
                     "assignee" : {
-                      "firstName" : "George",
-                      "lastName" : "Vincent",
-                      "photoURL" : "https://desk.example.com/api/v1/agents/1892000000056007/photo?orgId=1234567890",
+                      "firstName" : "dasca",
+                      "lastName" : "vins",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/1892000000056007/photo?orgId=123456",
                       "id" : "1892000000056007",
                       "email" : "jack@zylker.com"
                     },
@@ -999,8 +1179,8 @@
                     "contact" : {
                       "lastName" : "Richard",
                       "firstName" : "Lucas",
-                      "phone" : "1 555 010 0000",
-                      "mobile" : "5550100004",
+                      "phone" : "+1 5550100123",
+                      "mobile" : "+1 5550100123",
                       "id" : "1892000000093203",
                       "isSpam" : false,
                       "type" : [ "paid" ],
@@ -1025,18 +1205,18 @@
                     "team" : {
                       "name" : "kjsdfjks",
                       "id" : "8920000000069071",
-                      "logoUrl" : "https://desk.example.com/api/v1/teams/8920000000069071/logo?orgId=1234567890"
+                      "logoUrl" : "https://desk.zoho.com/api/v1/teams/8920000000069071/logo?orgId=123456"
                     },
                     "priority" : null,
                     "assigneeId" : "1892000000042001",
                     "commentCount" : "0",
                     "phone" : null,
-                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Cases/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
+                    "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Cases/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
                     "teamId" : "8920000000069071",
                     "assignee" : {
-                      "firstName" : "George",
-                      "lastName" : "Vincent",
-                      "photoURL" : "https://desk.example.com/api/v1/agents/1892000000042001/photo?orgId=1234567890",
+                      "firstName" : "dasca",
+                      "lastName" : "vins",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/1892000000042001/photo?orgId=123456",
                       "id" : "1892000000042001",
                       "email" : "jack@zylker.com"
                     },
@@ -1142,6 +1322,32 @@
             }
           }
         }
+      },
+      "renameTag" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "name" : {
+                  "type" : [ "string" ],
+                  "description" : "Name of the tag",
+                  "maxLength" : 50,
+                  "pattern" : "[a-zA-Z0-9\\_\\.\\-\\+\\%\\P{InBasicLatin}\\s]{3,}+"
+                }
+              },
+              "required" : [ "name" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "name" : "sample"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "securitySchemes" : {
@@ -1155,5 +1361,6 @@
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "TicketTag"
 }

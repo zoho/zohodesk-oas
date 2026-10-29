@@ -1,0 +1,449 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "HelpCenterPages",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/helpCenter/{helpcenterId}/page/{pageId}" : {
+      "get" : {
+        "tags" : [ "HelpCenterPages" ],
+        "summary" : "Get Help Center Page",
+        "description" : "This API retrieves the SEO configuration for a specific Helpcenter page, including SEO enablement status and per-locale SEO translations.",
+        "operationId" : "getPage",
+        "parameters" : [ {
+          "name" : "helpcenterId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "pageId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/pageResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.READ" ]
+        } ]
+      },
+      "patch" : {
+        "tags" : [ "HelpCenterPages" ],
+        "summary" : "Update Help Center Page",
+        "description" : "This API updates the SEO configuration for a Helpcenter page, including SEO enablement status and per-locale SEO translations (keyword, title, and description).",
+        "operationId" : "updatePage",
+        "parameters" : [ {
+          "name" : "helpcenterId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "pageId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/updateHelpcenterPageInput"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/pageResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.UPDATE" ]
+        } ]
+      }
+    },
+    "/api/v1/helpCenter/{helpcenterId}/pages" : {
+      "get" : {
+        "tags" : [ "HelpCenterPages" ],
+        "summary" : "Get Help Center Pages",
+        "description" : "This API retrieves the list of Helpcenter pages along with their SEO configuration details.",
+        "operationId" : "getPageList",
+        "parameters" : [ {
+          "name" : "from",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "minimum" : 0,
+            "maximum" : 11,
+            "default" : 0
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Index number, starting from which the resources must be searched"
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "minimum" : 1,
+            "maximum" : 12,
+            "default" : 12
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Number of resources to return in the search result"
+        }, {
+          "name" : "helpcenterId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/pageListDatawrapper"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.READ" ]
+        } ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "pageListResponseObj" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "pageMappingId" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "isDefault" : {
+            "type" : [ "boolean", "null" ]
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+          },
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        },
+        "required" : [ "id", "isDefault", "name", "pageMappingId" ]
+      },
+      "pageListResponse" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/pageListResponseObj"
+        }
+      }
+    },
+    "responses" : {
+      "pageResponse" : {
+        "description" : "pageResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "modifiedTime" : {
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 100,
+                  "minLength" : 0,
+                  "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+                },
+                "isDefault" : {
+                  "type" : [ "boolean", "null" ]
+                },
+                "name" : {
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 100,
+                  "minLength" : 0,
+                  "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+                },
+                "createdTime" : {
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 100,
+                  "minLength" : 0,
+                  "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+                },
+                "id" : {
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)"
+                },
+                "isSeoEnabled" : {
+                  "type" : [ "boolean", "null" ]
+                },
+                "status" : {
+                  "type" : [ "boolean", "null" ]
+                },
+                "seoTranslations" : {
+                  "type" : [ "array", "null" ],
+                  "items" : {
+                    "type" : [ "object", "null" ],
+                    "additionalProperties" : false,
+                    "maxProperties" : 4,
+                    "minProperties" : 4,
+                    "properties" : {
+                      "seoKeyword" : {
+                        "type" : [ "string", "null" ],
+                        "maxLength" : 100,
+                        "minLength" : 0,
+                        "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]*"
+                      },
+                      "seoDescription" : {
+                        "type" : [ "string", "null" ],
+                        "maxLength" : 250,
+                        "minLength" : 0,
+                        "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]*"
+                      },
+                      "seoTitle" : {
+                        "type" : [ "string", "null" ],
+                        "maxLength" : 100,
+                        "minLength" : 0,
+                        "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]*"
+                      },
+                      "locale" : {
+                        "type" : [ "string", "null" ],
+                        "enum" : [ "en", "ja", "zh", "es", "de", "fr", "tr", "ru", "pt", "it", "nl", "da", "sv", "pl", "ar", "he", "af", "cs", "fr-ca", "bg", "fi", "el", "hu", "id", "nb", "ro", "th", "uk", "vi", "ur", "hi", "te", "kn", "ta", "mr", "ko", "fa", "bn", "gu", "ms", "ml", "en-gb", "sk", "hr", "sl", "zh_TW", "zh-tw", "ca", "ka", "kk", "my", "km", "pt-br" ],
+                        "pattern" : "([a-zA-Z]{2,4}([-_][a-zA-Z]{2})?)"
+                      }
+                    },
+                    "required" : [ "locale", "seoDescription", "seoKeyword", "seoTitle" ]
+                  },
+                  "uniqueItems" : false
+                }
+              },
+              "required" : [ "createdTime", "id", "isDefault", "isSeoEnabled", "modifiedTime", "name", "seoTranslations", "status" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "modifiedTime" : "2000-01-01T05:30:00.000Z",
+                  "isDefault" : true,
+                  "name" : "HOME PAGE",
+                  "createdTime" : "2000-01-01T05:30:00.000Z",
+                  "id" : "1230000123",
+                  "isSeoEnabled" : true,
+                  "status" : true,
+                  "seoTranslations" : [ {
+                    "seoKeyword" : "company, support",
+                    "seoDescription" : "problem solved",
+                    "seoTitle" : "solution to problem",
+                    "locale" : "en"
+                  }, {
+                    "seoKeyword" : "empresa, apoyo",
+                    "seoDescription" : "problema resuelto",
+                    "seoTitle" : "soluci�n al problema",
+                    "locale" : "es"
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "pageListDatawrapper" : {
+        "description" : "pageListDatawrapper template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "#/components/schemas/pageListResponse"
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : [ {
+                  "pageMappingId" : "3242561",
+                  "isDefault" : true,
+                  "name" : "HOME PAGE",
+                  "id" : "123676878"
+                }, {
+                  "pageMappingId" : "3242562",
+                  "isDefault" : true,
+                  "name" : "SOLUTION LIST PAGE",
+                  "id" : "1236768324"
+                }, {
+                  "pageMappingId" : "3242563",
+                  "isDefault" : true,
+                  "name" : "SOLUTION DETAIL VIEW PAGE",
+                  "id" : "123676879"
+                }, {
+                  "pageMappingId" : "3242564",
+                  "isDefault" : true,
+                  "name" : "COMMUNITY DETAIL VIEW PAGE",
+                  "id" : "123676880"
+                }, {
+                  "pageMappingId" : "3242565",
+                  "isDefault" : true,
+                  "name" : "COMMUNITY LIST PAGE",
+                  "id" : "1236768381"
+                } ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "requestBodies" : {
+      "updateHelpcenterPageInput" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "isSeoEnabled" : {
+                  "pattern" : "true|false",
+                  "type" : [ "string" ]
+                },
+                "seoTranslations" : {
+                  "type" : [ "array" ],
+                  "items" : {
+                    "type" : [ "object" ],
+                    "additionalProperties" : false,
+                    "maxProperties" : 4,
+                    "minProperties" : 4,
+                    "properties" : {
+                      "seoKeyword" : {
+                        "type" : [ "string" ],
+                        "maxLength" : 100,
+                        "minLength" : 0,
+                        "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]*"
+                      },
+                      "seoDescription" : {
+                        "type" : [ "string" ],
+                        "maxLength" : 250,
+                        "minLength" : 0,
+                        "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]*"
+                      },
+                      "seoTitle" : {
+                        "type" : [ "string" ],
+                        "maxLength" : 100,
+                        "minLength" : 0,
+                        "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]*"
+                      },
+                      "locale" : {
+                        "type" : [ "string" ],
+                        "enum" : [ "en", "ja", "zh", "es", "de", "fr", "tr", "ru", "pt", "it", "nl", "da", "sv", "pl", "ar", "he", "af", "cs", "fr-ca", "bg", "fi", "el", "hu", "id", "nb", "ro", "th", "uk", "vi", "ur", "hi", "te", "kn", "ta", "mr", "ko", "fa", "bn", "gu", "ms", "ml", "en-gb", "sk", "hr", "sl", "zh_TW", "zh-tw", "ca", "ka", "kk", "my", "km", "pt-br" ],
+                        "pattern" : "([a-zA-Z]{2,4}([-_][a-zA-Z]{2})?)"
+                      }
+                    },
+                    "required" : [ "locale", "seoDescription", "seoKeyword", "seoTitle" ]
+                  },
+                  "uniqueItems" : false
+                }
+              }
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "isSeoEnabled" : true,
+                  "seoTranslations" : [ {
+                    "seoKeyword" : "hello my friend",
+                    "seoDescription" : "Hello bot i am description",
+                    "seoTitle" : "This is Titlie",
+                    "locale" : "en"
+                  }, {
+                    "seoKeyword" : "Hola mi amigo",
+                    "seoDescription" : "Hola bot, soy descripci�n",
+                    "seoTitle" : "Esto es titlie",
+                    "locale" : "es"
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "jwt-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/jwt-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "HelpCenterPages"
+}

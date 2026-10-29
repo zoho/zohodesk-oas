@@ -1,0 +1,200 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "SandboxDeploymentLogs",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/sandbox/{sandboxId}/deploymentLogs" : {
+      "get" : {
+        "tags" : [ "SandboxDeploymentLogs" ],
+        "summary" : "Get Sandbox Deployment Logs",
+        "description" : "Retrieves deployment logs for a sandbox, with pagination support.",
+        "operationId" : "getDeploymentLogs",
+        "x-mcp-group" : [ "Sandbox Deployment" ],
+        "parameters" : [ {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of deployment logs to fetch. The default value and the maximum value allowed is 50",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 50,
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "default" : 50
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number from which the deployment logs must be fetched",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "default" : 1
+          }
+        }, {
+          "$ref" : "./Sandbox.json#/components/parameters/sandboxId"
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/getDeploymentLogs"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.sandbox.READ" ]
+        } ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "sandboxChangesetListObject" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "department" : {
+            "$ref" : "./Sandbox.json#/components/schemas/sandboxDepartment",
+            "description" : "Department associated with the changeset"
+          },
+          "entity" : {
+            "$ref" : "./Sandbox.json#/components/schemas/sandboxEntityObject",
+            "description" : "Entity affected by the changeset"
+          },
+          "changeSetId" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the changeset"
+          }
+        },
+        "required" : [ "changeSetId", "department", "entity" ]
+      },
+      "sandboxChangesetList" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/sandboxChangesetListObject"
+        }
+      },
+      "sandboxDeploymentLogs" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "deploymentId" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the deployment"
+          },
+          "successTime" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+            "description" : "Time at which the deployment completed successfully (ISO 8601 format)"
+          },
+          "deployer" : {
+            "$ref" : "./Sandbox.json#/components/schemas/sandboxActor",
+            "description" : "User who deployed the changesets"
+          },
+          "sandboxChangesetList" : {
+            "$ref" : "#/components/schemas/sandboxChangesetList",
+            "description" : "Changesets included in the deployment"
+          }
+        },
+        "required" : [ "deployer", "deploymentId", "sandboxChangesetList", "successTime" ]
+      },
+      "sandboxDeploymentLogsResponse" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/sandboxDeploymentLogs"
+        }
+      }
+    },
+    "responses" : {
+      "getDeploymentLogs" : {
+        "description" : "getDeploymentLogs template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "#/components/schemas/sandboxDeploymentLogsResponse",
+                  "description" : "List of deployment log entries for the sandbox"
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "data" : [ {
+                    "deploymentId" : "7000000213001",
+                    "successTime" : 1702297349000,
+                    "deployer" : {
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/7000000000375/photo?orgId=123456",
+                      "firstName" : "",
+                      "lastName" : "Nitro",
+                      "name" : "Nitro",
+                      "id" : "7000000000375"
+                    },
+                    "sandboxChangesetList" : [ {
+                      "department" : null,
+                      "entity" : {
+                        "name" : "test field",
+                        "id" : "11000000097001",
+                        "type" : "Fields"
+                      },
+                      "changeSetId" : "11000000097015"
+                    }, {
+                      "department" : null,
+                      "entity" : {
+                        "name" : "test 2",
+                        "id" : "11000000097067",
+                        "type" : "Fields"
+                      },
+                      "changeSetId" : "11000000097081"
+                    } ]
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "SandboxDeploymentLogs"
+}

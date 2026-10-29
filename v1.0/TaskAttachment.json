@@ -71,7 +71,6 @@
             "type" : [ "string", "null", "integer" ],
             "format" : "int32",
             "description" : "",
-            "minimum" : 0,
             "pattern" : "([0-9]+)"
           }
         }, {
@@ -84,9 +83,8 @@
           "schema" : {
             "type" : [ "string", "null" ],
             "description" : "",
-            "enum" : [ "createdTime" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "pattern" : "-?(createdTime)"
           }
         } ],
         "responses" : {
@@ -98,9 +96,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.activities.tasks.READ", "Desk.tasks.READ" ]
+          "iam-oauth2-schema" : [ "Desk.activities.tasks.READ" ]
         }, {
-          "iam-oauth2-schema" : [ "Desk.tasks.UPDATE" ]
+          "deprecated-iam-oauth2-schema" : [ "Desk.tasks.READ" ]
         } ]
       },
       "post" : {
@@ -151,9 +149,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.activities.tasks.UPDATE", "Desk.tasks.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.activities.tasks.UPDATE" ]
         }, {
-          "iam-oauth2-schema" : [ "Desk.tasks.UPDATE" ]
+          "deprecated-iam-oauth2-schema" : [ "Desk.tasks.UPDATE" ]
         } ]
       }
     },
@@ -201,9 +199,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.activities.tasks.UPDATE", "Desk.tasks.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.activities.tasks.UPDATE" ]
         }, {
-          "iam-oauth2-schema" : [ "Desk.tasks.UPDATE" ]
+          "deprecated-iam-oauth2-schema" : [ "Desk.tasks.UPDATE" ]
         } ]
       }
     },
@@ -240,6 +238,16 @@
           },
           "description" : ""
         }, {
+          "name" : "inline",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : [ "boolean" ]
+          },
+          "style" : "form",
+          "explode" : true,
+          "description" : "Whether the display is to be inline"
+        }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
@@ -248,7 +256,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.tasks.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.activities.tasks.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.tasks.READ" ]
         } ]
       }
     }
@@ -534,5 +544,6 @@
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "TaskAttachment"
 }

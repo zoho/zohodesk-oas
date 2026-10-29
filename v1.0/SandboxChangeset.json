@@ -1,0 +1,336 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Sandbox Changeset",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/sandbox/{sandboxId}/changesets/count" : {
+      "get" : {
+        "tags" : [ "SandboxChangeset" ],
+        "summary" : "Get Sandbox Changeset Count",
+        "description" : "Retrieves the count of all changesets in a sandbox, grouped by action type.",
+        "operationId" : "getChangesetCount",
+        "x-mcp-group" : [ "Sandbox Changeset" ],
+        "parameters" : [ {
+          "$ref" : "./Sandbox.json#/components/parameters/sandboxId"
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/getCountResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.sandbox.READ" ]
+        } ]
+      }
+    },
+    "/api/v1/sandbox/{sandboxId}/changesets" : {
+      "get" : {
+        "tags" : [ "SandboxChangeset" ],
+        "summary" : "Get Sandbox Changesets",
+        "description" : "Retrieves all changesets in a sandbox, with pagination support.",
+        "operationId" : "getAllChangeSets",
+        "x-mcp-group" : [ "Sandbox Changeset" ],
+        "parameters" : [ {
+          "name" : "entityType",
+          "in" : "query",
+          "description" : "Filters changesets based on a specific entity type. Possible values: Fields, Layouts, Layout Rules, Validation Rules, Ticket Templates, Email Templates Folder, Email Templates, Modules, Time Tracking, Field Dependencies, Direct Assignment Rule, Round Robin Rule, Notification Rules, Feed Preferences, Skill Type, Skills, Skill Configuration, Alerts, Tasks, Field Updates, Custom Function, Schedules, Macro, Supervise, Custom Action, Blueprint, Workflow, SLA, ActionMapping, Automation Studio. Note: The default value includes all entities",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "$ref" : "./Sandbox.json#/components/schemas/sandboxEntityType"
+          }
+        }, {
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "Unique ID of the department to filter changesets by. Note: The default value includes all departments",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "module",
+          "in" : "query",
+          "description" : "Filters changesets based on a specific module apiName. Possible values: tickets, contacts, accounts, tasks, calls, events, timeEntry, contracts, products and custom module apiName. Note: The default response includes all modules",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s\\^\\{\\}\\~\\[\\]\\*\\+~\\|\\\"]+",
+            "x-regex-name" : "cleartextpattern"
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of changesets to fetch. The maximum value allowed is 50",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 50,
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "default" : 50
+          }
+        }, {
+          "name" : "action",
+          "in" : "query",
+          "description" : "Filters changesets based on their action type. Possible values: ADD, UPDATE, DELETE. Note: The default value includes all actions",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "ADD", "UPDATE", "DELETE" ]
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number from which changesets must be fetched",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "default" : 1
+          }
+        }, {
+          "$ref" : "./Sandbox.json#/components/parameters/sandboxId"
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/allSandboxChangesetResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.sandbox.READ" ]
+        } ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "changesetCountResponse" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "count" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "description" : "Number of changesets for the action"
+          },
+          "action" : {
+            "$ref" : "./Sandbox.json#/components/schemas/changesetAction",
+            "description" : "Action type of the changesets. Possible values: ADD, UPDATE, DELETE"
+          }
+        },
+        "required" : [ "action", "count" ]
+      },
+      "changesetResponse" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "actor" : {
+            "$ref" : "./Sandbox.json#/components/schemas/sandboxActor",
+            "description" : "User who performed the change"
+          },
+          "entity" : {
+            "$ref" : "./Sandbox.json#/components/schemas/sandboxEntityObject",
+            "description" : "Entity that was changed"
+          },
+          "module" : {
+            "$ref" : "./Sandbox.json#/components/schemas/sandboxModule",
+            "description" : "Module in which the change was made"
+          },
+          "eventTime" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+            "description" : "Time at which the change was made (ISO 8601 format)"
+          },
+          "action" : {
+            "$ref" : "./Sandbox.json#/components/schemas/changesetAction",
+            "description" : "Action performed on the entity. Possible values: ADD, UPDATE, DELETE"
+          },
+          "externalId" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "description" : "External ID associated with the entity in the production environment"
+          },
+          "department" : {
+            "$ref" : "./Sandbox.json#/components/schemas/sandboxDepartment",
+            "description" : "Department in which the change was made"
+          },
+          "changeSetId" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the changeset"
+          }
+        },
+        "required" : [ "action", "actor", "changeSetId", "department", "entity", "eventTime", "externalId", "module" ]
+      },
+      "changesetRespArray" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/changesetResponse"
+        }
+      }
+    },
+    "responses" : {
+      "getCountResponse" : {
+        "description" : "getCountResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "array", "null" ],
+              "items" : {
+                "$ref" : "#/components/schemas/changesetCountResponse"
+              }
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "data" : [ {
+                    "count" : 3,
+                    "action" : "ADD"
+                  }, {
+                    "count" : 1,
+                    "action" : "UPDATE"
+                  }, {
+                    "count" : 2,
+                    "action" : "DELETE"
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "allSandboxChangesetResponse" : {
+        "description" : "allSandboxChangesetResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "#/components/schemas/changesetRespArray",
+                  "description" : "List of changeset entries in the sandbox"
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "data" : [ {
+                    "actor" : {
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000000349/photo?orgId=123456",
+                      "firstName" : "raja",
+                      "lastName" : "sekar",
+                      "name" : "raja sekar",
+                      "id" : "4000000000349"
+                    },
+                    "entity" : {
+                      "id" : "4000000000953",
+                      "name" : "PM process",
+                      "type" : "Blueprint"
+                    },
+                    "module" : {
+                      "apiName" : "tickets",
+                      "displayName" : "Ticket"
+                    },
+                    "eventTime" : "2022-09-20T00:05:55.000Z",
+                    "action" : "UPDATE",
+                    "externalId" : "2000000000953",
+                    "department" : {
+                      "name" : "changeset1",
+                      "id" : "4000000020772"
+                    },
+                    "changeSetId" : "4000000044003"
+                  }, {
+                    "actor" : {
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000000349/photo?orgId=123456",
+                      "firstName" : "raja",
+                      "lastName" : "sekar",
+                      "name" : "raja sekar",
+                      "id" : "4000000000349"
+                    },
+                    "entity" : {
+                      "id" : "4000000000802",
+                      "name" : "Notify ticket assignment",
+                      "type" : "Notification Rules"
+                    },
+                    "module" : {
+                      "apiName" : "contacts",
+                      "displayName" : "Contact"
+                    },
+                    "eventTime" : "2022-09-20T06:06:03.000Z",
+                    "action" : "UPDATE",
+                    "externalId" : null,
+                    "department" : {
+                      "name" : "changeset1",
+                      "id" : "4000000020772"
+                    },
+                    "changeSetId" : "4000000046003"
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "SandboxChangeset"
+}

@@ -11,6 +11,7 @@
         "summary" : "List Task Time Entries",
         "description" : "This API lists the time entries associated with a task.",
         "operationId" : "getTaskTimeEntries",
+        "x-mcp-group" : [ "Time Tracking", "Tasks" ],
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
@@ -125,7 +126,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.activities.tasks.READ", "Desk.tasks.READ" ]
+          "iam-oauth2-schema" : [ "Desk.activities.tasks.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.tasks.READ" ]
         } ]
       },
       "post" : {
@@ -133,6 +136,7 @@
         "summary" : "Add a Task Time Entry",
         "description" : "This API creates a time entry in your help desk",
         "operationId" : "createTaskTimeEntry",
+        "x-mcp-group" : [ "Time Tracking", "Tasks" ],
         "parameters" : [ {
           "name" : "taskId",
           "in" : "path",
@@ -159,7 +163,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.activities.tasks.CREATE", "Desk.tasks.CREATE" ]
+          "iam-oauth2-schema" : [ "Desk.activities.tasks.CREATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.tasks.CREATE" ]
         } ]
       }
     },
@@ -169,6 +175,7 @@
         "summary" : "Get summation of Task Time Entries",
         "description" : "This API fetches the sum of time entries associated with a task.",
         "operationId" : "getSummationOfTimeEntryForTask",
+        "x-mcp-group" : [ "Time Tracking", "Tasks" ],
         "parameters" : [ {
           "name" : "billStatus",
           "in" : "query",
@@ -201,7 +208,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.activities.tasks.READ", "Desk.tasks.READ" ]
+          "iam-oauth2-schema" : [ "Desk.activities.tasks.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.tasks.READ" ]
         } ]
       }
     },
@@ -211,6 +220,7 @@
         "summary" : "Get a Task Time Entry",
         "description" : "This API fetches a time entry recorded for a task.",
         "operationId" : "getTaskTimeEntry",
+        "x-mcp-group" : [ "Time Tracking", "Tasks" ],
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
@@ -256,12 +266,15 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.activities.tasks.READ", "Desk.tasks.READ" ]
+          "iam-oauth2-schema" : [ "Desk.activities.tasks.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.tasks.READ" ]
         } ]
       },
       "patch" : {
         "tags" : [ "TaskTimeEntry" ],
         "operationId" : "updateTaskTimeEntry",
+        "x-mcp-group" : [ "Time Tracking", "Tasks" ],
         "summary" : "Update a Task Time Entry",
         "description" : "This API updates details of an existing time entry.",
         "parameters" : [ {
@@ -302,7 +315,51 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.activities.tasks.UPDATE", "Desk.tasks.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.activities.tasks.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.tasks.UPDATE" ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "TaskTimeEntry" ],
+        "summary" : "Delete a Task Time Entry",
+        "description" : "This API deletes a time entry recorded for a task.",
+        "operationId" : "deleteTaskTimeEntry",
+        "parameters" : [ {
+          "name" : "taskTimeEntryId",
+          "in" : "path",
+          "description" : "Unique ID of the time entry",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "taskId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.activities.tasks.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.tasks.UPDATE" ]
         } ]
       }
     }
@@ -667,10 +724,10 @@
                 "value" : {
                   "data" : [ {
                     "owner" : {
-                      "firstName" : "Oliver",
-                      "lastName" : "Miller",
-                      "photoURL" : "https://contacts.example.com/file?t=user&ID=1234567890",
-                      "name" : "Oliver Miller",
+                      "firstName" : "Eswer",
+                      "lastName" : "KM",
+                      "photoURL" : "https://contacts.zoho.com/file?t=user&ID=4851669",
+                      "name" : "Eswer KM",
                       "id" : "4000000008688129"
                     },
                     "secondsSpent" : "21",
@@ -684,7 +741,7 @@
                     "cf" : {
                       "cf_timeentryname" : "time1"
                     },
-                    "executedTime" : 1466627400000,
+                    "executedTime" : "2016-06-22T20:30:00.000Z",
                     "fixedCost" : null,
                     "departmentId" : "4000000008694",
                     "minutesSpent" : "23",
@@ -697,7 +754,7 @@
                     "mode" : "MANUAL",
                     "isTrashed" : "false",
                     "billingType" : "FIXED_COST_FOR_TICKETS",
-                    "createdTime" : 1466061884000,
+                    "createdTime" : "2016-06-16T07:24:44.000Z",
                     "invoiceId" : "40000000086881212",
                     "id" : "4000000033001",
                     "requestChargeType" : "Customer Service",
@@ -705,10 +762,10 @@
                     "totalCost" : "20.17"
                   }, {
                     "owner" : {
-                      "firstName" : "Oliver",
-                      "lastName" : "Miller",
-                      "photoURL" : "https://contacts.example.com/file?t=user&ID=1234567890",
-                      "name" : "Oliver Miller",
+                      "firstName" : "Eswer",
+                      "lastName" : "KM",
+                      "photoURL" : "https://contacts.zoho.com/file?t=user&ID=4851669",
+                      "name" : "Eswer KM",
                       "id" : "4000000008688129"
                     },
                     "secondsSpent" : "21",
@@ -722,7 +779,7 @@
                     "cf" : {
                       "cf_timeentryname" : "time2"
                     },
-                    "executedTime" : 1466796600000,
+                    "executedTime" : "2016-06-24T19:30:00.000Z",
                     "fixedCost" : null,
                     "departmentId" : "4000000008694",
                     "minutesSpent" : "34",
@@ -735,7 +792,7 @@
                     "mode" : "MANUAL",
                     "isTrashed" : "false",
                     "billingType" : "FIXED_COST_FOR_TICKETS",
-                    "createdTime" : 1466063199000,
+                    "createdTime" : "2016-06-16T07:46:39.000Z",
                     "invoiceId" : "40000000086881212",
                     "id" : "4000000033006",
                     "requestChargeType" : "Product Consultation",
@@ -743,10 +800,10 @@
                     "totalCost" : "45.72"
                   }, {
                     "owner" : {
-                      "firstName" : "Oliver",
-                      "lastName" : "Miller",
-                      "photoURL" : "https://contacts.example.com/file?t=user&ID=1234567890",
-                      "name" : "Oliver Miller",
+                      "firstName" : "Eswer",
+                      "lastName" : "KM",
+                      "photoURL" : "https://contacts.zoho.com/file?t=user&ID=4851669",
+                      "name" : "Eswer KM",
                       "id" : "4000000008688129"
                     },
                     "secondsSpent" : "22",
@@ -760,7 +817,7 @@
                     "cf" : {
                       "cf_timeentryname" : "time3"
                     },
-                    "executedTime" : 1465846200000,
+                    "executedTime" : "2016-06-13T19:30:00.000Z",
                     "fixedCost" : null,
                     "departmentId" : "4000000008694",
                     "minutesSpent" : "22",
@@ -773,7 +830,7 @@
                     "mode" : "MANUAL",
                     "isTrashed" : "false",
                     "billingType" : "FIXED_COST_FOR_TICKETS",
-                    "createdTime" : 1466063392000,
+                    "createdTime" : "2016-06-16T07:49:52.000Z",
                     "invoiceId" : "40000000086881212",
                     "id" : "4000000033011",
                     "requestChargeType" : "Customer Service",
@@ -929,7 +986,36 @@
             },
             "examples" : {
               "Valid responses Definitions" : {
-                "value" : null
+                "value" : {
+                  "secondsSpent" : "21",
+                  "parent" : {
+                    "ticketNumber" : "1003",
+                    "associatedTicketId" : "4000000030017",
+                    "subject" : "Tasks subject",
+                    "id" : "4000000031014",
+                    "type" : "TASKS"
+                  },
+                  "cf" : {
+                    "cf_timeentryname" : "time1"
+                  },
+                  "executedTime" : "2016-06-22T20:30:00.000Z",
+                  "fixedCost" : null,
+                  "departmentId" : "4000000008694",
+                  "minutesSpent" : "23",
+                  "agentCostPerHour" : "3.0",
+                  "description" : "Time Entry description",
+                  "hoursSpent" : "3",
+                  "ownerId" : "4000000008692",
+                  "isBillable" : true,
+                  "mode" : "MANUAL",
+                  "isTrashed" : false,
+                  "createdTime" : "2016-06-16T07:24:44.000Z",
+                  "invoiceId" : "40000000086881212",
+                  "id" : "4000000033001",
+                  "requestChargeType" : "Customer Service",
+                  "additionalCost" : "10.0",
+                  "totalCost" : "20.17"
+                }
               }
             }
           }
@@ -1062,7 +1148,7 @@
                   "cf" : {
                     "cf_timeentryname" : "time2"
                   },
-                  "executedTime" : 1466627400000,
+                  "executedTime" : "2016-06-22T20:30:00.000Z",
                   "minutesSpent" : "23",
                   "agentCostPerHour" : "3.0",
                   "description" : "Time Entry description",
@@ -1195,7 +1281,20 @@
             },
             "examples" : {
               "Valid requestBody Definitions" : {
-                "value" : null
+                "value" : {
+                  "executedTime" : "2016-06-22T18:30:00.000Z",
+                  "hoursSpent" : "3",
+                  "minutesSpent" : "23",
+                  "secondsSpent" : "0",
+                  "ownerId" : "4000000008692",
+                  "isBillable" : true,
+                  "mode" : "MANUAL",
+                  "requestChargeType" : "Customer Service",
+                  "description" : "Time Entry description",
+                  "agentCostPerHour" : "3.0",
+                  "additionalCost" : "10.0",
+                  "totalCost" : "20.17"
+                }
               }
             }
           }
@@ -1211,7 +1310,11 @@
       },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "TaskTimeEntry"
 }

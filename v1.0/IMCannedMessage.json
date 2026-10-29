@@ -1,5 +1,6 @@
 {
   "openapi" : "3.1.0",
+  "x-mcp-group" : [ "IM Canned Messages" ],
   "info" : {
     "title" : "IMCannedMessage",
     "version" : "1.0.0",
@@ -12,6 +13,7 @@
         "summary" : "Get IM Template Message",
         "description" : "Retrieves details of a specific template message.",
         "operationId" : "getCannedMessage",
+        "x-mcp-group" : [ "Initiate Session" ],
         "parameters" : [ {
           "name" : "template_message_id",
           "in" : "path",
@@ -44,7 +46,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.InstantMessages.READ" ]
+          "iam-oauth2-schema" : [ "Desk.InstantMessages.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.basic.READ" ]
         } ]
       }
     },
@@ -54,6 +58,8 @@
         "summary" : "Apply template message",
         "description" : "Retrieves a template message with contact information applied to the placeholders.",
         "operationId" : "applyCannedMessage",
+        "x-mcp-group" : [ "Initiate Session" ],
+        "x-system-description" : "Call this API before Initiate Session to replace ticket and contact placeholders in a template message. Pass contactId to replace contact placeholders; contactId can be fetched from the Get Session API if not already available. Pass either ticketId or sessionId to replace ticket placeholders, but not both. If sessionId is passed, the latest ticket associated with that session is used. If a placeholder is not present in the template, it is replaced with an empty string.",
         "parameters" : [ {
           "name" : "contactId",
           "in" : "query",
@@ -62,10 +68,9 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "integer" ],
+            "type" : "string",
             "format" : "int64",
-            "description" : "Unique ID of the contact for which the template message must be applied or filtered.",
-            "pattern" : "([0-9]+)"
+            "description" : "Unique ID of the contact for which the template message must be applied or filtered."
           }
         }, {
           "name" : "sessionId",
@@ -75,10 +80,9 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "integer" ],
+            "type" : "string",
             "format" : "int64",
-            "description" : "Unique ID of the session for which template messages must be applied or filtered.",
-            "pattern" : "([0-9]+)"
+            "description" : "Unique ID of the session for which template messages must be applied or filtered."
           }
         }, {
           "name" : "ticketId",
@@ -88,10 +92,9 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "integer" ],
+            "type" : "string",
             "format" : "int64",
-            "description" : "Unique ID of the ticket for which template messages must be applied or filtered.",
-            "pattern" : "([0-9]+)"
+            "description" : "Unique ID of the ticket for which template messages must be applied or filtered."
           }
         }, {
           "name" : "language",
@@ -104,8 +107,8 @@
             "type" : "string",
             "description" : "Language in ISO language code (e.g., en, fr, de, bn, ta) to filter or apply template messages.",
             "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "(^([a-zA-Z0-9\\s\\.\\?\\_\\-\\,\\@\\:/+\\(\\)])*$|null|undefined)"
+            "pattern" : "(^([a-zA-Z0-9\\s\\.\\?\\,])*$|null|undefined)",
+            "x-regex-name" : "String_null"
           }
         }, {
           "name" : "template_message_id",
@@ -146,6 +149,7 @@
         "summary" : "Get IM Template Messages",
         "description" : "Retrieves a list of IM template messages for the specified department, with pagination support.",
         "operationId" : "getCannedMessages",
+        "x-mcp-group" : [ "Initiate Session" ],
         "parameters" : [ {
           "name" : "modifiedAfter",
           "in" : "query",
@@ -157,8 +161,8 @@
             "type" : "string",
             "description" : "Filters entities modified after the specified date. Enter a date in ISO format: yyyy-MM-ddThh:mm:ss.SSSZ.",
             "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "((19|20)\\d\\d)-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z"
+            "pattern" : "((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)",
+            "x-regex-name" : "APIDateTime"
           }
         }, {
           "name" : "tag",
@@ -171,7 +175,6 @@
             "type" : "string",
             "description" : "Search keyword to filter template messages by template name or template content.",
             "maxLength" : 100,
-            "minLength" : 0,
             "pattern" : "[a-zA-Z0-9\\_\\-\\+\\?\\!\\#\\.\\:\\,@\\;\\P{InBasicLatin}\\(\\)\\s]+"
           }
         }, {
@@ -182,10 +185,9 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "integer" ],
+            "type" : "string",
             "format" : "int64",
-            "description" : "Unique ID of the contact for which the template message must be applied or filtered.",
-            "pattern" : "([0-9]+)"
+            "description" : "Unique ID of the contact for which the template message must be applied or filtered."
           }
         }, {
           "name" : "departmentId",
@@ -195,10 +197,9 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "integer" ],
+            "type" : "string",
             "format" : "int64",
-            "description" : "Unique ID of the department for which template messages must be fetched.",
-            "pattern" : "([0-9]+)"
+            "description" : "Unique ID of the department for which template messages must be fetched."
           }
         }, {
           "name" : "limit",
@@ -208,10 +209,10 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "integer" ],
+            "type" : "string",
             "format" : "int32",
             "description" : "Number of template messages to fetch. Defaults to 0 when omitted.",
-            "pattern" : "([0-9]+)"
+            "default" : "0"
           }
         }, {
           "name" : "from",
@@ -221,10 +222,10 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "integer" ],
+            "type" : "string",
             "format" : "int32",
             "description" : "Index number from which template messages must be fetched. Defaults to 0 when omitted.",
-            "pattern" : "([0-9]+)"
+            "default" : "0"
           }
         }, {
           "name" : "wabaId",
@@ -237,7 +238,6 @@
             "type" : "string",
             "description" : "WhatsApp Business Account ID for which template messages must be fetched.",
             "maxLength" : 100,
-            "minLength" : 0,
             "pattern" : "([0-9]+)"
           }
         }, {
@@ -248,10 +248,9 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "integer" ],
+            "type" : "string",
             "format" : "int64",
-            "description" : "Unique ID of the channel for which template messages must be fetched.",
-            "pattern" : "([0-9]+)"
+            "description" : "Unique ID of the channel for which template messages must be fetched."
           }
         }, {
           "name" : "type",
@@ -264,8 +263,7 @@
             "type" : "string",
             "description" : "Filter by message type. Possible values: TEMPLATE, CANNED, WELCOMEMSG, AWAY.",
             "enum" : [ "TEMPLATE", "CANNED", "WELCOMEMSG", "AWAY" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           }
         }, {
           "name" : "status",
@@ -278,9 +276,7 @@
             "type" : "string",
             "description" : "Filters by status of the message. Possible values: SUBMITTED, FAILED, APPROVED, REJECTED. Applicable only if type is TEMPLATE.",
             "enum" : [ "SUBMITTED", "FAILED", "APPROVED", "REJECTED" ],
-            "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "SUBMITTED|FAILED|APPROVED|REJECTED"
+            "maxLength" : 100
           }
         }, {
           "name" : "language",
@@ -293,8 +289,8 @@
             "type" : "string",
             "description" : "Language in ISO language code (e.g., en, fr, de, bn, ta) to filter or apply template messages.",
             "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "(^([a-zA-Z0-9\\s\\.\\?\\_\\-\\,\\@\\:/+\\(\\)])*$|null|undefined)"
+            "pattern" : "(^([a-zA-Z0-9\\s\\.\\?\\,])*$|null|undefined)",
+            "x-regex-name" : "String_null"
           }
         }, {
           "name" : "sessionId",
@@ -304,10 +300,9 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "integer" ],
+            "type" : "string",
             "format" : "int64",
-            "description" : "Unique ID of the session for which template messages must be applied or filtered.",
-            "pattern" : "([0-9]+)"
+            "description" : "Unique ID of the session for which template messages must be applied or filtered."
           }
         }, {
           "name" : "ticketId",
@@ -317,10 +312,9 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "integer" ],
+            "type" : "string",
             "format" : "int64",
-            "description" : "Unique ID of the ticket for which template messages must be applied or filtered.",
-            "pattern" : "([0-9]+)"
+            "description" : "Unique ID of the ticket for which template messages must be applied or filtered."
           }
         }, {
           "name" : "isActive",
@@ -332,6 +326,16 @@
           "schema" : {
             "type" : "boolean",
             "description" : "Filters by active status of the template message."
+          }
+        }, {
+          "name" : "meta.INTEGRATION_SERVICE",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "pattern" : "[a-zA-Z0-9\\_]*$"
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -348,7 +352,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.InstantMessages.READ" ]
+          "iam-oauth2-schema" : [ "Desk.InstantMessages.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.basic.READ" ]
         } ]
       }
     }
@@ -369,14 +375,12 @@
             "description" : "Photo URL of the actor.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
-            "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "name" : {
             "description" : "Name of the actor.",
             "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "id" : {
             "description" : "Unique ID of the actor.",
@@ -388,14 +392,12 @@
             "description" : "Type of the actor.",
             "type" : [ "string", "null" ],
             "enum" : [ "ENDUSER", "AGENT", "BOT" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "email" : {
             "description" : "Email address of the actor.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
-            "minLength" : 0,
             "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
           }
         },
@@ -409,14 +411,12 @@
             "description" : "ISO language code of the translation.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
-            "minLength" : 0,
             "pattern" : "af|sq|ar|az|bn|bg|ca|zh_CN|zh_HK|zh_TW|hr|cs|da|nl|en_GB|en_US|et|fil|fi|fr|ka|de|el|gu|ha|he|hi|hu|id|ga|it|ja|kn|kk|rw_RW|ko|ky_KG|lo|lv|lt|mk|ms|ml|mr|nb|fa|pl|pt_BR|pt_PT|pa|ro|ru|sr|sk|sl|es|es_AR|es_ES|es_MX|sw|sv|ta|te|th|tr|uk|ur|uz|vi|zu|en"
           },
           "message" : {
             "description" : "Message content of the translation.",
             "type" : [ "string", "null" ],
-            "maxLength" : 65535,
-            "minLength" : 0
+            "maxLength" : 65535
           }
         },
         "required" : [ "language", "message" ]
@@ -431,8 +431,7 @@
             "displayMessage" : {
               "description" : "Display message for the translation.",
               "type" : [ "string", "null" ],
-              "maxLength" : 65535,
-              "minLength" : 0
+              "maxLength" : 65535
             },
             "id" : {
               "description" : "Unique ID of the translation.",
@@ -444,33 +443,28 @@
               "description" : "Status of the translation. Possible values: SUBMITTED, PENDING, FAILED, APPROVED, REJECTED, DELETION_IN_PROGRESS.",
               "type" : [ "string", "null" ],
               "enum" : [ "SUBMITTED", "FAILED", "APPROVED", "REJECTED", "PENDING", "DELETION_IN_PROGRESS" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "rejectionReason" : {
               "description" : "Reason for rejection if the translation was rejected.",
               "type" : [ "string", "null" ],
-              "maxLength" : 65535,
-              "minLength" : 0
+              "maxLength" : 65535
             },
             "uuid" : {
               "description" : "UUID of the translation (returned when placeholders are applied).",
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "modifiedTime" : {
               "description" : "Time when the translation was last modified.",
               "type" : [ "string", "null" ],
               "format" : "date-time",
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "failedReason" : {
               "description" : "Reason for failure if the translation failed (returned when placeholders are applied).",
               "type" : [ "string", "null" ],
-              "maxLength" : 65535,
-              "minLength" : 0
+              "maxLength" : 65535
             },
             "templateItems" : {
               "description" : "Template items including buttons, footer, and header.",
@@ -486,14 +480,12 @@
                       "description" : "Type of the header content. Possible values: TEXT, IMAGE, DOCUMENT, VIDEO.",
                       "type" : [ "string", "null" ],
                       "enum" : [ "TEXT", "IMAGE", "DOCUMENT", "VIDEO" ],
-                      "maxLength" : 100,
-                      "minLength" : 0
+                      "maxLength" : 100
                     },
                     "message" : {
                       "description" : "Header message text.",
                       "type" : [ "string", "null" ],
-                      "maxLength" : 60,
-                      "minLength" : 0
+                      "maxLength" : 60
                     },
                     "attachment" : {
                       "description" : "Attachment in the header.",
@@ -509,32 +501,27 @@
                         "name" : {
                           "description" : "File name of the attachment.",
                           "type" : [ "string", "null" ],
-                          "maxLength" : 255,
-                          "minLength" : 0
+                          "maxLength" : 255
                         },
                         "size" : {
                           "description" : "Size of the attachment in bytes.",
                           "type" : [ "string", "null" ],
-                          "maxLength" : 100,
-                          "minLength" : 0
+                          "maxLength" : 100
                         },
                         "type" : {
                           "description" : "MIME type of the attachment.",
                           "type" : [ "string", "null" ],
-                          "maxLength" : 100,
-                          "minLength" : 0
+                          "maxLength" : 100
                         },
                         "uuid" : {
                           "description" : "UUID of the attachment.",
                           "type" : [ "string", "null" ],
-                          "maxLength" : 100,
-                          "minLength" : 0
+                          "maxLength" : 100
                         },
                         "url" : {
                           "description" : "URL to access the attachment.",
                           "type" : [ "string", "null" ],
-                          "maxLength" : 2000,
-                          "minLength" : 0
+                          "maxLength" : 2000
                         }
                       }
                     }
@@ -549,14 +536,12 @@
                       "description" : "Type of the footer content.",
                       "type" : [ "string", "null" ],
                       "enum" : [ "TEXT" ],
-                      "maxLength" : 100,
-                      "minLength" : 0
+                      "maxLength" : 100
                     },
                     "message" : {
                       "description" : "Footer message text.",
                       "type" : [ "string", "null" ],
-                      "maxLength" : 60,
-                      "minLength" : 0
+                      "maxLength" : 60
                     }
                   }
                 },
@@ -571,20 +556,17 @@
                         "description" : "Type of the button. Possible values: QUICK_REPLY, PHONE_NUMBER, URL, CALL_PERMISSION_REQUEST, VOICE_CALL.",
                         "type" : [ "string", "null" ],
                         "enum" : [ "QUICK_REPLY", "PHONE_NUMBER", "URL", "CALL_PERMISSION_REQUEST", "VOICE_CALL" ],
-                        "maxLength" : 100,
-                        "minLength" : 0
+                        "maxLength" : 100
                       },
                       "message" : {
                         "description" : "Display text of the button.",
                         "type" : [ "string", "null" ],
-                        "maxLength" : 200,
-                        "minLength" : 0
+                        "maxLength" : 200
                       },
                       "action" : {
                         "description" : "Action value of the button (phone number or URL).",
                         "type" : [ "string", "null" ],
-                        "maxLength" : 2000,
-                        "minLength" : 0
+                        "maxLength" : 2000
                       }
                     }
                   },
@@ -614,14 +596,12 @@
             "description" : "Time when the template message was last modified.",
             "type" : [ "string", "null" ],
             "format" : "date-time",
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "displayMessage" : {
             "description" : "Display message shown to the recipient.",
             "type" : [ "string", "null" ],
-            "maxLength" : 65535,
-            "minLength" : 0
+            "maxLength" : 65535
           },
           "translations" : {
             "description" : "List of translations for the template message.",
@@ -642,21 +622,18 @@
           "title" : {
             "description" : "Title of the message.",
             "type" : [ "string", "null" ],
-            "maxLength" : 65535,
-            "minLength" : 0
+            "maxLength" : 65535
           },
           "message" : {
             "description" : "Content of the message.",
             "type" : [ "string", "null" ],
-            "maxLength" : 65535,
-            "minLength" : 0
+            "maxLength" : 65535
           },
           "type" : {
             "description" : "Type of the message. Possible values: TEMPLATE, CANNED, WELCOMEMSG, AWAY.",
             "type" : [ "string", "null" ],
             "enum" : [ "TEMPLATE", "CANNED", "WELCOMEMSG", "AWAY" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "isActive" : {
             "description" : "Indicates whether the template message is active. Possible values: true = active, false = inactive.",
@@ -665,31 +642,49 @@
           "tags" : {
             "description" : "Tags associated with the message.",
             "type" : [ "string", "null" ],
-            "maxLength" : 65535,
-            "minLength" : 0
+            "maxLength" : 65535
           },
           "status" : {
             "description" : "Status of the template message. Possible values: SUBMITTED, PENDING, FAILED, APPROVED, REJECTED, DELETION_IN_PROGRESS.",
             "type" : [ "string", "null" ],
             "enum" : [ "SUBMITTED", "FAILED", "APPROVED", "REJECTED", "PENDING", "DELETION_IN_PROGRESS" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "wabaId" : {
             "description" : "WhatsApp Business Account ID.",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
-            "minLength" : 0,
             "pattern" : "([0-9]+)"
           },
           "primaryLanguage" : {
             "description" : "Primary language of the template message in ISO language code (returned when placeholders are applied).",
             "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
+          },
+          "meta" : {
+            "description" : "Metadata associated with the canned message, including department and integration-specific attributes.",
+            "type" : [ "array" ],
+            "items" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "properties" : {
+                "name" : {
+                  "description" : "Name of the metadata attribute.",
+                  "type" : "string",
+                  "maxLength" : 100,
+                  "minLength" : 1
+                },
+                "value" : {
+                  "description" : "Value of the metadata attribute.",
+                  "type" : "string",
+                  "maxLength" : 65535
+                }
+              },
+              "required" : [ "name", "value" ]
+            }
           }
         },
-        "required" : [ "actor", "departmentId", "displayMessage", "id", "isActive", "message", "modifiedTime", "primaryLanguage", "status", "tags", "title", "translations", "type", "wabaId" ]
+        "required" : [ "actor", "departmentId", "displayMessage", "id", "isActive", "message", "meta", "modifiedTime", "primaryLanguage", "status", "tags", "title", "translations", "type", "wabaId" ]
       },
       "listofCannedMessages" : {
         "type" : [ "null", "array" ],
@@ -704,7 +699,7 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "actor" : {
@@ -715,14 +710,12 @@
                   "description" : "Time when the template message was last modified.",
                   "type" : [ "string", "null" ],
                   "format" : "date-time",
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "maxLength" : 100
                 },
                 "displayMessage" : {
                   "description" : "Display message shown to the recipient. Rendered with placeholders replaced when returned by Get Applied Template Message.",
                   "type" : [ "string", "null" ],
-                  "maxLength" : 65535,
-                  "minLength" : 0
+                  "maxLength" : 65535
                 },
                 "translations" : {
                   "description" : "List of translations for the template message.",
@@ -743,21 +736,18 @@
                 "title" : {
                   "description" : "Title of the message.",
                   "type" : [ "string", "null" ],
-                  "maxLength" : 65535,
-                  "minLength" : 0
+                  "maxLength" : 65535
                 },
                 "message" : {
                   "description" : "Content of the message. Rendered with placeholders replaced when returned by Get Applied Template Message.",
                   "type" : [ "string", "null" ],
-                  "maxLength" : 65535,
-                  "minLength" : 0
+                  "maxLength" : 65535
                 },
                 "type" : {
                   "description" : "Type of the message. Possible values: TEMPLATE, CANNED, WELCOMEMSG, AWAY.",
                   "type" : [ "string", "null" ],
                   "enum" : [ "TEMPLATE", "CANNED", "WELCOMEMSG", "AWAY" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "maxLength" : 100
                 },
                 "isActive" : {
                   "description" : "Indicates whether the template message is active. Possible values: true = active, false = inactive.",
@@ -766,31 +756,49 @@
                 "tags" : {
                   "description" : "Tags associated with the message.",
                   "type" : [ "string", "null" ],
-                  "maxLength" : 65535,
-                  "minLength" : 0
+                  "maxLength" : 65535
                 },
                 "status" : {
                   "description" : "Status of the template message. Possible values: SUBMITTED, PENDING, FAILED, APPROVED, REJECTED, DELETION_IN_PROGRESS.",
                   "type" : [ "string", "null" ],
                   "enum" : [ "SUBMITTED", "FAILED", "APPROVED", "REJECTED", "PENDING", "DELETION_IN_PROGRESS" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "maxLength" : 100
                 },
                 "wabaId" : {
                   "description" : "WhatsApp Business Account ID.",
                   "type" : [ "string", "null" ],
                   "maxLength" : 100,
-                  "minLength" : 0,
                   "pattern" : "([0-9]+)"
                 },
                 "primaryLanguage" : {
                   "description" : "Primary language of the template message in ISO language code (returned when placeholders are applied).",
                   "type" : [ "string", "null" ],
-                  "maxLength" : 100,
-                  "minLength" : 0
+                  "maxLength" : 100
+                },
+                "meta" : {
+                  "description" : "Metadata associated with the canned message, including department and integration-specific attributes.",
+                  "type" : [ "array" ],
+                  "items" : {
+                    "type" : "object",
+                    "additionalProperties" : false,
+                    "properties" : {
+                      "name" : {
+                        "description" : "Name of the metadata attribute.",
+                        "type" : "string",
+                        "maxLength" : 100,
+                        "minLength" : 1
+                      },
+                      "value" : {
+                        "description" : "Value of the metadata attribute.",
+                        "type" : "string",
+                        "maxLength" : 65535
+                      }
+                    },
+                    "required" : [ "name", "value" ]
+                  }
                 }
               },
-              "required" : [ "actor", "departmentId", "displayMessage", "id", "isActive", "message", "modifiedTime", "primaryLanguage", "status", "tags", "title", "translations", "type", "wabaId" ]
+              "required" : [ "actor", "departmentId", "displayMessage", "id", "isActive", "message", "meta", "modifiedTime", "primaryLanguage", "status", "tags", "title", "translations", "type", "wabaId" ]
             },
             "examples" : {
               "GetIMCannedMessage_200_TEMPLATE" : {
@@ -820,7 +828,7 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
@@ -861,7 +869,11 @@
       },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "IMCannedMessage"
 }

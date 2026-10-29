@@ -1,0 +1,156 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "EventTimer",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/events/{eventId}/timer" : {
+      "get" : {
+        "tags" : [ "EventTimer" ],
+        "summary" : "Get Event Timer",
+        "description" : "Retrieves the time elapsed in the event timer, along with its current state.",
+        "operationId" : "getEventTimer",
+        "parameters" : [ {
+          "name" : "eventId",
+          "in" : "path",
+          "description" : "Unique ID of the event from which the timer must be retrieved",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/eventTimerJson"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.activities.events.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.tasks.READ" ]
+        } ]
+      },
+      "post" : {
+        "tags" : [ "EventTimer" ],
+        "summary" : "Perform Event Timer Action",
+        "description" : "Performs a timer-related action on an event.",
+        "operationId" : "updateEventTimerState",
+        "parameters" : [ {
+          "name" : "action",
+          "in" : "query",
+          "description" : "Action of the timer. Supported actions are START, STOP, PAUSE and RESUME",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "maxLength" : 100,
+            "enum" : [ "START", "STOP", "PAUSE", "RESUME" ],
+            "pattern" : "START|STOP|PAUSE|RESUME"
+          }
+        }, {
+          "name" : "eventId",
+          "in" : "path",
+          "description" : "Unique ID of the event containing the timer",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/eventTimerJson"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.activities.events.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.tasks.UPDATE" ]
+        } ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "eventTimerJson" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "hours" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "seconds" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "minutes" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "state" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "RUNNING", "PAUSED", "INIT" ]
+          }
+        },
+        "required" : [ "hours", "minutes", "seconds", "state" ]
+      }
+    },
+    "responses" : {
+      "eventTimerJson" : {
+        "description" : "eventTimerJson template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/eventTimerJson"
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "hours" : 0,
+                  "seconds" : 0,
+                  "minutes" : 0,
+                  "state" : "RUNNING"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "EventTimer"
+}

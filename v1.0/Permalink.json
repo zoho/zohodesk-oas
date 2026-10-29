@@ -11,6 +11,7 @@
         "summary" : "Check Topic Permalink Availability",
         "description" : "Checks whether the specified permalink is available for use.",
         "operationId" : "checkCommunityTopicPermalinkAvailability",
+        "x-mcp-group" : [ "Manage Community Topics" ],
         "parameters" : [ {
           "name" : "permalink",
           "in" : "query",
@@ -21,7 +22,7 @@
           "schema" : {
             "type" : [ "string" ],
             "maxLength" : 3000,
-            "pattern" : "[a-zA-Z0-9%\\-._/?\\P{InBasicLatin}]+"
+            "pattern" : "[A-Za-z0-9%\\-+/=\\P{InBasicLatin}]+"
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -51,6 +52,7 @@
         "summary" : "Get Topic Permalinks",
         "description" : "Retrieves all permalinks of a community topic.",
         "operationId" : "getTopicPermalinks",
+        "x-mcp-group" : [ "Manage Community Topics", "View Community Topics" ],
         "parameters" : [ {
           "$ref" : "#/components/parameters/topicId",
           "description" : "Unique ID of the topic from which permalinks must be retrieved"
@@ -83,6 +85,7 @@
         "summary" : "Update Topic Permalinks",
         "description" : "Updates the permalinks of a community topic.",
         "operationId" : "updateTopicPermalinks",
+        "x-mcp-group" : [ "Manage Community Topics" ],
         "parameters" : [ {
           "$ref" : "#/components/parameters/topicId",
           "description" : "Unique ID of the topic for which permalinks must be updated"
@@ -276,7 +279,8 @@
                   "description" : "Primary permalink of the topic",
                   "maxLength" : 3000,
                   "minLength" : 1,
-                  "pattern" : "[a-zA-Z0-9%\\-._/?\\P{InBasicLatin}]+"
+                  "pattern" : "[a-zA-Z0-9%\\-._/?\\P{InBasicLatin}]+",
+                  "x-unique" : true
                 },
                 "secondaryPermalink" : {
                   "type" : [ "array" ],
@@ -284,7 +288,8 @@
                     "type" : [ "string" ],
                     "maxLength" : 100,
                     "minLength" : 0,
-                    "pattern" : "[a-z0-9\\/%\\-\\P{InBasicLatin}]+"
+                    "pattern" : "[a-z0-9\\/%\\-\\P{InBasicLatin}]+",
+                    "x-unique" : true
                   },
                   "uniqueItems" : false,
                   "description" : "Secondary permalink(s) of the topic"
@@ -315,5 +320,6 @@
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "Permalink"
 }

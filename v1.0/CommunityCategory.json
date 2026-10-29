@@ -5,12 +5,106 @@
     "version" : "1.0.0"
   },
   "paths" : {
+    "/api/v1/communityCategory/{categoryId}/permalinks" : {
+      "get" : {
+        "tags" : [ "CommunityCategory" ],
+        "summary" : "Get Category or Forum Permalinks",
+        "description" : "Retrieves all permalinks of a community category or forum.",
+        "operationId" : "getCommunityCategoryPermalinks",
+        "x-mcp-group" : [ "View Community Category" ],
+        "parameters" : [ {
+          "name" : "categoryId",
+          "in" : "path",
+          "required" : true,
+          "description" : "Unique ID of the category or forum from which permalinks must be retrieved.",
+          "schema" : {
+            "$ref" : "#/components/schemas/categoryIdSchema"
+          },
+          "style" : "simple",
+          "explode" : false
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/communityCategorySecondaryPermalinks"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.forums.READ", "Desk.community.READ" ]
+        } ]
+      },
+      "post" : {
+        "tags" : [ "CommunityCategory" ],
+        "summary" : "Update Category or Forum Permalink",
+        "description" : "Updates the primary permalink of a community category or forum.",
+        "operationId" : "addCommunityCategorySecondaryPermalink",
+        "parameters" : [ {
+          "name" : "categoryId",
+          "in" : "path",
+          "required" : true,
+          "description" : "Unique ID of the category or forum for which the permalink must be updated.",
+          "schema" : {
+            "$ref" : "#/components/schemas/categoryIdSchema"
+          },
+          "style" : "simple",
+          "explode" : false
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/addSecondaryPermalinkJSON"
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "204" : {
+            "$ref" : "#/components/responses/emptyResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.forums.UPDATE", "Desk.community.UPDATE" ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "CommunityCategory" ],
+        "summary" : "Delete Category or Forum Permalink",
+        "description" : "Deletes the secondary permalink of a community category or forum.",
+        "operationId" : "deleteCommunityCategorySecondaryPermalink",
+        "parameters" : [ {
+          "name" : "categoryId",
+          "in" : "path",
+          "description" : "Unique ID of the category or forum from which the permalink must be deleted.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/categoryId"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/deletePermalinkRequest"
+        },
+        "responses" : {
+          "204" : {
+            "$ref" : "#/components/responses/emptyResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.forums.DELETE", "Desk.community.DELETE" ]
+        } ]
+      }
+    },
     "/api/v1/communityCategory/{categoryId}/disable" : {
       "post" : {
         "tags" : [ "CommunityCategory" ],
         "summary" : "Disable Category or Forum",
         "description" : "Disables a community category or forum to restrict posting access.",
         "operationId" : "disableCommunityCategory",
+        "x-mcp-group" : [ "Manage Community" ],
         "parameters" : [ {
           "name" : "categoryId",
           "in" : "path",
@@ -29,7 +123,7 @@
             "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
           },
           "204" : {
-            "$ref" : "./Common.json#/components/responses/emptyResponse"
+            "$ref" : "#/components/responses/noContentResponse"
           }
         },
         "security" : [ {
@@ -43,6 +137,7 @@
         "summary" : "Enable Category or Forum",
         "description" : "Enables a community category or forum to provide posting access.",
         "operationId" : "enableCommunityCategory",
+        "x-mcp-group" : [ "Manage Community" ],
         "parameters" : [ {
           "name" : "categoryId",
           "in" : "path",
@@ -61,7 +156,7 @@
             "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
           },
           "204" : {
-            "$ref" : "./Common.json#/components/responses/emptyResponse"
+            "$ref" : "#/components/responses/noContentResponse"
           }
         },
         "security" : [ {
@@ -75,6 +170,7 @@
         "summary" : "Get All Categories",
         "description" : "Retrieves all community categories for the setup page.",
         "operationId" : "getAllCommunityCategories",
+        "x-mcp-group" : [ "Manage Community" ],
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
@@ -109,6 +205,7 @@
         "summary" : "Get Categories",
         "description" : "Retrieves a list of community categories.",
         "operationId" : "getEnabledCommunityCategories",
+        "x-mcp-group" : [ "Manage Community", "View Community Category", "Manage Community Moderation", "Manage Community Recyclebin", "Manage Community Topics", "View Community Topics" ],
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
@@ -148,6 +245,29 @@
         "security" : [ {
           "iam-oauth2-schema" : [ "Desk.forums.READ", "Desk.community.READ" ]
         } ]
+      },
+      "post" : {
+        "tags" : [ "CommunityCategory" ],
+        "summary" : "Create Community Category or Forum",
+        "description" : "Creates a new category or forum.",
+        "operationId" : "addCommunityCategory",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/addCommunityCategoryRequest"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/communityCategoryWithGroupsResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.forums.UPDATE", "Desk.community.UPDATE" ]
+        } ]
       }
     },
     "/api/v1/communityCategory/{categoryId}/follow" : {
@@ -156,6 +276,7 @@
         "summary" : "Follow Category or Forum",
         "description" : "Subscribes the authenticated user to follow a community category or forum.",
         "operationId" : "followCommunityCategory",
+        "x-mcp-group" : [ "View Community Category" ],
         "parameters" : [ {
           "name" : "categoryId",
           "in" : "path",
@@ -174,7 +295,7 @@
             "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
           },
           "204" : {
-            "$ref" : "./Common.json#/components/responses/emptyResponse"
+            "$ref" : "#/components/responses/noContentResponse"
           }
         },
         "security" : [ {
@@ -188,6 +309,7 @@
         "summary" : "Unfollow Category or Forum",
         "description" : "Unsubscribes the authenticated user from following a community category or forum.",
         "operationId" : "unfollowCommunityCategory",
+        "x-mcp-group" : [ "View Community Category" ],
         "parameters" : [ {
           "name" : "categoryId",
           "in" : "path",
@@ -206,7 +328,7 @@
             "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
           },
           "204" : {
-            "$ref" : "./Common.json#/components/responses/emptyResponse"
+            "$ref" : "#/components/responses/noContentResponse"
           }
         },
         "security" : [ {
@@ -220,6 +342,7 @@
         "summary" : "Get Category or Forum Followers",
         "description" : "Retrieves users who follow a community category or forum, with pagination support.",
         "operationId" : "getCommunityCategoryFollowers",
+        "x-mcp-group" : [ "View Community Category" ],
         "parameters" : [ {
           "name" : "limit",
           "in" : "query",
@@ -292,6 +415,7 @@
         "summary" : "Get Category or Forum by Permalink",
         "description" : "Retrieves the details of a community category or forum using its permalink.",
         "operationId" : "getCommunityCategoryByPermalink",
+        "x-mcp-group" : [ "View Community Category" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         }, {
@@ -302,8 +426,8 @@
           "schema" : {
             "type" : [ "string", "null" ],
             "maxLength" : 1000,
-            "pattern" : "[a-zA-Z0-9%\\-._/?\\P{InBasicLatin}]+",
-            "minLength" : 1
+            "pattern" : "[A-Za-z0-9%\\-+\\/=\\P{InBasicLatin}]+",
+            "x-regex-name" : "permalink"
           }
         }, {
           "name" : "include",
@@ -315,7 +439,6 @@
           "schema" : {
             "type" : [ "array" ],
             "maxLength" : 100,
-            "minLength" : 0,
             "items" : {
               "type" : "string",
               "enum" : [ "postCount", "followersCount", "commentCount", "groups" ]
@@ -333,7 +456,7 @@
         "security" : [ {
           "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.community.READ" ]
         }, {
-          "iam-oauth2-schema" : [ "Desk.forums.READ", "Desk.community.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.community.READ" ]
         } ]
       }
     },
@@ -343,6 +466,7 @@
         "summary" : "Get Category or Forum",
         "description" : "Retrieves the details of a community category or forum.",
         "operationId" : "getCommunityCategory",
+        "x-mcp-group" : [ "Manage Community", "View Community Category", "Manage Community Topics", "View Community Topics" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         }, {
@@ -365,7 +489,6 @@
           "schema" : {
             "type" : [ "array" ],
             "maxLength" : 100,
-            "minLength" : 0,
             "items" : {
               "type" : "string",
               "enum" : [ "postCount", "followersCount", "commentCount", "groups" ]
@@ -383,6 +506,68 @@
         "security" : [ {
           "iam-oauth2-schema" : [ "Desk.forums.READ", "Desk.community.READ" ]
         } ]
+      },
+      "patch" : {
+        "tags" : [ "CommunityCategory" ],
+        "summary" : "Update Category or Forum",
+        "description" : "Updates the details of a community category or forum.",
+        "operationId" : "updateCommunityCategory",
+        "parameters" : [ {
+          "name" : "categoryId",
+          "in" : "path",
+          "required" : true,
+          "description" : "Unique ID of the category or forum to update.",
+          "schema" : {
+            "$ref" : "#/components/schemas/categoryIdSchema"
+          },
+          "style" : "simple",
+          "explode" : false
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/updateCommunityCategoryRequest"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/communityCategoryWithGroupsResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.community.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.basic.UPDATE" ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "CommunityCategory" ],
+        "summary" : "Delete Community Category or Forum",
+        "description" : "Deletes a community category or forum.",
+        "operationId" : "deleteCommunityCategory",
+        "parameters" : [ {
+          "name" : "categoryId",
+          "in" : "path",
+          "required" : true,
+          "description" : "Unique ID of the forum to delete.",
+          "schema" : {
+            "$ref" : "#/components/schemas/categoryIdSchema"
+          },
+          "style" : "simple",
+          "explode" : false
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "#/components/responses/emptyResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.community.DELETE", "Desk.forums.DELETE" ]
+        } ]
       }
     },
     "/api/v1/communityCategory/{categoryId}/lock" : {
@@ -391,6 +576,7 @@
         "summary" : "Lock Category or Forum",
         "description" : "Locks a community category or forum to restrict posting access.",
         "operationId" : "lockCommunityCategory",
+        "x-mcp-group" : [ "Manage Community" ],
         "parameters" : [ {
           "name" : "categoryId",
           "in" : "path",
@@ -406,7 +592,67 @@
         } ],
         "responses" : {
           "204" : {
-            "$ref" : "./Common.json#/components/responses/emptyResponse"
+            "$ref" : "#/components/responses/noContentResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.community.UPDATE", "Desk.forums.UPDATE" ]
+        } ]
+      }
+    },
+    "/api/v1/communityCategory/{categoryId}/sort" : {
+      "post" : {
+        "tags" : [ "CommunityCategory" ],
+        "summary" : "Sort Forums",
+        "description" : "Sorts forums within a community category in a specified order.",
+        "operationId" : "sortCommunityForums",
+        "parameters" : [ {
+          "name" : "categoryId",
+          "in" : "path",
+          "required" : true,
+          "description" : "Unique ID of the parent category containing the forums.",
+          "schema" : {
+            "$ref" : "#/components/schemas/categoryIdSchema"
+          },
+          "style" : "simple",
+          "explode" : false
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/sortForumsRequest"
+        },
+        "responses" : {
+          "204" : {
+            "$ref" : "#/components/responses/emptyResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.forums.UPDATE", "Desk.community.UPDATE" ]
+        } ]
+      }
+    },
+    "/api/v1/communityCategory/sort" : {
+      "post" : {
+        "tags" : [ "CommunityCategory" ],
+        "summary" : "Sort Categories",
+        "description" : "Sorts community categories in a specified order.",
+        "operationId" : "sortCommunityCategories",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/sortCategoriesRequest"
+        },
+        "responses" : {
+          "204" : {
+            "$ref" : "#/components/responses/emptyResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
           }
         },
         "security" : [ {
@@ -430,14 +676,12 @@
             "description" : "URL of the moderator's profile photo",
             "type" : [ "string", "null" ],
             "maxLength" : 400,
-            "minLength" : 0,
             "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
           },
           "name" : {
             "description" : "Display name of the moderator",
             "type" : [ "string", "null" ],
             "maxLength" : 200,
-            "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "id" : {
@@ -450,8 +694,7 @@
             "description" : "Type of user",
             "type" : [ "string", "null" ],
             "enum" : [ "END_USER", "AGENT" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           }
         },
         "required" : [ "id", "name", "photoUrl", "type" ]
@@ -462,6 +705,143 @@
           "$ref" : "#/components/schemas/moderator"
         }
       },
+      "groups" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "name" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
+          },
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        },
+        "required" : [ "id", "name" ]
+      },
+      "communityCategoryGroupsJSONArray" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/groups"
+        }
+      },
+      "communityManagerChildCategoryWithGroupsJSON" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "isFollowing" : {
+            "type" : [ "boolean", "null" ]
+          },
+          "visibility" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 200,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "departmentId" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100
+          },
+          "groups" : {
+            "$ref" : "#/components/schemas/communityCategoryGroupsJSONArray"
+          },
+          "canAutoConvertTicket" : {
+            "type" : [ "boolean", "null" ]
+          },
+          "photoUrl" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 500,
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+          },
+          "moderation" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 200,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 200,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "parentCategoryId" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "id" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "position" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "permalink" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 250,
+            "pattern" : "[a-zA-Z0-9%\\-._/?\\P{InBasicLatin}]*"
+          },
+          "status" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "ENABLED", "LOCKED", "DISABLED" ],
+            "maxLength" : 100
+          },
+          "moderators" : {
+            "$ref" : "#/components/schemas/communityCategoryModeratorJSONArray"
+          },
+          "child" : {
+            "type" : [ "array", "null" ],
+            "items" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false
+            },
+            "uniqueItems" : false
+          },
+          "helpCenterId" : {
+            "type" : [ "string", "integer", "null" ],
+            "description" : "ID of the help center the category belongs to"
+          },
+          "associatedDepartmentIds" : {
+            "type" : [ "array", "null" ],
+            "items" : {
+              "type" : [ "string", "integer" ],
+              "description" : "ID of an associated department"
+            },
+            "description" : "IDs of the departments associated with the category"
+          },
+          "deparmentIdForTicketCreation" : {
+            "type" : [ "string", "integer", "null" ],
+            "description" : "ID of the department in which tickets converted from this category are created"
+          },
+          "permissions" : {
+            "type" : [ "array", "null" ],
+            "items" : {
+              "type" : [ "string" ],
+              "description" : "Permission granted to the current user, such as POST or RESPOND"
+            },
+            "description" : "Permissions the current user has in the category"
+          },
+          "view" : {
+            "$ref" : "#/components/schemas/permissionObject"
+          },
+          "post" : {
+            "$ref" : "#/components/schemas/permissionObject"
+          },
+          "respond" : {
+            "$ref" : "#/components/schemas/permissionObject"
+          }
+        },
+        "required" : [ "canAutoConvertTicket", "child", "departmentId", "description", "groups", "id", "isFollowing", "moderation", "moderators", "name", "parentCategoryId", "permalink", "photoUrl", "position", "status", "visibility" ]
+      },
       "communityManagerForumJSONForSetup" : {
         "type" : [ "object", "null" ],
         "additionalProperties" : false,
@@ -469,7 +849,6 @@
           "name" : {
             "type" : [ "string", "null" ],
             "maxLength" : 200,
-            "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "parentCategoryId" : {
@@ -490,8 +869,13 @@
           "status" : {
             "type" : [ "string", "null" ],
             "enum" : [ "ENABLED", "LOCKED", "DISABLED" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
+          },
+          "postCount" : {
+            "description" : "Number of topics posted in the forum; returned only when the forum has topics",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
           }
         },
         "required" : [ "id", "name", "parentCategoryId", "position", "status" ]
@@ -521,7 +905,6 @@
           "photoUrl" : {
             "type" : [ "string", "null" ],
             "maxLength" : 500,
-            "minLength" : 0,
             "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
           },
           "departmentId" : {
@@ -532,13 +915,11 @@
           "name" : {
             "type" : [ "string", "null" ],
             "maxLength" : 200,
-            "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "description" : {
             "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "childCount" : {
             "type" : [ "string", "integer", "null" ],
@@ -558,14 +939,12 @@
           "permalink" : {
             "type" : [ "string", "null" ],
             "maxLength" : 250,
-            "minLength" : 0,
             "pattern" : "[a-zA-Z0-9%\\-._/?\\P{InBasicLatin}]*"
           },
           "status" : {
             "type" : [ "string", "null" ],
             "enum" : [ "ENABLED", "LOCKED", "DISABLED" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "child" : {
             "$ref" : "#/components/schemas/communityForumForSetupJSONArray"
@@ -598,7 +977,6 @@
           "visibility" : {
             "type" : [ "string", "null" ],
             "maxLength" : 200,
-            "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "departmentId" : {
@@ -608,8 +986,7 @@
           },
           "description" : {
             "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "canAutoConvertTicket" : {
             "type" : [ "boolean", "null" ]
@@ -631,7 +1008,6 @@
           "photoUrl" : {
             "type" : [ "string", "null" ],
             "maxLength" : 500,
-            "minLength" : 0,
             "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
           },
           "permissions" : {
@@ -639,21 +1015,18 @@
             "items" : {
               "type" : [ "string", "null" ],
               "enum" : [ "POST", "RESPOND" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "uniqueItems" : false
           },
           "moderation" : {
             "type" : [ "string", "null" ],
             "maxLength" : 200,
-            "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "name" : {
             "type" : [ "string", "null" ],
             "maxLength" : 200,
-            "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "parentCategoryId" : {
@@ -674,14 +1047,12 @@
           "permalink" : {
             "type" : [ "string", "null" ],
             "maxLength" : 250,
-            "minLength" : 0,
             "pattern" : "[a-zA-Z0-9%\\-._/?\\P{InBasicLatin}]*"
           },
           "status" : {
             "type" : [ "string", "null" ],
             "enum" : [ "ENABLED", "LOCKED", "DISABLED" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "moderators" : {
             "$ref" : "#/components/schemas/communityCategoryModeratorJSONArray"
@@ -693,6 +1064,39 @@
               "additionalProperties" : false
             },
             "uniqueItems" : false
+          },
+          "deparmentIdForTicketCreation" : {
+            "description" : "ID of the department in which tickets converted from this forum are created",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "postCount" : {
+            "description" : "Number of topics posted in the forum",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "commentCount" : {
+            "description" : "Number of comments in the forum",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "followersCount" : {
+            "description" : "Number of users following the forum",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "view" : {
+            "$ref" : "#/components/schemas/permissionObject"
+          },
+          "post" : {
+            "$ref" : "#/components/schemas/permissionObject"
+          },
+          "respond" : {
+            "$ref" : "#/components/schemas/permissionObject"
           }
         },
         "required" : [ "associatedDepartmentIds", "canAutoConvertTicket", "child", "departmentId", "description", "helpCenterId", "id", "isFollowing", "moderation", "moderators", "name", "parentCategoryId", "permalink", "permissions", "photoUrl", "position", "status", "visibility" ]
@@ -725,7 +1129,6 @@
           "visibility" : {
             "type" : [ "string", "null" ],
             "maxLength" : 200,
-            "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "departmentId" : {
@@ -735,8 +1138,7 @@
           },
           "description" : {
             "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "canAutoConvertTicket" : {
             "type" : [ "boolean", "null" ]
@@ -758,7 +1160,6 @@
           "photoUrl" : {
             "type" : [ "string", "null" ],
             "maxLength" : 500,
-            "minLength" : 0,
             "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
           },
           "permissions" : {
@@ -766,21 +1167,18 @@
             "items" : {
               "type" : [ "string", "null" ],
               "enum" : [ "POST", "RESPOND" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "uniqueItems" : false
           },
           "moderation" : {
             "type" : [ "string", "null" ],
             "maxLength" : 200,
-            "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "name" : {
             "type" : [ "string", "null" ],
             "maxLength" : 200,
-            "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "parentCategoryId" : {
@@ -801,14 +1199,12 @@
           "permalink" : {
             "type" : [ "string", "null" ],
             "maxLength" : 250,
-            "minLength" : 0,
             "pattern" : "[a-zA-Z0-9%\\-._/?\\P{InBasicLatin}]*"
           },
           "status" : {
             "type" : [ "string", "null" ],
             "enum" : [ "ENABLED", "LOCKED", "DISABLED" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "moderators" : {
             "$ref" : "#/components/schemas/communityCategoryModeratorJSONArray"
@@ -833,7 +1229,6 @@
             "description" : "URL of the user's profile photo.",
             "type" : [ "string", "null" ],
             "maxLength" : 400,
-            "minLength" : 0,
             "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
           },
           "contactId" : {
@@ -845,7 +1240,6 @@
             "description" : "Display name of the user.",
             "type" : [ "string", "null" ],
             "maxLength" : 200,
-            "minLength" : 0,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
           },
           "id" : {
@@ -862,13 +1256,11 @@
             "description" : "Type of user. Possible values: AGENT, END_USER.",
             "type" : [ "string", "null" ],
             "enum" : [ "END_USER", "AGENT" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "email" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
-            "minLength" : 0,
             "pattern" : "^[a-zA-Z0-9\\_]([a-zA-Z0-9\\_\\+\\-\\.\\'&]*)@(?=.{4,256}$)(([a-zA-Z0-9]+)(([\\-\\_]*[a-zA-Z0-9])*)[\\.])+[a-zA-Z]{2,22}$"
           }
         },
@@ -879,9 +1271,468 @@
         "items" : {
           "$ref" : "#/components/schemas/categoryFollowersDetails"
         }
+      },
+      "permissionObject" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "description" : "Permission object defining visibility rules. When permission=GROUPS, groupIds must contain at least one item; otherwise, groupIds must be null.",
+        "properties" : {
+          "permission" : {
+            "type" : [ "string", "null" ],
+            "description" : "Permission level. Request values allowed by the server: LOGGED_IN_USERS, MODERATORS, GROUPS, AGENTS, NONE; responses may also return ALL_USERS.",
+            "enum" : [ "ALL_USERS", "LOGGED_IN_USERS", "MODERATORS", "GROUPS", "AGENTS", "NONE" ],
+            "pattern" : "^[-0-9a-zA-Z_.$@?,:'/!\\s]+$",
+            "maxLength" : 100
+          },
+          "groupIds" : {
+            "type" : [ "array", "null" ],
+            "description" : "Group ID(s) with access",
+            "items" : {
+              "type" : [ "string" ],
+              "pattern" : "^[0-9]+$"
+            },
+            "minItems" : 0,
+            "uniqueItems" : false
+          }
+        },
+        "required" : [ "permission", "groupIds" ]
+      },
+      "communityGetCategoryJSON" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "id" : {
+            "description" : "Unique ID of the category or forum",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "name" : {
+            "description" : "Name of the category or forum",
+            "type" : [ "string", "null" ],
+            "maxLength" : 200,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "description" : {
+            "description" : "Brief description of the category or forum",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100
+          },
+          "parentCategoryId" : {
+            "description" : "Unique ID of the parent category",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "visibility" : {
+            "description" : "Visibility setting of the category or forum",
+            "type" : [ "string", "null" ],
+            "maxLength" : 200,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "moderation" : {
+            "description" : "Moderation setting. Possible values: NONE, ALL_POSTS, FIRST_POST.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 200,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "status" : {
+            "description" : "Status of the category or forum",
+            "type" : [ "string", "null" ],
+            "enum" : [ "ENABLED", "LOCKED", "DISABLED" ],
+            "maxLength" : 100
+          },
+          "position" : {
+            "description" : "Display position in the list",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "moderators" : {
+            "description" : "Agents who moderate the category or forum",
+            "$ref" : "#/components/schemas/communityCategoryModeratorJSONArray"
+          },
+          "canAutoConvertTicket" : {
+            "description" : "Indicates whether topics are auto-converted to tickets. Possible values: true = Auto-convert enabled, false = Auto-convert disabled.",
+            "type" : [ "boolean", "null" ]
+          },
+          "departmentId" : {
+            "description" : "Unique ID of the associated department",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "photoUrl" : {
+            "description" : "URL of the category or forum logo",
+            "type" : [ "string", "null" ],
+            "maxLength" : 500,
+            "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
+          },
+          "permalink" : {
+            "description" : "Permanent URL slug",
+            "type" : [ "string", "null" ],
+            "maxLength" : 250,
+            "pattern" : "[a-zA-Z0-9%\\-._/?\\P{InBasicLatin}]*"
+          },
+          "commentCount" : {
+            "description" : "Number of comments in the category or forum",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "postCount" : {
+            "description" : "Number of topics posted",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "followersCount" : {
+            "description" : "Number of users following the category or forum",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "isFollowing" : {
+            "description" : "Indicates whether the authenticated user is following the category or forum",
+            "type" : [ "boolean", "null" ]
+          },
+          "post" : {
+            "description" : "Post permission settings",
+            "$ref" : "#/components/schemas/permissionObject"
+          },
+          "respond" : {
+            "description" : "Respond permission settings",
+            "$ref" : "#/components/schemas/permissionObject"
+          },
+          "view" : {
+            "description" : "View permission settings",
+            "$ref" : "#/components/schemas/permissionObject"
+          },
+          "permissions" : {
+            "description" : "Permissions available for the category or forum",
+            "type" : [ "array", "null" ],
+            "items" : {
+              "type" : [ "string", "null" ],
+              "enum" : [ "POST", "RESPOND" ],
+              "maxLength" : 100
+            },
+            "uniqueItems" : false
+          },
+          "associatedDepartmentIds" : {
+            "description" : "ID(s) of the departments associated with the category",
+            "type" : [ "array", "null" ],
+            "items" : {
+              "type" : [ "string", "integer", "null" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "uniqueItems" : false
+          },
+          "deparmentIdForTicketCreation" : {
+            "description" : "Unique ID of the department for ticket creation",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "child" : {
+            "description" : "Forums nested under the category; empty for a category without forums and for a forum",
+            "type" : [ "array", "null" ],
+            "items" : {
+              "$ref" : "#/components/schemas/communityManagerChildCategoryJSON"
+            },
+            "uniqueItems" : false
+          },
+          "helpCenterId" : {
+            "description" : "ID of the help center the category or forum belongs to",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "groups" : {
+            "description" : "Help center user groups mapped to the category or forum",
+            "type" : [ "array", "null" ],
+            "items" : {
+              "type" : [ "object", "null" ],
+              "description" : "A help center user group mapped to the category or forum"
+            },
+            "uniqueItems" : false
+          }
+        },
+        "required" : [ "id", "name", "description", "parentCategoryId", "visibility", "moderation", "status", "position", "moderators", "canAutoConvertTicket", "departmentId", "photoUrl", "permalink", "isFollowing", "post", "respond", "view", "permissions", "associatedDepartmentIds", "deparmentIdForTicketCreation" ]
+      },
+      "communityPermission" : {
+        "type" : "object",
+        "properties" : {
+          "permission" : {
+            "type" : "string",
+            "enum" : [ "LOGGED_IN_USERS", "MODERATORS", "GROUPS", "AGENTS", "NONE" ]
+          },
+          "groupIds" : {
+            "type" : "array",
+            "items" : {
+              "type" : "integer",
+              "format" : "int64"
+            },
+            "minItems" : 0,
+            "maxItems" : 30
+          }
+        }
+      },
+      "addCommunityCategoryRequest" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string",
+            "maxLength" : 150,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s\\|&]+",
+            "description" : "Name of the forum.",
+            "x-regex-name" : "departmentName"
+          },
+          "parentCategoryId" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "Unique ID of the community category under which the forum must be added."
+          },
+          "description" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 50000,
+            "description" : "Brief description of the forum."
+          },
+          "visibility" : {
+            "type" : "string",
+            "enum" : [ "ALL_USERS", "LOGGED_IN_USERS", "MODERATORS", "GROUPS", "AGENTS", "NONE" ],
+            "description" : "Visibility setting of the forum. Possible values: ALL, LOGGED_IN_USERS, GROUPS, MODERATORS."
+          },
+          "post" : {
+            "description" : "Post permission setting of the forum.",
+            "$ref" : "#/components/schemas/communityPermission"
+          },
+          "respond" : {
+            "description" : "Respond permission setting of the forum.",
+            "$ref" : "#/components/schemas/communityPermission"
+          },
+          "moderators" : {
+            "type" : "array",
+            "items" : {
+              "type" : "integer",
+              "format" : "int64"
+            },
+            "minItems" : 0,
+            "maxItems" : 50,
+            "description" : "ID(s) of the agents who moderate the forum."
+          },
+          "groupIds" : {
+            "type" : "array",
+            "items" : {
+              "type" : "integer",
+              "format" : "int64"
+            },
+            "minItems" : 0,
+            "maxItems" : 30,
+            "description" : "Group ID(s) to associate with the forum."
+          },
+          "moderation" : {
+            "type" : "string",
+            "enum" : [ "NONE", "FIRST_POST", "ALL_POSTS" ],
+            "description" : "Moderation setting for the forum. Possible values: NONE, ALL_POSTS, FIRST_POST."
+          },
+          "canAutoConvertTicket" : {
+            "type" : "boolean",
+            "description" : "Indicates whether topics posted in the forum must be automatically converted into tickets. Possible values: true = Auto-convert topics to tickets, false = Do not auto-convert."
+          },
+          "associatedDepartmentIds" : {
+            "type" : "array",
+            "items" : {
+              "type" : "integer",
+              "format" : "int64"
+            },
+            "minItems" : 1,
+            "maxItems" : 20,
+            "description" : "ID(s) of the departments to associate with the category."
+          },
+          "deparmentIdForTicketCreation" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "Unique ID of the department in which tickets must be created."
+          },
+          "logoId" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "Unique ID of the uploaded community category logo."
+          }
+        }
+      },
+      "updateCommunityCategoryRequest" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "properties" : {
+          "name" : {
+            "type" : "string",
+            "maxLength" : 150,
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s\\|&]+",
+            "description" : "Name of the category or forum.",
+            "x-regex-name" : "departmentName"
+          },
+          "description" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 50000,
+            "description" : "Brief description of the category or forum."
+          },
+          "visibility" : {
+            "type" : "string",
+            "enum" : [ "ALL_USERS", "LOGGED_IN_USERS", "MODERATORS", "GROUPS", "AGENTS", "NONE" ],
+            "description" : "Visibility setting of the category or forum. Possible values: ALL, LOGGED_IN_USERS, GROUPS, AGENTS, MODERATORS."
+          },
+          "post" : {
+            "description" : "Post permission setting of the category or forum.",
+            "$ref" : "#/components/schemas/communityPermission"
+          },
+          "respond" : {
+            "description" : "Respond permission setting of the category or forum.",
+            "$ref" : "#/components/schemas/communityPermission"
+          },
+          "moderators" : {
+            "type" : "array",
+            "items" : {
+              "type" : "integer",
+              "format" : "int64"
+            },
+            "minItems" : 0,
+            "maxItems" : 50,
+            "description" : "ID(s) of the agents who moderate the category or forum."
+          },
+          "groupIds" : {
+            "type" : "array",
+            "items" : {
+              "type" : "integer",
+              "format" : "int64"
+            },
+            "minItems" : 0,
+            "maxItems" : 30,
+            "description" : "Group ID(s) to associate."
+          },
+          "moderation" : {
+            "type" : "string",
+            "enum" : [ "NONE", "FIRST_POST", "ALL_POSTS" ],
+            "description" : "Moderation setting for the category or forum. Possible values: NONE, ALL_POSTS, FIRST_POST."
+          },
+          "canAutoConvertTicket" : {
+            "type" : "boolean",
+            "description" : "Indicates whether topics posted in the forum must be automatically converted into tickets. Possible values: true = Auto-convert topics to tickets, false = Do not auto-convert."
+          },
+          "associatedDepartmentIds" : {
+            "type" : "array",
+            "items" : {
+              "type" : "integer",
+              "format" : "int64"
+            },
+            "minItems" : 1,
+            "maxItems" : 25,
+            "description" : "ID(s) of the departments to associate with the category."
+          },
+          "deparmentIdForTicketCreation" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "Unique ID of the department in which tickets must be created."
+          },
+          "logoId" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "Unique ID of the uploaded community category logo."
+          }
+        },
+        "required" : [ "name" ]
+      },
+      "sortCategoriesRequest" : {
+        "type" : "object",
+        "properties" : {
+          "categoryIds" : {
+            "type" : "array",
+            "items" : {
+              "type" : "integer",
+              "format" : "int64"
+            },
+            "minItems" : 1,
+            "maxItems" : 1000,
+            "description" : "ID(s) of the community categories in the desired sort order."
+          }
+        },
+        "required" : [ "categoryIds" ]
+      },
+      "sortForumsRequest" : {
+        "type" : "object",
+        "properties" : {
+          "categoryIds" : {
+            "type" : "array",
+            "items" : {
+              "type" : "integer",
+              "format" : "int64"
+            },
+            "minItems" : 1,
+            "maxItems" : 500,
+            "description" : "ID(s) of the forums in the desired sort order."
+          }
+        },
+        "required" : [ "categoryIds" ]
+      },
+      "deletePermalinkRequest" : {
+        "type" : "object",
+        "properties" : {
+          "permalink" : {
+            "type" : "string",
+            "maxLength" : 100,
+            "pattern" : "[A-Za-z0-9%\\-+\\/=\\P{InBasicLatin}]+",
+            "description" : "Secondary permalink to delete.",
+            "x-regex-name" : "permalink"
+          }
+        },
+        "required" : [ "permalink" ]
+      },
+      "categoryIdSchema" : {
+        "type" : [ "string", "integer", "null" ],
+        "format" : "int64",
+        "pattern" : "([0-9]+)"
       }
     },
     "responses" : {
+      "emptyResponse" : {
+        "description" : "This API returns a 204 status code with no response body."
+      },
+      "noContentResponse" : {
+        "description" : "This API returns a 204 status code with no response body."
+      },
+      "communityCategoryWithGroupsResponse" : {
+        "description" : "Details of the created or updated community category or forum",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/communityManagerChildCategoryWithGroupsJSON"
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "id" : "20628000000020011",
+                  "name" : "Product Discussions",
+                  "description" : "Forum for product questions",
+                  "parentCategoryId" : "20628000000020001",
+                  "visibility" : "ALL_USERS",
+                  "moderation" : "NONE",
+                  "status" : "ENABLED",
+                  "position" : "1",
+                  "permalink" : "product-discussions",
+                  "photoUrl" : null,
+                  "departmentId" : "20628000000006907",
+                  "canAutoConvertTicket" : false,
+                  "isFollowing" : false,
+                  "moderators" : [ ],
+                  "groups" : [ ],
+                  "child" : [ ]
+                }
+              }
+            }
+          }
+        }
+      },
       "listAllCommunityCategoriesForSetup" : {
         "description" : "listAllCommunityCategoriesForSetup template definitions",
         "content" : {
@@ -1078,6 +1929,44 @@
           }
         }
       },
+      "communityCategorySecondaryPermalinks" : {
+        "description" : "communityCategorySecondaryPermalinks template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "primaryPermalink" : {
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 250,
+                  "pattern" : "[a-zA-Z0-9%\\-._/?\\P{InBasicLatin}]*",
+                  "description" : "Primary permalink of the category or forum."
+                },
+                "secondaryPermalinks" : {
+                  "type" : [ "array", "null" ],
+                  "items" : {
+                    "type" : [ "string", "null" ],
+                    "maxLength" : 250,
+                    "pattern" : "[a-zA-Z0-9%\\-._/?\\P{InBasicLatin}]*"
+                  },
+                  "uniqueItems" : false,
+                  "description" : "Secondary permalink(s) of the category or forum."
+                }
+              },
+              "required" : [ "primaryPermalink", "secondaryPermalinks" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "secondayPermalinks" : [ "category-secondary-peramalink-updated", "category-secondary-peramalink-updated1", "category-secondary-peramalink-updated2" ],
+                  "primaryPermalink" : "category-secondary-peramalink"
+                }
+              }
+            }
+          }
+        }
+      },
       "listAllCommunityCategoryFollowers" : {
         "description" : "listAllCommunityCategoryFollowers template definitions",
         "content" : {
@@ -1097,7 +1986,7 @@
               "Valid responses Definitions" : {
                 "value" : {
                   "data" : [ {
-                    "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015971/photo?orgId=1234567890",
+                    "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015971/photo?orgId=123456",
                     "name" : "user 3",
                     "id" : "7000000015971",
                     "label" : {
@@ -1108,11 +1997,11 @@
                       },
                       "name" : "Admin",
                       "id" : "6000000158001",
-                      "logoUrl" : "https://desk.example.com/portal/api/publicImages/6000000158231?orgId=1234567890"
+                      "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/6000000158231?orgId=123456"
                     },
                     "type" : [ "AGENT" ]
                   }, {
-                    "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015972/photo?orgId=1234567890",
+                    "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015972/photo?orgId=123456",
                     "name" : "user 2",
                     "id" : "7000000015972",
                     "label" : {
@@ -1123,11 +2012,11 @@
                       },
                       "name" : "Admin",
                       "id" : "6000000158001",
-                      "logoUrl" : "https://desk.example.com/portal/api/publicImages/6000000158231?orgId=1234567890"
+                      "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/6000000158231?orgId=123456"
                     },
                     "type" : [ "AGENT" ]
                   }, {
-                    "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015971/photo?orgId=1234567890",
+                    "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015971/photo?orgId=123456",
                     "name" : "user 3",
                     "id" : "7000000015971",
                     "label" : {
@@ -1138,11 +2027,11 @@
                       },
                       "name" : "Admin",
                       "id" : "6000000158001",
-                      "logoUrl" : "https://desk.example.com/portal/api/publicImages/6000000158231?orgId=1234567890"
+                      "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/6000000158231?orgId=123456"
                     },
                     "type" : "AGENT"
                   }, {
-                    "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015972/photo?orgId=1234567890",
+                    "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015972/photo?orgId=123456",
                     "name" : "user 2",
                     "id" : "7000000015972",
                     "label" : {
@@ -1153,7 +2042,7 @@
                       },
                       "name" : "Admin",
                       "id" : "6000000158001",
-                      "logoUrl" : "https://desk.example.com/portal/api/publicImages/6000000158231?orgId=1234567890"
+                      "logoUrl" : "https://desk.zoho.com/portal/api/publicImages/6000000158231?orgId=123456"
                     },
                     "type" : "AGENT"
                   } ]
@@ -1168,7 +2057,7 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "ref" : "#/components/schemas/communityGetCategoryJSON"
+              "$ref" : "#/components/schemas/communityGetCategoryJSON"
             },
             "examples" : {
               "Valid responses Definitions" : {
@@ -1184,22 +2073,22 @@
                   "moderators" : [ {
                     "id" : "7000000015971",
                     "name" : "user 2",
-                    "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015971/photo?orgId=1234567890",
+                    "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015971/photo?orgId=123456",
                     "type" : [ "AGENT" ]
                   }, {
                     "id" : "7000000015972",
                     "name" : "user 3",
-                    "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015972/photo?orgId=1234567890",
+                    "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015972/photo?orgId=123456",
                     "type" : [ "AGENT" ]
                   }, {
                     "id" : "7000000015971",
                     "name" : "user 2",
-                    "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015971/photo?orgId=1234567890",
+                    "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015971/photo?orgId=123456",
                     "type" : "AGENT"
                   }, {
                     "id" : "7000000015972",
                     "name" : "user 3",
-                    "photoUrl" : "https://desk.example.com/api/v1/agents/7000000015972/photo?orgId=1234567890",
+                    "photoUrl" : "https://desk.zoho.com/api/v1/agents/7000000015972/photo?orgId=123456",
                     "type" : "AGENT"
                   } ],
                   "canAutoConvertTicket" : true,
@@ -1225,7 +2114,7 @@
                   "permissions" : [ "POST", "RESPOND" ],
                   "associatedDepartmentIds" : [ "20628000000020011" ],
                   "deparmentIdForTicketCreation" : "20628000000020011",
-                  "childs" : [ {
+                  "child" : [ {
                     "isFollowing" : false,
                     "photoUrl" : null,
                     "child" : [ ],
@@ -1267,6 +2156,95 @@
         }
       }
     },
+    "requestBodies" : {
+      "addSecondaryPermalinkJSON" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "useOldPermalinkForRedirection" : {
+                  "type" : [ "boolean", "null" ],
+                  "description" : "Indicates whether the current primary permalink must be used for redirection. Possible values: true = Add the primary permalink to the 301 redirect list, false = Overwrite the primary permalink."
+                },
+                "permalink" : {
+                  "type" : [ "string", "null" ],
+                  "description" : "Permalink of the category or forum.",
+                  "maxLength" : 100,
+                  "pattern" : "[A-Za-z0-9%\\-+\\/=\\P{InBasicLatin}]+",
+                  "x-regex-name" : "permalink"
+                }
+              },
+              "required" : [ "permalink", "useOldPermalinkForRedirection" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "useOldPermalinkForRedirection" : "false",
+                  "permalink" : "new-dep-updated-permalink"
+                }
+              }
+            }
+          }
+        }
+      },
+      "addCommunityCategoryRequest" : {
+        "description" : "Request body for creating a community category or forum.",
+        "required" : true,
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/addCommunityCategoryRequest"
+            }
+          }
+        }
+      },
+      "updateCommunityCategoryRequest" : {
+        "description" : "Request body for updating a community category or forum.",
+        "required" : true,
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/updateCommunityCategoryRequest"
+            }
+          }
+        }
+      },
+      "sortCategoriesRequest" : {
+        "description" : "Request body for sorting community categories.",
+        "required" : true,
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/sortCategoriesRequest"
+            }
+          }
+        }
+      },
+      "sortForumsRequest" : {
+        "description" : "Request body for sorting forums within a category.",
+        "required" : true,
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/sortForumsRequest"
+            }
+          }
+        }
+      },
+      "deletePermalinkRequest" : {
+        "description" : "Request body for deleting a secondary permalink.",
+        "required" : true,
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/deletePermalinkRequest"
+            }
+          }
+        }
+      }
+    },
     "securitySchemes" : {
       "cookie-auth" : {
         "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
@@ -1276,7 +2254,11 @@
       },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "CommunityCategory"
 }

@@ -8,14 +8,14 @@
     "/api/v1/groupContactDuplicateValues" : {
       "get" : {
         "tags" : [ "ContactDeduplication" ],
-        "summary" : "List duplicate contacts",
-        "description" : "This API lists the duplicate entries of a contact.The _fieldName_ parameters is mandatory in the API request <br/></br/>_Note:_<br/> If you encounter a 202 status code while executing this API request, it means there are 100,000 or more contacts in the help desk portal. Matching the records and finding duplicates will be time-consuming in such a scenario. Therefore, the deduplication request will be accepted, and after the process is completed, an automated report will be sent to the user who initiated the deduplication.",
+        "summary" : "Get Duplicate Contact Groups",
+        "description" : "Retrieves duplicate contact groups, with pagination support.\n\n**Note:** If this API returns a `202` status code, there are `100,000` or more contacts in the help desk portal. In that scenario, the deduplication request is accepted and an automated report is sent to the user who initiated the request after processing completes.",
         "operationId" : "getDuplicateContactFieldValueCounts",
         "parameters" : [ {
           "name" : "fieldName",
           "in" : "query",
-          "description" : "Name of the field whose values must be matched for deduplication.Values allowed are: !@firstName,@! !@lastName,@! !@email,@! !@secondaryEmail,@! !@phone,@! !@fullName,@! and !@bothEmail.@!",
-          "required" : false,
+          "description" : "Name of the field whose values must be matched for deduplication. Possible values: firstName, lastName, email, secondaryEmail, phone, fullName, bothEmail",
+          "required" : true,
           "style" : "form",
           "explode" : true,
           "schema" : {
@@ -65,7 +65,7 @@
         }, {
           "name" : "sortBy",
           "in" : "query",
-          "description" : "Key that sorts the contacts by a specific attribute: @count@ or @fieldValue@. The default sorting order is ascending. A @-@ prefix denotes descending order of sorting",
+          "description" : "Sorts contacts by the specified attribute. Possible values: count, fieldValue. Default sorting order is ascending. Prefix with - for descending.",
           "required" : false,
           "style" : "form",
           "explode" : true,
@@ -99,8 +99,8 @@
     "/api/v1/contactsDeduplication/defaultFieldName" : {
       "get" : {
         "tags" : [ "ContactDeduplication" ],
-        "summary" : "Get name of default field",
-        "description" : "This API fetches the name of the field set as the default field for contact deduplication.",
+        "summary" : "Get Default Deduplication Field Name",
+        "description" : "Retrieves the name of the field set as the default field for contact deduplication.",
         "operationId" : "getDefaultFieldNameForContactDeduplication",
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -116,8 +116,8 @@
       },
       "post" : {
         "tags" : [ "ContactDeduplication" ],
-        "summary" : "Set default field for contact deduplication",
-        "description" : "This API sets the field you specify as the default field for deduplicating contacts.",
+        "summary" : "Update Default Deduplication Field",
+        "description" : "Updates the default field used for contact deduplication.",
         "operationId" : "setDefaultFieldNameForContactDeduplication",
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -144,13 +144,13 @@
     "/api/v1/groupContacts" : {
       "get" : {
         "tags" : [ "ContactDeduplication" ],
-        "summary" : "List details of duplicate contacts",
-        "description" : "This API lists all the details of duplicate contacts.The _fieldName_ and _fieldValues_ parameters are mandatory in the API request",
+        "summary" : "Get Duplicate Contact Details",
+        "description" : "Retrieves details of duplicate contacts, with pagination support.",
         "operationId" : "listGroupedDuplicateContacts",
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
-          "description" : "Secondary information related to the contact. Value allowed is: @accounts@",
+          "description" : "Additional information to include in the response. Possible values: accounts",
           "required" : false,
           "style" : "form",
           "explode" : true,
@@ -162,7 +162,7 @@
         }, {
           "name" : "fieldName",
           "in" : "query",
-          "description" : "Name of the field whose values must be matched for deduplication.Values allowed are: !@firstName,@! !@lastName,@! !@email,@! !@secondaryEmail,@! !@phone,@! !@fullName,@! and !@bothEmail.@!",
+          "description" : "Name of the field whose values must be matched for deduplication. Possible values: firstName, lastName, email, secondaryEmail, phone, fullName, bothEmail",
           "required" : true,
           "style" : "form",
           "explode" : true,
@@ -188,7 +188,7 @@
         }, {
           "name" : "sortBy",
           "in" : "query",
-          "description" : "Key that sorts the contacts by a specific attribute:  !@firstName,@! !@lastName,@! !@fullName,@! !@phone,@! !@email,@! !@account,@! !@createdTime,@! !@modifiedTime@!",
+          "description" : "Sorts contacts by the specified attribute. Possible values: firstName, lastName, fullName, phone, email, account, createdTime, modifiedTime",
           "required" : false,
           "style" : "form",
           "explode" : true,
@@ -248,12 +248,14 @@
           "count" : {
             "type" : [ "string", "integer", "null" ],
             "format" : "int32",
-            "pattern" : "([0-9]+)"
+            "pattern" : "([0-9]+)",
+            "description" : "Number of duplicate contacts for the field value"
           },
           "fieldValue" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Field value shared by the duplicate contacts"
           }
         },
         "required" : [ "count", "fieldValue" ]
@@ -277,10 +279,12 @@
           "fieldValue" : {
             "type" : [ "string", "null" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "minLength" : 0,
+            "description" : "Value used to identify duplicate contact groups"
           },
           "contacts" : {
-            "$ref" : "#/components/schemas/contactsArray"
+            "$ref" : "#/components/schemas/contactsArray",
+            "description" : "List of contacts that share the same deduplication value"
           }
         },
         "required" : [ "contacts", "fieldValue" ]
@@ -302,7 +306,8 @@
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "#/components/schemas/counts"
+                  "$ref" : "#/components/schemas/counts",
+                  "description" : "List of duplicate contact group entries"
                 }
               },
               "required" : [ "data" ]
@@ -315,7 +320,7 @@
                     "fieldValue" : "Jade"
                   }, {
                     "count" : 2,
-                    "fieldValue" : "William"
+                    "fieldValue" : "saran"
                   } ]
                 }
               }
@@ -333,7 +338,8 @@
               "properties" : {
                 "fieldName" : {
                   "type" : [ "string", "null" ],
-                  "enum" : [ "firstName", "lastName", "email", "secondaryEmail", "phone", "fullName", "bothEmail", null ]
+                  "enum" : [ "firstName", "lastName", "email", "secondaryEmail", "phone", "fullName", "bothEmail", null ],
+                  "description" : "Name of the default field used for contact deduplication"
                 }
               },
               "required" : [ "fieldName" ]
@@ -370,24 +376,29 @@
                             "website" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 120,
-                              "minLength" : 0
+                              "minLength" : 0,
+                              "description" : "Website of the account"
                             },
                             "accountName" : {
                               "type" : [ "string", "null" ],
                               "maxLength" : 200,
-                              "minLength" : 0
+                              "minLength" : 0,
+                              "description" : "Name of the account"
                             },
                             "id" : {
                               "type" : [ "string", "integer", "null" ],
                               "format" : "int64",
-                              "pattern" : "([0-9]+)"
+                              "pattern" : "([0-9]+)",
+                              "description" : "Unique ID of the account"
                             }
                           },
-                          "required" : [ "accountName", "id", "website" ]
+                          "required" : [ "accountName", "id", "website" ],
+                          "description" : "Account details associated with the contact"
                         }
                       },
                       "additionalProperties" : false
-                    }
+                    },
+                    "description" : "List of duplicate contact detail entries"
                   }
                 },
                 "additionalProperties" : false
@@ -396,11 +407,13 @@
                 "additionalProperties" : false,
                 "properties" : {
                   "data" : {
-                    "$ref" : "#/components/schemas/duplicateResponseData"
+                    "$ref" : "#/components/schemas/duplicateResponseData",
+                    "description" : "List of duplicate contact detail entries"
                   }
                 },
                 "required" : [ "data" ]
-              } ]
+              } ],
+              "type" : "object"
             },
             "examples" : {
               "Valid responses Definitions" : {
@@ -414,9 +427,9 @@
                       "type" : null,
                       "accountId" : "1892000000091433",
                       "firstName" : "Jonathan",
-                      "photoURL" : "https://desk.example.com/api/v1/contacts/1892000000772003/photo",
+                      "photoURL" : "https://desk.zoho.com/api/v1/contacts/1892000000772003/photo",
                       "phone" : "555555",
-                      "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Contacts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
+                      "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Contacts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
                       "createdTime" : 1507813910000,
                       "zohoCRMContact" : null,
                       "id" : "1892000000772003",
@@ -433,10 +446,10 @@
                       "ownerId" : null,
                       "type" : null,
                       "accountId" : "1892000000052077",
-                      "firstName" : "Chris",
+                      "firstName" : "Christ",
                       "photoURL" : null,
                       "phone" : null,
-                      "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Contacts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
+                      "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Contacts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
                       "createdTime" : 1507813910000,
                       "zohoCRMContact" : {
                         "id" : "1892000000772030",
@@ -459,10 +472,10 @@
                       "ownerId" : null,
                       "type" : null,
                       "accountId" : "1892000000091433",
-                      "firstName" : "Chris",
-                      "photoURL" : "https://desk.example.com/api/v1/contacts/1892000000772003/photo",
+                      "firstName" : "Christ",
+                      "photoURL" : "https://desk.zoho.com/api/v1/contacts/1892000000772003/photo",
                       "phone" : "555555",
-                      "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Contacts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
+                      "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Contacts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
                       "createdTime" : 1507813910000,
                       "zohoCRMContact" : null,
                       "id" : "1892000000772003",
@@ -479,10 +492,10 @@
                       "ownerId" : null,
                       "type" : null,
                       "accountId" : "1892000000052077",
-                      "firstName" : "Chris",
+                      "firstName" : "Christ",
                       "photoURL" : null,
                       "phone" : null,
-                      "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Contacts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
+                      "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Contacts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
                       "createdTime" : 1507813910000,
                       "zohoCRMContact" : {
                         "id" : "1892000000772030",
@@ -516,10 +529,12 @@
                 "fieldName" : {
                   "type" : [ "string" ],
                   "enum" : [ "firstName", "lastName", "email", "secondaryEmail", "phone", "fullName", "bothEmail" ],
-                  "pattern" : "^(firstName|lastName|email|secondaryEmail|phone|fullName|bothEmail)"
+                  "pattern" : "^(firstName|lastName|email|secondaryEmail|phone|fullName|bothEmail)",
+                  "description" : "Name of the default deduplication field. Possible values: firstName, lastName, email, secondaryEmail, phone, fullName, bothEmail"
                 },
                 "markDefault" : {
-                  "type" : [ "boolean" ]
+                  "type" : [ "boolean" ],
+                  "description" : "Marks the given field as default or removes the field from the default"
                 }
               },
               "required" : [ "fieldName", "markDefault" ]
@@ -547,5 +562,6 @@
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "ContactDeduplication"
 }

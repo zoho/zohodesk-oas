@@ -1,0 +1,3439 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "RoundRobin",
+    "version" : "1.0.0",
+    "description" : "Round robin rules automatically assign incoming tickets to your agents in a series to balance workloads and improve response times."
+  },
+  "paths" : {
+    "/api/v1/roundRobinRules" : {
+      "get" : {
+        "tags" : [ "RoundRobin" ],
+        "summary" : "Get Round Robin Rules",
+        "description" : "Retrieves round robin rules for the specified department, with pagination support.",
+        "operationId" : "getRoundRobinRules",
+        "parameters" : [ {
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "Unique ID of the department",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the department"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of rules to retrieve",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int32",
+            "description" : "Number of rules to retrieve",
+            "maximum" : 50,
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "default" : 50
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number from which the rules must be fetched",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int32",
+            "description" : "Index number from which the rules must be fetched",
+            "pattern" : "([0-9]+)",
+            "default" : 1
+          }
+        }, {
+          "name" : "status",
+          "in" : "query",
+          "description" : "Filters rules by status. Possible values: ACTIVE, INACTIVE",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "description" : "Filters rules by status. Possible values: ACTIVE, INACTIVE",
+            "enum" : [ "ACTIVE", "INACTIVE" ],
+            "maxLength" : 100
+          }
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/rulesListViewResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.automations.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
+        } ]
+      },
+      "post" : {
+        "tags" : [ "RoundRobin" ],
+        "summary" : "Create Round Robin Rule",
+        "description" : "Creates a round robin rule.",
+        "operationId" : "createRoundRobinRule",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/createRoundRobinRulesRequestBody"
+        },
+        "responses" : {
+          "201" : {
+            "$ref" : "#/components/responses/createRoundRobinRulesResponse"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/unprocessableEntityErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.automations.CREATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.CREATE" ]
+        } ]
+      }
+    },
+    "/api/v1/roundRobinRules/executionStatus" : {
+      "get" : {
+        "tags" : [ "RoundRobin" ],
+        "summary" : "Get Round Robin Rules Execution Status",
+        "description" : "Retrieves the round robin rules execution status for the specified department.",
+        "operationId" : "getRoundRobinExecutionStatus",
+        "parameters" : [ {
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "Unique ID of the department",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the department"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/executionStatusInput"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.automations.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
+        } ]
+      },
+      "put" : {
+        "tags" : [ "RoundRobin" ],
+        "summary" : "Update Round Robin Rules Execution Status",
+        "description" : "Updates the round robin rules execution status for a department.",
+        "operationId" : "updateRoundRobinExecutionStatus",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/executionStatusInput"
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.automations.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+        } ]
+      }
+    },
+    "/api/v1/roundRobinRules/reorder" : {
+      "post" : {
+        "tags" : [ "RoundRobin" ],
+        "summary" : "Reorder Round Robin Rules",
+        "description" : "Reorders round robin rules in a department.",
+        "operationId" : "reorderRoundRobinRules",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/ruleIdsToReorderPayload"
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.automations.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+        } ]
+      }
+    },
+    "/api/v1/roundRobinRules/{ruleId}" : {
+      "get" : {
+        "tags" : [ "RoundRobin" ],
+        "summary" : "Get Round Robin Rule",
+        "description" : "Retrieves details of a specific round robin rule.",
+        "operationId" : "getRoundRobinRule",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        }, {
+          "name" : "ruleId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the round robin rule"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/ruleJson"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.automations.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
+        } ]
+      },
+      "put" : {
+        "tags" : [ "RoundRobin" ],
+        "summary" : "Update Round Robin Rule",
+        "description" : "Updates a round robin rule.",
+        "operationId" : "updateRoundRobinRule",
+        "parameters" : [ {
+          "name" : "ruleId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the round robin rule"
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/updateRoundRobinRulesRequestBody"
+        },
+        "responses" : {
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/unprocessableEntityErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/updateRoundRobinRulesResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.automations.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+        } ]
+      },
+      "patch" : {
+        "tags" : [ "RoundRobin" ],
+        "summary" : "Update Round Robin Rule",
+        "description" : "Updates a round robin rule.",
+        "operationId" : "patchRoundRobinRule",
+        "parameters" : [ {
+          "name" : "ruleId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the round robin rule"
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/patchRoundRobinRulesRequestBody"
+        },
+        "responses" : {
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/unprocessableEntityErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/patchRoundRobinRulesResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.automations.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+        } ]
+      }
+    },
+    "/api/v1/roundRobinRules/{ruleId}/targets" : {
+      "post" : {
+        "tags" : [ "RoundRobin" ],
+        "summary" : "Create Round Robin Rule Target",
+        "description" : "Creates a target for a round robin rule.",
+        "operationId" : "createRoundRobinRuleTarget",
+        "parameters" : [ {
+          "name" : "ruleId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the round robin rule"
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/createRoundRobinRulesTargetRequestBody"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/createRoundRobinRulesTargetResponse"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/unprocessableEntityErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.automations.CREATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.CREATE" ]
+        } ]
+      }
+    },
+    "/api/v1/roundRobinRules/{ruleId}/targets/{targetId}" : {
+      "put" : {
+        "tags" : [ "RoundRobin" ],
+        "summary" : "Update Round Robin Rule Target",
+        "description" : "Updates a specific target in a round robin rule.",
+        "operationId" : "updateRoundRobinRuleTarget",
+        "parameters" : [ {
+          "name" : "ruleId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the round robin rule"
+        }, {
+          "name" : "targetId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the target"
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/updateRoundRobinRulesTargetRequestBody"
+        },
+        "responses" : {
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/unprocessableEntityErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/updateRoundRobinRulesTargetResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.automations.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+        } ]
+      },
+      "patch" : {
+        "tags" : [ "RoundRobin" ],
+        "summary" : "Update Round Robin Rule Target",
+        "description" : "Updates a specific target in a round robin rule.",
+        "operationId" : "patchRoundRobinRuleTarget",
+        "parameters" : [ {
+          "name" : "ruleId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the round robin rule"
+        }, {
+          "name" : "targetId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "description" : "Unique ID of the target"
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/patchRoundRobinRulesTargetRequestBody"
+        },
+        "responses" : {
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/unprocessableEntityErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/patchRoundRobinRulesTargetResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.automations.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+        } ]
+      }
+    },
+    "/api/v1/roundRobinRules/criteriaFields" : {
+      "get" : {
+        "tags" : [ "RoundRobin" ],
+        "summary" : "Get Round Robin Rule Criteria Fields",
+        "description" : "Retrieves the fields allowed in criteria for round robin rules for the specified department.",
+        "operationId" : "getRoundRobinRulesCriteriaFields",
+        "parameters" : [ {
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "Unique ID of the department",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the department"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/getRoundRobinRulesCriteriaFieldsResponse"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "401" : {
+            "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
+          },
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/unprocessableEntityErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.automations.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
+        } ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "ruleJson" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "modifiedTime" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+            "description" : "Timestamp when the round robin rule was last modified"
+          },
+          "orderId" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)",
+            "description" : "Display order of the round robin rule"
+          },
+          "createdBy" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "ID of the user who created the round robin rule"
+          },
+          "departmentId" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the department associated with the round robin rule"
+          },
+          "name" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+            "description" : "Name of the rule"
+          },
+          "description" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 32000,
+            "minLength" : 0,
+            "description" : "Description of the round robin rule"
+          },
+          "createdTime" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+            "description" : "Timestamp when the round robin rule was created"
+          },
+          "modifiedBy" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "ID of the user who last modified the round robin rule"
+          },
+          "ruleId" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the round robin rule"
+          },
+          "executeOn" : {
+            "type" : [ "array", "null" ],
+            "items" : {
+              "type" : [ "string", "null" ],
+              "enum" : [ "CREATE", "EDIT" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "uniqueItems" : false,
+            "description" : "Execution events configured for the rule"
+          },
+          "targets" : {
+            "$ref" : "./RoundRobinTarget.json#/components/schemas/targetList",
+            "description" : "List of target configurations for the rule"
+          },
+          "status" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "ACTIVE", "INACTIVE" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "description" : "Current status of the rule. Possible values: ACTIVE, INACTIVE"
+          }
+        },
+        "required" : [ "createdBy", "createdTime", "departmentId", "description", "executeOn", "modifiedBy", "modifiedTime", "name", "orderId", "ruleId", "status", "targets" ]
+      },
+      "ruleList" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/ruleJson"
+        }
+      },
+      "ruleIdsToReorder" : {
+        "type" : "array",
+        "items" : {
+          "type" : [ "string", "integer" ],
+          "format" : "int64",
+          "pattern" : "([0-9]+)"
+        },
+        "description" : "ID(s) of the round robin rule(s) in the required order"
+      }
+    },
+    "responses" : {
+      "rulesListViewResponse" : {
+        "description" : "rulesListViewResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "#/components/schemas/ruleList",
+                  "description" : "List of round robin rule entries"
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "data" : [ {
+                    "departmentId" : 4000000007235,
+                    "name" : "Assign to support reps",
+                    "description" : "To assign tickets to agents who are online in mail",
+                    "targets" : [ {
+                      "agentIds" : [ 4000000007723, 4000000007865 ],
+                      "targetId" : 4000000007347,
+                      "criteria" : {
+                        "fieldConditions" : [ {
+                          "condition" : "is open",
+                          "fieldName" : "Status",
+                          "fieldModule" : "tickets",
+                          "value" : [ "${OPEN}" ]
+                        } ],
+                        "pattern" : "(1)"
+                      },
+                      "agentIdsToExclude" : [ ],
+                      "assigneeType" : "AGENT",
+                      "assignmentType" : "LoadBalance"
+                    } ],
+                    "status" : "ACTIVE",
+                    "ruleId" : 4000000004532,
+                    "createdBy" : 4000000001001,
+                    "createdTime" : "2024-01-15T09:30:00.000Z",
+                    "modifiedBy" : 4000000001001,
+                    "modifiedTime" : "2024-06-10T14:20:00.000Z",
+                    "orderId" : 1,
+                    "executeOn" : [ "CREATE", "EDIT" ]
+                  }, {
+                    "departmentId" : 4000000007235,
+                    "name" : "Assign to leads",
+                    "description" : "To assign tickets to all the leads",
+                    "targets" : [ {
+                      "targetId" : 4000000007349,
+                      "criteria" : {
+                        "fieldConditions" : [ {
+                          "condition" : "is open",
+                          "fieldName" : "Status",
+                          "fieldModule" : "tickets",
+                          "value" : [ "${OPEN}" ]
+                        } ],
+                        "pattern" : "(1)"
+                      },
+                      "teamId" : 4000000000423,
+                      "agentIdsToExclude" : [ 4000000007723, 4000000007865 ],
+                      "assigneeType" : "TEAM",
+                      "assignmentType" : "LoadBalance"
+                    } ],
+                    "status" : "ACTIVE",
+                    "ruleId" : 4000000004539,
+                    "createdBy" : 4000000001002,
+                    "createdTime" : "2024-02-20T11:00:00.000Z",
+                    "modifiedBy" : 4000000001002,
+                    "modifiedTime" : "2024-07-01T08:45:00.000Z",
+                    "orderId" : 2,
+                    "executeOn" : [ "CREATE" ]
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "executionStatusInput" : {
+        "description" : "executionStatusInput template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "departmentId" : {
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)",
+                  "description" : "Unique ID of the department"
+                },
+                "status" : {
+                  "type" : [ "string", "null" ],
+                  "enum" : [ "ACTIVE", "INACTIVE" ],
+                  "maxLength" : 100,
+                  "minLength" : 0,
+                  "description" : "Current execution status of round robin rules. Possible values: ACTIVE, INACTIVE"
+                }
+              },
+              "required" : [ "departmentId", "status" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "departmentId" : "10000000010762",
+                  "status" : "ACTIVE"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ruleJson" : {
+        "description" : "ruleJson template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "modifiedTime" : {
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 100,
+                  "minLength" : 0,
+                  "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+                  "description" : "Timestamp when the round robin rule was last modified"
+                },
+                "orderId" : {
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int32",
+                  "pattern" : "([0-9]+)",
+                  "description" : "Display order of the round robin rule"
+                },
+                "createdBy" : {
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)",
+                  "description" : "ID of the user who created the round robin rule"
+                },
+                "departmentId" : {
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)",
+                  "description" : "Unique ID of the department associated with the round robin rule"
+                },
+                "name" : {
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 50,
+                  "minLength" : 0,
+                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+                  "description" : "Name of the rule"
+                },
+                "description" : {
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 32000,
+                  "minLength" : 0,
+                  "description" : "Description of the round robin rule"
+                },
+                "createdTime" : {
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 100,
+                  "minLength" : 0,
+                  "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+                  "description" : "Timestamp when the round robin rule was created"
+                },
+                "modifiedBy" : {
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)",
+                  "description" : "ID of the user who last modified the round robin rule"
+                },
+                "ruleId" : {
+                  "type" : [ "string", "integer", "null" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)",
+                  "description" : "Unique ID of the round robin rule"
+                },
+                "executeOn" : {
+                  "type" : [ "array", "null" ],
+                  "items" : {
+                    "type" : [ "string", "null" ],
+                    "enum" : [ "CREATE", "EDIT" ],
+                    "maxLength" : 100,
+                    "minLength" : 0
+                  },
+                  "uniqueItems" : false,
+                  "description" : "Execution events configured for the rule"
+                },
+                "targets" : {
+                  "$ref" : "./RoundRobinTarget.json#/components/schemas/targetList",
+                  "description" : "List of target configurations for the rule"
+                },
+                "status" : {
+                  "type" : [ "string", "null" ],
+                  "enum" : [ "ACTIVE", "INACTIVE" ],
+                  "maxLength" : 100,
+                  "minLength" : 0,
+                  "description" : "Current status of the rule. Possible values: ACTIVE, INACTIVE"
+                }
+              },
+              "required" : [ "createdBy", "createdTime", "departmentId", "description", "executeOn", "modifiedBy", "modifiedTime", "name", "orderId", "ruleId", "status", "targets" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "departmentId" : 4000000007235,
+                  "name" : "Assign to support reps",
+                  "description" : "To assign tickets to agents who are online in mail",
+                  "targets" : [ {
+                    "targetId" : 4000000007347,
+                    "criteria" : {
+                      "fieldConditions" : [ {
+                        "condition" : "is open",
+                        "fieldName" : "Status",
+                        "fieldModule" : "tickets",
+                        "value" : [ "${OPEN}" ]
+                      } ],
+                      "pattern" : "(1)"
+                    },
+                    "teamId" : 4000000000423,
+                    "agentIdsToExclude" : [ 4000000007723, 4000000007865 ],
+                    "assigneeType" : "TEAM",
+                    "assignmentType" : "LoadBalance"
+                  } ],
+                  "status" : "ACTIVE",
+                  "ruleId" : 4000000004532,
+                  "createdBy" : 4000000001001,
+                  "createdTime" : "2024-01-15T09:30:00.000Z",
+                  "modifiedBy" : 4000000001001,
+                  "modifiedTime" : "2024-06-10T14:20:00.000Z",
+                  "orderId" : 1,
+                  "executeOn" : [ "CREATE", "EDIT" ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "createRoundRobinRulesResponse" : {
+        "$ref" : "#/components/responses/ruleJson"
+      },
+      "updateRoundRobinRulesResponse" : {
+        "$ref" : "#/components/responses/ruleJson"
+      },
+      "patchRoundRobinRulesResponse" : {
+        "$ref" : "#/components/responses/ruleJson"
+      },
+      "createRoundRobinRulesTargetResponse" : {
+        "$ref" : "./RoundRobinTarget.json#/components/responses/targetJson"
+      },
+      "updateRoundRobinRulesTargetResponse" : {
+        "$ref" : "./RoundRobinTarget.json#/components/responses/targetJson"
+      },
+      "getRoundRobinRulesCriteriaFieldsResponse" : {
+        "description" : "getRoundRobinRulesCriteriaFieldsResponse response",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "null", "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "criteriaFields" : {
+                  "type" : [ "null", "array" ],
+                  "items" : {
+                    "type" : [ "null", "object" ],
+                    "additionalProperties" : false,
+                    "properties" : {
+                      "displayLabel" : {
+                        "type" : [ "string", "null" ],
+                        "maxLength" : 250,
+                        "minLength" : 0,
+                        "description" : "Display label of the criteria field group"
+                      },
+                      "name" : {
+                        "type" : [ "string", "null" ],
+                        "maxLength" : 250,
+                        "minLength" : 0,
+                        "description" : "API name of the criteria field group"
+                      },
+                      "fieldDetails" : {
+                        "type" : [ "null", "array" ],
+                        "items" : {
+                          "type" : [ "null", "object" ],
+                          "additionalProperties" : false,
+                          "properties" : {
+                            "availableConditions" : {
+                              "type" : [ "null", "array" ],
+                              "items" : {
+                                "type" : [ "null", "object" ],
+                                "additionalProperties" : false,
+                                "properties" : {
+                                  "condition" : {
+                                    "type" : [ "string", "null" ],
+                                    "maxLength" : 250,
+                                    "minLength" : 0,
+                                    "description" : "Condition label supported for the field"
+                                  },
+                                  "i18NCondition" : {
+                                    "type" : [ "string", "null" ],
+                                    "maxLength" : 250,
+                                    "minLength" : 0,
+                                    "description" : "Localized condition label"
+                                  },
+                                  "value" : {
+                                    "type" : [ "null", "array" ],
+                                    "items" : { },
+                                    "description" : "Allowed values or placeholder tokens for the condition. Note: For conditions such as between and not between, this can contain nested value lists"
+                                  }
+                                },
+                                "required" : [ "condition", "i18NCondition", "value" ]
+                              },
+                              "description" : "List of supported conditions for the criteria field"
+                            },
+                            "fieldLabel" : {
+                              "type" : [ "string", "null" ],
+                              "maxLength" : 250,
+                              "minLength" : 0,
+                              "description" : "Display label of the criteria field"
+                            },
+                            "i18NLabel" : {
+                              "type" : [ "string", "null" ],
+                              "maxLength" : 250,
+                              "minLength" : 0,
+                              "description" : "Localized display label of the criteria field"
+                            },
+                            "type" : {
+                              "type" : [ "string", "null" ],
+                              "maxLength" : 250,
+                              "minLength" : 0,
+                              "description" : "Data type of the criteria field"
+                            }
+                          },
+                          "required" : [ "availableConditions", "fieldLabel", "i18NLabel", "type" ]
+                        },
+                        "description" : "List of criteria field definitions in the group"
+                      }
+                    },
+                    "required" : [ "displayLabel", "fieldDetails", "name" ]
+                  },
+                  "description" : "List of criteria field groups available for round robin rules"
+                }
+              },
+              "required" : [ "criteriaFields" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "criteriaFields" : [ {
+                    "displayLabel" : "Contacts",
+                    "name" : "contacts",
+                    "fieldDetails" : [ {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "First Name",
+                      "i18NLabel" : "First Name",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Last Name",
+                      "i18NLabel" : "Last Name",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Email",
+                      "i18NLabel" : "Email",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Secondary Email",
+                      "i18NLabel" : "Secondary Email",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Phone",
+                      "i18NLabel" : "Phone",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Mobile",
+                      "i18NLabel" : "Mobile",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Type",
+                      "i18NLabel" : "Type",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Title",
+                      "i18NLabel" : "Title",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "customer", "potential", "contact", "lead" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "customer", "potential", "contact", "lead" ]
+                      } ],
+                      "fieldLabel" : "CRM Contact Type",
+                      "i18NLabel" : "CRM Contact Type",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "=",
+                        "i18NCondition" : "=",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "<>",
+                        "i18NCondition" : "<>",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "<",
+                        "i18NCondition" : "<",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "<=",
+                        "i18NCondition" : "<=",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : ">",
+                        "i18NCondition" : ">",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : ">=",
+                        "i18NCondition" : ">=",
+                        "value" : [ "${CUSTOM}" ]
+                      } ],
+                      "fieldLabel" : "Total Revenue To Get",
+                      "i18NLabel" : "Total Revenue To Get",
+                      "type" : "integer"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is after",
+                        "i18NCondition" : "is after",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is before",
+                        "i18NCondition" : "is before",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Closing Date",
+                      "i18NLabel" : "Closing Date",
+                      "type" : "date"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is after",
+                        "i18NCondition" : "is after",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is before",
+                        "i18NCondition" : "is before",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Customer Since",
+                      "i18NLabel" : "Customer Since",
+                      "type" : "date"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "=",
+                        "i18NCondition" : "=",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "<>",
+                        "i18NCondition" : "<>",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "<",
+                        "i18NCondition" : "<",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "<=",
+                        "i18NCondition" : "<=",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : ">",
+                        "i18NCondition" : ">",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : ">=",
+                        "i18NCondition" : ">=",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Total Revenue Recieved",
+                      "i18NLabel" : "Total Revenue Recieved",
+                      "type" : "integer"
+                    } ]
+                  }, {
+                    "displayLabel" : "Accounts",
+                    "name" : "accounts",
+                    "fieldDetails" : [ {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Phone",
+                      "i18NLabel" : "Phone",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Email",
+                      "i18NLabel" : "Email",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Country",
+                      "i18NLabel" : "Country",
+                      "type" : "text"
+                    } ]
+                  }, {
+                    "displayLabel" : "Tickets",
+                    "name" : "tickets",
+                    "fieldDetails" : [ {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Account Name",
+                      "i18NLabel" : "Account Name",
+                      "type" : "lookup"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Contact Name",
+                      "i18NLabel" : "Contact Name",
+                      "type" : "lookup"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Email",
+                      "i18NLabel" : "Email",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Phone",
+                      "i18NLabel" : "Phone",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Subject",
+                      "i18NLabel" : "Subject",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Description",
+                      "i18NLabel" : "Description",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is OPEN",
+                        "i18NCondition" : "is OPEN",
+                        "value" : [ "${OPEN}" ]
+                      }, {
+                        "condition" : "is ON HOLD",
+                        "i18NCondition" : "is ON HOLD",
+                        "value" : [ "${ONHOLD}" ]
+                      }, {
+                        "condition" : "is CLOSED",
+                        "i18NCondition" : "is CLOSED",
+                        "value" : [ "${CLOSED}" ]
+                      }, {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Status",
+                      "i18NLabel" : "Status",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Product Name",
+                      "i18NLabel" : "Product Name",
+                      "type" : "lookup"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Case Owner",
+                      "i18NLabel" : "Ticket Owner",
+                      "type" : "user"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Created By",
+                      "i18NLabel" : "Created By",
+                      "type" : "user"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Modified By",
+                      "i18NLabel" : "Modified By",
+                      "type" : "user"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CURRENTTIME}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CURRENTTIME}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is after",
+                        "i18NCondition" : "is after",
+                        "value" : [ "${CURRENTTIME}", "${DUEDATE}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is before",
+                        "i18NCondition" : "is before",
+                        "value" : [ "${CURRENTTIME}", "${DUEDATE}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "between",
+                        "i18NCondition" : "between",
+                        "value" : [ [ "${CURRENTTIME}", "${CUSTOM}" ], [ "${CURRENTTIME}", "${CUSTOM}" ] ]
+                      }, {
+                        "condition" : "not between",
+                        "i18NCondition" : "not between",
+                        "value" : [ [ "${CURRENTTIME}", "${CUSTOM}" ], [ "${CURRENTTIME}", "${CUSTOM}" ] ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Created Time",
+                      "i18NLabel" : "Created Time",
+                      "type" : "dateTime"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CURRENTTIME}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CURRENTTIME}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is after",
+                        "i18NCondition" : "is after",
+                        "value" : [ "${CURRENTTIME}", "${DUEDATE}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is before",
+                        "i18NCondition" : "is before",
+                        "value" : [ "${CURRENTTIME}", "${DUEDATE}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "between",
+                        "i18NCondition" : "between",
+                        "value" : [ [ "${CURRENTTIME}", "${CUSTOM}" ], [ "${CURRENTTIME}", "${CUSTOM}" ] ]
+                      }, {
+                        "condition" : "not between",
+                        "i18NCondition" : "not between",
+                        "value" : [ [ "${CURRENTTIME}", "${CUSTOM}" ], [ "${CURRENTTIME}", "${CUSTOM}" ] ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Case On Hold Time",
+                      "i18NLabel" : "Ticket On Hold Time",
+                      "type" : "dateTime"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CURRENTTIME}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CURRENTTIME}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is after",
+                        "i18NCondition" : "is after",
+                        "value" : [ "${CURRENTTIME}", "${DUEDATE}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is before",
+                        "i18NCondition" : "is before",
+                        "value" : [ "${CURRENTTIME}", "${DUEDATE}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "between",
+                        "i18NCondition" : "between",
+                        "value" : [ [ "${CURRENTTIME}", "${CUSTOM}" ], [ "${CURRENTTIME}", "${CUSTOM}" ] ]
+                      }, {
+                        "condition" : "not between",
+                        "i18NCondition" : "not between",
+                        "value" : [ [ "${CURRENTTIME}", "${CUSTOM}" ], [ "${CURRENTTIME}", "${CUSTOM}" ] ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Case Closed Time",
+                      "i18NLabel" : "Ticket Closed Time",
+                      "type" : "dateTime"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CURRENTTIME}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CURRENTTIME}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is after",
+                        "i18NCondition" : "is after",
+                        "value" : [ "${CURRENTTIME}", "${DUEDATE}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is before",
+                        "i18NCondition" : "is before",
+                        "value" : [ "${CURRENTTIME}", "${DUEDATE}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "between",
+                        "i18NCondition" : "between",
+                        "value" : [ [ "${CURRENTTIME}", "${CUSTOM}" ], [ "${CURRENTTIME}", "${CUSTOM}" ] ]
+                      }, {
+                        "condition" : "not between",
+                        "i18NCondition" : "not between",
+                        "value" : [ [ "${CURRENTTIME}", "${CUSTOM}" ], [ "${CURRENTTIME}", "${CUSTOM}" ] ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Modified Time",
+                      "i18NLabel" : "Modified Time",
+                      "type" : "dateTime"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "=",
+                        "i18NCondition" : "=",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "<>",
+                        "i18NCondition" : "<>",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "<",
+                        "i18NCondition" : "<",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "<=",
+                        "i18NCondition" : "<=",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : ">",
+                        "i18NCondition" : ">",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : ">=",
+                        "i18NCondition" : ">=",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Request Id",
+                      "i18NLabel" : "Ticket Id",
+                      "type" : "integer"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "To Address",
+                      "i18NLabel" : "To Address",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "=",
+                        "i18NCondition" : "=",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "<>",
+                        "i18NCondition" : "<>",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "<",
+                        "i18NCondition" : "<",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "<=",
+                        "i18NCondition" : "<=",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : ">",
+                        "i18NCondition" : ">",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : ">=",
+                        "i18NCondition" : ">=",
+                        "value" : [ "${CUSTOM}" ]
+                      } ],
+                      "fieldLabel" : "Thread Count",
+                      "i18NLabel" : "Number of Threads",
+                      "type" : "integer"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "=",
+                        "i18NCondition" : "=",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "<>",
+                        "i18NCondition" : "<>",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "<",
+                        "i18NCondition" : "<",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "<=",
+                        "i18NCondition" : "<=",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : ">",
+                        "i18NCondition" : ">",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : ">=",
+                        "i18NCondition" : ">=",
+                        "value" : [ "${CUSTOM}" ]
+                      } ],
+                      "fieldLabel" : "Comment Count",
+                      "i18NLabel" : "Number of Comments",
+                      "type" : "integer"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "Good", "Bad", "Okay" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "Good", "Bad", "Okay" ]
+                      }, {
+                        "condition" : "is received",
+                        "i18NCondition" : "is received"
+                      }, {
+                        "condition" : "is not received",
+                        "i18NCondition" : "is not received"
+                      }, {
+                        "condition" : "link provided",
+                        "i18NCondition" : "link provided"
+                      }, {
+                        "condition" : "link not provided",
+                        "i18NCondition" : "link not provided"
+                      } ],
+                      "fieldLabel" : "Happiness Rating",
+                      "i18NLabel" : "Happiness Rating",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "has agents",
+                        "i18NCondition" : "has agents",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Team",
+                      "i18NLabel" : "Team",
+                      "type" : "team"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CURRENTTIME}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CURRENTTIME}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is after",
+                        "i18NCondition" : "is after",
+                        "value" : [ "${CURRENTTIME}", "${DUEDATE}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is before",
+                        "i18NCondition" : "is before",
+                        "value" : [ "${CURRENTTIME}", "${DUEDATE}", "${CUSTOM}" ]
+                      }, {
+                        "condition" : "between",
+                        "i18NCondition" : "between",
+                        "value" : [ [ "${CURRENTTIME}", "${CUSTOM}" ], [ "${CURRENTTIME}", "${CUSTOM}" ] ]
+                      }, {
+                        "condition" : "not between",
+                        "i18NCondition" : "not between",
+                        "value" : [ [ "${CURRENTTIME}", "${CUSTOM}" ], [ "${CURRENTTIME}", "${CUSTOM}" ] ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Due Date",
+                      "i18NLabel" : "Due Date",
+                      "type" : "dateTime"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Priority",
+                      "i18NLabel" : "Priority",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Mode",
+                      "i18NLabel" : "Channel",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "true", "false" ]
+                      } ],
+                      "fieldLabel" : "Is Overdue",
+                      "i18NLabel" : "Is Overdue",
+                      "type" : "boolean"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "true", "false" ]
+                      } ],
+                      "fieldLabel" : "Is Escalated",
+                      "i18NLabel" : "Is Escalated",
+                      "type" : "boolean"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Classification",
+                      "i18NLabel" : "Classifications",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "isn't",
+                        "i18NCondition" : "isn't",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "starts with",
+                        "i18NCondition" : "starts with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "contains",
+                        "i18NCondition" : "contains",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "doesn't contain",
+                        "i18NCondition" : "doesn't contain",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "ends with",
+                        "i18NCondition" : "ends with",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is empty",
+                        "i18NCondition" : "is empty",
+                        "value" : [ "${EMPTY}" ]
+                      }, {
+                        "condition" : "is not empty",
+                        "i18NCondition" : "is not empty",
+                        "value" : [ "${NOTEMPTY}" ]
+                      } ],
+                      "fieldLabel" : "Resolution",
+                      "i18NLabel" : "Resolution",
+                      "type" : "text"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is Less Than",
+                        "i18NCondition" : "is Less Than",
+                        "value" : [ "${CUSTOM}" ]
+                      }, {
+                        "condition" : "is Greater Than",
+                        "i18NCondition" : "is Greater Than",
+                        "value" : [ "${CUSTOM}" ]
+                      } ],
+                      "fieldLabel" : "Time to Respond",
+                      "i18NLabel" : "Time to Respond",
+                      "type" : "integer"
+                    }, {
+                      "availableConditions" : [ {
+                        "condition" : "is",
+                        "i18NCondition" : "is",
+                        "value" : [ "true", "false" ]
+                      } ],
+                      "fieldLabel" : "Is Response Overdue",
+                      "i18NLabel" : "Is Response Overdue",
+                      "type" : "boolean"
+                    } ]
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "patchRoundRobinRulesTargetResponse" : {
+        "$ref" : "./RoundRobinTarget.json#/components/responses/targetJson"
+      }
+    },
+    "requestBodies" : {
+      "ruleIdsToReorderPayload" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "properties" : {
+                "ruleIds" : {
+                  "$ref" : "#/components/schemas/ruleIdsToReorder"
+                },
+                "departmentId" : {
+                  "type" : [ "string", "integer" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)",
+                  "description" : "Unique ID of the department associated with the round robin rules to reorder"
+                }
+              },
+              "required" : [ "departmentId", "ruleIds" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "departmentId" : 4000000007235,
+                  "ruleIds" : [ 4000000004076, 4000000004479, 4000000004506 ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "executionStatusInput" : {
+        "required" : true,
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "properties" : {
+                "departmentId" : {
+                  "type" : [ "string", "integer" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)",
+                  "description" : "Unique ID of the department"
+                },
+                "status" : {
+                  "type" : "string",
+                  "enum" : [ "ACTIVE", "INACTIVE" ],
+                  "maxLength" : 100,
+                  "description" : "Execution status of round robin rules. Possible values: ACTIVE, INACTIVE"
+                }
+              },
+              "required" : [ "departmentId", "status" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "departmentId" : "146284000000006907",
+                  "status" : "INACTIVE"
+                }
+              }
+            }
+          }
+        }
+      },
+      "createRoundRobinRulesRequestBody" : {
+        "description" : "createRoundRobinRulesRequestBody request body",
+        "required" : true,
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "properties" : {
+                "name" : {
+                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
+                  "type" : "string",
+                  "description" : "Name of the rule",
+                  "maxLength" : 100
+                },
+                "description" : {
+                  "type" : "string",
+                  "description" : "Description of the round robin rule",
+                  "maxLength" : 100
+                },
+                "departmentId" : {
+                  "type" : [ "string", "integer" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)",
+                  "description" : "Unique ID of the department associated with the round robin rule"
+                },
+                "executeOn" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "string",
+                    "enum" : [ "CREATE", "EDIT" ]
+                  },
+                  "description" : "Execution events configured for the rule"
+                },
+                "status" : {
+                  "type" : "string",
+                  "description" : "Status of the rule. Possible values: ACTIVE, INACTIVE",
+                  "enum" : [ "ACTIVE", "INACTIVE" ]
+                },
+                "targets" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "object",
+                    "additionalProperties" : false,
+                    "properties" : {
+                      "targetId" : {
+                        "type" : [ "string", "integer" ],
+                        "format" : "int64",
+                        "pattern" : "([0-9]+)",
+                        "description" : "Unique ID of the round robin target"
+                      },
+                      "criteria" : {
+                        "type" : "object",
+                        "additionalProperties" : false,
+                        "properties" : {
+                          "fieldConditions" : {
+                            "type" : "array",
+                            "items" : {
+                              "type" : "object",
+                              "additionalProperties" : false,
+                              "properties" : {
+                                "fieldName" : {
+                                  "type" : "string",
+                                  "maxLength" : 200,
+                                  "minLength" : 0,
+                                  "description" : "Name of the field used in the condition"
+                                },
+                                "value" : {
+                                  "type" : "array",
+                                  "items" : {
+                                    "type" : [ "string", "integer" ]
+                                  },
+                                  "description" : "Value(s) configured for the field condition"
+                                },
+                                "condition" : {
+                                  "type" : "string",
+                                  "description" : "Condition configured for the field"
+                                },
+                                "fieldModule" : {
+                                  "type" : "string",
+                                  "description" : "Module of the field condition"
+                                }
+                              },
+                              "required" : [ "condition", "fieldName" ]
+                            },
+                            "description" : "Field conditions configured for the target criteria"
+                          },
+                          "pattern" : {
+                            "type" : "string",
+                            "maxLength" : 200,
+                            "minLength" : 0,
+                            "description" : "Pattern used to evaluate the field conditions"
+                          }
+                        },
+                        "required" : [ "pattern", "fieldConditions" ],
+                        "description" : "Criteria configured for the round robin target"
+                      },
+                      "assignmentType" : {
+                        "type" : "string",
+                        "description" : "Assignment strategy used for the target. Possible values: LoadBalance, SkillBased, SequentialAssignment",
+                        "enum" : [ "LoadBalance", "SkillBased", "SequentialAssignment" ]
+                      },
+                      "assigneeType" : {
+                        "type" : "string",
+                        "description" : "Assignee type configured for the target. Possible values: AGENT, TEAM",
+                        "enum" : [ "AGENT", "TEAM" ]
+                      },
+                      "agentIds" : {
+                        "type" : "array",
+                        "items" : {
+                          "type" : [ "string", "integer" ],
+                          "format" : "int64",
+                          "pattern" : "([0-9]+)"
+                        },
+                        "description" : "List of agent IDs considered for assignment"
+                      },
+                      "teamId" : {
+                        "type" : [ "string", "integer" ],
+                        "format" : "int64",
+                        "pattern" : "([0-9]+)",
+                        "description" : "Unique ID of the team considered for assignment"
+                      },
+                      "agentIdsToExclude" : {
+                        "type" : "array",
+                        "items" : {
+                          "type" : [ "string", "integer" ],
+                          "format" : "int64",
+                          "pattern" : "([0-9]+)"
+                        },
+                        "description" : "List of agent IDs excluded from assignment in the specified team"
+                      }
+                    },
+                    "required" : [ "agentIds", "assigneeType", "assignmentType", "criteria" ]
+                  },
+                  "description" : "List of target configurations for the rule"
+                }
+              },
+              "required" : [ "departmentId", "executeOn", "name", "targets" ]
+            },
+            "examples" : {
+              "Valid request Definitions" : {
+                "value" : {
+                  "name" : "Assign to support reps",
+                  "description" : "To assign tickets to agents who are online in mail",
+                  "departmentId" : 4000000007235,
+                  "status" : "ACTIVE",
+                  "executeOn" : [ "CREATE" ],
+                  "targets" : [ {
+                    "criteria" : {
+                      "fieldConditions" : [ {
+                        "condition" : "is open",
+                        "fieldName" : "Status",
+                        "value" : [ "${OPEN}" ],
+                        "fieldModule" : "tickets"
+                      } ],
+                      "pattern" : "(1)"
+                    },
+                    "assignmentType" : "LoadBalance",
+                    "assigneeType" : "AGENT",
+                    "agentIds" : [ 4000000007723, 4000000007865 ]
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "updateRoundRobinRulesRequestBody" : {
+        "description" : "updateRoundRobinRulesRequestBody request body",
+        "required" : true,
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "properties" : {
+                "name" : {
+                  "type" : "string",
+                  "description" : "Name of the rule",
+                  "maxLength" : 100
+                },
+                "description" : {
+                  "type" : "string",
+                  "description" : "Description of the round robin rule",
+                  "maxLength" : 100
+                },
+                "departmentId" : {
+                  "type" : [ "string", "integer" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)",
+                  "description" : "Unique ID of the department associated with the round robin rule"
+                },
+                "executeOn" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "string",
+                    "enum" : [ "CREATE", "EDIT" ]
+                  },
+                  "description" : "Execution events configured for the rule"
+                },
+                "status" : {
+                  "type" : "string",
+                  "description" : "Status of the rule. Possible values: ACTIVE, INACTIVE",
+                  "enum" : [ "ACTIVE", "INACTIVE" ]
+                },
+                "targets" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "object",
+                    "additionalProperties" : false,
+                    "properties" : {
+                      "targetId" : {
+                        "type" : [ "string", "integer" ],
+                        "format" : "int64",
+                        "pattern" : "([0-9]+)",
+                        "description" : "Unique ID of the round robin target"
+                      },
+                      "criteria" : {
+                        "type" : "object",
+                        "additionalProperties" : false,
+                        "properties" : {
+                          "fieldConditions" : {
+                            "type" : "array",
+                            "items" : {
+                              "type" : "object",
+                              "additionalProperties" : false,
+                              "properties" : {
+                                "fieldName" : {
+                                  "type" : "string",
+                                  "maxLength" : 200,
+                                  "minLength" : 0,
+                                  "description" : "Name of the field used in the condition"
+                                },
+                                "value" : {
+                                  "type" : "array",
+                                  "items" : {
+                                    "type" : [ "string", "integer" ]
+                                  },
+                                  "description" : "Value(s) configured for the field condition"
+                                },
+                                "condition" : {
+                                  "type" : "string",
+                                  "description" : "Condition configured for the field"
+                                },
+                                "fieldModule" : {
+                                  "type" : "string",
+                                  "description" : "Module of the field condition"
+                                }
+                              },
+                              "required" : [ "condition", "fieldName" ]
+                            },
+                            "description" : "Field conditions configured for the target criteria"
+                          },
+                          "pattern" : {
+                            "type" : "string",
+                            "maxLength" : 200,
+                            "minLength" : 0,
+                            "description" : "Pattern used to evaluate the field conditions"
+                          }
+                        },
+                        "required" : [ "pattern", "fieldConditions" ],
+                        "description" : "Criteria configured for the round robin target"
+                      },
+                      "assignmentType" : {
+                        "type" : "string",
+                        "description" : "Assignment strategy used for the target. Possible values: LoadBalance, SkillBased, SequentialAssignment",
+                        "enum" : [ "LoadBalance", "SkillBased", "SequentialAssignment" ]
+                      },
+                      "assigneeType" : {
+                        "type" : "string",
+                        "description" : "Assignee type configured for the target. Possible values: AGENT, TEAM",
+                        "enum" : [ "AGENT", "TEAM" ]
+                      },
+                      "agentIds" : {
+                        "type" : "array",
+                        "items" : {
+                          "type" : [ "string", "integer" ],
+                          "format" : "int64",
+                          "pattern" : "([0-9]+)"
+                        },
+                        "description" : "List of agent IDs considered for assignment"
+                      },
+                      "teamId" : {
+                        "type" : [ "string", "integer" ],
+                        "format" : "int64",
+                        "pattern" : "([0-9]+)",
+                        "description" : "Unique ID of the team considered for assignment"
+                      },
+                      "agentIdsToExclude" : {
+                        "type" : "array",
+                        "items" : {
+                          "type" : [ "string", "integer" ],
+                          "format" : "int64",
+                          "pattern" : "([0-9]+)"
+                        },
+                        "description" : "List of agent IDs excluded from assignment in the specified team"
+                      }
+                    },
+                    "required" : [ "agentIds", "assigneeType", "assignmentType", "criteria" ]
+                  },
+                  "description" : "List of target configurations for the rule"
+                }
+              },
+              "required" : [ "departmentId", "executeOn", "name", "targets" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "name" : "Assign to support reps",
+                  "description" : "To assign tickets to agents who are online in mail",
+                  "departmentId" : 4000000007235,
+                  "status" : "ACTIVE",
+                  "executeOn" : [ "CREATE" ],
+                  "targets" : [ {
+                    "targetId" : 4000000007347,
+                    "criteria" : {
+                      "fieldConditions" : [ {
+                        "condition" : "is open",
+                        "fieldName" : "Status",
+                        "value" : [ "${OPEN}" ],
+                        "fieldModule" : "tickets"
+                      } ],
+                      "pattern" : "(1)"
+                    },
+                    "assignmentType" : "LoadBalance",
+                    "assigneeType" : "AGENT",
+                    "agentIds" : [ 4000000007723, 4000000007865 ]
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "patchRoundRobinRulesRequestBody" : {
+        "description" : "patchRoundRobinRulesRequestBody request body",
+        "required" : true,
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "properties" : {
+                "name" : {
+                  "type" : "string",
+                  "description" : "Name of the rule",
+                  "maxLength" : 100
+                },
+                "description" : {
+                  "type" : "string",
+                  "description" : "Description of the round robin rule",
+                  "maxLength" : 100
+                },
+                "departmentId" : {
+                  "type" : [ "string", "integer" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)",
+                  "description" : "Unique ID of the department associated with the round robin rule"
+                },
+                "executeOn" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "string",
+                    "enum" : [ "CREATE", "EDIT" ]
+                  },
+                  "description" : "Execution events configured for the rule"
+                },
+                "status" : {
+                  "type" : "string",
+                  "description" : "Status of the rule. Possible values: ACTIVE, INACTIVE",
+                  "enum" : [ "ACTIVE", "INACTIVE" ]
+                },
+                "targets" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "object",
+                    "additionalProperties" : false,
+                    "properties" : {
+                      "targetId" : {
+                        "type" : [ "string", "integer" ],
+                        "format" : "int64",
+                        "pattern" : "([0-9]+)",
+                        "description" : "Unique ID of the round robin target"
+                      },
+                      "criteria" : {
+                        "type" : "object",
+                        "additionalProperties" : false,
+                        "properties" : {
+                          "fieldConditions" : {
+                            "type" : "array",
+                            "items" : {
+                              "type" : "object",
+                              "additionalProperties" : false,
+                              "properties" : {
+                                "fieldName" : {
+                                  "type" : "string",
+                                  "maxLength" : 200,
+                                  "minLength" : 0,
+                                  "description" : "Name of the field used in the condition"
+                                },
+                                "value" : {
+                                  "type" : "array",
+                                  "items" : {
+                                    "type" : [ "string", "integer" ]
+                                  },
+                                  "description" : "Value(s) configured for the field condition"
+                                },
+                                "condition" : {
+                                  "type" : "string",
+                                  "description" : "Condition configured for the field"
+                                },
+                                "fieldModule" : {
+                                  "type" : "string",
+                                  "description" : "Module of the field condition"
+                                }
+                              },
+                              "required" : [ "condition", "fieldName" ]
+                            },
+                            "description" : "Field conditions configured for the target criteria"
+                          },
+                          "pattern" : {
+                            "type" : "string",
+                            "maxLength" : 200,
+                            "minLength" : 0,
+                            "description" : "Pattern used to evaluate the field conditions"
+                          }
+                        },
+                        "required" : [ "pattern", "fieldConditions" ],
+                        "description" : "Criteria configured for the round robin target"
+                      },
+                      "assignmentType" : {
+                        "type" : "string",
+                        "description" : "Assignment strategy used for the target. Possible values: LoadBalance, SkillBased, SequentialAssignment",
+                        "enum" : [ "LoadBalance", "SkillBased", "SequentialAssignment" ]
+                      },
+                      "assigneeType" : {
+                        "type" : "string",
+                        "description" : "Assignee type configured for the target. Possible values: AGENT, TEAM",
+                        "enum" : [ "AGENT", "TEAM" ]
+                      },
+                      "agentIds" : {
+                        "type" : "array",
+                        "items" : {
+                          "type" : [ "string", "integer" ],
+                          "format" : "int64",
+                          "pattern" : "([0-9]+)"
+                        },
+                        "description" : "List of agent IDs considered for assignment"
+                      },
+                      "teamId" : {
+                        "type" : [ "string", "integer" ],
+                        "format" : "int64",
+                        "pattern" : "([0-9]+)",
+                        "description" : "Unique ID of the team considered for assignment"
+                      },
+                      "agentIdsToExclude" : {
+                        "type" : "array",
+                        "items" : {
+                          "type" : [ "string", "integer" ],
+                          "format" : "int64",
+                          "pattern" : "([0-9]+)"
+                        },
+                        "description" : "List of agent IDs excluded from assignment in the specified team"
+                      }
+                    },
+                    "required" : [ "agentIds", "assigneeType", "assignmentType", "criteria" ]
+                  },
+                  "description" : "List of target configurations for the rule"
+                }
+              },
+              "required" : [ "departmentId", "executeOn", "name", "targets" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "name" : "Assign to support reps",
+                  "description" : "To assign tickets to agents who are online in mail",
+                  "departmentId" : 4000000007235,
+                  "status" : "ACTIVE",
+                  "executeOn" : [ "CREATE" ],
+                  "targets" : [ {
+                    "targetId" : 4000000007347,
+                    "criteria" : {
+                      "fieldConditions" : [ {
+                        "condition" : "is open",
+                        "fieldName" : "Status",
+                        "value" : [ "${OPEN}" ],
+                        "fieldModule" : "tickets"
+                      } ],
+                      "pattern" : "(1)"
+                    },
+                    "assignmentType" : "LoadBalance",
+                    "assigneeType" : "AGENT",
+                    "agentIds" : [ 4000000007723, 4000000007865 ]
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "createRoundRobinRulesTargetRequestBody" : {
+        "description" : "createRoundRobinRulesTargetRequestBody request body",
+        "required" : true,
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "properties" : {
+                "targetId" : {
+                  "type" : [ "string", "integer" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)",
+                  "description" : "Unique ID of the round robin target"
+                },
+                "criteria" : {
+                  "type" : "object",
+                  "additionalProperties" : false,
+                  "properties" : {
+                    "fieldConditions" : {
+                      "type" : "array",
+                      "items" : {
+                        "type" : "object",
+                        "additionalProperties" : false,
+                        "properties" : {
+                          "fieldName" : {
+                            "type" : "string",
+                            "maxLength" : 200,
+                            "minLength" : 0,
+                            "description" : "Name of the field used in the condition"
+                          },
+                          "value" : {
+                            "type" : "array",
+                            "items" : {
+                              "type" : [ "string", "integer" ]
+                            },
+                            "description" : "Value(s) configured for the field condition"
+                          },
+                          "condition" : {
+                            "type" : "string",
+                            "description" : "Condition configured for the field"
+                          },
+                          "fieldModule" : {
+                            "type" : "string",
+                            "description" : "Module of the field condition"
+                          }
+                        },
+                        "required" : [ "condition", "fieldName" ]
+                      },
+                      "description" : "Field conditions configured for the target criteria"
+                    },
+                    "pattern" : {
+                      "type" : "string",
+                      "maxLength" : 200,
+                      "minLength" : 0,
+                      "description" : "Pattern used to evaluate the field conditions"
+                    }
+                  },
+                  "required" : [ "pattern", "fieldConditions" ],
+                  "description" : "Criteria configured for the round robin target"
+                },
+                "assignmentType" : {
+                  "type" : "string",
+                  "description" : "Assignment strategy used for the target. Possible values: LoadBalance, SkillBased, SequentialAssignment",
+                  "enum" : [ "LoadBalance", "SkillBased", "SequentialAssignment" ]
+                },
+                "assigneeType" : {
+                  "type" : "string",
+                  "description" : "Assignee type configured for the target. Possible values: AGENT, TEAM",
+                  "enum" : [ "AGENT", "TEAM" ]
+                },
+                "agentIds" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : [ "string", "integer" ],
+                    "format" : "int64",
+                    "pattern" : "([0-9]+)"
+                  },
+                  "description" : "List of agent IDs considered for assignment"
+                },
+                "teamId" : {
+                  "type" : [ "string", "integer" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)",
+                  "description" : "Unique ID of the team considered for assignment"
+                },
+                "agentIdsToExclude" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : [ "string", "integer" ],
+                    "format" : "int64",
+                    "pattern" : "([0-9]+)"
+                  },
+                  "description" : "List of agent IDs excluded from assignment in the specified team"
+                }
+              },
+              "required" : [ "assigneeType", "assignmentType", "criteria" ],
+              "if" : {
+                "properties" : {
+                  "assigneeType" : {
+                    "const" : "AGENT"
+                  }
+                },
+                "required" : [ "assigneeType" ]
+              },
+              "then" : {
+                "required" : [ "agentIds" ]
+              }
+            },
+            "examples" : {
+              "Valid request Definitions" : {
+                "value" : {
+                  "criteria" : {
+                    "fieldConditions" : [ {
+                      "condition" : "is",
+                      "fieldName" : "Priority",
+                      "value" : [ "High" ],
+                      "fieldModule" : "tickets"
+                    } ],
+                    "pattern" : "(1)"
+                  },
+                  "assignmentType" : "LoadBalance",
+                  "assigneeType" : "AGENT",
+                  "agentIds" : [ 4000000007865 ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "updateRoundRobinRulesTargetRequestBody" : {
+        "description" : "updateRoundRobinRulesTargetRequestBody request body",
+        "required" : true,
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "properties" : {
+                "targetId" : {
+                  "type" : [ "string", "integer" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)",
+                  "description" : "Unique ID of the round robin target"
+                },
+                "criteria" : {
+                  "type" : "object",
+                  "additionalProperties" : false,
+                  "properties" : {
+                    "fieldConditions" : {
+                      "type" : "array",
+                      "items" : {
+                        "type" : "object",
+                        "additionalProperties" : false,
+                        "properties" : {
+                          "fieldName" : {
+                            "type" : "string",
+                            "maxLength" : 200,
+                            "minLength" : 0,
+                            "description" : "Name of the field used in the condition"
+                          },
+                          "value" : {
+                            "type" : "array",
+                            "items" : {
+                              "type" : [ "string", "integer" ]
+                            },
+                            "description" : "Value(s) configured for the field condition"
+                          },
+                          "condition" : {
+                            "type" : "string",
+                            "description" : "Condition configured for the field"
+                          },
+                          "fieldModule" : {
+                            "type" : "string",
+                            "description" : "Module of the field condition"
+                          }
+                        },
+                        "required" : [ "condition", "fieldName" ]
+                      },
+                      "description" : "Field conditions configured for the target criteria"
+                    },
+                    "pattern" : {
+                      "type" : "string",
+                      "maxLength" : 200,
+                      "minLength" : 0,
+                      "description" : "Pattern used to evaluate the field conditions"
+                    }
+                  },
+                  "required" : [ "pattern", "fieldConditions" ],
+                  "description" : "Criteria configured for the round robin target"
+                },
+                "assignmentType" : {
+                  "type" : "string",
+                  "description" : "Assignment strategy used for the target. Possible values: LoadBalance, SkillBased, SequentialAssignment",
+                  "enum" : [ "LoadBalance", "SkillBased", "SequentialAssignment" ]
+                },
+                "assigneeType" : {
+                  "type" : "string",
+                  "description" : "Assignee type configured for the target. Possible values: AGENT, TEAM",
+                  "enum" : [ "AGENT", "TEAM" ]
+                },
+                "agentIds" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : [ "string", "integer" ],
+                    "format" : "int64",
+                    "pattern" : "([0-9]+)"
+                  },
+                  "description" : "List of agent IDs considered for assignment"
+                },
+                "teamId" : {
+                  "type" : [ "string", "integer" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)",
+                  "description" : "Unique ID of the team considered for assignment"
+                },
+                "agentIdsToExclude" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : [ "string", "integer" ],
+                    "format" : "int64",
+                    "pattern" : "([0-9]+)"
+                  },
+                  "description" : "List of agent IDs excluded from assignment in the specified team"
+                }
+              },
+              "required" : [ "agentIds", "assigneeType", "assignmentType", "criteria" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "criteria" : {
+                    "fieldConditions" : [ {
+                      "condition" : "is",
+                      "fieldName" : "Priority",
+                      "value" : [ "High" ],
+                      "fieldModule" : "tickets"
+                    } ],
+                    "pattern" : "(1)"
+                  },
+                  "assignmentType" : "LoadBalance",
+                  "assigneeType" : "AGENT",
+                  "agentIds" : [ 4000000007865 ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "patchRoundRobinRulesTargetRequestBody" : {
+        "description" : "updateRoundRobinRulesTargetRequestBody request body",
+        "required" : true,
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "properties" : {
+                "targetId" : {
+                  "type" : [ "string", "integer" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)",
+                  "description" : "Unique ID of the round robin target"
+                },
+                "criteria" : {
+                  "type" : "object",
+                  "additionalProperties" : false,
+                  "properties" : {
+                    "fieldConditions" : {
+                      "type" : "array",
+                      "items" : {
+                        "type" : "object",
+                        "additionalProperties" : false,
+                        "properties" : {
+                          "fieldName" : {
+                            "type" : "string",
+                            "maxLength" : 200,
+                            "minLength" : 0,
+                            "description" : "Name of the field used in the condition"
+                          },
+                          "value" : {
+                            "type" : "array",
+                            "items" : {
+                              "type" : [ "string", "integer" ]
+                            },
+                            "description" : "Value(s) configured for the field condition"
+                          },
+                          "condition" : {
+                            "type" : "string",
+                            "description" : "Condition configured for the field"
+                          },
+                          "fieldModule" : {
+                            "type" : "string",
+                            "description" : "Module of the field condition"
+                          }
+                        },
+                        "required" : [ "condition", "fieldName" ]
+                      },
+                      "description" : "Field conditions configured for the target criteria"
+                    },
+                    "pattern" : {
+                      "type" : "string",
+                      "maxLength" : 200,
+                      "minLength" : 0,
+                      "description" : "Pattern used to evaluate the field conditions"
+                    }
+                  },
+                  "required" : [ "pattern", "fieldConditions" ],
+                  "description" : "Criteria configured for the round robin target"
+                },
+                "assignmentType" : {
+                  "type" : "string",
+                  "description" : "Assignment strategy used for the target. Possible values: LoadBalance, SkillBased, SequentialAssignment",
+                  "enum" : [ "LoadBalance", "SkillBased", "SequentialAssignment" ]
+                },
+                "assigneeType" : {
+                  "type" : "string",
+                  "description" : "Assignee type configured for the target. Possible values: AGENT, TEAM",
+                  "enum" : [ "AGENT", "TEAM" ]
+                },
+                "agentIds" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : [ "string", "integer" ],
+                    "format" : "int64",
+                    "pattern" : "([0-9]+)"
+                  },
+                  "description" : "List of agent IDs considered for assignment"
+                },
+                "teamId" : {
+                  "type" : [ "string", "integer" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)",
+                  "description" : "Unique ID of the team considered for assignment"
+                },
+                "agentIdsToExclude" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : [ "string", "integer" ],
+                    "format" : "int64",
+                    "pattern" : "([0-9]+)"
+                  },
+                  "description" : "List of agent IDs excluded from assignment in the specified team"
+                }
+              },
+              "required" : [ "agentIds", "assigneeType", "assignmentType", "criteria" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "criteria" : {
+                    "fieldConditions" : [ {
+                      "condition" : "is",
+                      "fieldName" : "Priority",
+                      "value" : [ "High" ],
+                      "fieldModule" : "tickets"
+                    } ],
+                    "pattern" : "(1)"
+                  },
+                  "assignmentType" : "LoadBalance",
+                  "assigneeType" : "AGENT",
+                  "agentIds" : [ 4000000007865 ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "RoundRobin"
+}

@@ -1,5 +1,6 @@
 {
   "openapi" : "3.1.0",
+  "x-mcp-group" : [ "IM Metrics" ],
   "info" : {
     "title" : "IM_Metrics",
     "version" : "1.0.0"
@@ -22,8 +23,7 @@
             "type" : "string",
             "description" : "Start of the metrics date range. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the start time as a Unix timestamp in milliseconds.",
             "pattern" : "[0-9\\-]+",
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           }
         }, {
           "name" : "endDate",
@@ -36,8 +36,7 @@
             "type" : "string",
             "description" : "End of the metrics date range. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the end time as a Unix timestamp in milliseconds.",
             "pattern" : "[0-9\\-]+",
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           }
         }, {
           "name" : "duration",
@@ -49,10 +48,8 @@
           "schema" : {
             "type" : "string",
             "description" : "Duration to filter the metrics. Possible values: LAST24HOURS, TODAY, YESTERDAY, LAST_7_DAYS, LAST_30_DAYS, THIS_WEEK, LAST_WEEK, THIS_MONTH, LAST_MONTH, CUSTOM_IN_DATE, CUSTOM_IN_MILLIS, LAST_1_HOUR. When duration is CUSTOM_IN_DATE, also pass startDate and endDate as dates in dd-mm-yyyy format. When duration is CUSTOM_IN_MILLIS, also pass startDate and endDate as Unix timestamps in milliseconds.",
-            "enum" : [ "LAST24HOURS", "TODAY", "YESTERDAY", "LAST_7_DAYS", "LAST_30_DAYS", "THIS_WEEK", "LAST_WEEK", "THIS_MONTH", "LAST_MONTH", "CUSTOM_IN_DATE", "CUSTOM_IN_MILLIS", "LAST_1_HOUR" ],
-            "pattern" : "(LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR)",
-            "maxLength" : 100,
-            "minLength" : 0
+            "pattern" : "([1-8]{1}|LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR|LAST12MONTHS)",
+            "maxLength" : 100
           }
         }, {
           "name" : "agentIds",
@@ -64,7 +61,6 @@
           "schema" : {
             "type" : "string",
             "description" : "Filter agent metrics for particular agents. Comma-separated list of agent IDs.",
-            "pattern" : "^([0-9]+)(,([0-9]+))*$",
             "maxLength" : 1000
           }
         }, {
@@ -79,19 +75,18 @@
             "description" : "Denotes which attribute group data is required. For example, AVG_RESPONSE_TIME comes under the RESPONSIVENESS group. Possible values: RESPONSIVENESS",
             "const" : "RESPONSIVENESS",
             "maxLength" : 100,
-            "minLength" : 0
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s\\^\\{\\}\\~\\[\\]\\*\\+~\\|\\\"]+"
           }
         }, {
           "name" : "departmentId",
           "in" : "query",
           "description" : "Filter session metrics in the given department.",
-          "required" : true,
+          "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "integer" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "type" : "string",
+            "format" : "int64"
           }
         }, {
           "name" : "attributes",
@@ -103,10 +98,8 @@
           "schema" : {
             "type" : "string",
             "description" : "Denotes which metrics are required in the response. This is a list-based parameter; pass one or more comma-separated values. Possible values: ATTENDED_CHATS, AVG_PICKUP_TIME, AVG_FIRST_RESPONSE_TIME, AVG_RESPONSE_TIME",
-            "pattern" : "^(ATTENDED_CHATS|AVG_PICKUP_TIME|AVG_FIRST_RESPONSE_TIME|AVG_RESPONSE_TIME)(,(ATTENDED_CHATS|AVG_PICKUP_TIME|AVG_FIRST_RESPONSE_TIME|AVG_RESPONSE_TIME)){0,3}$",
             "example" : "ATTENDED_CHATS,AVG_PICKUP_TIME,AVG_RESPONSE_TIME",
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           }
         }, {
           "name" : "integrationService",
@@ -117,10 +110,8 @@
           "explode" : true,
           "schema" : {
             "type" : "string",
-            "enum" : [ "TELEGRAM", "TWILIO", "IM_TALK", "LINE", "WECHAT", "WHATSAPP", "FACEBOOKMESSENGER", "INSTAGRAM", "WECOM" ],
             "pattern" : "[a-zA-Z0-9\\_]*$",
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           }
         }, {
           "name" : "channelIds",
@@ -131,7 +122,6 @@
           "explode" : true,
           "schema" : {
             "type" : "string",
-            "pattern" : "^([0-9]+)(,([0-9]+))*$",
             "maxLength" : 1000
           }
         }, {
@@ -144,8 +134,7 @@
           "schema" : {
             "type" : "string",
             "enum" : [ "START_TIME", "END_TIME" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -186,8 +175,7 @@
             "type" : "string",
             "description" : "Start of the metrics date range. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the start time as a Unix timestamp in milliseconds.",
             "pattern" : "[0-9\\-]+",
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           }
         }, {
           "name" : "endDate",
@@ -200,8 +188,7 @@
             "type" : "string",
             "description" : "End of the metrics date range. Required when duration is CUSTOM_IN_DATE or CUSTOM_IN_MILLIS. For CUSTOM_IN_DATE, use dd-mm-yyyy format. For CUSTOM_IN_MILLIS, pass the end time as a Unix timestamp in milliseconds.",
             "pattern" : "[0-9\\-]+",
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           }
         }, {
           "name" : "duration",
@@ -213,10 +200,8 @@
           "schema" : {
             "type" : "string",
             "description" : "Duration to filter the metrics. Possible values: LAST24HOURS, TODAY, YESTERDAY, LAST_7_DAYS, LAST_30_DAYS, THIS_WEEK, LAST_WEEK, THIS_MONTH, LAST_MONTH, CUSTOM_IN_DATE, CUSTOM_IN_MILLIS, LAST_1_HOUR. When duration is CUSTOM_IN_DATE, also pass startDate and endDate as dates in dd-mm-yyyy format. When duration is CUSTOM_IN_MILLIS, also pass startDate and endDate as Unix timestamps in milliseconds.",
-            "enum" : [ "LAST24HOURS", "TODAY", "YESTERDAY", "LAST_7_DAYS", "LAST_30_DAYS", "THIS_WEEK", "LAST_WEEK", "THIS_MONTH", "LAST_MONTH", "CUSTOM_IN_DATE", "CUSTOM_IN_MILLIS", "LAST_1_HOUR" ],
-            "pattern" : "(LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR)",
-            "maxLength" : 100,
-            "minLength" : 0
+            "pattern" : "([1-8]{1}|LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR|LAST12MONTHS)",
+            "maxLength" : 100
           }
         }, {
           "name" : "granularity",
@@ -229,8 +214,7 @@
             "type" : "string",
             "enum" : [ "HOURLY", "DAY" ],
             "pattern" : "HOURLY|DAY",
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           }
         }, {
           "name" : "dimension",
@@ -243,7 +227,7 @@
             "type" : "string",
             "const" : "RESPONSIVENESS",
             "maxLength" : 100,
-            "minLength" : 0
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s\\^\\{\\}\\~\\[\\]\\*\\+~\\|\\\"]+"
           }
         }, {
           "name" : "dimensionValue",
@@ -255,10 +239,8 @@
           "schema" : {
             "type" : "string",
             "description" : "Dimension values required in the response. This is a list-based parameter; pass one or more comma-separated values. Possible values: AVG_PICKUP_TIME, AVG_RESPONSE_TIME, AVG_FIRST_RESPONSE_TIME",
-            "pattern" : "^(AVG_PICKUP_TIME|AVG_RESPONSE_TIME|AVG_FIRST_RESPONSE_TIME)(,(AVG_PICKUP_TIME|AVG_RESPONSE_TIME|AVG_FIRST_RESPONSE_TIME)){0,2}$",
             "example" : "AVG_PICKUP_TIME,AVG_FIRST_RESPONSE_TIME",
-            "maxLength" : 200,
-            "minLength" : 0
+            "maxLength" : 100
           }
         }, {
           "name" : "integrationService",
@@ -269,10 +251,8 @@
           "explode" : true,
           "schema" : {
             "type" : "string",
-            "enum" : [ "TELEGRAM", "TWILIO", "IM_TALK", "LINE", "WECHAT", "WHATSAPP", "FACEBOOKMESSENGER", "INSTAGRAM", "WECOM" ],
             "pattern" : "[a-zA-Z0-9\\_]*$",
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           }
         }, {
           "name" : "channelIds",
@@ -283,20 +263,18 @@
           "explode" : true,
           "schema" : {
             "type" : "string",
-            "pattern" : "^([0-9]+)(,([0-9]+))*$",
             "maxLength" : 1000
           }
         }, {
           "name" : "departmentId",
           "in" : "query",
           "description" : "Filter session metrics in the given department.",
-          "required" : true,
+          "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "integer" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "type" : "string",
+            "format" : "int64"
           }
         }, {
           "name" : "basedOn",
@@ -308,8 +286,7 @@
           "schema" : {
             "type" : "string",
             "enum" : [ "START_TIME", "END_TIME" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -484,7 +461,7 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "description" : "Agent metrics response object containing per-agent metric rows and agent profile details.",
               "additionalProperties" : false,
               "properties" : {
@@ -522,7 +499,7 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "null", "object" ],
+              "type" : [ "object" ],
               "description" : "Session time-series metrics response object containing aggregated metrics and trend data points.",
               "additionalProperties" : false,
               "properties" : {
@@ -557,5 +534,6 @@
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "IM_Metrics"
 }

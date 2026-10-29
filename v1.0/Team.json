@@ -11,6 +11,7 @@
         "summary" : "Get Teams in Department",
         "description" : "Retrieves details of all teams in a specific department, with pagination support.",
         "operationId" : "getTeamsInDepartment",
+        "x-mcp-group" : [ "Departments" ],
         "parameters" : [ {
           "name" : "departmentId",
           "in" : "path",
@@ -55,7 +56,9 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : "string"
+            "type" : "string",
+            "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+",
+            "x-regex-name" : "cleartextpattern"
           },
           "description" : "Search string used to filter teams by name."
         }, {
@@ -67,7 +70,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.departments.READ", "Desk.settings.READ", "Desk.teams.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.departments.READ", "Desk.teams.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       }
     },
@@ -77,6 +82,7 @@
         "summary" : "Get Teams from All Associated Departments",
         "description" : "Retrieves details of all teams created in all departments to which the current user belongs, with pagination support.",
         "operationId" : "getTeams",
+        "x-mcp-group" : [ "Teams" ],
         "parameters" : [ {
           "name" : "from",
           "in" : "query",
@@ -111,7 +117,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.settings.READ", "Desk.teams.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.teams.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       },
       "post" : {
@@ -119,6 +127,7 @@
         "summary" : "Create Team",
         "description" : "Creates a team in the help desk portal.",
         "operationId" : "createTeam",
+        "x-mcp-group" : [ "Teams" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -134,7 +143,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.basic.CREATE", "Desk.settings.CREATE", "Desk.teams.CREATE" ]
+          "iam-oauth2-schema" : [ "Desk.teams.CREATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.basic.CREATE", "Desk.settings.CREATE" ]
         } ]
       }
     },
@@ -162,7 +173,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.basic.DELETE", "Desk.settings.DELETE", "Desk.teams.DELETE" ]
+          "iam-oauth2-schema" : [ "Desk.teams.DELETE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.basic.DELETE", "Desk.settings.DELETE" ]
         } ]
       }
     },
@@ -172,6 +185,7 @@
         "summary" : "Get Associable Teams",
         "description" : "Retrieves teams that can be added as sub-teams to the specified team.",
         "operationId" : "getSubTeamsIds",
+        "x-mcp-group" : [ "Teams" ],
         "parameters" : [ {
           "name" : "teamId",
           "in" : "path",
@@ -193,7 +207,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.settings.READ", "Desk.teams.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.teams.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       }
     },
@@ -203,6 +219,7 @@
         "summary" : "Get Teams for a Role",
         "description" : "Retrieves details of all teams associated with a specific role, with pagination support.",
         "operationId" : "getAssociatedTeamsForRole",
+        "x-mcp-group" : [ "Profiles & Roles" ],
         "parameters" : [ {
           "name" : "role_id",
           "in" : "path",
@@ -249,7 +266,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.settings.READ", "Desk.teams.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.teams.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       }
     },
@@ -259,6 +278,7 @@
         "summary" : "Get Teams of an Agent",
         "description" : "Retrieves details of all teams to which an agent belongs, with pagination support.",
         "operationId" : "listAssociatedTeamsForAgent",
+        "x-mcp-group" : [ "Teams", "Users Management" ],
         "parameters" : [ {
           "name" : "agentId",
           "in" : "path",
@@ -305,7 +325,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.agents.READ", "Desk.basic.READ", "Desk.settings.READ", "Desk.teams.READ" ]
+          "iam-oauth2-schema" : [ "Desk.agents.READ", "Desk.basic.READ", "Desk.teams.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       }
     },
@@ -315,6 +337,7 @@
         "summary" : "Get Team Members",
         "description" : "Retrieves details of all members of a specific team.",
         "operationId" : "getTeamMembersDetails",
+        "x-mcp-group" : [ "Teams" ],
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
@@ -352,7 +375,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.agents.READ", "Desk.basic.READ", "Desk.settings.READ", "Desk.teams.READ" ]
+          "iam-oauth2-schema" : [ "Desk.agents.READ", "Desk.basic.READ", "Desk.teams.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       }
     },
@@ -362,6 +387,7 @@
         "summary" : "Get Team",
         "description" : "Retrieves details of a specific team.",
         "operationId" : "getTeam",
+        "x-mcp-group" : [ "Teams" ],
         "parameters" : [ {
           "name" : "teamId",
           "in" : "path",
@@ -383,7 +409,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.settings.READ", "Desk.teams.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.teams.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       }
     },
@@ -393,6 +421,7 @@
         "summary" : "Update Team",
         "description" : "Updates details of an existing team.",
         "operationId" : "updateTeam",
+        "x-mcp-group" : [ "Teams" ],
         "parameters" : [ {
           "name" : "team_id",
           "in" : "path",
@@ -420,7 +449,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.basic.UPDATE", "Desk.settings.UPDATE", "Desk.teams.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.teams.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.basic.UPDATE", "Desk.settings.UPDATE" ]
         } ]
       }
     }
@@ -855,12 +886,12 @@
                   "members" : [ {
                     "firstName" : "",
                     "lastName" : "John",
-                    "photoURL" : "https://contacts.example.com/file?t=user&ID=1234567890",
+                    "photoURL" : "https://desk.zoho.com/api/v1/agents/7000000013328/photo?orgId=123456",
                     "roleId" : "7000000012324",
                     "profileId" : "7000000012339",
                     "emailId" : "john@zylker.com",
                     "id" : "7000000013328",
-                    "zuid" : "1234567890"
+                    "zuid" : "437793"
                   }, {
                     "firstName" : "Steve",
                     "lastName" : "Kyle",
@@ -869,7 +900,7 @@
                     "profileId" : "7000000012339",
                     "emailId" : "kyle@zylker.com",
                     "id" : "7000000012958",
-                    "zuid" : "1234567890"
+                    "zuid" : "5625416"
                   } ]
                 }
               }
@@ -921,7 +952,8 @@
                   "type" : [ "string" ],
                   "maxLength" : 50,
                   "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+",
-                  "description" : "Name of the team"
+                  "description" : "Name of the team",
+                  "x-unique" : true
                 },
                 "description" : {
                   "type" : [ "string" ],
@@ -1112,7 +1144,11 @@
       },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "Team"
 }

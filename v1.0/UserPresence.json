@@ -1,0 +1,419 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "UserPresence",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/myChannelPreferences/markAll" : {
+      "post" : {
+        "tags" : [ "UserPresence" ],
+        "summary" : "Update overall preference of an agent in all the available channels",
+        "description" : "Update overall preference of an agent in all the available channels. This API updates the current agent's overall online status across all configured channels. Specify status as ONLINE to mark the agent available, or OFFLINE to mark them unavailable.",
+        "operationId" : "updateUserOverallChannelPreference",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/agentPreferenceJson"
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "200" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.basic.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+        } ]
+      }
+    },
+    "/api/v1/myChannelPreferences" : {
+      "get" : {
+        "tags" : [ "UserPresence" ],
+        "summary" : "Get channel online preferences of current agent",
+        "description" : "Get channel online preferences of current agent. This API fetches the current agent's online preference across available channels. Possible values: Mail: ONLINE, OFFLINE | Phone: ONLINE, OFFLINE, BUSY, ONCALL (AFTERCALL is currently treated as BUSY) | PhoneMode: WEB, PHONE | Chat: ONLINE, OFFLINE | notificationVolume: 0 or 100",
+        "operationId" : "getMyChannelPreferences",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/getAgentChannelPreferenceJson"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.basic.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
+        } ]
+      }
+    },
+    "/api/v1/agentChannelPreferences" : {
+      "get" : {
+        "tags" : [ "UserPresence" ],
+        "summary" : "Get availability status of agents in different channels",
+        "description" : "Get availability status of agents in different channels. This API fetches the channel-specific availability of one or more agents identified by their agent IDs. Possible values: Mail: ONLINE, OFFLINE | Phone: ONLINE, OFFLINE, BUSY, ONCALL | PhoneMode: WEB, PHONE | Chat: ONLINE, OFFLINE | imStatus: ONLINE, OFFLINE | imNotification: ENABLED, DISABLED | notificationVolume: 0 or 100.",
+        "operationId" : "getUserChannelPreference",
+        "parameters" : [ {
+          "name" : "agentIds",
+          "in" : "query",
+          "description" : "Comma-separated array of agent IDs to retrieve channel preferences for. Maximum 50 IDs allowed.",
+          "required" : true,
+          "style" : "form",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string", "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "minItems" : 1,
+            "maxItems" : 50,
+            "uniqueItems" : false
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/getAgentChannelPreferenceJSONData"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.agents.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
+        } ]
+      }
+    },
+    "/api/v1/agentChannelPreferences/markAll" : {
+      "post" : {
+        "tags" : [ "UserPresence" ],
+        "summary" : "Update overall availability of agents across all channels",
+        "description" : "This API updates the overall availability of agents across all channels. Specify the status as ONLINE or OFFLINE for the provided list of agent IDs.",
+        "operationId" : "updateUserOverallChannelPreferenceForAdmin",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/agentPreferenceJsonForAdmin"
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "200" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.agents.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
+        } ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "agentPreferenceJson" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "status" : {
+            "description" : "Accepted values: ONLINE, OFFLINE.",
+            "type" : [ "string" ],
+            "enum" : [ "ONLINE", "OFFLINE" ]
+          }
+        },
+        "required" : [ "status" ]
+      },
+      "agentsPreferenceJson" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "chatStatus" : {
+            "description" : "Agent's availability status for the Chat channel. Accepted values: ONLINE, OFFLINE.",
+            "type" : [ "string", "null" ],
+            "enum" : [ "ONLINE", "OFFLINE" ]
+          },
+          "imStatus" : {
+            "description" : "Agent's availability status for the IM (Instant Messaging) channel. Accepted values: ONLINE, OFFLINE.",
+            "type" : [ "string", "null" ],
+            "enum" : [ "ONLINE", "OFFLINE" ]
+          },
+          "phoneMode" : {
+            "description" : "Agent's phone mode for the Phone channel. Accepted values: WEB, PHONE.",
+            "type" : [ "string", "null" ],
+            "enum" : [ "WEB", "PHONE" ]
+          },
+          "imNotification" : {
+            "description" : "Agent's IM notification preference. Accepted values: ENABLED, DISABLED.",
+            "type" : [ "string", "null" ],
+            "enum" : [ "ENABLED", "DISABLED" ]
+          },
+          "phoneStatus" : {
+            "description" : "Agent's availability status for the Phone channel. Accepted values: ONLINE, OFFLINE, BUSY.",
+            "type" : [ "string", "null" ],
+            "enum" : [ "ONLINE", "OFFLINE", "BUSY" ]
+          },
+          "notificationVolume" : {
+            "description" : "Agent's notification volume level (0 to 100).",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "maximum" : 100,
+            "minimum" : 0,
+            "pattern" : "([0-9]+)"
+          },
+          "isOnline" : {
+            "description" : "Indicates whether the agent is currently online across all channels.",
+            "type" : [ "boolean", "null" ]
+          },
+          "mailStatus" : {
+            "description" : "Agent's availability status for the Mail channel. Accepted values: ONLINE, OFFLINE.",
+            "type" : [ "string", "null" ],
+            "enum" : [ "ONLINE", "OFFLINE" ]
+          },
+          "userId" : {
+            "description" : "Unique identifier of the agent.",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        },
+        "required" : [ "chatStatus", "imStatus", "phoneMode", "imNotification", "phoneStatus", "notificationVolume", "isOnline", "mailStatus", "userId" ]
+      },
+      "data" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/agentsPreferenceJson"
+        }
+      },
+      "agentChannelPreferenceJsonResponse" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "chatStatus" : {
+            "description" : "Agent's availability status for the Chat channel. Accepted values: ONLINE, OFFLINE.",
+            "type" : [ "string", "null" ],
+            "enum" : [ "ONLINE", "OFFLINE" ]
+          },
+          "phoneMode" : {
+            "description" : "Agent's phone mode for the Phone channel. Accepted values: WEB, PHONE.",
+            "type" : [ "string", "null" ],
+            "enum" : [ "WEB", "PHONE" ]
+          },
+          "phoneStatus" : {
+            "description" : "Agent's availability status for the Phone channel. Accepted values: ONLINE, OFFLINE, BUSY.",
+            "type" : [ "string", "null" ],
+            "enum" : [ "ONLINE", "OFFLINE", "BUSY" ]
+          },
+          "notificationVolume" : {
+            "description" : "Notification volume level for the agent (0 to 100).",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "maximum" : 100,
+            "minimum" : 0,
+            "pattern" : "([0-9]+)"
+          },
+          "mailStatus" : {
+            "description" : "Agent's availability status for the Mail channel. Accepted values: ONLINE, OFFLINE.",
+            "type" : [ "string", "null" ],
+            "enum" : [ "ONLINE", "OFFLINE" ]
+          }
+        }
+      }
+    },
+    "responses" : {
+      "getAgentChannelPreferenceJSONData" : {
+        "description" : "getAgentChannelPreferenceJSONData template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "description" : "List of agent channel preference objects, one per requested agent.",
+                  "$ref" : "#/components/schemas/data"
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "data" : [ {
+                    "chatStatus" : "ONLINE",
+                    "imStatus" : "ONLINE",
+                    "phoneMode" : "WEB",
+                    "imNotification" : "ENABLED",
+                    "phoneStatus" : "OFFLINE",
+                    "notificationVolume" : "75",
+                    "isOnline" : true,
+                    "mailStatus" : "ONLINE",
+                    "userId" : 1892000000056007
+                  }, {
+                    "chatStatus" : "ONLINE",
+                    "imStatus" : "ONLINE",
+                    "phoneMode" : "WEB",
+                    "imNotification" : "ENABLED",
+                    "phoneStatus" : "OFFLINE",
+                    "notificationVolume" : "75",
+                    "isOnline" : false,
+                    "mailStatus" : "ONLINE",
+                    "userId" : 1892000000042001
+                  }, {
+                    "chatStatus" : "ONLINE",
+                    "imStatus" : "ONLINE",
+                    "phoneMode" : "WEB",
+                    "imNotification" : "ENABLED",
+                    "phoneStatus" : "OFFLINE",
+                    "notificationVolume" : "75",
+                    "isOnline" : false,
+                    "mailStatus" : "ONLINE",
+                    "userId" : 1892000000888059
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "getAgentChannelPreferenceJson" : {
+        "description" : "getAgentChannelPreferenceJson template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "allOf" : [ {
+                "$ref" : "#/components/schemas/agentChannelPreferenceJsonResponse"
+              }, {
+                "type" : [ "object", "null" ],
+                "properties" : {
+                  "phoneStatus" : {
+                    "description" : "Accepted values: ONCALL, ONLINE, OFFLINE, BUSY.",
+                    "type" : [ "string", "null" ],
+                    "enum" : [ "ONCALL", "ONLINE", "OFFLINE", "BUSY" ]
+                  },
+                  "isOnline" : {
+                    "description" : "Whether the agent is currently online across all channels.",
+                    "type" : [ "boolean", "null" ]
+                  }
+                },
+                "required" : [ "isOnline", "phoneStatus" ],
+                "additionalProperties" : false
+              }, {
+                "type" : [ "object" ],
+                "required" : [ "chatStatus", "mailStatus", "notificationVolume", "phoneMode", "phoneStatus" ]
+              } ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "chatStatus" : "ONLINE",
+                  "phoneMode" : "WEB",
+                  "phoneStatus" : "ONLINE",
+                  "notificationVolume" : "100",
+                  "isOnline" : true,
+                  "mailStatus" : "OFFLINE"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "requestBodies" : {
+      "agentPreferenceJson" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "status" : {
+                  "description" : "Agent's overall availability status across all channels. Allowed values: ONLINE, OFFLINE.",
+                  "type" : [ "string" ],
+                  "enum" : [ "ONLINE", "OFFLINE" ]
+                }
+              },
+              "required" : [ "status" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "status" : "ONLINE"
+                }
+              }
+            }
+          }
+        },
+        "required" : true
+      },
+      "agentPreferenceJsonForAdmin" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "allOf" : [ {
+                "$ref" : "#/components/schemas/agentPreferenceJson"
+              }, {
+                "type" : [ "object" ],
+                "properties" : {
+                  "agentIds" : {
+                    "description" : "Array of agent IDs whose overall availability is to be updated.",
+                    "type" : [ "array" ],
+                    "items" : {
+                      "type" : [ "string", "integer" ],
+                      "format" : "int64",
+                      "pattern" : "([0-9]+)"
+                    },
+                    "minItems" : 1,
+                    "uniqueItems" : false
+                  }
+                },
+                "additionalProperties" : false
+              } ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "agentIds" : [ "12345678", "87654321" ],
+                  "status" : "ONLINE"
+                }
+              }
+            }
+          }
+        },
+        "required" : true
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "UserPresence"
+}

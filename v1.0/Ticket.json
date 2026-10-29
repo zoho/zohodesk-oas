@@ -11,6 +11,7 @@
         "summary" : "Get Ticket Resolution",
         "description" : "Retrieves the resolution notes of a ticket.",
         "operationId" : "getTicketResolution",
+        "x-mcp-group" : [ "Tickets" ],
         "parameters" : [ {
           "name" : "ticketId",
           "in" : "path",
@@ -39,6 +40,7 @@
         "summary" : "Delete Ticket Resolution",
         "description" : "Deletes the resolution notes of a ticket.",
         "operationId" : "deleteTicketResolution",
+        "x-mcp-group" : [ "Tickets" ],
         "parameters" : [ {
           "name" : "ticketId",
           "in" : "path",
@@ -67,6 +69,7 @@
         "summary" : "Update Ticket Resolution",
         "description" : "Updates the resolution notes of a ticket.",
         "operationId" : "updateTicketResolution",
+        "x-mcp-group" : [ "Tickets" ],
         "parameters" : [ {
           "name" : "ticketId",
           "in" : "path",
@@ -154,6 +157,7 @@
         "summary" : "Delete Tickets",
         "description" : "Moves the specified tickets to the Recycle Bin. Note: Deleted tickets remain in the Recycle Bin for 60 days, during which they can be restored. After this period, they are permanently deleted.",
         "operationId" : "deleteTicket",
+        "x-mcp-group" : [ "Tickets" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -179,6 +183,7 @@
         "summary" : "Get Agent-followed Tickets",
         "description" : "Retrieves tickets that are followed by agents, with pagination support.",
         "operationId" : "getAssociatedTickets",
+        "x-mcp-group" : [ "Tickets" ],
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
@@ -265,10 +270,10 @@
           "schema" : {
             "type" : [ "array" ],
             "items" : {
-              "type" : [ "integer" ],
-              "format" : "int64",
-              "pattern" : "([0-9]+)"
-            }
+              "type" : [ "string" ],
+              "pattern" : "^([0-9]+|Unassigned)$"
+            },
+            "maxItems" : 20
           }
         }, {
           "name" : "receivedInDays",
@@ -302,7 +307,8 @@
             "type" : [ "array" ],
             "items" : {
               "type" : [ "string" ]
-            }
+            },
+            "x-dynamic-enum" : true
           }
         }, {
           "name" : "commenter",
@@ -338,6 +344,7 @@
         "summary" : "Update Field in Multiple Tickets",
         "description" : "Updates a single field value across multiple tickets simultaneously.",
         "operationId" : "bulkUpdateTickets",
+        "x-mcp-group" : [ "Tickets" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -366,6 +373,7 @@
         "summary" : "Delete Spam Tickets",
         "description" : "Deletes the specified spam tickets. Note: Deleted tickets cannot be restored from the Recycle Bin.",
         "operationId" : "deleteSpamTickets",
+        "x-mcp-group" : [ "Tickets" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -391,6 +399,7 @@
         "summary" : "Get Archived Tickets",
         "description" : "Retrieves archived tickets from the specified department based on the selected view type, with pagination support.",
         "operationId" : "getArchivedTickets",
+        "x-mcp-group" : [ "Tickets" ],
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
@@ -481,6 +490,7 @@
         "summary" : "Move Ticket",
         "description" : "Moves a ticket from one department to another department.",
         "operationId" : "moveTicket",
+        "x-mcp-group" : [ "Tickets" ],
         "parameters" : [ {
           "name" : "departmentId",
           "in" : "query",
@@ -529,6 +539,7 @@
         "summary" : "Get Ticket Metrics",
         "description" : "Retrieves detailed metrics of a ticket, including response times, resolution time, agent handling details, and ticket-related counts.",
         "operationId" : "getTicketsMetrics",
+        "x-mcp-group" : [ "Static Reports" ],
         "parameters" : [ {
           "name" : "ticketId",
           "in" : "path",
@@ -559,6 +570,7 @@
         "summary" : "Merge Tickets",
         "description" : "Merges multiple tickets into a single ticket. Note: A maximum of 5 tickets can be merged at a time.",
         "operationId" : "mergeTicket",
+        "x-mcp-group" : [ "Tickets" ],
         "parameters" : [ {
           "name" : "ticketId",
           "in" : "path",
@@ -595,6 +607,7 @@
         "summary" : "Delete All Spam Tickets",
         "description" : "Deletes all spam tickets in the specified department. Note: Deleted tickets cannot be restored from the Recycle Bin.",
         "operationId" : "deleteAllSpamTickets",
+        "x-mcp-group" : [ "Tickets" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -620,6 +633,7 @@
         "summary" : "Map articles to tickets",
         "description" : "This API maps tickets with help articles to automatically suggest the same articles for similar tickets that arrive later.",
         "operationId" : "mapArticlesToTicket",
+        "x-mcp-group" : [ "KB Admin" ],
         "parameters" : [ {
           "name" : "ticketId",
           "in" : "path",
@@ -638,6 +652,9 @@
           "$ref" : "./Article.json#/components/requestBodies/associateArticlesUsage_articleIdsJson"
         },
         "responses" : {
+          "200" : {
+            "$ref" : "./MassActionResponse.json#/components/responses/massActionListResponse"
+          },
           "422" : {
             "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
           },
@@ -656,6 +673,7 @@
         "summary" : "Get Ticket Resolution History",
         "description" : "Fetches the resolution history of a ticket.",
         "operationId" : "getTicketResolutionHistory",
+        "x-mcp-group" : [ "Tickets" ],
         "parameters" : [ {
           "name" : "from",
           "in" : "query",
@@ -711,6 +729,7 @@
         "summary" : "Mark Tickets as Spam",
         "description" : "Marks or unmarks tickets as spam based on the isSpam parameter.",
         "operationId" : "markTicketAsSpam",
+        "x-mcp-group" : [ "Tickets" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -739,6 +758,7 @@
         "summary" : "List tickets by contact",
         "description" : "This API lists tickets received from a specific contact.",
         "operationId" : "getTicketsByContact",
+        "x-mcp-group" : [ "Contacts" ],
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
@@ -839,7 +859,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.contacts.READ", "Desk.tickets.READ", "Desk.search.READ" ]
+          "iam-oauth2-schema" : [ "Desk.search.READ", "Desk.tickets.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.contacts.READ" ]
         } ]
       }
     },
@@ -849,6 +871,7 @@
         "summary" : "Mark Ticket as Read",
         "description" : "Marks a ticket as read by the user.",
         "operationId" : "markTicketAsRead",
+        "x-mcp-group" : [ "Tickets" ],
         "parameters" : [ {
           "name" : "ticketId",
           "in" : "path",
@@ -879,6 +902,7 @@
         "summary" : "Get Tickets",
         "description" : "Retrieves a list of tickets, with pagination support.",
         "operationId" : "getTickets",
+        "x-mcp-group" : [ "Tickets" ],
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
@@ -918,7 +942,8 @@
             "items" : {
               "type" : [ "string" ],
               "maxLength" : 120,
-              "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
+              "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+",
+              "x-regex-name" : "picklistValue"
             },
             "maxItems" : 20
           },
@@ -961,7 +986,9 @@
             "items" : {
               "type" : [ "string" ],
               "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
-            }
+            },
+            "x-regex-name" : "picklistValue",
+            "x-dynamic-enum" : true
           }
         }, {
           "name" : "from",
@@ -997,10 +1024,10 @@
           "schema" : {
             "type" : [ "array" ],
             "items" : {
-              "type" : [ "integer" ],
-              "format" : "int64",
-              "pattern" : "([0-9]+)"
-            }
+              "type" : [ "string" ],
+              "pattern" : "^([0-9]+|Unassigned)$"
+            },
+            "maxItems" : 20
           }
         }, {
           "name" : "teamIds",
@@ -1039,7 +1066,8 @@
             "type" : [ "array" ],
             "items" : {
               "type" : [ "string" ]
-            }
+            },
+            "x-dynamic-enum" : true
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -1094,6 +1122,7 @@
         "summary" : "Create Ticket",
         "description" : "Creates a new ticket using the data provided in the request payload.",
         "operationId" : "createTicket",
+        "x-mcp-group" : [ "Tickets" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -1122,6 +1151,7 @@
         "summary" : "Close Tickets",
         "description" : "Closes the specified tickets.",
         "operationId" : "closeTickets",
+        "x-mcp-group" : [ "Tickets" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -1147,6 +1177,7 @@
         "summary" : "List all ticketQueueView count",
         "description" : "This API returns the number of tickets in a particular view.",
         "operationId" : "getTicketQueueViewCount",
+        "x-mcp-group" : [ "Tickets" ],
         "parameters" : [ {
           "name" : "agentId",
           "in" : "query",
@@ -1205,6 +1236,7 @@
         "summary" : "Get Ticket",
         "description" : "Retrieves a specific ticket and its associated details based on the provided ticket ID.",
         "operationId" : "getTicket",
+        "x-mcp-group" : [ "Tickets" ],
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
@@ -1247,6 +1279,7 @@
       "patch" : {
         "tags" : [ "Ticket" ],
         "operationId" : "updateTicket",
+        "x-mcp-group" : [ "Tickets" ],
         "summary" : "Update Ticket",
         "description" : "Updates an existing ticket using the data provided in the request payload.",
         "parameters" : [ {
@@ -1295,6 +1328,7 @@
         "summary" : "Mark Ticket as Unread",
         "description" : "Marks a ticket as unread by the user.",
         "operationId" : "markTicketAsUnRead",
+        "x-mcp-group" : [ "Tickets" ],
         "parameters" : [ {
           "name" : "ticketId",
           "in" : "path",
@@ -1325,6 +1359,7 @@
         "summary" : "Split Tickets",
         "description" : "Creates a new ticket by splitting a single thread from an existing ticket. Note: Only the selected thread is converted into a new ticket. Any subsequent threads in the original ticket are not included in the new ticket.",
         "operationId" : "splitThreadIntoNewTicket",
+        "x-mcp-group" : [ "Ticket Threads", "Tickets" ],
         "parameters" : [ {
           "name" : "threadId",
           "in" : "path",
@@ -1366,6 +1401,7 @@
         "summary" : "List tickets by products",
         "description" : "This API lists tickets received from a specific products.",
         "operationId" : "getTicketsByProduct",
+        "x-mcp-group" : [ "Tickets" ],
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
@@ -1465,7 +1501,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.tickets.READ", "Desk.search.READ" ]
+          "iam-oauth2-schema" : [ "Desk.tickets.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.search.READ", "Desk.settings.READ" ]
         } ]
       }
     }
@@ -1549,11 +1587,8 @@
             }
           },
           "Closed Time" : {
-            "type" : [ "array" ],
-            "items" : {
-              "type" : [ "string" ],
-              "enum" : [ "today", "yesterday", "currentWeek", "currentMonth", "last3days", "last7days", "last15days", "last30days" ]
-            }
+            "type" : [ "string" ],
+            "enum" : [ "today", "yesterday", "currentWeek", "currentMonth", "last3days", "last7days", "last15days", "last30days" ]
           },
           "Due Date" : {
             "type" : [ "array" ],
@@ -1608,7 +1643,8 @@
               "type" : [ "string", "null" ],
               "maxLength" : 100,
               "minLength" : 0,
-              "pattern" : "(POSITIVE|NEUTRAL|NEGATIVE)"
+              "pattern" : "(POSITIVE|NEUTRAL|NEGATIVE)",
+              "description" : "Indicates whether the customer's overall tone in the ticket is positive, negative, or neutral. Possible values: Positive - The customer expresses a positive or satisfied tone. Negative - The customer expresses a negative, dissatisfied, or frustrated tone. Neutral - The customer expresses neither a clearly positive nor negative tone. null - Returned when the ticket sentiment feature is disabled for the organization or the specific department."
             },
             "isFollowing" : {
               "type" : [ "boolean", "null" ]
@@ -1924,7 +1960,8 @@
             "type" : [ "boolean" ]
           },
           "fieldName" : {
-            "type" : [ "string" ]
+            "type" : [ "string" ],
+            "x-dynamic-enum" : true
           },
           "ids" : {
             "$ref" : "#/components/schemas/long_array"
@@ -2050,7 +2087,7 @@
           "subject" : {
             "type" : [ "string" ],
             "description" : "Subject of the ticket",
-            "maxLength" : 1000
+            "maxLength" : 255
           },
           "dueDate" : {
             "type" : [ "string", "null" ],
@@ -2061,16 +2098,19 @@
           "channel" : {
             "type" : [ "string", "null" ],
             "description" : "Channel through which the ticket is being created.",
+            "x-dynamic-enum" : true,
             "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
           },
           "language" : {
             "type" : [ "string", "null" ],
             "description" : "Language preference of the ticket",
+            "x-dynamic-enum" : true,
             "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
           },
           "priority" : {
             "type" : [ "string", "null" ],
             "description" : "Priority of the ticket",
+            "x-dynamic-enum" : true,
             "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
           },
           "assigneeId" : {
@@ -2096,6 +2136,7 @@
           "properties" : {
             "subCategory" : {
               "type" : [ "string", "null" ],
+              "x-dynamic-enum" : true,
               "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
             },
             "cf" : {
@@ -2128,14 +2169,17 @@
             },
             "classification" : {
               "type" : [ "string", "null" ],
+              "x-dynamic-enum" : true,
               "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
             },
             "category" : {
               "type" : [ "string", "null" ],
+              "x-dynamic-enum" : true,
               "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
             },
             "status" : {
               "type" : [ "string" ],
+              "x-dynamic-enum" : true,
               "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
             },
             "sourceTicket" : {
@@ -2448,7 +2492,8 @@
             "pattern" : "([0-9]+)"
           },
           "type" : {
-            "type" : [ "string", "null" ]
+            "type" : [ "string", "null" ],
+            "x-dynamic-enum" : true
           },
           "email" : {
             "type" : [ "string", "null" ],
@@ -2467,7 +2512,8 @@
         "additionalProperties" : false,
         "properties" : {
           "channel" : {
-            "type" : [ "string", "null" ]
+            "type" : [ "string", "null" ],
+            "x-dynamic-enum" : true
           },
           "isDraft" : {
             "type" : [ "boolean", "null" ]
@@ -2498,7 +2544,8 @@
               "type" : [ "string", "null" ],
               "maxLength" : 100,
               "minLength" : 0,
-              "pattern" : "(POSITIVE|NEUTRAL|NEGATIVE)"
+              "pattern" : "(POSITIVE|NEUTRAL|NEGATIVE)",
+              "description" : "Indicates whether the customer's overall tone in the ticket is positive, negative, or neutral. Possible values: Positive - The customer expresses a positive or satisfied tone. Negative - The customer expresses a negative, dissatisfied, or frustrated tone. Neutral - The customer expresses neither a clearly positive nor negative tone. null - Returned when the ticket sentiment feature is disabled for the organization or the specific department."
             },
             "customerResponseTime" : {
               "type" : [ "string", "null" ],
@@ -2599,7 +2646,8 @@
               "type" : [ "boolean", "null" ]
             },
             "status" : {
-              "type" : [ "string", "null" ]
+              "type" : [ "string", "null" ],
+              "x-dynamic-enum" : true
             },
             "channelCode" : {
               "type" : [ "string", "null" ],
@@ -2626,10 +2674,12 @@
           "type" : [ "object" ],
           "properties" : {
             "subCategory" : {
-              "type" : [ "string", "null" ]
+              "type" : [ "string", "null" ],
+              "x-dynamic-enum" : true
             },
             "category" : {
-              "type" : [ "string", "null" ]
+              "type" : [ "string", "null" ],
+              "x-dynamic-enum" : true
             },
             "layoutId" : {
               "type" : [ "string", "integer", "null" ],
@@ -2644,7 +2694,8 @@
       "channelList" : {
         "type" : [ "array", "null" ],
         "items" : {
-          "type" : [ "string", "null" ]
+          "type" : [ "string", "null" ],
+          "x-dynamic-enum" : true
         }
       },
       "getUnassignedTicketsCount" : {
@@ -2796,7 +2847,8 @@
             "minLength" : 0
           },
           "status" : {
-            "type" : [ "string" ]
+            "type" : [ "string" ],
+            "x-dynamic-enum" : true
           }
         },
         "required" : [ "handledTime", "status" ]
@@ -3188,13 +3240,28 @@
                   "webUrl" : {
                     "type" : [ "string" ],
                     "pattern" : "(^(ht|f)tp(s?)\\:\\/\\/[0-9a-zA-Z][-.\\w]*(:[0-9])*(\\/?)([a-zA-Z0-9\\-\\.\\?\\,|\\:\\'\\/\\\\\\+=&%\\$#_\\[\\]@!\\(\\)\\*;~]*)?$)|[*]",
+                    "x-regex-name" : "url_regex",
                     "maxLength" : 5000
                   },
                   "sharedDepartments" : {
                     "type" : [ "array" ],
                     "items" : {
-                      "type" : [ "string" ],
-                      "maxLength" : 500
+                      "type" : [ "object" ],
+                      "additionalProperties" : false,
+                      "properties" : {
+                        "id" : {
+                          "type" : [ "string", "integer" ],
+                          "format" : "int64",
+                          "pattern" : "([0-9]+)",
+                          "description" : "Id of the shared department"
+                        },
+                        "type" : {
+                          "type" : [ "string" ],
+                          "enum" : [ "READ_ONLY", "READ_WRITE", "RESTRICTED_ACCESS" ],
+                          "description" : "Sharing type. Allowed values: READ_ONLY, READ_WRITE, RESTRICTED_ACCESS"
+                        }
+                      },
+                      "required" : [ "id", "type" ]
                     },
                     "minItems" : 0,
                     "maxItems" : 10
@@ -3202,7 +3269,8 @@
                   "teamId" : {
                     "type" : [ "string", "integer" ],
                     "format" : "int64",
-                    "pattern" : "([0-9]*|null|undefined)"
+                    "pattern" : "([0-9]*|null|undefined)",
+                    "x-regex-name" : "long_null"
                   },
                   "secondaryContacts" : {
                     "type" : [ "array" ],
@@ -3389,7 +3457,7 @@
                   "priority" : "High",
                   "classification" : "",
                   "assigneeId" : "1892000000056007",
-                  "phone" : "1 555 010 0000",
+                  "phone" : "+1 5550100123",
                   "category" : "general",
                   "email" : "carol@zylker.com",
                   "status" : "Open"
@@ -3492,11 +3560,13 @@
                       "email" : {
                         "type" : [ "string" ],
                         "pattern" : "^[\\p{L}\\p{M}\\p{N}\\_]([\\p{L}\\p{M}\\p{N}\\_\\+\\-\\.\\'&\\!\\~]*)@(?=.{4,256}$)(([\\p{L}\\p{N}\\p{M}]+)(([\\-\\_]*[\\p{L}\\p{N}\\p{M}])*)[\\.])+[\\p{L}\\p{M}]{2,22}$",
+                        "x-regex-name" : "emailDesk",
                         "maxLength" : 255
                       },
                       "phone" : {
                         "type" : [ "string" ],
                         "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\$@\\?\\,\\;\\:\\'\\/\\!\\P{InBasicLatin}\\s]+",
+                        "x-regex-name" : "inv_clrtxtpatrn_phone",
                         "maxLength" : 100
                       }
                     },
@@ -3515,12 +3585,14 @@
                   "webUrl" : {
                     "type" : [ "string" ],
                     "pattern" : "(^(ht|f)tp(s?)\\:\\/\\/[0-9a-zA-Z][-.\\w]*(:[0-9])*(\\/?)([a-zA-Z0-9\\-\\.\\?\\,|\\:\\'\\/\\\\\\+=&%\\$#_\\[\\]@!\\(\\)\\*;~]*)?$)|[*]",
+                    "x-regex-name" : "url_regex",
                     "maxLength" : 5000
                   },
                   "teamId" : {
                     "type" : [ "string", "integer" ],
                     "format" : "int64",
-                    "pattern" : "([0-9]*|null|undefined)"
+                    "pattern" : "([0-9]*|null|undefined)",
+                    "x-regex-name" : "long_null"
                   },
                   "secondaryContacts" : {
                     "type" : [ "array" ],
@@ -3587,7 +3659,35 @@
             },
             "examples" : {
               "Valid requestBody Definitions" : {
-                "value" : null
+                "value" : {
+                  "entitySkills" : [ "18921000000379001", "18921000000364001", "18921000000379055", "18921000000379031" ],
+                  "subCategory" : "Sub General",
+                  "cf" : {
+                    "cf_permanentaddress" : null,
+                    "cf_dateofpurchase" : null,
+                    "cf_phone" : null,
+                    "cf_numberofitems" : null,
+                    "cf_url" : null,
+                    "cf_secondaryemail" : null,
+                    "cf_severitypercentage" : "0.0",
+                    "cf_modelname" : "F3 2017"
+                  },
+                  "productId" : "",
+                  "contactId" : "1892000000042032",
+                  "subject" : "Real Time analysis Requirement",
+                  "dueDate" : 1466525776000,
+                  "departmentId" : "1892000000006907",
+                  "channel" : "Email",
+                  "description" : "Hai This is Description",
+                  "language" : "English",
+                  "priority" : "High",
+                  "classification" : "",
+                  "assigneeId" : "1892000000056007",
+                  "phone" : "+1 5550100123",
+                  "category" : "general",
+                  "email" : "carol@zylker.com",
+                  "status" : "Open"
+                }
               }
             }
           }
@@ -3624,9 +3724,9 @@
                 "value" : {
                   "modifiedTime" : 1449878400000,
                   "author" : {
-                    "firstName" : "William",
-                    "lastName" : "Jones",
-                    "photoURL" : "https://desk.example.com/api/v1/agent/160200000000068005/photo",
+                    "firstName" : "saran",
+                    "lastName" : "raj",
+                    "photoURL" : "https://desk.zoho.com/api/v1/agent/160200000000068005/photo",
                     "id" : 160200000000068000,
                     "email" : "carol@zylker.com"
                   },
@@ -3724,8 +3824,8 @@
                   "contact" : {
                     "lastName" : "Carol",
                     "firstName" : "Lucas",
-                    "phone" : "1 555 010 0000",
-                    "mobile" : "5550100005",
+                    "phone" : "+1 5550100123",
+                    "mobile" : "+1 5550100123",
                     "id" : "1892000000042032",
                     "isSpam" : false,
                     "type" : null,
@@ -3747,13 +3847,13 @@
                   "classification" : null,
                   "commentCount" : "1",
                   "taskCount" : "1",
-                  "phone" : "1 555 010 0000",
-                  "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Cases/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
+                  "phone" : "+1 5550100123",
+                  "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Cases/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
                   "isSpam" : false,
                   "assignee" : {
-                    "firstName" : "George",
-                    "lastName" : "Vincent",
-                    "photoURL" : "https://desk.example.com/api/v1/agents/1892000000056007/photo?orgId=1234567890",
+                    "firstName" : "dasca",
+                    "lastName" : "vins",
+                    "photoURL" : "https://desk.zoho.com/api/v1/agents/1892000000056007/photo?orgId=123456",
                     "id" : "1892000000056007",
                     "email" : "jack@zylker.com"
                   },
@@ -3767,7 +3867,7 @@
                     "topicId" : "1892000000056253",
                     "isTopicDeleted" : false,
                     "forumStatus" : "ANALYSING",
-                    "sourceLink" : "https://desk.example.com/support/zylker/ShowHomePage.do#Community/singlepost/problem-topic-forum-ticket-18-5-2018",
+                    "sourceLink" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Community/singlepost/problem-topic-forum-ticket-18-5-2018",
                     "topicType" : "PROBLEM"
                   },
                   "isDeleted" : "false",
@@ -3797,7 +3897,7 @@
                   "team" : {
                     "name" : "kjsdfjks",
                     "id" : "8920000000069071",
-                    "logoUrl" : "https://desk.example.com/api/v1/teams/8920000000069071/logo?orgId=1234567890"
+                    "logoUrl" : "https://desk.zoho.com/api/v1/teams/8920000000069071/logo?orgId=123456"
                   },
                   "assigneeId" : "1892000000056007",
                   "teamId" : "8920000000069071",
@@ -3859,19 +3959,19 @@
                     "team" : {
                       "name" : "kjsdfjks",
                       "id" : "8920000000069071",
-                      "logoUrl" : "https://desk.example.com/api/v1/teams/8920000000069071/logo?orgId=1234567890"
+                      "logoUrl" : "https://desk.zoho.com/api/v1/teams/8920000000069071/logo?orgId=123456"
                     },
                     "priority" : "Medium",
                     "assigneeId" : "1892000000042001",
                     "commentCount" : "0",
                     "accountId" : "189200000005345",
-                    "phone" : "9876543321",
-                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Cases/dv/20d7881a46edfcffefe308ab38676ec3e612657a51fd5fbe",
+                    "phone" : "+1 5550100123",
+                    "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Cases/dv/20d7881a46edfcffefe308ab38676ec3e612657a51fd5fbe",
                     "teamId" : "8920000000069071",
                     "assignee" : {
-                      "firstName" : "George",
-                      "lastName" : "Vincent",
-                      "photoURL" : "https://desk.example.com/api/v1/agent/1892000000042001/photo",
+                      "firstName" : "dasca",
+                      "lastName" : "vins",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agent/1892000000042001/photo",
                       "id" : "1892000000042001",
                       "email" : "jack@zylker.com"
                     },
@@ -3974,8 +4074,8 @@
                     "assigneeId" : "5853000000281047",
                     "commentCount" : "1",
                     "accountId" : "189200000005345",
-                    "phone" : "123421412125",
-                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Cases/dv/5853000001102037",
+                    "phone" : "+1 5550100123",
+                    "webUrl" : "https://desk.zoho.com/support/arunasales/ShowHomePage.do#Cases/dv/5853000001102037",
                     "teamId" : null,
                     "isSpam" : false,
                     "category" : null,
@@ -4136,8 +4236,8 @@
                   "assigneeId" : "1892000000056007",
                   "commentCount" : "1",
                   "taskCount" : "1",
-                  "phone" : "1 555 010 0000",
-                  "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Cases/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
+                  "phone" : "+1 5550100123",
+                  "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Cases/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
                   "attachmentCount" : "1",
                   "isEscalated" : false,
                   "isSpam" : false,
@@ -4169,9 +4269,9 @@
                   "data" : [ {
                     "modifiedTime" : 1449878400000,
                     "author" : {
-                      "firstName" : "William",
-                      "lastName" : "Jones",
-                      "photoURL" : "https://desk.example.com/api/v1/agent/160200000000068005/photo",
+                      "firstName" : "saran",
+                      "lastName" : "raj",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agent/160200000000068005/photo",
                       "id" : 160200000000068000,
                       "email" : "carol@zylker.com"
                     },
@@ -4179,9 +4279,9 @@
                   }, {
                     "modifiedTime" : 1447286400000,
                     "author" : {
-                      "firstName" : "William",
-                      "lastName" : "Jones",
-                      "photoURL" : "https://desk.example.com/api/v1/agent/160200000000068005/photo",
+                      "firstName" : "saran",
+                      "lastName" : "raj",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agent/160200000000068005/photo",
                       "id" : 160200000000068000,
                       "email" : "carol@zylker.com"
                     },
@@ -4239,20 +4339,20 @@
                     "team" : {
                       "name" : "kjsdfjks",
                       "id" : "8920000000069071",
-                      "logoUrl" : "https://desk.example.com/api/v1/teams/8920000000069071/logo?orgId=1234567890"
+                      "logoUrl" : "https://desk.zoho.com/api/v1/teams/8920000000069071/logo?orgId=123456"
                     },
                     "priority" : "Medium",
                     "assigneeId" : "1892000000042001",
                     "commentCount" : "0",
                     "accountId" : "189200000005345",
-                    "phone" : "9876543321",
-                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Cases/dv/20d7881a46edfcffefe308ab38676ec3e612657a51fd5fbe",
+                    "phone" : "+1 5550100123",
+                    "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Cases/dv/20d7881a46edfcffefe308ab38676ec3e612657a51fd5fbe",
                     "teamId" : "8920000000069071",
                     "isSpam" : false,
                     "assignee" : {
-                      "firstName" : "George",
-                      "lastName" : "Vincent",
-                      "photoURL" : "https://desk.example.com/api/v1/agent/1892000000042001/photo",
+                      "firstName" : "dasca",
+                      "lastName" : "vins",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agent/1892000000042001/photo",
                       "id" : "1892000000042001",
                       "email" : "jack@zylker.com"
                     },
@@ -4274,7 +4374,11 @@
       },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "Ticket"
 }

@@ -1,0 +1,252 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Help_Center_MFAPolicy",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/helpCenter/{helpCenter_Id}/mfaPolicy" : {
+      "get" : {
+        "tags" : [ "Help_Center_MFAPolicy" ],
+        "summary" : "Get MFA Policy",
+        "description" : "Retrieves the MFA policy configuration for the specified help center.",
+        "operationId" : "getMFAPolicy",
+        "parameters" : [ {
+          "name" : "helpCenter_Id",
+          "description" : "Unique ID of the help center",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/hcMFAPolicyResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.READ" ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "Help_Center_MFAPolicy" ],
+        "summary" : "Delete MFA Policy",
+        "description" : "Deletes the MFA policy configuration for the specified help center.",
+        "operationId" : "deleteMFAPolicy",
+        "parameters" : [ {
+          "name" : "helpCenter_Id",
+          "description" : "Unique ID of the help center",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.DELETE" ]
+        } ]
+      },
+      "patch" : {
+        "tags" : [ "Help_Center_MFAPolicy" ],
+        "summary" : "Add MFA Policy",
+        "description" : "Configures an MFA policy for a help center.",
+        "operationId" : "addOrUpdateMFAPolicy",
+        "parameters" : [ {
+          "name" : "helpCenter_Id",
+          "description" : "Unique ID of the help center",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/hcMFARequestJson"
+        },
+        "responses" : {
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/hcMFAPolicyResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.UPDATE" ]
+        } ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "hcMFAJson" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "status" : {
+            "description" : "Status of the MFA Policy. Possible values: ENABLED — The MFA policy is ENABLED for the help center. DISABLED — The MFA policy is DISABLED for the help center.",
+            "type" : [ "string", "null" ],
+            "maxLength" : 30,
+            "minLength" : 0,
+            "pattern" : "ENABLED|DISABLED"
+          },
+          "mfaMethods" : {
+            "description" : "Sets the MFA method for authentication. Possible values: TOTP.",
+            "type" : [ "array", "null" ],
+            "items" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 4,
+              "minLength" : 0,
+              "pattern" : "TOTP"
+            },
+            "maxItems" : 20,
+            "minItems" : 1,
+            "uniqueItems" : false
+          },
+          "sessionValidity" : {
+            "description" : "Specifies the MFA session validity duration. The maximum session validity is 180 days.",
+            "type" : [ "string" ],
+            "maxLength" : 3,
+            "minLength" : 1,
+            "pattern" : "^(0|[1-9][0-9]?|1[0-7][0-9]|180)$"
+          }
+        }
+      },
+      "hcMFAPolicyJSON" : {
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/hcMFAJson"
+        } ]
+      }
+    },
+    "responses" : {
+      "hcMFAPolicyResponse" : {
+        "description" : "mfaPolicyResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "additionalProperties" : false,
+              "allOf" : [ {
+                "$ref" : "#/components/schemas/hcMFAPolicyJSON"
+              } ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "mfaMethods" : [ "TOTP" ],
+                  "sessionValidity" : "180",
+                  "status" : "ENABLED"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "requestBodies" : {
+      "hcMFARequestJson" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "status" : {
+                  "description" : "Status of the MFA Policy. Possible values: ENABLED — The MFA policy is ENABLED for the help center. DISABLED — The MFA policy is DISABLED for the help center.",
+                  "type" : [ "string" ],
+                  "maxLength" : 30,
+                  "pattern" : "ENABLED|DISABLED",
+                  "enum" : [ "ENABLED", "DISABLED" ]
+                },
+                "mfaMethods" : {
+                  "description" : "Sets the MFA method for authentication. Possible values: TOTP.",
+                  "type" : [ "array" ],
+                  "items" : {
+                    "type" : [ "string" ],
+                    "maxLength" : 4,
+                    "minLength" : 3,
+                    "pattern" : "TOTP",
+                    "enum" : [ "TOTP" ]
+                  },
+                  "maxItems" : 20,
+                  "minItems" : 1,
+                  "uniqueItems" : false
+                },
+                "sessionValidity" : {
+                  "description" : "Specifies the MFA session validity duration. The maximum session validity is 180 days.",
+                  "type" : [ "string" ],
+                  "maxLength" : 3,
+                  "minLength" : 1,
+                  "pattern" : "^(0|[1-9][0-9]?|1[0-7][0-9]|180)$"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "jwt-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/jwt-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "Help_Center_MFAPolicy"
+}

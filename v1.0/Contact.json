@@ -11,6 +11,7 @@
         "summary" : "List contacts associated with product",
         "description" : "This API lists the contacts associated with a product.",
         "operationId" : "getContactsUnderProduct",
+        "x-mcp-group" : [ "Contacts" ],
         "parameters" : [ {
           "name" : "limit",
           "in" : "query",
@@ -19,7 +20,7 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "integer", "string", "null" ],
+            "type" : [ "integer" ],
             "format" : "int32",
             "maximum" : 100,
             "minimum" : 1,
@@ -58,18 +59,12 @@
           "in" : "query",
           "description" : "Key that fetches secondary information related to the contact.Value allowed is @accounts@",
           "required" : false,
-          "style" : "simple",
+          "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "null", "array" ],
+            "type" : "string",
             "description" : "Key that fetches secondary information related to the contact.Value allowed is @accounts@",
-            "items" : {
-              "type" : [ "string", "null" ],
-              "enum" : [ "accounts" ],
-              "maxLength" : 100,
-              "minLength" : 0
-            },
-            "uniqueItems" : true
+            "pattern" : "(accounts)"
           }
         }, {
           "name" : "sortBy",
@@ -83,7 +78,7 @@
             "description" : "Parameter that sorts contacts by one of these attributes: !@firstName,@! !@lastName,@! !@phone,@! !@email,@! !@account,@! !@createdTime,@! !@modifiedTime@!",
             "enum" : [ "firstName", "lastName", "phone", "email", "account", "createdTime", "modifiedTime" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "pattern" : "-?(firstName|lastName|phone|email|account|createdTime|modifiedTime)"
           }
         }, {
           "name" : "productId",
@@ -106,7 +101,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.contacts.READ" ]
+          "iam-oauth2-schema" : [ "Desk.contacts.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       }
     },
@@ -116,6 +113,7 @@
         "summary" : "Invite multiple contacts to help center",
         "description" : "This API helps invite multiple contacts as end-users to your help center.",
         "operationId" : "inviteContactsAsEndUser",
+        "x-mcp-group" : [ "Contacts" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -127,7 +125,7 @@
             "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
           },
           "200" : {
-            "$ref" : "./MassActionResponse.json#/components/responses/massActionListResponse"
+            "$ref" : "./MassActionResponse.json#/components/responses/massActionListSuccessNullResponse"
           },
           "403" : {
             "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
@@ -144,6 +142,7 @@
         "summary" : "Delete contact photo",
         "description" : "This API deletes the display picture of a contact.",
         "operationId" : "deleteContactPhoto",
+        "x-mcp-group" : [ "Contacts" ],
         "parameters" : [ {
           "name" : "contactId",
           "in" : "path",
@@ -180,6 +179,7 @@
         "summary" : "Get contact statistics",
         "description" : "This API fetches the overall statistics of an contact.",
         "operationId" : "getContactStatistics",
+        "x-mcp-group" : [ "Contacts" ],
         "parameters" : [ {
           "name" : "departmentId",
           "in" : "query",
@@ -205,6 +205,33 @@
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
+        }, {
+          "name" : "department",
+          "in" : "query",
+          "description" : "_This Param is being deprecated please use the departmentId param to fetch the department specific statistics_",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "null", "integer" ],
+            "format" : "int64",
+            "description" : "_This Param is being deprecated please use the departmentId param to fetch the department specific statistics_",
+            "pattern" : "allDepartment|[0-9]+",
+            "x-regex-name" : "departmentsInAPI"
+          }
+        }, {
+          "name" : "timeRange",
+          "in" : "query",
+          "description" : "Key that filters statistics observed in a specific date and time range. Enter the from and to dates in the ISO date format of yyyy-MM-ddThh:mm:ss.SSSZ; for example, timeRange=2017-11-05T00:00:00.000Z,2018-02-05T23:59:00.000Z. The maximum period allowed for the time range is six months.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "null" ],
+            "description" : "Key that filters statistics observed in a specific date and time range. Enter the from and to dates in the ISO date format of yyyy-MM-ddThh:mm:ss.SSSZ; for example, timeRange=2017-11-05T00:00:00.000Z,2018-02-05T23:59:00.000Z. The maximum period allowed for the time range is six months.",
+            "maxLength" : 100,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)),(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))|null"
+          }
         } ],
         "responses" : {
           "200" : {
@@ -222,6 +249,7 @@
         "summary" : "Dissociate accounts from contact",
         "description" : "This API dissociates multiple accounts from a particular contact.",
         "operationId" : "dissociateAccountsWithContact",
+        "x-mcp-group" : [ "Contacts" ],
         "parameters" : [ {
           "name" : "contactId",
           "in" : "path",
@@ -258,6 +286,7 @@
         "summary" : "Delete Contacts",
         "description" : "This API moves the contacts specified to the Recycle Bin.",
         "operationId" : "deleteContact",
+        "x-mcp-group" : [ "Contacts" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -292,6 +321,7 @@
         "summary" : "Dissociate account from contact",
         "description" : "This API dissociates a particular account from a contact.",
         "operationId" : "dissociateAccountWithContact",
+        "x-mcp-group" : [ "Contacts" ],
         "parameters" : [ {
           "name" : "accountId",
           "in" : "path",
@@ -342,6 +372,7 @@
         "summary" : "Get status of contact in help centers",
         "description" : "This API fetches a particular contact's activation status in all the help centers they are part of.",
         "operationId" : "getContactActivationStatusAcrossHelpCenters",
+        "x-mcp-group" : [ "Contacts" ],
         "parameters" : [ {
           "name" : "helpCenterId",
           "in" : "query",
@@ -390,20 +421,21 @@
         "summary" : "Get contact history",
         "description" : "This API fetches the ticket history of a contact.",
         "operationId" : "getContactTicketHistory",
+        "x-mcp-group" : [ "Contacts" ],
         "parameters" : [ {
           "name" : "limit",
           "in" : "query",
-          "description" : "Number of contacts to fetch",
+          "description" : " Number of history details to fetch",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "integer", "string", "null" ],
+            "type" : [ "integer" ],
             "format" : "int32",
             "maximum" : 100,
             "minimum" : 1,
             "pattern" : "([0-9]+)",
-            "description" : "Number of contacts to fetch"
+            "description" : " Number of history details to fetch"
           }
         }, {
           "name" : "from",
@@ -483,6 +515,7 @@
         "summary" : "List Contacts",
         "description" : "This API lists a particular number of contacts, based on the limit specified. ",
         "operationId" : "getContacts",
+        "x-mcp-group" : [ "Contacts" ],
         "parameters" : [ {
           "name" : "fields",
           "in" : "query",
@@ -521,8 +554,9 @@
             "format" : "int32",
             "maximum" : 100,
             "minimum" : 1,
-            "pattern" : "([0-9]+)",
-            "description" : "Number of contacts to fetch"
+            "pattern" : "(^([a-zA-Z0-9\\s\\.\\?\\,])*$|null|undefined)",
+            "description" : "Number of contacts to fetch",
+            "x-regex-name" : "String_null"
           }
         }, {
           "name" : "from",
@@ -560,8 +594,7 @@
             "items" : {
               "type" : [ "string", "null" ],
               "enum" : [ "accounts" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "uniqueItems" : true
           }
@@ -575,7 +608,7 @@
             "type" : [ "string", "null" ],
             "enum" : [ "firstName", "lastName", "phone", "email", "account", "createdTime", "modifiedTime" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "pattern" : "-?(firstName|lastName|phone|email|account|createdTime|modifiedTime)"
           }
         } ],
         "responses" : {
@@ -584,29 +617,21 @@
           },
           "403" : {
             "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
           }
         },
         "security" : [ {
           "iam-oauth2-schema" : [ "Desk.contacts.READ" ]
-        } ],
-        "requestBody" : {
-          "required" : false,
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "type" : [ "object" ],
-                "description" : "Optional request body filters",
-                "additionalProperties" : true
-              }
-            }
-          }
-        }
+        } ]
       },
       "post" : {
         "tags" : [ "Contact" ],
         "summary" : "Create Contact",
         "description" : "This API creates a contact in your help desk portal.",
         "operationId" : "createContact",
+        "x-mcp-group" : [ "Contacts" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -632,6 +657,7 @@
         "summary" : "Update many contacts",
         "description" : "This API updates multiple contacts at once.",
         "operationId" : "bulkUpdateContacts",
+        "x-mcp-group" : [ "Contacts" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -663,6 +689,7 @@
         "summary" : "Get contacts count",
         "description" : "This API displays the count for the number of contacts in a custom view",
         "operationId" : "getContactsCount",
+        "x-mcp-group" : [ "Contacts" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         }, {
@@ -702,8 +729,7 @@
           "explode" : true,
           "schema" : {
             "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           }
         } ],
         "responses" : {
@@ -725,6 +751,7 @@
         "summary" : "List Contacts By Ids",
         "description" : "This API lists details of specific contacts, based on the IDs passed in the request.",
         "operationId" : "getContactsByIds",
+        "x-mcp-group" : [ "Contacts" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         }, {
@@ -764,6 +791,7 @@
         "summary" : "Get Contact",
         "description" : "This API fetches a single contact from your help desk portal.",
         "operationId" : "getContact",
+        "x-mcp-group" : [ "Contacts" ],
         "parameters" : [ {
           "name" : "contactId",
           "in" : "path",
@@ -790,8 +818,7 @@
             "items" : {
               "type" : [ "string", "null" ],
               "enum" : [ "accounts", "owner" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "uniqueItems" : true
           }
@@ -808,6 +835,7 @@
       "patch" : {
         "tags" : [ "Contact" ],
         "operationId" : "updateContact",
+        "x-mcp-group" : [ "Contacts" ],
         "summary" : "Update Contact",
         "description" : "This API updates details of an existing contact.",
         "parameters" : [ {
@@ -846,6 +874,7 @@
         "summary" : "Merge Contacts",
         "description" : "This API merges two or more contacts  <br/></br/>_Note:_<br/>Though portal users (users who signed up via the help center) are saved as contacts in the help desk, their records cannot be merged with other records/contacts.",
         "operationId" : "mergeContacts",
+        "x-mcp-group" : [ "Contacts" ],
         "parameters" : [ {
           "name" : "contactId",
           "in" : "path",
@@ -891,6 +920,7 @@
         "summary" : "Approve contact for help center",
         "description" : "This API helps approve a particular contact as an end-user to your help center.",
         "operationId" : "approveEndUserInvite",
+        "x-mcp-group" : [ "Contacts" ],
         "parameters" : [ {
           "name" : "contactId",
           "in" : "path",
@@ -936,6 +966,7 @@
         "summary" : "Reject contact for help center",
         "description" : "This API helps reject a particular contact from being added as an end-user to your help center.",
         "operationId" : "rejectEndUserInvite",
+        "x-mcp-group" : [ "Contacts" ],
         "parameters" : [ {
           "name" : "contactId",
           "in" : "path",
@@ -981,6 +1012,7 @@
         "summary" : "Associate accounts with contact",
         "description" : "This API associates multiple accounts with a particular contact.",
         "operationId" : "associateAccountsWithContact",
+        "x-mcp-group" : [ "Contacts" ],
         "parameters" : [ {
           "name" : "contactId",
           "in" : "path",
@@ -1003,7 +1035,7 @@
             "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
           },
           "200" : {
-            "$ref" : "./MassActionResponse.json#/components/responses/massActionListResponse"
+            "$ref" : "./MassActionResponse.json#/components/responses/massActionListSuccessNullResponse"
           }
         },
         "security" : [ {
@@ -1017,6 +1049,7 @@
         "summary" : "Associate products with a contact",
         "description" : "This API associates products with a contact. Only a maximum of 10 products can be associated with a contact through a single API request.",
         "operationId" : "associateProductsWithContact",
+        "x-mcp-group" : [ "Contacts" ],
         "parameters" : [ {
           "name" : "contactId",
           "in" : "path",
@@ -1053,6 +1086,7 @@
         "summary" : "Mark contact as spam",
         "description" : "This API marks contacts as spam.",
         "operationId" : "markContactsAsSpam",
+        "x-mcp-group" : [ "Contacts" ],
         "requestBody" : {
           "$ref" : "#/components/requestBodies/markSpamContactPayload"
         },
@@ -1061,7 +1095,7 @@
             "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
           },
           "200" : {
-            "$ref" : "./MassActionResponse.json#/components/responses/massActionListResponse"
+            "$ref" : "./MassActionResponse.json#/components/responses/massActionListSuccessNullResponse"
           }
         },
         "security" : [ {
@@ -1075,6 +1109,7 @@
         "summary" : "Delete spam contacts",
         "description" : "This API deletes the given spam contacts",
         "operationId" : "deleteSpamContacts",
+        "x-mcp-group" : [ "Contacts" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -1100,6 +1135,7 @@
         "summary" : "Invite contact to help center",
         "description" : "This API helps invite a particular contact as an end-user to your help center.",
         "operationId" : "inviteContactAsEndUser",
+        "x-mcp-group" : [ "Contacts" ],
         "parameters" : [ {
           "name" : "contactId",
           "in" : "path",
@@ -1126,6 +1162,9 @@
           },
           "403" : {
             "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "200" : {
+            "$ref" : "./MassActionResponse.json#/components/responses/massActionListSuccessNullResponse"
           }
         },
         "security" : [ {
@@ -1139,20 +1178,21 @@
         "summary" : "List Associated contacts",
         "description" : "This API lists the contacts associated with an account",
         "operationId" : "getContactsUnderAccount",
+        "x-mcp-group" : [ "Accounts" ],
         "parameters" : [ {
           "name" : "limit",
           "in" : "query",
-          "description" : "Number of contacts to fetch",
+          "description" : "No. of contacts to fetch",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "integer", "string", "null" ],
+            "type" : [ "integer" ],
             "format" : "int32",
             "maximum" : 100,
             "minimum" : 1,
             "pattern" : "([0-9]+)",
-            "description" : "Number of contacts to fetch"
+            "description" : "No. of contacts to fetch"
           }
         }, {
           "name" : "from",
@@ -1204,7 +1244,8 @@
             "description" : "Parameter that sorts contacts by one of these attributes: !@firstName,@! !@lastName,@! !@fullName,@! !@phone,@! !@email,@! !@createdTime,@! !@modifiedTime@!",
             "enum" : [ "firstName", "lastName", "phone", "fullName", "email", "createdTime", "modifiedTime" ],
             "maxLength" : 100,
-            "minLength" : 0
+            "pattern" : "-?(firstName|lastName|fullName|phone|email|createdTime|modifiedTime)",
+            "x-regex-name" : "contactSortFields"
           }
         } ],
         "responses" : {
@@ -1217,6 +1258,125 @@
         },
         "security" : [ {
           "iam-oauth2-schema" : [ "Desk.contacts.READ" ]
+        } ]
+      }
+    },
+    "/api/v1/contacts/{contactId}/accountsCount" : {
+      "get" : {
+        "tags" : [ "Contacts" ],
+        "summary" : "Get associated accounts count for a contact",
+        "description" : "Returns the count of accounts associated with a specific contact.",
+        "operationId" : "getAssociatedAccountsCountForContact",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        }, {
+          "name" : "contactId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/countJson"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.contacts.READ" ]
+        } ]
+      }
+    },
+    "/api/v1/contacts/{contactId}/updateTicketsAccount" : {
+      "post" : {
+        "tags" : [ "Contact" ],
+        "summary" : "Update tickets account for contact",
+        "description" : "Updates the account associated with the tickets of the specified contact.",
+        "operationId" : "updateTicketsAccount",
+        "x-mcp-group" : [ "Contacts" ],
+        "parameters" : [ {
+          "name" : "contactId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/updateTicketsAccount"
+        },
+        "responses" : {
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          },
+          "200" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.contacts.UPDATE" ]
+        } ]
+      }
+    },
+    "/api/v1/portalUser/{userId}/photo" : {
+      "get" : {
+        "tags" : [ "Contact" ],
+        "summary" : "Get portal user photo",
+        "description" : "Retrieves the profile photo of the specified portal user.",
+        "operationId" : "getUserPhotoStream",
+        "x-mcp-group" : [ "Contacts" ],
+        "parameters" : [ {
+          "name" : "userId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "./Common.json#/components/responses/fileResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.tickets.READ" ]
         } ]
       }
     }
@@ -1257,8 +1417,7 @@
           "type" : {
             "type" : [ "string", "null" ],
             "enum" : [ "new", "potentials", "customers", "contacts", "leads" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           }
         },
         "required" : [ "id", "type" ]
@@ -1270,8 +1429,7 @@
           "lastName" : {
             "type" : [ "string", "null" ],
             "description" : "Last name of the contact",
-            "maxLength" : 200,
-            "minLength" : 0
+            "maxLength" : 200
           },
           "accountId" : {
             "type" : [ "string", "integer", "null" ],
@@ -1282,29 +1440,28 @@
           "firstName" : {
             "type" : [ "string", "null" ],
             "description" : "First name of the contact",
-            "maxLength" : 40,
-            "minLength" : 0
+            "maxLength" : 40
           },
           "secondaryEmail" : {
             "type" : [ "string", "null" ],
             "description" : "Secondary email ID of the contact",
             "maxLength" : 100,
             "pattern" : "^[\\p{L}\\p{M}\\p{N}\\_]([\\p{L}\\p{M}\\p{N}\\_\\+\\-\\.\\'&\\!\\~]*)@(?=.{4,256}$)(([\\p{L}\\p{N}\\p{M}]+)(([\\-\\_]*[\\p{L}\\p{N}\\p{M}])*)[\\.])+[\\p{L}\\p{M}]{2,22}$",
-            "minLength" : 0
+            "x-regex-name" : "emailDesk"
           },
           "phone" : {
             "type" : [ "string", "null" ],
             "description" : "Phone number of the contact",
             "maxLength" : 50,
-            "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\$@\\?\\,\\;\\:\\'\\/\\!\\P{InBasicLatin}\\s]+",
-            "minLength" : 0
+            "pattern" : "[^0-9a-zA-Z_\\+\\-\\.\\(\\)\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]",
+            "x-regex-name" : "inv_clrtxtpatrn_phone"
           },
           "mobile" : {
             "type" : [ "string", "null" ],
             "description" : "Mobile number of the contact",
             "maxLength" : 50,
-            "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\$@\\?\\,\\;\\:\\'\\/\\!\\P{InBasicLatin}\\s]+",
-            "minLength" : 0
+            "pattern" : "[^0-9a-zA-Z_\\+\\-\\.\\(\\)\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]",
+            "x-regex-name" : "inv_clrtxtpatrn_phone"
           },
           "ownerId" : {
             "type" : [ "string", "integer", "null" ],
@@ -1315,6 +1472,7 @@
           "type" : {
             "type" : [ "string", "null" ],
             "description" : "Contact type",
+            "x-dynamic-enum" : true,
             "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
           },
           "email" : {
@@ -1322,7 +1480,7 @@
             "description" : "Email ID of the contact",
             "maxLength" : 255,
             "pattern" : "^[\\p{L}\\p{M}\\p{N}\\_]([\\p{L}\\p{M}\\p{N}\\_\\+\\-\\.\\'&\\!\\~]*)@(?=.{4,256}$)(([\\p{L}\\p{N}\\p{M}]+)(([\\-\\_]*[\\p{L}\\p{N}\\p{M}])*)[\\.])+[\\p{L}\\p{M}]{2,22}$",
-            "minLength" : 0
+            "x-regex-name" : "emailDesk"
           }
         }
       },
@@ -1336,7 +1494,6 @@
             "photoURL" : {
               "type" : [ "string", "null" ],
               "maxLength" : 100,
-              "minLength" : 0,
               "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
             },
             "isAnonymous" : {
@@ -1350,13 +1507,11 @@
             "webUrl" : {
               "type" : [ "string", "null" ],
               "maxLength" : 500,
-              "minLength" : 0,
               "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
             },
             "createdTime" : {
               "type" : [ "string", "null" ],
               "maxLength" : 100,
-              "minLength" : 0,
               "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
             },
             "isEndUser" : {
@@ -1390,7 +1545,6 @@
             "photoURL" : {
               "type" : [ "string", "null" ],
               "maxLength" : 100,
-              "minLength" : 0,
               "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
             },
             "isAnonymous" : {
@@ -1404,13 +1558,11 @@
             "webUrl" : {
               "type" : [ "string", "null" ],
               "maxLength" : 500,
-              "minLength" : 0,
               "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
             },
             "createdTime" : {
               "type" : [ "string", "null" ],
               "maxLength" : 100,
-              "minLength" : 0,
               "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
             },
             "isEndUser" : {
@@ -1487,13 +1639,11 @@
             },
             "country" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 30,
-              "minLength" : 0
+              "maxLength" : 30
             },
             "twitter" : {
               "type" : [ "string", "null" ],
               "maxLength" : 100,
-              "minLength" : 0,
               "description" : "Twitter ID of the contact"
             },
             "cf" : {
@@ -1503,15 +1653,13 @@
                 "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
                   "type" : [ "string", "null" ],
                   "maxLength" : 100,
-                  "minLength" : 0,
                   "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                 }
               }
             },
             "city" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 30,
-              "minLength" : 0
+              "maxLength" : 30
             },
             "customFields" : {
               "type" : [ "object", "null" ],
@@ -1520,41 +1668,34 @@
                 "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
                   "type" : [ "string", "null" ],
                   "maxLength" : 100,
-                  "minLength" : 0,
                   "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                 }
               }
             },
             "street" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 250,
-              "minLength" : 0
+              "maxLength" : 250
             },
             "facebook" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             },
             "mobile" : {
               "type" : [ "string", "null" ],
               "maxLength" : 50,
-              "minLength" : 0,
               "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\(\\)\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
             },
             "description" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 65535,
-              "minLength" : 0
+              "maxLength" : 65535
             },
             "state" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 30,
-              "minLength" : 0
+              "maxLength" : 30
             },
             "title" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             }
           },
           "required" : [ "cf", "city", "country", "customFields", "description", "facebook", "mobile", "state", "street", "title", "twitter", "zip" ],
@@ -1571,13 +1712,11 @@
             },
             "country" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 30,
-              "minLength" : 0
+              "maxLength" : 30
             },
             "twitter" : {
               "type" : [ "string", "null" ],
               "maxLength" : 100,
-              "minLength" : 0,
               "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
             },
             "cf" : {
@@ -1587,15 +1726,13 @@
                 "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
                   "type" : [ "string", "null" ],
                   "maxLength" : 100,
-                  "minLength" : 0,
                   "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                 }
               }
             },
             "city" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 30,
-              "minLength" : 0
+              "maxLength" : 30
             },
             "customFields" : {
               "type" : [ "null", "object" ],
@@ -1604,42 +1741,35 @@
                 "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
                   "type" : [ "string", "null" ],
                   "maxLength" : 100,
-                  "minLength" : 0,
                   "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                 }
               }
             },
             "street" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 250,
-              "minLength" : 0
+              "maxLength" : 250
             },
             "facebook" : {
               "type" : [ "string", "null" ],
               "maxLength" : 100,
-              "minLength" : 0,
               "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
             },
             "mobile" : {
               "type" : [ "string", "null" ],
               "maxLength" : 50,
-              "minLength" : 0,
               "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\(\\)\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
             },
             "description" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 65535,
-              "minLength" : 0
+              "maxLength" : 65535
             },
             "state" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 30,
-              "minLength" : 0
+              "maxLength" : 30
             },
             "title" : {
               "type" : [ "string", "null" ],
-              "maxLength" : 100,
-              "minLength" : 0
+              "maxLength" : 100
             }
           },
           "required" : [ "cf", "city", "country", "customFields", "description", "facebook", "mobile", "state", "street", "title", "twitter", "zip" ]
@@ -1776,8 +1906,7 @@
           "mappingType" : {
             "type" : [ "string", "null" ],
             "enum" : [ "PRIMARY", "SECONDARY" ],
-            "maxLength" : 100,
-            "minLength" : 0
+            "maxLength" : 100
           },
           "isAccountTicketsViewable" : {
             "type" : [ "boolean", "null" ]
@@ -1838,15 +1967,15 @@
                   "data" : [ {
                     "lastName" : "Case",
                     "secondaryEmail" : null,
-                    "mobile" : "+91 55501 00001",
+                    "mobile" : "+1 5550100123",
                     "ownerId" : null,
                     "type" : null,
                     "accountId" : "1892000000091433",
                     "firstName" : "Jonathan",
-                    "photoURL" : "https://desk.example.com/api/v1/contacts/1892000000772003/photo",
+                    "photoURL" : "https://desk.zoho.com/api/v1/contacts/1892000000772003/photo",
                     "isAnonymous" : false,
-                    "phone" : "1 555 010 0000",
-                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Contacts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
+                    "phone" : "+1 5550100123",
+                    "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Contacts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
                     "createdTime" : 1507813910000,
                     "isEndUser" : false,
                     "zohoCRMContact" : null,
@@ -1865,11 +1994,11 @@
                     "ownerId" : null,
                     "type" : null,
                     "accountId" : "1892000000052077",
-                    "firstName" : "Chris",
+                    "firstName" : "Christ",
                     "photoURL" : null,
                     "isAnonymous" : false,
                     "phone" : null,
-                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Contacts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
+                    "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Contacts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
                     "createdTime" : 1507813910000,
                     "isEndUser" : false,
                     "zohoCRMContact" : {
@@ -1891,11 +2020,11 @@
                     "ownerId" : null,
                     "type" : null,
                     "accountId" : "1892000000052077",
-                    "firstName" : "Chris",
+                    "firstName" : "Christ",
                     "photoURL" : null,
                     "isAnonymous" : false,
                     "phone" : null,
-                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Contacts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
+                    "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Contacts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
                     "createdTime" : 1507813910000,
                     "isEndUser" : false,
                     "zohoCRMContact" : {
@@ -2061,13 +2190,11 @@
                     "properties" : {
                       "firstName" : {
                         "type" : [ "string", "null" ],
-                        "maxLength" : 50,
-                        "minLength" : 0
+                        "maxLength" : 50
                       },
                       "lastName" : {
                         "type" : [ "string", "null" ],
-                        "maxLength" : 50,
-                        "minLength" : 0
+                        "maxLength" : 50
                       },
                       "id" : {
                         "type" : [ "string", "integer", "null" ],
@@ -2085,13 +2212,11 @@
                     "properties" : {
                       "website" : {
                         "type" : [ "string", "null" ],
-                        "maxLength" : 120,
-                        "minLength" : 0
+                        "maxLength" : 120
                       },
                       "accountName" : {
                         "type" : [ "string", "null" ],
-                        "maxLength" : 200,
-                        "minLength" : 0
+                        "maxLength" : 200
                       },
                       "id" : {
                         "type" : [ "string", "integer", "null" ],
@@ -2113,7 +2238,6 @@
                     "modifiedTime" : {
                       "type" : [ "string", "null" ],
                       "maxLength" : 100,
-                      "minLength" : 0,
                       "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
                     },
                     "cf" : {
@@ -2123,7 +2247,6 @@
                         "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
                           "type" : [ "string", "null" ],
                           "maxLength" : 100,
-                          "minLength" : 0,
                           "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                         }
                       }
@@ -2143,7 +2266,6 @@
                         "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
                           "type" : [ "string", "null" ],
                           "maxLength" : 100,
-                          "minLength" : 0,
                           "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                         }
                       }
@@ -2156,7 +2278,6 @@
                     "photoURL" : {
                       "type" : [ "string", "null" ],
                       "maxLength" : 100,
-                      "minLength" : 0,
                       "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
                     },
                     "isAnonymous" : {
@@ -2171,13 +2292,11 @@
                     "webUrl" : {
                       "type" : [ "string", "null" ],
                       "maxLength" : 500,
-                      "minLength" : 0,
                       "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
                     },
                     "createdTime" : {
                       "type" : [ "string", "null" ],
                       "maxLength" : 100,
-                      "minLength" : 0,
                       "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
                     },
                     "isEndUser" : {
@@ -2211,7 +2330,6 @@
                         "layoutName" : {
                           "type" : [ "string", "null" ],
                           "maxLength" : 120,
-                          "minLength" : 0,
                           "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                         }
                       },
@@ -2232,13 +2350,11 @@
                     "properties" : {
                       "firstName" : {
                         "type" : [ "string", "null" ],
-                        "maxLength" : 50,
-                        "minLength" : 0
+                        "maxLength" : 50
                       },
                       "lastName" : {
                         "type" : [ "string", "null" ],
-                        "maxLength" : 50,
-                        "minLength" : 0
+                        "maxLength" : 50
                       },
                       "id" : {
                         "type" : [ "string", "null", "integer" ],
@@ -2256,13 +2372,11 @@
                     "properties" : {
                       "website" : {
                         "type" : [ "string", "null" ],
-                        "maxLength" : 120,
-                        "minLength" : 0
+                        "maxLength" : 120
                       },
                       "accountName" : {
                         "type" : [ "string", "null" ],
-                        "maxLength" : 200,
-                        "minLength" : 0
+                        "maxLength" : 200
                       },
                       "id" : {
                         "type" : [ "string", "null", "integer" ],
@@ -2283,7 +2397,6 @@
                     "modifiedTime" : {
                       "type" : [ "string", "null" ],
                       "maxLength" : 100,
-                      "minLength" : 0,
                       "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
                     },
                     "cf" : {
@@ -2293,7 +2406,6 @@
                         "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
                           "type" : [ "string", "null" ],
                           "maxLength" : 100,
-                          "minLength" : 0,
                           "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                         }
                       }
@@ -2313,7 +2425,6 @@
                         "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
                           "type" : [ "string", "null" ],
                           "maxLength" : 100,
-                          "minLength" : 0,
                           "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                         }
                       }
@@ -2326,7 +2437,6 @@
                     "photoURL" : {
                       "type" : [ "string", "null" ],
                       "maxLength" : 100,
-                      "minLength" : 0,
                       "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
                     },
                     "isAnonymous" : {
@@ -2341,13 +2451,11 @@
                     "webUrl" : {
                       "type" : [ "string", "null" ],
                       "maxLength" : 500,
-                      "minLength" : 0,
                       "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
                     },
                     "createdTime" : {
                       "type" : [ "string", "null" ],
                       "maxLength" : 100,
-                      "minLength" : 0,
                       "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
                     },
                     "isEndUser" : {
@@ -2381,7 +2489,6 @@
                         "layoutName" : {
                           "type" : [ "string", "null" ],
                           "maxLength" : 120,
-                          "minLength" : 0,
                           "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                         }
                       },
@@ -2404,7 +2511,7 @@
                   "ownerId" : "1892000000042001",
                   "type" : null,
                   "title" : null,
-                  "photoURL" : "https://desk.example.com/api/v1/contacts/1892000000042032/photo",
+                  "photoURL" : "https://desk.zoho.com/api/v1/contacts/1892000000042032/photo",
                   "twitter" : null,
                   "isDeleted" : false,
                   "isTrashed" : false,
@@ -2438,8 +2545,8 @@
                   "accountId" : "1892000000975382",
                   "firstName" : "Jennifer",
                   "isAnonymous" : false,
-                  "phone" : "1 555 010 0000",
-                  "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Contacts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
+                  "phone" : "+1 5550100123",
+                  "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Contacts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
                   "isSpam" : false
                 }
               }
@@ -2472,15 +2579,15 @@
                       "mappingType" : "PRIMARY",
                       "isAccountTicketsViewable" : true
                     },
-                    "mobile" : "+91 55501 00001",
+                    "mobile" : "+1 5550100123",
                     "type" : null,
                     "ownerId" : "4000000008734",
                     "firstName" : null,
                     "accountId" : "4000000008784",
                     "photoURL" : null,
                     "isAnonymous" : true,
-                    "phone" : "1 555 010 0000",
-                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Contacts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
+                    "phone" : "+1 5550100123",
+                    "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Contacts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
                     "createdTime" : 1507813910000,
                     "isEndUser" : "false",
                     "zohoCRMContact" : {
@@ -2503,15 +2610,15 @@
                       "mappingType" : "PRIMARY",
                       "isAccountTicketsViewable" : true
                     },
-                    "mobile" : "+91 55501 00001",
+                    "mobile" : "+1 5550100123",
                     "type" : null,
                     "ownerId" : "4000000008734",
                     "firstName" : null,
                     "accountId" : "4000000008784",
                     "photoURL" : null,
                     "isAnonymous" : true,
-                    "phone" : "1 555 010 0000",
-                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Contacts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
+                    "phone" : "+1 5550100123",
+                    "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Contacts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
                     "createdTime" : 1507813910000,
                     "isEndUser" : "false",
                     "zohoCRMContact" : {
@@ -2634,21 +2741,17 @@
                 },
                 "fieldName" : {
                   "type" : [ "string", "null" ],
-                  "maxLength" : 320,
-                  "minLength" : 0,
-                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                  "maxLength" : 320
                 },
                 "ids" : {
                   "$ref" : "#/components/schemas/long_array"
                 },
                 "fieldValue" : {
                   "type" : [ "string", "null" ],
-                  "maxLength" : 320,
-                  "minLength" : 0,
-                  "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+                  "maxLength" : 320
                 }
               },
-              "required" : [ "fieldName", "ids" ]
+              "required" : [ "fieldName", "ids", "fieldValue" ]
             },
             "examples" : {
               "Valid requestBody Definitions" : {
@@ -2667,7 +2770,6 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "additionalProperties" : false,
               "allOf" : [ {
                 "$ref" : "#/components/schemas/commonJson"
               }, {
@@ -2696,7 +2798,6 @@
                       "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
                         "type" : [ "string" ],
                         "maxLength" : 100,
-                        "minLength" : 0,
                         "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                       }
                     }
@@ -2713,7 +2814,6 @@
                       "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
                         "type" : [ "string" ],
                         "maxLength" : 100,
-                        "minLength" : 0,
                         "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                       }
                     }
@@ -2732,7 +2832,6 @@
                     "type" : [ "string" ],
                     "description" : "Mobile number of the contact",
                     "maxLength" : 50,
-                    "minLength" : 0,
                     "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\(\\)\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
                   },
                   "description" : {
@@ -2750,8 +2849,7 @@
                     "description" : "Contact title",
                     "maxLength" : 100
                   }
-                },
-                "additionalProperties" : false
+                }
               }, {
                 "type" : [ "object" ],
                 "properties" : {
@@ -2763,6 +2861,7 @@
                   "language" : {
                     "type" : [ "string" ],
                     "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+",
+                    "x-regex-name" : "picklistValue",
                     "maxLength" : 255
                   }
                 }
@@ -2777,15 +2876,15 @@
                   "secondaryEmail" : "hughjack@zylker.com",
                   "city" : "Texas",
                   "facebook" : "hugh jacks",
-                  "mobile" : "+1 555 010 0010",
+                  "mobile" : "+1 5550100123",
                   "description" : "first priority contact",
                   "ownerId" : "1892000000056007",
                   "type" : [ "paidUser" ],
                   "title" : "The contact",
                   "accountId" : "1892000000052077",
-                  "firstName" : "Hugh",
+                  "firstName" : "hugh",
                   "twitter" : "Hugh jack",
-                  "phone" : "5550100011",
+                  "phone" : "+1 5550100123",
                   "street" : "North street",
                   "state" : "Austin",
                   "email" : "jack@zylker.com"
@@ -2814,14 +2913,12 @@
                   "country" : {
                     "type" : [ "string" ],
                     "description" : "Contact's country of residence",
-                    "maxLength" : 30,
-                    "minLength" : 0
+                    "maxLength" : 30
                   },
                   "twitter" : {
                     "type" : [ "string" ],
                     "description" : "Twitter ID of the contact",
-                    "maxLength" : 100,
-                    "minLength" : 0
+                    "maxLength" : 100
                   },
                   "cf" : {
                     "type" : [ "object" ],
@@ -2830,7 +2927,6 @@
                       "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
                         "type" : [ "string" ],
                         "maxLength" : 100,
-                        "minLength" : 0,
                         "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                       }
                     }
@@ -2838,8 +2934,7 @@
                   "city" : {
                     "type" : [ "string" ],
                     "description" : "Contact's city of residence",
-                    "maxLength" : 30,
-                    "minLength" : 0
+                    "maxLength" : 30
                   },
                   "customFields" : {
                     "type" : [ "object" ],
@@ -2848,7 +2943,6 @@
                       "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+" : {
                         "type" : [ "string" ],
                         "maxLength" : 100,
-                        "minLength" : 0,
                         "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
                       }
                     }
@@ -2856,39 +2950,33 @@
                   "street" : {
                     "type" : [ "string" ],
                     "description" : "Contact's address",
-                    "maxLength" : 250,
-                    "minLength" : 0
+                    "maxLength" : 250
                   },
                   "facebook" : {
                     "type" : [ "string" ],
                     "description" : "Facebook ID of the contact",
-                    "maxLength" : 100,
-                    "minLength" : 0
+                    "maxLength" : 100
                   },
                   "mobile" : {
                     "type" : [ "string" ],
                     "description" : "Mobile number of the contact",
                     "maxLength" : 50,
-                    "minLength" : 0,
                     "pattern" : "[0-9a-zA-Z_\\+\\-\\.\\(\\)\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
                   },
                   "description" : {
                     "type" : [ "string" ],
                     "description" : "Contact description",
-                    "maxLength" : 65535,
-                    "minLength" : 0
+                    "maxLength" : 65535
                   },
                   "state" : {
                     "type" : [ "string" ],
                     "description" : "Contact's state of residence",
-                    "maxLength" : 30,
-                    "minLength" : 0
+                    "maxLength" : 30
                   },
                   "title" : {
                     "type" : [ "string" ],
                     "description" : "Contact title",
-                    "maxLength" : 100,
-                    "minLength" : 0
+                    "maxLength" : 100
                   }
                 },
                 "additionalProperties" : false
@@ -2903,6 +2991,7 @@
                   "language" : {
                     "type" : [ "string" ],
                     "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+",
+                    "x-regex-name" : "picklistValue",
                     "maxLength" : 255
                   }
                 }
@@ -2910,7 +2999,26 @@
             },
             "examples" : {
               "Valid requestBody Definitions" : {
-                "value" : null
+                "value" : {
+                  "zip" : "123902",
+                  "lastName" : "Jack",
+                  "country" : "USA",
+                  "secondaryEmail" : "hughjack@zylker.com",
+                  "city" : "Texas",
+                  "facebook" : "hugh jacks",
+                  "mobile" : "+1 5550100123",
+                  "description" : "first priority contact",
+                  "ownerId" : "1892000000056007",
+                  "type" : [ "paidUser" ],
+                  "title" : "The contact",
+                  "accountId" : "1892000000052077",
+                  "firstName" : "hugh",
+                  "twitter" : "Hugh jack",
+                  "phone" : "+1 5550100123",
+                  "street" : "North street",
+                  "state" : "Austin",
+                  "email" : "jack@zylker.com"
+                }
               }
             }
           }
@@ -2946,14 +3054,14 @@
                     },
                     "city" : "4000000018011",
                     "facebook" : "4000000018011",
-                    "mobile" : "4000000018011",
+                    "mobile" : "+1 5550100123",
                     "description" : "4000000018011",
                     "type" : [ "4000000018011" ],
                     "title" : "4000000018011",
                     "firstName" : "4000000018011",
                     "accountId" : "4000000018011",
                     "twitter" : "4000000018011",
-                    "phone" : "4000000018011",
+                    "phone" : "+1 5550100123",
                     "street" : "4000000018011",
                     "email" : "4000000018011"
                   }
@@ -3195,7 +3303,7 @@
                   "description" : "Key that marks or unmarks tickets from the contact(s) as spam"
                 }
               },
-              "required" : [ "ids", "isSpam" ],
+              "required" : [ "ids", "isSpam", "handleExistingTickets" ],
               "additionalProperties" : false
             },
             "examples" : {
@@ -3230,6 +3338,40 @@
             }
           }
         }
+      },
+      "updateTicketsAccount" : {
+        "required" : true,
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "oldAccountId" : {
+                  "type" : [ "string", "integer" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)",
+                  "description" : "ID of the account from which the tickets need to be moved"
+                },
+                "newAccountId" : {
+                  "type" : [ "string", "integer" ],
+                  "format" : "int64",
+                  "pattern" : "([0-9]+)",
+                  "description" : "ID of the account to move the tickets to"
+                }
+              },
+              "required" : [ "oldAccountId", "newAccountId" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "oldAccountId" : 7000000027223,
+                  "newAccountId" : 7000000043968
+                }
+              }
+            }
+          }
+        }
       }
     },
     "securitySchemes" : {
@@ -3241,7 +3383,11 @@
       },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "Contact"
 }

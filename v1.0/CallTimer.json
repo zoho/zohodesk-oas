@@ -1,0 +1,156 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "CallTimer",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/calls/{callId}/timer" : {
+      "get" : {
+        "tags" : [ "CallTimer" ],
+        "summary" : "Get Call Timer",
+        "description" : "Retrieves the time elapsed in the call timer, along with its current state.",
+        "operationId" : "getCallTimer",
+        "parameters" : [ {
+          "name" : "callId",
+          "in" : "path",
+          "description" : "Unique ID of the call from which the timer must be retrieved",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/callTimerJson"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.activities.calls.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.tasks.READ" ]
+        } ]
+      },
+      "post" : {
+        "tags" : [ "CallTimer" ],
+        "summary" : "Perform Call Timer Action",
+        "description" : "Performs a timer-related action on a call.",
+        "operationId" : "updateCallTimerState",
+        "parameters" : [ {
+          "name" : "action",
+          "in" : "query",
+          "description" : "Action of the timer. Supported actions are START, STOP, PAUSE and RESUME",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "maxLength" : 100,
+            "enum" : [ "START", "STOP", "PAUSE", "RESUME" ],
+            "pattern" : "START|STOP|PAUSE|RESUME"
+          }
+        }, {
+          "name" : "callId",
+          "in" : "path",
+          "description" : "Unique ID of the call containing the timer",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/callTimerJson"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.activities.calls.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.tasks.UPDATE" ]
+        } ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "callTimerJson" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "hours" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "seconds" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "minutes" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          },
+          "state" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "RUNNING", "PAUSED", "INIT" ]
+          }
+        },
+        "required" : [ "hours", "minutes", "seconds", "state" ]
+      }
+    },
+    "responses" : {
+      "callTimerJson" : {
+        "description" : "callTimerJson template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/callTimerJson"
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "hours" : 0,
+                  "seconds" : 0,
+                  "minutes" : 0,
+                  "state" : "RUNNING"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "CallTimer"
+}

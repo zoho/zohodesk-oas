@@ -11,6 +11,7 @@
         "summary" : "Get Invoices",
         "description" : "Retrieves invoices associated with the specified Desk entity.",
         "operationId" : "getInvoices",
+        "x-mcp-group" : [ "Integrations" ],
         "parameters" : [ {
           "name" : "deskEntityId",
           "in" : "query",
@@ -19,9 +20,8 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "integer" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "type" : "string",
+            "format" : "int64"
           }
         }, {
           "name" : "pageNumber",
@@ -31,9 +31,8 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "integer" ],
-            "format" : "int32",
-            "pattern" : "([0-9]+)"
+            "type" : "integer",
+            "format" : "int32"
           }
         }, {
           "name" : "departmentId",
@@ -43,9 +42,8 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "integer" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "type" : "string",
+            "format" : "int64"
           }
         }, {
           "name" : "deskModuleName",
@@ -55,7 +53,7 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string" ],
+            "type" : "string",
             "enum" : [ "Contacts", "Cases", "Accounts" ]
           }
         }, {
@@ -66,7 +64,7 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string" ],
+            "type" : "string",
             "enum" : [ "sent", "draft", "overdue", "paid", "void", "partially_paid" ],
             "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
           }
@@ -112,6 +110,7 @@
         "summary" : "Get Estimates",
         "description" : "Retrieves estimates associated with the specified Desk entity.",
         "operationId" : "getEstimates",
+        "x-mcp-group" : [ "Integrations" ],
         "parameters" : [ {
           "name" : "deskEntityId",
           "in" : "query",
@@ -120,9 +119,8 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "integer" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "type" : "string",
+            "format" : "int64"
           }
         }, {
           "name" : "pageNumber",
@@ -132,9 +130,8 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "integer" ],
-            "format" : "int32",
-            "pattern" : "([0-9]+)"
+            "type" : "integer",
+            "format" : "int32"
           }
         }, {
           "name" : "deskModuleName",
@@ -144,7 +141,7 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string" ],
+            "type" : "string",
             "enum" : [ "Contacts", "Cases", "Accounts" ]
           }
         }, {
@@ -155,7 +152,7 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string" ],
+            "type" : "string",
             "enum" : [ "sent", "draft", "overdue", "paid", "void", "partially_paid" ],
             "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
           }
@@ -349,6 +346,7 @@
         "summary" : "Get Tickets for Invoice",
         "description" : "Retrieves tickets associated with the specified invoice.",
         "operationId" : "getTicketsForInvoiceId",
+        "x-mcp-group" : [ "Integrations" ],
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -584,11 +582,13 @@
           },
           "priority" : {
             "description" : "Priority of the ticket",
-            "type" : [ "string", "null" ]
+            "type" : [ "string", "null" ],
+            "x-dynamic-enum" : true
           },
           "status" : {
             "description" : "Status of the ticket",
-            "type" : [ "string", "null" ]
+            "type" : [ "string", "null" ],
+            "x-dynamic-enum" : true
           },
           "commentCount" : {
             "description" : "Number of comments on the ticket",
@@ -765,7 +765,7 @@
               "properties" : {
                 "status" : {
                   "description" : "Status to apply to the estimate",
-                  "type" : [ "string" ],
+                  "type" : "string",
                   "enum" : [ "sent" ],
                   "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
                 }
@@ -791,7 +791,7 @@
               "properties" : {
                 "status" : {
                   "description" : "Status to apply to the invoice",
-                  "type" : [ "string" ],
+                  "type" : "string",
                   "enum" : [ "sent" ],
                   "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
                 }
@@ -819,9 +819,9 @@
                   "description" : "ID(s) of the invoices to mark as sent",
                   "type" : [ "array" ],
                   "items" : {
-                    "type" : [ "string", "integer" ],
+                    "type" : "string",
                     "format" : "int64",
-                    "pattern" : "([0-9]+)"
+                    "maxLength" : 800
                   },
                   "uniqueItems" : false
                 }
@@ -849,5 +849,6 @@
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "Finance"
 }

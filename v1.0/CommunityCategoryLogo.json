@@ -11,6 +11,7 @@
         "summary" : "Upload Category Logo",
         "description" : "Uploads a logo for a community category.",
         "operationId" : "addCommunityCategoryLogo",
+        "x-mcp-group" : [ "Manage Community", "Manage Community Recyclebin" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -53,10 +54,59 @@
           "iam-oauth2-schema" : [ "Desk.forums.CREATE", "Desk.community.CREATE" ]
         } ]
       }
+    },
+    "/api/v1/communityCategory/{categoryId}/logo/{logoId}" : {
+      "get" : {
+        "tags" : [ "CommunityCategoryLogo" ],
+        "summary" : "Get Category Logo",
+        "description" : "Retrieves the logo of a community category.",
+        "operationId" : "getCommunityCategoryLogo",
+        "parameters" : [ {
+          "name" : "categoryId",
+          "description" : "Unique ID of the category from which the logo must be retrieved.",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/categoryIdSchema"
+          }
+        }, {
+          "name" : "logoId",
+          "description" : "Unique ID of the logo to retrieve.",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/logoIdSchema"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "#/components/responses/getCategoryLogoResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.forums.READ", "Desk.community.READ" ]
+        } ]
+      }
     }
   },
   "components" : {
     "schemas" : {
+      "categoryIdSchema" : {
+        "type" : [ "string", "null", "integer" ],
+        "format" : "int64",
+        "pattern" : "([0-9]+)"
+      },
+      "logoIdSchema" : {
+        "type" : [ "string", "null", "integer" ],
+        "format" : "int64",
+        "pattern" : "([0-9]+)"
+      },
       "addAttachmentResponse" : {
         "type" : [ "object", "null" ],
         "additionalProperties" : false,
@@ -125,6 +175,17 @@
             }
           }
         }
+      },
+      "getCategoryLogoResponse" : {
+        "description" : "This API returns a 204 status code with no response body.",
+        "content" : {
+          "image/png" : {
+            "schema" : {
+              "type" : "string",
+              "format" : "binary"
+            }
+          }
+        }
       }
     },
     "securitySchemes" : {
@@ -138,5 +199,6 @@
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "CommunityCategoryLogo"
 }

@@ -11,6 +11,7 @@
         "summary" : "Remove File Attachments from Article Translation",
         "description" : "Removes file attachments from an article translation.",
         "operationId" : "removeFileAttachmentsFromArticleTranslation",
+        "x-mcp-group" : [ "KB Admin", "Manage KB Templates", "Manage KB Articles" ],
         "parameters" : [ {
           "description" : "Unique ID of the article",
           "$ref" : "#/components/parameters/articleId"
@@ -105,6 +106,7 @@
         "summary" : "Get Article Translation Attachments",
         "description" : "Retrieves the files attached to an article translation, with pagination support.",
         "operationId" : "getArticleTranslationAttachments",
+        "x-mcp-group" : [ "KB Admin", "Manage KB Templates", "View KB Templates", "Manage KB Articles", "View KB Articles", "View KB" ],
         "parameters" : [ {
           "description" : "Unique ID of the article",
           "$ref" : "#/components/parameters/articleId"
@@ -206,6 +208,7 @@
         "summary" : "Attach Files to Article Translation",
         "description" : "Attaches files selected from the portal gallery to an article translation.",
         "operationId" : "attachFilesToArticleTranslation",
+        "x-mcp-group" : [ "KB Admin", "Manage KB Templates", "Manage KB Articles" ],
         "parameters" : [ {
           "description" : "Unique ID of the article",
           "$ref" : "#/components/parameters/articleId"
@@ -228,207 +231,6 @@
         },
         "security" : [ {
           "iam-oauth2-schema" : [ "Desk.articles.CREATE" ]
-        } ]
-      }
-    },
-    "/api/v1/Solutions/{articleId}/attachments" : {
-      "get" : {
-        "tags" : [ "ArticleAttachment" ],
-        "summary" : "Get article attachments",
-        "description" : "Lists article attachments.",
-        "operationId" : "getArticleAttachments",
-        "parameters" : [ {
-          "name" : "articleId",
-          "in" : "path",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : [ "string", "integer", "null" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
-          }
-        }, {
-          "$ref" : "./Common.json#/components/parameters/orgId"
-        } ],
-        "responses" : {
-          "200" : {
-            "$ref" : "./FAQTranslation.json#/components/responses/articleAttachments"
-          }
-        },
-        "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.articles.READ" ]
-        } ]
-      },
-      "put" : {
-        "tags" : [ "ArticleAttachment" ],
-        "summary" : "Associate article attachment",
-        "description" : "Associates attachments to article.",
-        "operationId" : "associateArticleAttachment",
-        "parameters" : [ {
-          "name" : "attachmentType",
-          "in" : "query",
-          "required" : true,
-          "style" : "form",
-          "explode" : true,
-          "schema" : {
-            "type" : [ "string" ],
-            "enum" : [ "file", "blob" ]
-          }
-        }, {
-          "name" : "articleId",
-          "in" : "path",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : [ "string", "integer", "null" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
-          }
-        }, {
-          "$ref" : "./Common.json#/components/parameters/orgId"
-        } ],
-        "requestBody" : {
-          "content" : {
-            "multipart/form-data" : {
-              "schema" : {
-                "type" : "object",
-                "properties" : {
-                  "file" : {
-                    "type" : "string",
-                    "format" : "binary"
-                  }
-                },
-                "required" : [ "file" ]
-              }
-            }
-          }
-        },
-        "responses" : {
-          "422" : {
-            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
-          },
-          "200" : {
-            "$ref" : "./FAQ.json#/components/responses/attachments"
-          }
-        },
-        "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.articles.CREATE" ]
-        } ]
-      },
-      "patch" : {
-        "tags" : [ "ArticleAttachment" ],
-        "summary" : "Associate article attachment",
-        "description" : "Associates attachments to article.",
-        "operationId" : "patchAssociateArticleAttachment",
-        "parameters" : [ {
-          "name" : "attachmentType",
-          "in" : "query",
-          "required" : true,
-          "style" : "form",
-          "explode" : true,
-          "schema" : {
-            "type" : [ "string" ],
-            "enum" : [ "file", "blob" ]
-          }
-        }, {
-          "name" : "articleId",
-          "in" : "path",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : [ "string", "integer", "null" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
-          }
-        }, {
-          "$ref" : "./Common.json#/components/parameters/orgId"
-        } ],
-        "requestBody" : {
-          "content" : {
-            "multipart/form-data" : {
-              "schema" : {
-                "type" : "object",
-                "properties" : {
-                  "file" : {
-                    "type" : "string",
-                    "format" : "binary"
-                  }
-                },
-                "required" : [ "file" ]
-              }
-            }
-          }
-        },
-        "responses" : {
-          "422" : {
-            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
-          },
-          "200" : {
-            "$ref" : "./FAQ.json#/components/responses/attachments"
-          }
-        },
-        "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.articles.CREATE" ]
-        } ]
-      },
-      "delete" : {
-        "tags" : [ "ArticleAttachment" ],
-        "summary" : "Delete article attachment",
-        "description" : "Deletes article attachment.",
-        "operationId" : "deleteArticleAttachment",
-        "parameters" : [ {
-          "name" : "limit",
-          "in" : "query",
-          "description" : "Number of attachments to fetch",
-          "required" : false,
-          "style" : "form",
-          "explode" : true,
-          "schema" : {
-            "type" : [ "string", "integer" ],
-            "format" : "int32",
-            "description" : "Number of attachments to fetch",
-            "maximum" : 30,
-            "minimum" : 1,
-            "pattern" : "([0-9]+)"
-          }
-        }, {
-          "name" : "from",
-          "in" : "query",
-          "description" : "Index number starting from which the article attachments must be fetched.",
-          "required" : false,
-          "style" : "form",
-          "explode" : true,
-          "schema" : {
-            "type" : [ "string", "null", "integer" ],
-            "format" : "int32",
-            "description" : "Index number starting from which the article attachments must be fetched.",
-            "minimum" : 1,
-            "pattern" : "([0-9]+)"
-          }
-        }, {
-          "name" : "articleId",
-          "in" : "path",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : [ "string", "integer", "null" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
-          }
-        }, {
-          "$ref" : "./Common.json#/components/parameters/orgId"
-        } ],
-        "responses" : {
-          "204" : {
-            "$ref" : "./Common.json#/components/responses/emptyResponse"
-          }
-        },
-        "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.articles.READ" ]
         } ]
       }
     },
@@ -512,7 +314,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.articles.CREATE" ]
+          "iam-oauth2-schema" : [ "Desk.articles.UPDATE" ]
         } ]
       }
     },
@@ -708,7 +510,7 @@
                   "extension" : "png",
                   "name" : "Screen Shot 2018-12-28 at 7.21.58 PM.png",
                   "filesize" : "62",
-                  "url" : "https://desk.example.com/galleryDocuments/edbsnf8e40a0174a649fa9b698be5f73211329e2a7513daad01207c771fbf50e1b3e33f3f5c1d654f5a4c7805862493f6bb8a?inline=true"
+                  "url" : "https://desk.zoho.com/galleryDocuments/edbsnf8e40a0174a649fa9b698be5f73211329e2a7513daad01207c771fbf50e1b3e33f3f5c1d654f5a4c7805862493f6bb8a?inline=true"
                 }
               }
             }
@@ -769,7 +571,7 @@
                     "resourceId" : "ri690b233fcd327d74e6d843e7519df78695d",
                     "size" : 503111,
                     "name" : "img.png",
-                    "url" : "https://desk.example.com/galleryDocuments/edbsn600c48f2ffd30fa778de3fad61ac8844391cd70b2575f36ac6c0295bbb93259e0129ddaf874099a9f97f9e16b2f1f48f?inline=true"
+                    "url" : "https://desk.zoho.com/galleryDocuments/edbsn600c48f2ffd30fa778de3fad61ac8844391cd70b2575f36ac6c0295bbb93259e0129ddaf874099a9f97f9e16b2f1f48f?inline=true"
                   } ]
                 }
               }
@@ -828,5 +630,6 @@
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "ArticleAttachment"
 }

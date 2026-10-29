@@ -11,6 +11,7 @@
         "summary" : "Get My Profile Details",
         "description" : "Retrieves the configuration details and permissions defined for the profile of the currently logged-in user.",
         "operationId" : "getMyProfile",
+        "x-mcp-group" : [ "Profiles & Roles" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -20,7 +21,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.permissions.READ", "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.permissions.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       }
     },
@@ -30,6 +33,7 @@
         "summary" : "Get Profile",
         "description" : "Retrieves details of a specific profile.",
         "operationId" : "getProfile",
+        "x-mcp-group" : [ "Profiles & Roles" ],
         "parameters" : [ {
           "name" : "profileId",
           "in" : "path",
@@ -51,7 +55,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.permissions.READ", "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.permissions.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       },
       "patch" : {
@@ -86,7 +92,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.basic.UPDATE", "Desk.permissions.UPDATE", "Desk.settings.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.permissions.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.basic.UPDATE", "Desk.settings.UPDATE" ]
         } ]
       }
     },
@@ -96,6 +104,7 @@
         "summary" : "Get Profile Count",
         "description" : "Retrieves the number of profiles configured in the help desk portal.",
         "operationId" : "getProfileCount",
+        "x-mcp-group" : [ "Profiles & Roles" ],
         "parameters" : [ {
           "name" : "default",
           "in" : "query",
@@ -125,7 +134,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.permissions.READ", "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.permissions.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       }
     },
@@ -135,6 +146,7 @@
         "summary" : "Get Light Agent Profile",
         "description" : "Retrieves the permissions configured for the light agent profile.",
         "operationId" : "getLightAgentProfile",
+        "x-mcp-group" : [ "Profiles & Roles" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -144,7 +156,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.permissions.READ", "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.permissions.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       }
     },
@@ -154,6 +168,7 @@
         "summary" : "Clone Profile",
         "description" : "Replicates an existing profile.",
         "operationId" : "cloneProfile",
+        "x-mcp-group" : [ "Profiles & Roles" ],
         "parameters" : [ {
           "name" : "profileId",
           "in" : "path",
@@ -181,7 +196,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.basic.CREATE", "Desk.permissions.CREATE", "Desk.settings.CREATE" ]
+          "iam-oauth2-schema" : [ "Desk.permissions.CREATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.basic.CREATE", "Desk.settings.CREATE" ]
         } ]
       }
     },
@@ -218,7 +235,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.basic.DELETE", "Desk.permissions.DELETE", "Desk.settings.DELETE" ]
+          "iam-oauth2-schema" : [ "Desk.permissions.DELETE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.basic.DELETE", "Desk.settings.DELETE" ]
         } ]
       }
     },
@@ -228,6 +247,7 @@
         "summary" : "Get Profiles",
         "description" : "Retrieves profiles in the help desk portal.",
         "operationId" : "getProfileList",
+        "x-mcp-group" : [ "Profiles & Roles" ],
         "parameters" : [ {
           "name" : "default",
           "in" : "query",
@@ -259,7 +279,7 @@
             "type" : [ "string" ],
             "maxLength" : 100,
             "minLength" : 1,
-            "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+"
+            "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+"
           }
         }, {
           "name" : "from",
@@ -271,7 +291,7 @@
           "schema" : {
             "type" : [ "string", "null", "integer" ],
             "format" : "int32",
-            "minimum" : 0,
+            "default" : 0,
             "pattern" : "([0-9]+)"
           }
         }, {
@@ -286,6 +306,7 @@
             "format" : "int32",
             "maximum" : 250,
             "minimum" : 1,
+            "default" : 250,
             "pattern" : "([0-9]+)"
           }
         }, {
@@ -296,10 +317,12 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "null" ],
-            "maxLength" : 100,
-            "minLength" : 0,
-            "pattern" : "^((type|isVisible|default|modifiedBy|modifiedTime|permissions|description)(,(type|isVisible|default|modifiedBy|modifiedTime|permissions|description))*)?$"
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "enum" : [ "type", "isVisible", "default", "modifiedBy", "modifiedTime", "permissions", "description" ]
+            },
+            "maxItems" : 7
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -316,7 +339,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.permissions.READ", "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.permissions.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       }
     },
@@ -326,6 +351,7 @@
         "summary" : "Get My Profile Permissions",
         "description" : "Retrieves the permissions associated with the profile of the currently logged-in user.",
         "operationId" : "getMyProfilePermissions",
+        "x-mcp-group" : [ "Profiles & Roles" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -335,7 +361,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.permissions.READ", "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.basic.READ", "Desk.permissions.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       }
     },
@@ -345,6 +373,7 @@
         "summary" : "Get Agents by Profile",
         "description" : "Retrieves agents mapped to a specific profile.",
         "operationId" : "getAgentsByProfile",
+        "x-mcp-group" : [ "Profiles & Roles" ],
         "parameters" : [ {
           "name" : "active",
           "in" : "query",
@@ -389,7 +418,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.agents.READ", "Desk.basic.READ", "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.agents.READ", "Desk.basic.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       }
     }
@@ -618,21 +649,61 @@
             "type" : [ "boolean", "null" ],
             "description" : "Indicates whether reports can be viewed"
           },
+          "create" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether reports can be created"
+          },
           "edit" : {
             "type" : [ "boolean", "null" ],
             "description" : "Indicates whether reports can be edited"
           },
-          "create" : {
+          "editAllArticles" : {
             "type" : [ "boolean", "null" ],
-            "description" : "Indicates whether reports can be created"
+            "description" : "Edit published articles permission of the module"
+          },
+          "moderate" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "moderate post / comment of community module"
           },
           "delete" : {
             "type" : [ "boolean", "null" ],
             "description" : "Indicates whether reports can be deleted"
           },
+          "manageKB" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Manage Permission of the module"
+          },
+          "admin" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Manage Permission of the module"
+          },
+          "import" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Import Permission of the module"
+          },
           "export" : {
             "type" : [ "boolean", "null" ],
             "description" : "Indicates whether reports can be exported"
+          },
+          "manageOwnCustomViews" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Permission to manage personal customviews"
+          },
+          "shareOwnCustomViews" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Permission to share personal customviews"
+          },
+          "editSharedCustomViews" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Permission to edit others customviews"
+          },
+          "deleteSharedCustomViews" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Permission to delete others customviews"
+          },
+          "reshareSharedCustomViews" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Permission to share others customviews"
           }
         },
         "required" : [ "create", "delete", "edit", "export", "view" ]
@@ -842,21 +913,37 @@
             "type" : [ "boolean", "null" ],
             "description" : "Indicates whether contracts can be viewed"
           },
-          "import" : {
+          "create" : {
             "type" : [ "boolean", "null" ],
-            "description" : "Indicates whether contracts can be imported"
+            "description" : "Indicates whether contracts can be created"
           },
           "edit" : {
             "type" : [ "boolean", "null" ],
             "description" : "Indicates whether contracts can be edited"
           },
-          "create" : {
+          "editAllArticles" : {
             "type" : [ "boolean", "null" ],
-            "description" : "Indicates whether contracts can be created"
+            "description" : "Edit published articles permission of the module"
+          },
+          "moderate" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "moderate post / comment of community module"
           },
           "delete" : {
             "type" : [ "boolean", "null" ],
             "description" : "Indicates whether contracts can be deleted"
+          },
+          "manageKB" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Manage Permission of the module"
+          },
+          "admin" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Manage Permission of the module"
+          },
+          "import" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether contracts can be imported"
           },
           "export" : {
             "type" : [ "boolean", "null" ],
@@ -893,25 +980,61 @@
             "type" : [ "boolean", "null" ],
             "description" : "Indicates whether community records can be viewed"
           },
-          "edit" : {
-            "type" : [ "boolean", "null" ],
-            "description" : "Indicates whether community records can be edited"
-          },
           "create" : {
             "type" : [ "boolean", "null" ],
             "description" : "Indicates whether community records can be created"
           },
-          "delete" : {
+          "edit" : {
             "type" : [ "boolean", "null" ],
-            "description" : "Indicates whether community records can be deleted"
+            "description" : "Indicates whether community records can be edited"
+          },
+          "editAllArticles" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Edit published articles permission of the module"
           },
           "moderate" : {
             "type" : [ "boolean", "null" ],
             "description" : "Indicates whether community content can be moderated"
           },
+          "delete" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether community records can be deleted"
+          },
+          "manageKB" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Manage Permission of the module"
+          },
+          "admin" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Manage Permission of the module"
+          },
+          "import" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Import Permission of the module"
+          },
           "export" : {
             "type" : [ "boolean", "null" ],
             "description" : "Export Permission of the module"
+          },
+          "manageOwnCustomViews" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Permission to manage personal customviews"
+          },
+          "shareOwnCustomViews" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Permission to share personal customviews"
+          },
+          "editSharedCustomViews" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Permission to edit others customviews"
+          },
+          "deleteSharedCustomViews" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Permission to delete others customviews"
+          },
+          "reshareSharedCustomViews" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Permission to share others customviews"
           }
         },
         "required" : [ "create", "delete", "edit", "moderate", "view" ]
@@ -925,21 +1048,37 @@
             "type" : [ "boolean", "null" ],
             "description" : "Indicates whether products can be viewed"
           },
-          "import" : {
+          "create" : {
             "type" : [ "boolean", "null" ],
-            "description" : "Indicates whether products can be imported"
+            "description" : "Indicates whether products can be created"
           },
           "edit" : {
             "type" : [ "boolean", "null" ],
             "description" : "Indicates whether products can be edited"
           },
-          "create" : {
+          "editAllArticles" : {
             "type" : [ "boolean", "null" ],
-            "description" : "Indicates whether products can be created"
+            "description" : "Edit published articles permission of the module"
+          },
+          "moderate" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "moderate post / comment of community module"
           },
           "delete" : {
             "type" : [ "boolean", "null" ],
             "description" : "Indicates whether products can be deleted"
+          },
+          "manageKB" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Manage Permission of the module"
+          },
+          "admin" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Manage Permission of the module"
+          },
+          "import" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether products can be imported"
           },
           "export" : {
             "type" : [ "boolean", "null" ],
@@ -1201,10 +1340,6 @@
             "type" : [ "boolean", "null" ],
             "description" : "Permission to manage Gamification"
           },
-          "managerDashboard" : {
-            "type" : [ "boolean" ],
-            "description" : "Indicates whether manager dashboard settings can be managed"
-          },
           "googleAnalytics" : {
             "type" : [ "boolean", "null" ],
             "description" : "Indicates whether Google Analytics settings can be managed"
@@ -1248,6 +1383,10 @@
           "manageAgentChatRoom" : {
             "type" : [ "boolean", "null" ],
             "description" : "Permission to manage Agent Chat Room"
+          },
+          "managerDashboard" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether manager dashboard settings can be managed"
           }
         },
         "required" : [ "automation", "buttons", "chat", "community", "customerHappiness", "department", "email", "exportPortalUsers", "exportUsers", "featureConfig", "fetchAcrossDepartment", "gamification", "globalReports", "googleAnalytics", "im", "importHistory", "layouts", "localization", "manageAgents", "manageMarketplace", "managerDashboard", "massComment", "massReply", "moveRecords", "permission", "pinnedConversations", "portal", "portalUsers", "privacySettings", "rebranding", "recycleBin", "sandbox", "securitySettings", "shareSnippet", "signUpApproval", "social", "tabsAndFields", "teams", "telephony", "templates", "timeTracking", "webForm", "webhooks" ]
@@ -1293,21 +1432,37 @@
             "type" : [ "boolean", "null" ],
             "description" : "Indicates whether accounts can be viewed"
           },
-          "import" : {
+          "create" : {
             "type" : [ "boolean", "null" ],
-            "description" : "Indicates whether accounts can be imported"
+            "description" : "Indicates whether accounts can be created"
           },
           "edit" : {
             "type" : [ "boolean", "null" ],
             "description" : "Indicates whether accounts can be edited"
           },
-          "create" : {
+          "editAllArticles" : {
             "type" : [ "boolean", "null" ],
-            "description" : "Indicates whether accounts can be created"
+            "description" : "Edit published articles permission of the module"
+          },
+          "moderate" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "moderate post / comment of community module"
           },
           "delete" : {
             "type" : [ "boolean", "null" ],
             "description" : "Indicates whether accounts can be deleted"
+          },
+          "manageKB" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Manage Permission of the module"
+          },
+          "admin" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Manage Permission of the module"
+          },
+          "import" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether accounts can be imported"
           },
           "export" : {
             "type" : [ "boolean", "null" ],
@@ -1345,17 +1500,61 @@
             "type" : [ "boolean", "null" ],
             "description" : "Indicates whether time entries can be viewed"
           },
-          "edit" : {
-            "type" : [ "boolean", "null" ],
-            "description" : "Indicates whether time entries can be edited"
-          },
           "create" : {
             "type" : [ "boolean", "null" ],
             "description" : "Indicates whether time entries can be created"
           },
+          "edit" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether time entries can be edited"
+          },
+          "editAllArticles" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Edit published articles permission of the module"
+          },
+          "moderate" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "moderate post / comment of community module"
+          },
           "delete" : {
             "type" : [ "boolean", "null" ],
             "description" : "Indicates whether time entries can be deleted"
+          },
+          "manageKB" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Manage Permission of the module"
+          },
+          "admin" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Manage Permission of the module"
+          },
+          "import" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Import Permission of the module"
+          },
+          "export" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Export Permission of the module"
+          },
+          "manageOwnCustomViews" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Permission to manage personal customviews"
+          },
+          "shareOwnCustomViews" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Permission to share personal customviews"
+          },
+          "editSharedCustomViews" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Permission to edit others customviews"
+          },
+          "deleteSharedCustomViews" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Permission to delete others customviews"
+          },
+          "reshareSharedCustomViews" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Permission to share others customviews"
           }
         },
         "required" : [ "create", "delete", "edit", "view" ]
@@ -1369,21 +1568,37 @@
             "type" : [ "boolean", "null" ],
             "description" : "Indicates whether contacts can be viewed"
           },
-          "import" : {
+          "create" : {
             "type" : [ "boolean", "null" ],
-            "description" : "Indicates whether contacts can be imported"
+            "description" : "Indicates whether contacts can be created"
           },
           "edit" : {
             "type" : [ "boolean", "null" ],
             "description" : "Indicates whether contacts can be edited"
           },
-          "create" : {
+          "editAllArticles" : {
             "type" : [ "boolean", "null" ],
-            "description" : "Indicates whether contacts can be created"
+            "description" : "Edit published articles permission of the module"
+          },
+          "moderate" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "moderate post / comment of community module"
           },
           "delete" : {
             "type" : [ "boolean", "null" ],
             "description" : "Indicates whether contacts can be deleted"
+          },
+          "manageKB" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Manage Permission of the module"
+          },
+          "admin" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Manage Permission of the module"
+          },
+          "import" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether contacts can be imported"
           },
           "export" : {
             "type" : [ "boolean", "null" ],
@@ -1448,21 +1663,37 @@
             "type" : [ "boolean", "null" ],
             "description" : "Indicates whether tasks can be viewed"
           },
-          "import" : {
+          "create" : {
             "type" : [ "boolean", "null" ],
-            "description" : "Indicates whether tasks can be imported"
+            "description" : "Indicates whether tasks can be created"
           },
           "edit" : {
             "type" : [ "boolean", "null" ],
             "description" : "Indicates whether tasks can be edited"
           },
-          "create" : {
+          "editAllArticles" : {
             "type" : [ "boolean", "null" ],
-            "description" : "Indicates whether tasks can be created"
+            "description" : "Edit published articles permission of the module"
+          },
+          "moderate" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "moderate post / comment of community module"
           },
           "delete" : {
             "type" : [ "boolean", "null" ],
             "description" : "Indicates whether tasks can be deleted"
+          },
+          "manageKB" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Manage Permission of the module"
+          },
+          "admin" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Manage Permission of the module"
+          },
+          "import" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether tasks can be imported"
           },
           "export" : {
             "type" : [ "boolean", "null" ],
@@ -1755,41 +1986,61 @@
             "type" : [ "boolean", "null" ],
             "description" : "View Permission of the module"
           },
-          "reshareSharedCustomViews" : {
+          "create" : {
             "type" : [ "boolean", "null" ],
-            "description" : "Permission to share others customviews"
+            "description" : "Create Permission of the module"
           },
           "edit" : {
             "type" : [ "boolean", "null" ],
             "description" : "Edit Permission of the module"
           },
-          "deleteSharedCustomViews" : {
+          "editAllArticles" : {
             "type" : [ "boolean", "null" ],
-            "description" : "Permission to delete others customviews"
+            "description" : "Edit published articles permission of the module"
           },
-          "shareOwnCustomViews" : {
+          "moderate" : {
             "type" : [ "boolean", "null" ],
-            "description" : "Permission to share personal customviews"
-          },
-          "create" : {
-            "type" : [ "boolean", "null" ],
-            "description" : "Create Permission of the module"
-          },
-          "manageOwnCustomViews" : {
-            "type" : [ "boolean", "null" ],
-            "description" : "Permission to manage personal customviews"
-          },
-          "editSharedCustomViews" : {
-            "type" : [ "boolean", "null" ],
-            "description" : "Permission to edit others customviews"
+            "description" : "moderate post / comment of community module"
           },
           "delete" : {
             "type" : [ "boolean", "null" ],
             "description" : "Delete Permission of the module"
           },
+          "manageKB" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Manage Permission of the module"
+          },
+          "admin" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Manage Permission of the module"
+          },
+          "import" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Import Permission of the module"
+          },
           "export" : {
             "type" : [ "boolean", "null" ],
             "description" : "Export Permission of the module"
+          },
+          "manageOwnCustomViews" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Permission to manage personal customviews"
+          },
+          "shareOwnCustomViews" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Permission to share personal customviews"
+          },
+          "editSharedCustomViews" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Permission to edit others customviews"
+          },
+          "deleteSharedCustomViews" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Permission to delete others customviews"
+          },
+          "reshareSharedCustomViews" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Permission to share others customviews"
           }
         },
         "required" : [ "create", "delete", "deleteSharedCustomViews", "edit", "editSharedCustomViews", "export", "manageOwnCustomViews", "reshareSharedCustomViews", "shareOwnCustomViews", "view" ]
@@ -1797,99 +2048,100 @@
       "commonPermissionJsonRequest" : {
         "type" : [ "object" ],
         "additionalProperties" : false,
+        "description" : "Permission groups to update for the profile",
         "properties" : {
           "crmInteg" : {
-            "$ref" : "#/components/schemas/crmIntegPermissionJson"
+            "$ref" : "#/components/schemas/crmIntegPermissionJsonRequest"
           },
           "reports" : {
-            "$ref" : "#/components/schemas/reportsPermissionJson"
+            "$ref" : "#/components/schemas/reportsPermissionJsonRequest"
           },
           "tickets" : {
-            "$ref" : "#/components/schemas/ticketsPermissionJson"
+            "$ref" : "#/components/schemas/ticketsPermissionJsonRequest"
           },
           "mobileapp" : {
-            "$ref" : "#/components/schemas/mobileappPermissionJson"
+            "$ref" : "#/components/schemas/mobileappPermissionJsonRequest"
           },
           "contracts" : {
-            "$ref" : "#/components/schemas/contractsPermissionJson"
+            "$ref" : "#/components/schemas/contractsPermissionJsonRequest"
           },
           "products" : {
-            "$ref" : "#/components/schemas/productsPermissionJson"
+            "$ref" : "#/components/schemas/productsPermissionJsonRequest"
           },
           "zia" : {
-            "$ref" : "#/components/schemas/ziaPermissionJson"
+            "$ref" : "#/components/schemas/ziaPermissionJsonRequest"
           },
           "timeEntry" : {
-            "$ref" : "#/components/schemas/timeEntryPermissionJson"
+            "$ref" : "#/components/schemas/timeEntryPermissionJsonRequest"
           },
           "gc" : {
-            "$ref" : "#/components/schemas/gcPermissionJson"
+            "$ref" : "#/components/schemas/gcPermissionJsonRequest"
           },
           "tasks" : {
-            "$ref" : "#/components/schemas/tasksPermissionJson"
+            "$ref" : "#/components/schemas/tasksPermissionJsonRequest"
           },
           "events" : {
-            "$ref" : "#/components/schemas/contactsPermissionJson"
+            "$ref" : "#/components/schemas/contactsPermissionJsonRequest"
           },
           "courses" : {
-            "$ref" : "#/components/schemas/clientActionPermissionJson"
+            "$ref" : "#/components/schemas/clientActionPermissionJsonRequest"
           },
           "comments" : {
-            "$ref" : "#/components/schemas/commentsPermissionJson"
+            "$ref" : "#/components/schemas/commentsPermissionJsonRequest"
           },
           "im" : {
-            "$ref" : "#/components/schemas/imPermissionJson"
+            "$ref" : "#/components/schemas/imPermissionJsonRequest"
           },
           "social" : {
-            "$ref" : "#/components/schemas/socialPermissionJson"
+            "$ref" : "#/components/schemas/socialPermissionJsonRequest"
           },
           "community" : {
-            "$ref" : "#/components/schemas/communityPermissionJson"
+            "$ref" : "#/components/schemas/communityPermissionJsonRequest"
           },
           "agents" : {
-            "$ref" : "#/components/schemas/agentsPermissionJson"
+            "$ref" : "#/components/schemas/agentsPermissionJsonRequest"
           },
           "CommunityTopic" : {
-            "$ref" : "#/components/schemas/CommunityTopicPermissionJson"
+            "$ref" : "#/components/schemas/CommunityTopicPermissionJsonRequest"
           },
           "radar" : {
-            "$ref" : "#/components/schemas/radarPermissionJson"
+            "$ref" : "#/components/schemas/radarPermissionJsonRequest"
           },
           "kbCategory" : {
-            "$ref" : "#/components/schemas/kbCategoryPermissionJson"
+            "$ref" : "#/components/schemas/kbCategoryPermissionJsonRequest"
           },
           "calls" : {
-            "$ref" : "#/components/schemas/contactsPermissionJson"
+            "$ref" : "#/components/schemas/contactsPermissionJsonRequest"
           },
           "setup" : {
-            "$ref" : "#/components/schemas/setupPermissionJson"
+            "$ref" : "#/components/schemas/setupPermissionJsonRequest"
           },
           "financeInteg" : {
-            "$ref" : "#/components/schemas/financeIntegPermissionJson"
+            "$ref" : "#/components/schemas/financeIntegPermissionJsonRequest"
           },
           "CommunityComment" : {
-            "$ref" : "#/components/schemas/CommunityCommentPermissionJson"
+            "$ref" : "#/components/schemas/CommunityCommentPermissionJsonRequest"
           },
           "accounts" : {
-            "$ref" : "#/components/schemas/accountsPermissionJson"
+            "$ref" : "#/components/schemas/accountsPermissionJsonRequest"
           },
           "contacts" : {
-            "$ref" : "#/components/schemas/contactsPermissionJson"
+            "$ref" : "#/components/schemas/contactsPermissionJsonRequest"
           },
           "activities" : {
-            "$ref" : "#/components/schemas/activitiesPermissionJson"
+            "$ref" : "#/components/schemas/activitiesPermissionJsonRequest"
           },
           "chat" : {
-            "$ref" : "#/components/schemas/chatPermissionJson"
+            "$ref" : "#/components/schemas/chatPermissionJsonRequest"
           },
           "ticketLifeCycleData" : {
-            "$ref" : "#/components/schemas/ticketLifeCycleDataJson"
+            "$ref" : "#/components/schemas/ticketLifeCycleDataJsonRequest"
           },
           "supportEmailAddress" : {
-            "$ref" : "#/components/schemas/supportEmailAddressDataJson"
+            "$ref" : "#/components/schemas/supportEmailAddressDataJsonRequest"
           },
           "managerDashboard" : {
-            "$ref" : "#/components/schemas/managerDashboardJson"
+            "$ref" : "#/components/schemas/managerDashboardJsonRequest"
           },
           "modules" : {
             "type" : [ "object" ],
@@ -1915,56 +2167,1368 @@
                 "description" : "Export Permission of the module"
               },
               "manageOwnCustomViews" : {
-                "type" : [ "boolean", "null" ],
+                "type" : [ "boolean" ],
                 "description" : "Permission to manage personal customviews"
               },
               "shareOwnCustomViews" : {
-                "type" : [ "boolean", "null" ],
+                "type" : [ "boolean" ],
                 "description" : "Permission to share personal customviews"
               },
               "editSharedCustomViews" : {
-                "type" : [ "boolean", "null" ],
+                "type" : [ "boolean" ],
                 "description" : "Permission to edit others customviews"
               },
               "deleteSharedCustomViews" : {
-                "type" : [ "boolean", "null" ],
+                "type" : [ "boolean" ],
                 "description" : "Permission to delete others customviews"
               },
               "reshareSharedCustomViews" : {
-                "type" : [ "boolean", "null" ],
+                "type" : [ "boolean" ],
                 "description" : "Permission to share others customviews"
               }
             },
-            "required" : [ "create", "delete", "deleteSharedCustomViews", "edit", "editSharedCustomViews", "export", "manageOwnCustomViews", "reshareSharedCustomViews", "shareOwnCustomViews", "view" ],
             "additionalProperties" : false,
             "description" : "Module-level access permissions for the profile"
           },
           "clientEvents" : {
-            "$ref" : "#/components/schemas/clientActionPermissionJson"
+            "$ref" : "#/components/schemas/clientActionPermissionJsonRequest"
           },
           "componentMapping" : {
-            "$ref" : "#/components/schemas/clientActionPermissionJson"
+            "$ref" : "#/components/schemas/clientActionPermissionJsonRequest"
           },
           "eventMapping" : {
-            "$ref" : "#/components/schemas/clientActionPermissionJson"
+            "$ref" : "#/components/schemas/clientActionPermissionJsonRequest"
           },
           "componentEventMappingAssociation" : {
-            "$ref" : "#/components/schemas/clientActionPermissionJson"
+            "$ref" : "#/components/schemas/clientActionPermissionJsonRequest"
           },
           "clientActionConditions" : {
-            "$ref" : "#/components/schemas/clientActionPermissionJson"
+            "$ref" : "#/components/schemas/clientActionPermissionJsonRequest"
           },
           "clientAction" : {
-            "$ref" : "#/components/schemas/clientActionPermissionJson"
+            "$ref" : "#/components/schemas/clientActionPermissionJsonRequest"
           },
           "clientActionModuleAssociation" : {
-            "$ref" : "#/components/schemas/clientActionPermissionJson"
+            "$ref" : "#/components/schemas/clientActionPermissionJsonRequest"
           },
           "clientActionLocationAssociation" : {
-            "$ref" : "#/components/schemas/clientActionPermissionJson"
+            "$ref" : "#/components/schemas/clientActionPermissionJsonRequest"
           }
-        },
-        "required" : [ "CommunityComment", "CommunityTopic", "accounts", "activities", "agents", "calls", "clientAction", "clientActionConditions", "clientActionLocationAssociation", "clientActionModuleAssociation", "clientEvents", "comments", "community", "componentEventMappingAssociation", "componentMapping", "contacts", "contracts", "crmInteg", "eventMapping", "events", "financeInteg", "gc", "im", "kbCategory", "mobileapp", "products", "radar", "reports", "setup", "social", "tasks", "tickets", "timeEntry", "zia" ]
+        }
+      },
+      "CommunityCommentPermissionJsonRequest" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "description" : "Community comment permissions",
+        "properties" : {
+          "view" : {
+            "type" : [ "boolean" ],
+            "description" : "View permission of the module"
+          }
+        }
+      },
+      "CommunityTopicPermissionJsonRequest" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "description" : "Community topic permissions",
+        "properties" : {
+          "view" : {
+            "type" : [ "boolean" ],
+            "description" : "View permission of the module"
+          }
+        }
+      },
+      "accountsPermissionJsonRequest" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "description" : "Account permissions",
+        "properties" : {
+          "view" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether accounts can be viewed"
+          },
+          "import" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether accounts can be imported"
+          },
+          "edit" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether accounts can be edited"
+          },
+          "create" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether accounts can be created"
+          },
+          "delete" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether accounts can be deleted"
+          },
+          "export" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether accounts can be exported"
+          },
+          "manageOwnCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to manage personal customviews"
+          },
+          "shareOwnCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to share personal customviews"
+          },
+          "editSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to edit others customviews"
+          },
+          "deleteSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to delete others customviews"
+          },
+          "reshareSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to share others customviews"
+          }
+        }
+      },
+      "activitiesPermissionJsonRequest" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "description" : "Activity permissions",
+        "properties" : {
+          "manageOwnCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to manage personal customviews"
+          },
+          "shareOwnCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to share personal customviews"
+          },
+          "editSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to edit others customviews"
+          },
+          "deleteSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to delete others customviews"
+          },
+          "reshareSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to share others customviews"
+          }
+        }
+      },
+      "agentsPermissionJsonRequest" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "description" : "Agent permissions",
+        "properties" : {
+          "overview" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the agent overview can be accessed"
+          },
+          "import" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether agents can be imported"
+          },
+          "edit" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether agents can be edited"
+          },
+          "create" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether agents can be created"
+          },
+          "delete" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether agents can be deleted"
+          },
+          "viewAllFields" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether all agent fields can be viewed"
+          }
+        }
+      },
+      "chatPermissionJsonRequest" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "description" : "Chat permissions",
+        "properties" : {
+          "view" : {
+            "type" : [ "boolean" ],
+            "description" : "View permission of the module"
+          }
+        }
+      },
+      "clientActionPermissionJsonRequest" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "description" : "Module permissions",
+        "properties" : {
+          "view" : {
+            "type" : [ "boolean" ],
+            "description" : "View Permission of the module"
+          },
+          "reshareSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to share others customviews"
+          },
+          "edit" : {
+            "type" : [ "boolean" ],
+            "description" : "Edit Permission of the module"
+          },
+          "deleteSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to delete others customviews"
+          },
+          "shareOwnCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to share personal customviews"
+          },
+          "create" : {
+            "type" : [ "boolean" ],
+            "description" : "Create Permission of the module"
+          },
+          "manageOwnCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to manage personal customviews"
+          },
+          "editSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to edit others customviews"
+          },
+          "delete" : {
+            "type" : [ "boolean" ],
+            "description" : "Delete Permission of the module"
+          },
+          "export" : {
+            "type" : [ "boolean" ],
+            "description" : "Export Permission of the module"
+          }
+        }
+      },
+      "commentsPermissionJsonRequest" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "description" : "Comment permissions",
+        "properties" : {
+          "edit" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether comments can be edited"
+          },
+          "delete" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether comments can be deleted"
+          },
+          "editOthers" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether other users' comments can be edited"
+          },
+          "deleteOthers" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether other users' comments can be deleted"
+          }
+        }
+      },
+      "communityPermissionJsonRequest" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "description" : "Community permissions",
+        "properties" : {
+          "view" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether community records can be viewed"
+          },
+          "edit" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether community records can be edited"
+          },
+          "create" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether community records can be created"
+          },
+          "delete" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether community records can be deleted"
+          },
+          "moderate" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether community content can be moderated"
+          },
+          "export" : {
+            "type" : [ "boolean" ],
+            "description" : "Export Permission of the module"
+          }
+        }
+      },
+      "contactsPermissionJsonRequest" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "description" : "Contact permissions",
+        "properties" : {
+          "view" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether contacts can be viewed"
+          },
+          "import" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether contacts can be imported"
+          },
+          "edit" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether contacts can be edited"
+          },
+          "create" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether contacts can be created"
+          },
+          "delete" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether contacts can be deleted"
+          },
+          "export" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether contacts can be exported"
+          },
+          "manageOwnCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to manage personal customviews"
+          },
+          "shareOwnCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to share personal customviews"
+          },
+          "editSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to edit others customviews"
+          },
+          "deleteSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to delete others customviews"
+          },
+          "reshareSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to share others customviews"
+          }
+        }
+      },
+      "contractsPermissionJsonRequest" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "description" : "Contract permissions",
+        "properties" : {
+          "view" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether contracts can be viewed"
+          },
+          "import" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether contracts can be imported"
+          },
+          "edit" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether contracts can be edited"
+          },
+          "create" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether contracts can be created"
+          },
+          "delete" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether contracts can be deleted"
+          },
+          "export" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether contracts can be exported"
+          },
+          "manageOwnCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to manage personal customviews"
+          },
+          "shareOwnCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to share personal customviews"
+          },
+          "editSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to edit others customviews"
+          },
+          "deleteSharedCustomViews" : {
+            "type" : [ "boolean" ]
+          },
+          "reshareSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to share others customviews"
+          }
+        }
+      },
+      "crmIntegPermissionJsonRequest" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "description" : "CRM integration permissions",
+        "properties" : {
+          "crmContactsActivityEvents" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether CRM contact activity events can be accessed"
+          },
+          "crmAccountsActivityEvents" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether CRM account activity events can be accessed"
+          },
+          "crmAccountsActivityTasks" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether CRM account activity tasks can be accessed"
+          },
+          "crmAccountsInfo" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether CRM account information can be accessed"
+          },
+          "crmContactsActivityCalls" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether CRM contact activity calls can be accessed"
+          },
+          "crmAccountsNotes" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether CRM account notes can be accessed"
+          },
+          "crmAccountsActivityCalls" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether CRM account activity calls can be accessed"
+          },
+          "crmContactsInfo" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether CRM contact information can be accessed"
+          },
+          "crmContactsNotes" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether CRM contact notes can be accessed"
+          },
+          "crmContactsActivityTasks" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether CRM contact activity tasks can be accessed"
+          },
+          "crmAccountsPotentials" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether CRM account potentials can be accessed"
+          },
+          "crmContactsPotentials" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether CRM contact potentials can be accessed"
+          }
+        }
+      },
+      "financeIntegPermissionJsonRequest" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "description" : "Finance integration permissions",
+        "properties" : {
+          "sendSalesOrder" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to manage send salesorder"
+          },
+          "createSalesOrder" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to manage create salesorder"
+          },
+          "sendInvoice" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether invoices can be sent"
+          },
+          "viewSubscription" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to manage view subscription details"
+          },
+          "createEstimate" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether estimates can be created"
+          },
+          "createContact" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether finance contacts can be created"
+          },
+          "viewInvoice" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether invoices can be viewed"
+          },
+          "createInvoice" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether invoices can be created"
+          },
+          "sendEstimate" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether estimates can be sent"
+          },
+          "viewSalesOrder" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to manage view salesorder details"
+          },
+          "viewEstimate" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether estimates can be viewed"
+          }
+        }
+      },
+      "gcPermissionJsonRequest" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "description" : "Guided conversation permissions",
+        "properties" : {
+          "view" : {
+            "type" : [ "boolean" ],
+            "description" : "View Permission for GC components"
+          },
+          "edit" : {
+            "type" : [ "boolean" ],
+            "description" : "Edit Permission for GC components"
+          },
+          "create" : {
+            "type" : [ "boolean" ],
+            "description" : "Create Permission for GC components"
+          },
+          "delete" : {
+            "type" : [ "boolean" ],
+            "description" : "Delete Permission for GC components"
+          }
+        }
+      },
+      "imPermissionJsonRequest" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "description" : "Instant messaging permissions",
+        "properties" : {
+          "view" : {
+            "type" : [ "boolean" ],
+            "description" : "View Permission of the module"
+          },
+          "edit" : {
+            "type" : [ "boolean" ],
+            "description" : "Edit Permission of the module"
+          },
+          "create" : {
+            "type" : [ "boolean" ],
+            "description" : "Create Permission of the module"
+          },
+          "delete" : {
+            "type" : [ "boolean" ],
+            "description" : "Delete Permission of the module"
+          }
+        }
+      },
+      "kbCategoryPermissionJsonRequest" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "description" : "Knowledge base category permissions",
+        "properties" : {
+          "view" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether knowledge base categories can be viewed"
+          },
+          "editAllArticles" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether all articles can be edited"
+          },
+          "import" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether knowledge base content can be imported"
+          },
+          "manageKB" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the knowledge base can be managed"
+          },
+          "edit" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether knowledge base categories can be edited"
+          },
+          "admin" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether knowledge base administrative actions are allowed"
+          },
+          "create" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether knowledge base categories can be created"
+          },
+          "delete" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether knowledge base categories can be deleted"
+          },
+          "export" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether knowledge base content can be exported"
+          },
+          "moderate" : {
+            "type" : [ "boolean" ],
+            "description" : "Moderate post or comment of the module"
+          },
+          "manageOwnCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to manage personal customviews"
+          },
+          "shareOwnCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to share personal customviews"
+          },
+          "editSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to edit others customviews"
+          },
+          "deleteSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to delete others customviews"
+          },
+          "reshareSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to share others customviews"
+          }
+        }
+      },
+      "managerDashboardJsonRequest" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "description" : "Manager dashboard permissions",
+        "properties" : {
+          "myView" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the personal manager dashboard view can be accessed"
+          },
+          "allView" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the all-users manager dashboard view can be accessed"
+          },
+          "customize" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the manager dashboard can be customized"
+          }
+        }
+      },
+      "mobileappPermissionJsonRequest" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "description" : "Mobile app permissions",
+        "properties" : {
+          "radar" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether Radar can be accessed"
+          },
+          "deskapp" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the Desk app can be accessed"
+          },
+          "customMobileApps" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether custom mobile apps can be accessed"
+          }
+        }
+      },
+      "productsPermissionJsonRequest" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "description" : "Product permissions",
+        "properties" : {
+          "view" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether products can be viewed"
+          },
+          "import" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether products can be imported"
+          },
+          "edit" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether products can be edited"
+          },
+          "create" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether products can be created"
+          },
+          "delete" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether products can be deleted"
+          },
+          "export" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether products can be exported"
+          },
+          "manageOwnCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to manage personal customviews"
+          },
+          "shareOwnCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to share personal customviews"
+          },
+          "editSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to edit others customviews"
+          },
+          "deleteSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to delete others customviews"
+          },
+          "reshareSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to share others customviews"
+          }
+        }
+      },
+      "radarPermissionJsonRequest" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "description" : "Radar permissions",
+        "properties" : {
+          "agentStats" : {
+            "type" : [ "boolean" ],
+            "description" : "Radar mobile app Agent Stats Widget"
+          },
+          "currentStats" : {
+            "type" : [ "boolean" ],
+            "description" : "Radar mobile app Current Stats Widget"
+          },
+          "auditLog" : {
+            "type" : [ "boolean" ],
+            "description" : "Radar mobile app Audit Log Widget"
+          },
+          "im" : {
+            "type" : [ "boolean" ],
+            "description" : "Radar mobile app IM Widget"
+          },
+          "channelTraffic" : {
+            "type" : [ "boolean" ],
+            "description" : "Radar mobile app Channel Traffic Widget"
+          },
+          "dailyToast" : {
+            "type" : [ "boolean" ],
+            "description" : "Radar mobile app Daily Toast Widget"
+          },
+          "liveTraffic" : {
+            "type" : [ "boolean" ],
+            "description" : "Radar mobile app Live Traffic Widget"
+          },
+          "exceptionHandling" : {
+            "type" : [ "boolean" ],
+            "description" : "Radar mobile app Exception Handling Widget"
+          },
+          "textContentProtection" : {
+            "type" : [ "boolean" ],
+            "description" : "Radar mobile app Text Content Protection"
+          },
+          "dashboards" : {
+            "type" : [ "boolean" ],
+            "description" : "Radar mobile app Dashboards Widget"
+          },
+          "dailyTrend" : {
+            "type" : [ "boolean" ],
+            "description" : "Radar mobile app Daily Trend Widget"
+          },
+          "apiUsageAlerts" : {
+            "type" : [ "boolean" ],
+            "description" : "Radar mobile app API Usage Alerts Widget"
+          },
+          "fcr" : {
+            "type" : [ "boolean" ],
+            "description" : "Radar mobile app FCR Widget"
+          },
+          "activities" : {
+            "type" : [ "boolean" ],
+            "description" : "Radar mobile app Activities Widget"
+          },
+          "kb" : {
+            "type" : [ "boolean" ],
+            "description" : "Radar mobile app KB Widget"
+          },
+          "visualContentProtection" : {
+            "type" : [ "boolean" ],
+            "description" : "Radar mobile app Visual Content Protection"
+          },
+          "feeds" : {
+            "type" : [ "boolean" ],
+            "description" : "Radar mobile app Feeds Widget"
+          },
+          "averageHandlingTime" : {
+            "type" : [ "boolean" ],
+            "description" : "Radar mobile app Average Handling Time Widget"
+          },
+          "customerHappiness" : {
+            "type" : [ "boolean" ],
+            "description" : "Radar mobile app Customer Happiness Widget"
+          },
+          "manageRadar" : {
+            "type" : [ "boolean" ],
+            "description" : "Radar mobile app accessible widget management permission"
+          },
+          "quickView" : {
+            "type" : [ "boolean" ],
+            "description" : "Radar mobile app Quick View Widget"
+          },
+          "mostThreadedTickets" : {
+            "type" : [ "boolean" ],
+            "description" : "Radar mobile app Most Threaded Tickets Widget"
+          },
+          "contacts" : {
+            "type" : [ "boolean" ],
+            "description" : "Radar mobile app Contacts Widget"
+          }
+        }
+      },
+      "reportsPermissionJsonRequest" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "description" : "Report permissions",
+        "properties" : {
+          "view" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether reports can be viewed"
+          },
+          "edit" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether reports can be edited"
+          },
+          "create" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether reports can be created"
+          },
+          "delete" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether reports can be deleted"
+          },
+          "export" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether reports can be exported"
+          }
+        }
+      },
+      "setupPermissionJsonRequest" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "description" : "Setup permissions",
+        "properties" : {
+          "localization" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether localization settings can be managed"
+          },
+          "timeTracking" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether time tracking settings can be managed"
+          },
+          "massReply" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to manage mass reply"
+          },
+          "fetchAcrossDepartment" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether data can be fetched across departments"
+          },
+          "globalReports" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether global reports can be managed"
+          },
+          "exportPortalUsers" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether portal users can be exported"
+          },
+          "layouts" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether layouts can be managed"
+          },
+          "shareSnippet" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to manage share snippet"
+          },
+          "automation" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether automation can be managed"
+          },
+          "featureConfig" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether feature configuration can be managed"
+          },
+          "customerHappiness" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether customer happiness settings can be managed"
+          },
+          "department" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether departments can be managed"
+          },
+          "portal" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether portal settings can be managed"
+          },
+          "webForm" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether web forms can be managed"
+          },
+          "rebranding" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether branding settings can be managed"
+          },
+          "email" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether email settings can be managed"
+          },
+          "recycleBin" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether Recycle Bin settings can be managed"
+          },
+          "tabsAndFields" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether tabs and fields can be managed"
+          },
+          "exportUsers" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether users can be exported"
+          },
+          "pinnedConversations" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to manage Pinned Conversations"
+          },
+          "buttons" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether button settings can be managed"
+          },
+          "teams" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether teams can be managed"
+          },
+          "im" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to manage IM channel."
+          },
+          "social" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether social settings can be managed"
+          },
+          "templates" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether templates can be managed"
+          },
+          "sandbox" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether sandbox settings can be managed"
+          },
+          "securitySettings" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to manage Security Settings"
+          },
+          "maskContent" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to mask content in a thread or comment"
+          },
+          "unmaskMaskedContent" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to unmask (restore) previously masked content"
+          },
+          "viewMaskedContent" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to view the original text of masked content"
+          },
+          "redactContent" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to permanently redact content"
+          },
+          "moveRecords" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether records can be moved"
+          },
+          "permission" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether permission settings can be managed"
+          },
+          "signUpApproval" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether signup approval can be managed"
+          },
+          "community" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether community settings can be managed"
+          },
+          "privacySettings" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to manage privacy settings"
+          },
+          "importHistory" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether import history can be accessed"
+          },
+          "manageAgents" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether agents can be managed"
+          },
+          "portalUsers" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether portal users can be managed"
+          },
+          "gamification" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to manage Gamification"
+          },
+          "googleAnalytics" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether Google Analytics settings can be managed"
+          },
+          "webhooks" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to manage Webhooks."
+          },
+          "chat" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether chat settings can be managed"
+          },
+          "telephony" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether telephony settings can be managed"
+          },
+          "manageMarketplace" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether marketplace integrations can be managed"
+          },
+          "massComment" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to manage Mass Comment"
+          },
+          "exportReports" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to export Reports"
+          },
+          "ticketStatus" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to manage the different Tickets statuses under setup."
+          },
+          "subscription" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to manage Subscription."
+          },
+          "manageAgentRoom" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to manage Workstation"
+          },
+          "manageAgentChatRoom" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to manage Agent Chat Room"
+          },
+          "managerDashboard" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether manager dashboard settings can be managed"
+          }
+        }
+      },
+      "socialPermissionJsonRequest" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "description" : "Social channels permissions",
+        "properties" : {
+          "view" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether social records can be viewed"
+          },
+          "twitterPostDelete" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether Twitter posts can be deleted"
+          },
+          "twitterConversationReply" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether Twitter conversations can be replied to"
+          },
+          "twitterPostCreate" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether Twitter posts can be created"
+          },
+          "twitterPostShare" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to manage share twitter post"
+          }
+        }
+      },
+      "supportEmailAddressDataJsonRequest" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "description" : "Support email address permissions",
+        "properties" : {
+          "view" : {
+            "type" : [ "boolean" ],
+            "description" : "View Permission of the module"
+          },
+          "edit" : {
+            "type" : [ "boolean" ],
+            "description" : "Edit Permission of the module"
+          },
+          "create" : {
+            "type" : [ "boolean" ],
+            "description" : "Create Permission of the module"
+          },
+          "delete" : {
+            "type" : [ "boolean" ],
+            "description" : "Delete Permission of the module"
+          },
+          "export" : {
+            "type" : [ "boolean" ],
+            "description" : "Export Permission of the module"
+          },
+          "manageOwnCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to manage personal customviews"
+          },
+          "shareOwnCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to share personal customviews"
+          },
+          "editSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to edit others customviews"
+          },
+          "deleteSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to delete others customviews"
+          },
+          "reshareSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to share others customviews"
+          }
+        }
+      },
+      "tasksPermissionJsonRequest" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "description" : "Task permissions",
+        "properties" : {
+          "view" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether tasks can be viewed"
+          },
+          "import" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether tasks can be imported"
+          },
+          "edit" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether tasks can be edited"
+          },
+          "create" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether tasks can be created"
+          },
+          "delete" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether tasks can be deleted"
+          },
+          "export" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether tasks can be exported"
+          },
+          "manageOwnCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to manage personal customviews"
+          },
+          "shareOwnCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to share personal customviews"
+          },
+          "editSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to edit others customviews"
+          },
+          "deleteSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to delete others customviews"
+          },
+          "reshareSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to share others customviews"
+          }
+        }
+      },
+      "ticketLifeCycleDataJsonRequest" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "description" : "Ticket life cycle permissions",
+        "properties" : {
+          "view" : {
+            "type" : [ "boolean" ],
+            "description" : "View Permission of the module"
+          },
+          "edit" : {
+            "type" : [ "boolean" ],
+            "description" : "Edit Permission of the module"
+          },
+          "create" : {
+            "type" : [ "boolean" ],
+            "description" : "Create Permission of the module"
+          },
+          "delete" : {
+            "type" : [ "boolean" ],
+            "description" : "Delete Permission of the module"
+          },
+          "export" : {
+            "type" : [ "boolean" ],
+            "description" : "Export Permission of the module"
+          },
+          "manageOwnCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to manage personal customviews"
+          },
+          "shareOwnCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to share personal customviews"
+          },
+          "editSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to edit others customviews"
+          },
+          "deleteSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to delete others customviews"
+          },
+          "reshareSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to share others customviews"
+          }
+        }
+      },
+      "ticketsPermissionJsonRequest" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "description" : "Ticket permissions",
+        "properties" : {
+          "mergeTickets" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether tickets can be merged"
+          },
+          "changeOwner" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether ticket ownership can be changed"
+          },
+          "import" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether tickets can be imported"
+          },
+          "handleUnassigned" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether unassigned tickets can be handled"
+          },
+          "edit" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether tickets can be edited"
+          },
+          "closeTicket" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether tickets can be closed"
+          },
+          "deleteTags" : {
+            "type" : [ "boolean" ],
+            "description" : "Delete Tags"
+          },
+          "revokeBlueprint" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether blueprint actions can be revoked"
+          },
+          "mailReview" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether outgoing email review is allowed"
+          },
+          "delete" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether tickets can be deleted"
+          },
+          "view" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether tickets can be viewed"
+          },
+          "create" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether tickets can be created"
+          },
+          "addFollowers" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether followers can be added to tickets"
+          },
+          "export" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether tickets can be exported"
+          },
+          "mailSend" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether ticket emails can be sent"
+          },
+          "editTags" : {
+            "type" : [ "boolean" ],
+            "description" : "Edit Tags"
+          },
+          "unassignedChangeOwner" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether ownership of unassigned tickets can be changed"
+          },
+          "shareTickets" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether tickets can be shared"
+          },
+          "manageOwnCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to manage personal customviews"
+          },
+          "shareOwnCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to share personal customviews"
+          },
+          "editSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to edit others customviews"
+          },
+          "deleteSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to delete others customviews"
+          },
+          "reshareSharedCustomViews" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to share others customviews"
+          },
+          "pinnedConversations" : {
+            "type" : [ "boolean" ],
+            "description" : "Permission to manage Pinned Conversations for all agents"
+          }
+        }
+      },
+      "timeEntryPermissionJsonRequest" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "description" : "Time entry permissions",
+        "properties" : {
+          "view" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether time entries can be viewed"
+          },
+          "edit" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether time entries can be edited"
+          },
+          "create" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether time entries can be created"
+          },
+          "delete" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether time entries can be deleted"
+          }
+        }
+      },
+      "ziaPermissionJsonRequest" : {
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "description" : "Zia permissions",
+        "properties" : {
+          "view" : {
+            "type" : [ "boolean" ],
+            "description" : "View Permission for Zia components"
+          },
+          "edit" : {
+            "type" : [ "boolean" ],
+            "description" : "Edit Permission for Zia components"
+          },
+          "create" : {
+            "type" : [ "boolean" ],
+            "description" : "Create Permission for Zia components"
+          },
+          "delete" : {
+            "type" : [ "boolean" ],
+            "description" : "Delete Permission for Zia components"
+          }
+        }
       },
       "commonPermissionJsonResponse" : {
         "type" : [ "object", "null" ],
@@ -2137,7 +3701,7 @@
             "$ref" : "#/components/schemas/clientActionPermissionJson"
           }
         },
-        "required" : [ "CommunityComment", "CommunityTopic", "accounts", "activities", "agents", "calls", "clientAction", "clientActionConditions", "clientActionLocationAssociation", "clientActionModuleAssociation", "clientEvents", "comments", "community", "componentEventMappingAssociation", "componentMapping", "contacts", "contracts", "crmInteg", "eventMapping", "events", "financeInteg", "gc", "im", "kbCategory", "mobileapp", "products", "radar", "reports", "setup", "social", "tasks", "tickets", "timeEntry", "zia" ]
+        "required" : [ "CommunityComment", "CommunityTopic", "accounts", "activities", "agents", "calls", "clientAction", "clientActionConditions", "clientActionLocationAssociation", "clientActionModuleAssociation", "clientEvents", "comments", "community", "componentEventMappingAssociation", "componentMapping", "contacts", "contracts", "crmInteg", "eventMapping", "events", "financeInteg", "gc", "im", "kbCategory", "managerDashboard", "mobileapp", "products", "radar", "reports", "setup", "social", "tasks", "tickets", "timeEntry", "zia" ]
       }
     },
     "responses" : {
@@ -2368,11 +3932,11 @@
                       "importHistory" : true,
                       "manageAgents" : true,
                       "portalUsers" : true,
-                      "managerDashboard" : true,
                       "googleAnalytics" : true,
                       "chat" : true,
                       "telephony" : true,
-                      "manageMarketplace" : true
+                      "manageMarketplace" : true,
+                      "managerDashboard" : true
                     },
                     "financeInteg" : {
                       "sendInvoice" : false,
@@ -2460,6 +4024,11 @@
                       "editSharedCustomViews" : true,
                       "deleteSharedCustomViews" : true,
                       "reshareSharedCustomViews" : true
+                    },
+                    "managerDashboard" : {
+                      "myView" : true,
+                      "allView" : true,
+                      "customize" : true
                     }
                   },
                   "name" : "Support Administrator",
@@ -2684,11 +4253,11 @@
                         "importHistory" : true,
                         "manageAgents" : true,
                         "portalUsers" : true,
-                        "managerDashboard" : true,
                         "googleAnalytics" : true,
                         "chat" : true,
                         "telephony" : true,
-                        "manageMarketplace" : true
+                        "manageMarketplace" : true,
+                        "managerDashboard" : true
                       },
                       "financeInteg" : {
                         "sendInvoice" : false,
@@ -2776,6 +4345,11 @@
                         "editSharedCustomViews" : true,
                         "deleteSharedCustomViews" : true,
                         "reshareSharedCustomViews" : true
+                      },
+                      "managerDashboard" : {
+                        "myView" : true,
+                        "allView" : true,
+                        "customize" : true
                       }
                     },
                     "name" : "Support Administrator",
@@ -2924,11 +4498,11 @@
                         "importHistory" : false,
                         "manageAgents" : false,
                         "portalUsers" : false,
-                        "managerDashboard" : true,
                         "googleAnalytics" : true,
                         "chat" : false,
                         "telephony" : false,
-                        "manageMarketplace" : false
+                        "manageMarketplace" : false,
+                        "managerDashboard" : true
                       },
                       "financeInteg" : {
                         "sendInvoice" : false,
@@ -3016,6 +4590,11 @@
                         "editSharedCustomViews" : true,
                         "deleteSharedCustomViews" : true,
                         "reshareSharedCustomViews" : true
+                      },
+                      "managerDashboard" : {
+                        "myView" : true,
+                        "allView" : true,
+                        "customize" : true
                       }
                     },
                     "name" : "Light Agent",
@@ -3164,11 +4743,11 @@
                         "importHistory" : false,
                         "manageAgents" : false,
                         "portalUsers" : false,
-                        "managerDashboard" : false,
                         "googleAnalytics" : false,
                         "chat" : false,
                         "telephony" : false,
-                        "manageMarketplace" : false
+                        "manageMarketplace" : false,
+                        "managerDashboard" : true
                       },
                       "financeInteg" : {
                         "sendInvoice" : false,
@@ -3256,6 +4835,11 @@
                         "editSharedCustomViews" : true,
                         "deleteSharedCustomViews" : true,
                         "reshareSharedCustomViews" : true
+                      },
+                      "managerDashboard" : {
+                        "myView" : true,
+                        "allView" : true,
+                        "customize" : true
                       }
                     },
                     "name" : "Newbie Agent",
@@ -3389,11 +4973,11 @@
                         "importHistory" : false,
                         "manageAgents" : false,
                         "portalUsers" : false,
-                        "managerDashboard" : false,
                         "googleAnalytics" : false,
                         "chat" : false,
                         "telephony" : false,
-                        "manageMarketplace" : false
+                        "manageMarketplace" : false,
+                        "managerDashboard" : true
                       },
                       "financeInteg" : {
                         "sendInvoice" : false,
@@ -3433,6 +5017,11 @@
                         "create" : false,
                         "delete" : false,
                         "export" : false
+                      },
+                      "managerDashboard" : {
+                        "myView" : true,
+                        "allView" : true,
+                        "customize" : true
                       }
                     },
                     "name" : "Help Center",
@@ -3585,11 +5174,11 @@
                         "importHistory" : true,
                         "manageAgents" : false,
                         "portalUsers" : false,
-                        "managerDashboard" : false,
                         "googleAnalytics" : false,
                         "chat" : false,
                         "telephony" : false,
-                        "manageMarketplace" : false
+                        "manageMarketplace" : false,
+                        "managerDashboard" : true
                       },
                       "financeInteg" : {
                         "sendInvoice" : false,
@@ -3677,6 +5266,11 @@
                         "editSharedCustomViews" : true,
                         "deleteSharedCustomViews" : true,
                         "reshareSharedCustomViews" : true
+                      },
+                      "managerDashboard" : {
+                        "myView" : true,
+                        "allView" : true,
+                        "customize" : true
                       }
                     },
                     "name" : "Agent",
@@ -3829,11 +5423,11 @@
                         "importHistory" : true,
                         "manageAgents" : false,
                         "portalUsers" : false,
-                        "managerDashboard" : true,
                         "googleAnalytics" : false,
                         "chat" : false,
                         "telephony" : false,
-                        "manageMarketplace" : false
+                        "manageMarketplace" : false,
+                        "managerDashboard" : true
                       },
                       "financeInteg" : {
                         "sendInvoice" : false,
@@ -3921,6 +5515,11 @@
                         "editSharedCustomViews" : true,
                         "deleteSharedCustomViews" : true,
                         "reshareSharedCustomViews" : true
+                      },
+                      "managerDashboard" : {
+                        "myView" : true,
+                        "allView" : true,
+                        "customize" : true
                       }
                     },
                     "name" : "Supervisor",
@@ -4073,11 +5672,11 @@
                         "importHistory" : true,
                         "manageAgents" : false,
                         "portalUsers" : false,
-                        "managerDashboard" : true,
                         "googleAnalytics" : true,
                         "chat" : false,
                         "telephony" : false,
-                        "manageMarketplace" : false
+                        "manageMarketplace" : false,
+                        "managerDashboard" : true
                       },
                       "financeInteg" : {
                         "sendInvoice" : false,
@@ -4165,6 +5764,11 @@
                         "editSharedCustomViews" : true,
                         "deleteSharedCustomViews" : true,
                         "reshareSharedCustomViews" : true
+                      },
+                      "managerDashboard" : {
+                        "myView" : true,
+                        "allView" : true,
+                        "customize" : true
                       }
                     },
                     "name" : "Support Manager",
@@ -4399,11 +6003,11 @@
                       "importHistory" : true,
                       "manageAgents" : true,
                       "portalUsers" : true,
-                      "managerDashboard" : true,
                       "googleAnalytics" : true,
                       "chat" : true,
                       "telephony" : true,
-                      "manageMarketplace" : false
+                      "manageMarketplace" : false,
+                      "managerDashboard" : true
                     },
                     "financeInteg" : {
                       "sendInvoice" : false,
@@ -4491,6 +6095,11 @@
                       "editSharedCustomViews" : true,
                       "deleteSharedCustomViews" : true,
                       "reshareSharedCustomViews" : true
+                    },
+                    "managerDashboard" : {
+                      "myView" : true,
+                      "allView" : true,
+                      "customize" : true
                     }
                   }
                 }
@@ -4520,12 +6129,12 @@
                   "agents" : [ {
                     "firstName" : "",
                     "lastName" : "John",
-                    "photoURL" : "https://contacts.example.com/file?t=user&ID=1234567890",
+                    "photoURL" : "https://desk.zoho.com/api/v1/agents/7000000013328/photo?orgId=123456",
                     "roleId" : "7000000012324",
                     "profileId" : "6000000011303",
                     "emailId" : "john@zylker.com",
                     "id" : "7000000013328",
-                    "zuid" : "1234567890",
+                    "zuid" : "437793",
                     "isZiaAgent" : false
                   }, {
                     "firstName" : "Steve",
@@ -4535,7 +6144,7 @@
                     "profileId" : "6000000011303",
                     "emailId" : "kyle@zylker.com",
                     "id" : "7000000012958",
-                    "zuid" : "1234567890",
+                    "zuid" : "5625416",
                     "isZiaAgent" : false
                   } ]
                 }
@@ -4561,46 +6170,14 @@
                   "type" : [ "string" ],
                   "maxLength" : 50,
                   "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+",
-                  "description" : "Name of the profile"
+                  "description" : "Name of the profile",
+                  "x-unique" : true
                 },
                 "description" : {
                   "type" : [ "string" ],
                   "maxLength" : 3200,
                   "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+",
                   "description" : "Description of the profile"
-                },
-                "editAllArticles" : {
-                  "type" : [ "string" ]
-                },
-                "moderate" : {
-                  "type" : [ "string" ]
-                },
-                "manageKB" : {
-                  "type" : [ "string" ]
-                },
-                "admin" : {
-                  "type" : [ "string" ]
-                },
-                "import" : {
-                  "type" : [ "string" ]
-                },
-                "export" : {
-                  "type" : [ "string" ]
-                },
-                "manageOwnCustomViews" : {
-                  "type" : [ "string" ]
-                },
-                "shareOwnCustomViews" : {
-                  "type" : [ "string" ]
-                },
-                "editSharedCustomViews" : {
-                  "type" : [ "string" ]
-                },
-                "deleteSharedCustomViews" : {
-                  "type" : [ "string" ]
-                },
-                "reshareSharedCustomViews" : {
-                  "type" : [ "string" ]
                 }
               },
               "required" : [ ]
@@ -4636,7 +6213,8 @@
                   "type" : [ "string" ],
                   "maxLength" : 50,
                   "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s]+",
-                  "description" : "Name of the profile to be created"
+                  "description" : "Name of the profile to be created",
+                  "x-unique" : true
                 },
                 "description" : {
                   "type" : [ "string" ],
@@ -4694,7 +6272,11 @@
       },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "Profile"
 }

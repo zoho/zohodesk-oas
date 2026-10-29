@@ -11,6 +11,7 @@
         "summary" : "View a specific attachment added to a transition draft",
         "description" : "Downloads the file content of a specific attachment added to a transition draft.",
         "operationId" : "viewTemporaryTransitionDraftAttachment",
+        "x-mcp-group" : [ "Blueprints" ],
         "parameters" : [ {
           "name" : "inline",
           "in" : "query",
@@ -135,6 +136,7 @@
         "summary" : "Get transition form details",
         "description" : "Retrieves the during-transition form details and available actions for a given transition on a ticket.",
         "operationId" : "getDuringTransitionForm",
+        "x-mcp-group" : [ "Blueprints" ],
         "parameters" : [ {
           "name" : "ticket_id",
           "in" : "path",
@@ -296,6 +298,7 @@
         "summary" : "Perform a blueprint transition on a ticket",
         "description" : "Execute a blueprint transition on the specified ticket. Supply form-action payloads for approval, resolution, attachment, reply, comment, sharing, and field-update actions as required by the transition configuration. Only the action categories required by the transition need to be included.",
         "operationId" : "performBlueprintTransition",
+        "x-mcp-group" : [ "Blueprints" ],
         "parameters" : [ {
           "name" : "ticket_id",
           "in" : "path",
@@ -928,6 +931,12 @@
           "criteria" : {
             "description" : "Criteria configured for the before-transition",
             "$ref" : "./blueprintCriteria.json#/components/schemas/criteriaObject"
+          },
+          "actionId" : {
+            "description" : "Unique ID of the action",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
           }
         },
         "required" : [ "criteria" ]
@@ -943,6 +952,12 @@
           "sharedDeptAccessors" : {
             "description" : "Departments with which the transition is shared",
             "$ref" : "#/components/schemas/sharedDeptAccessorsArray"
+          },
+          "actionId" : {
+            "description" : "Unique ID of the action",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
           }
         },
         "required" : [ "owners", "sharedDeptAccessors" ]
@@ -971,9 +986,34 @@
             "type" : [ "string", "null" ],
             "maxLength" : 255,
             "minLength" : 0
+          },
+          "actionId" : {
+            "description" : "Unique ID of the action",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
           }
         },
         "required" : [ "message" ]
+      },
+      "widgetsObject" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "widgetId" : {
+            "description" : "Unique ID of the widget",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "actionId" : {
+            "description" : "Unique ID of the action",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        },
+        "required" : [ "widgetId" ]
       },
       "fieldUpdatesObjectsObj" : {
         "type" : [ "object", "null" ],
@@ -986,6 +1026,12 @@
           "isMandatory" : {
             "description" : "Indicates whether the action is mandatory. Possible values: @true@ - action is mandatory, @false@ - action is optional",
             "type" : [ "boolean", "null" ]
+          },
+          "actionId" : {
+            "description" : "Unique ID of the action",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
           }
         },
         "required" : [ "fieldUpdates", "isMandatory" ]
@@ -1003,6 +1049,12 @@
           "isMandatory" : {
             "description" : "Indicates whether the action is mandatory. Possible values: @true@ - action is mandatory, @false@ - action is optional",
             "type" : [ "boolean", "null" ]
+          },
+          "actionId" : {
+            "description" : "Unique ID of the action",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
           }
         },
         "required" : [ "isMandatory", "otherActions" ]
@@ -1016,6 +1068,8 @@
             "$ref" : "#/components/schemas/fieldUpdatesObjectsObj"
           }, {
             "$ref" : "#/components/schemas/otherActionsObject"
+          }, {
+            "$ref" : "#/components/schemas/widgetsObject"
           } ]
         }
       },
@@ -1026,6 +1080,12 @@
           "ids" : {
             "description" : "Unique IDs of the alerts configured for the action",
             "$ref" : "#/components/schemas/alertIds"
+          },
+          "actionId" : {
+            "description" : "Unique ID of the action",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
           }
         },
         "required" : [ "ids" ]
@@ -1037,6 +1097,12 @@
           "ids" : {
             "description" : "Unique IDs of the tasks configured for the action",
             "$ref" : "#/components/schemas/taskIds"
+          },
+          "actionId" : {
+            "description" : "Unique ID of the action",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
           }
         },
         "required" : [ "ids" ]
@@ -1048,6 +1114,12 @@
           "ids" : {
             "description" : "Unique IDs of the field updates configured for the action",
             "$ref" : "#/components/schemas/fieldUpdateIds"
+          },
+          "actionId" : {
+            "description" : "Unique ID of the action",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
           }
         },
         "required" : [ "ids" ]
@@ -1059,6 +1131,12 @@
           "ids" : {
             "description" : "Unique IDs of the custom functions configured for the action",
             "$ref" : "#/components/schemas/customFunctionIds"
+          },
+          "actionId" : {
+            "description" : "Unique ID of the action",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
           }
         },
         "required" : [ "ids" ]
@@ -1097,6 +1175,12 @@
           "before" : {
             "description" : "Before-transition configuration including accessors and criteria",
             "$ref" : "#/components/schemas/beforeObject"
+          },
+          "id" : {
+            "description" : "Unique ID of the transition",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
           },
           "name" : {
             "description" : "Name of the transition",
@@ -1151,6 +1235,12 @@
             "maxLength" : 30,
             "minLength" : 1,
             "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "id" : {
+            "description" : "Unique ID of the transition",
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
           }
         },
         "required" : [ "name" ]
@@ -1916,5 +2006,6 @@
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "blueprintTransitions"
 }

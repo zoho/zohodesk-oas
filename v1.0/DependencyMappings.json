@@ -1,5 +1,6 @@
 {
   "openapi" : "3.1.0",
+  "x-mcp-group" : [ "Modules, Fields and Layouts" ],
   "info" : {
     "title" : "DependencyMappings",
     "version" : "1.0.0"
@@ -19,9 +20,8 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "integer" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "type" : "string",
+            "format" : "int64"
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -65,9 +65,8 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "integer" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "type" : "string",
+            "format" : "int64"
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -90,7 +89,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.fields.READ", "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.fields.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
         } ]
       }
     },
@@ -108,7 +109,7 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string" ],
+            "type" : "string",
             "maxLength" : 100,
             "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
           }
@@ -120,10 +121,10 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "integer" ],
+            "type" : "integer",
             "format" : "int32",
-            "maximum" : 99,
-            "default" : 50
+            "default" : "50",
+            "maxLength" : 2
           }
         }, {
           "name" : "from",
@@ -133,10 +134,9 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "integer" ],
+            "type" : "integer",
             "format" : "int32",
-            "minimum" : 0,
-            "default" : 0
+            "default" : "0"
           }
         }, {
           "name" : "parentValue",
@@ -146,7 +146,7 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string" ],
+            "type" : "string",
             "maxLength" : 100,
             "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
           }
@@ -158,9 +158,8 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "integer" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "type" : "string",
+            "format" : "int64"
           }
         }, {
           "name" : "layoutId",
@@ -213,7 +212,7 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.READ" ]
+          "iam-oauth2-schema" : [ "Desk.qaautomation.READ" ]
         } ]
       }
     },
@@ -231,9 +230,8 @@
           "style" : "form",
           "explode" : true,
           "schema" : {
-            "type" : [ "string", "integer" ],
-            "format" : "int64",
-            "pattern" : "([0-9]+)"
+            "type" : "string",
+            "format" : "int64"
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -274,14 +272,20 @@
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/createDependencyMappingjson"
+          "$ref" : "#/components/requestBodies/createDependencyMappingJson"
         },
         "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/dependencyMappingResponse"
+          },
+          "201" : {
+            "$ref" : "#/components/responses/dependencyMappingResponse"
+          },
           "204" : {
             "$ref" : "./Common.json#/components/responses/emptyResponse"
           },
           "400" : {
-            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+            "$ref" : "./Common.json#/components/responses/invalidLayoutResponse"
           },
           "401" : {
             "$ref" : "./Common.json#/components/responses/unauthorizedErrorResponse"
@@ -289,18 +293,17 @@
           "403" : {
             "$ref" : "./Common.json#/components/responses/licenseErrorResponse"
           },
-          "500" : {
-            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
-          },
           "422" : {
             "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
           },
-          "200" : {
-            "$ref" : "#/components/responses/dependencyMappingResponse"
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.CREATE", "Desk.fields.CREATE" ]
+          "iam-oauth2-schema" : [ "Desk.fields.CREATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.CREATE" ]
         } ]
       }
     },
@@ -326,6 +329,9 @@
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/getDependencyMappingsByLayoutJsonResponse"
+          },
           "204" : {
             "$ref" : "./Common.json#/components/responses/emptyResponse"
           },
@@ -335,14 +341,11 @@
           "403" : {
             "$ref" : "./Common.json#/components/responses/licenseErrorResponse"
           },
-          "500" : {
-            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
-          },
           "422" : {
             "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
           },
-          "200" : {
-            "$ref" : "#/components/responses/dependencyMappingResponse"
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
           }
         },
         "security" : [ {
@@ -370,9 +373,12 @@
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "requestBody" : {
-          "$ref" : "#/components/requestBodies/editDependencyMappingjson"
+          "$ref" : "#/components/requestBodies/editDependencyMappingJson"
         },
         "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/dependencyMappingResponse"
+          },
           "204" : {
             "$ref" : "./Common.json#/components/responses/emptyResponse"
           },
@@ -385,18 +391,17 @@
           "403" : {
             "$ref" : "./Common.json#/components/responses/licenseErrorResponse"
           },
-          "500" : {
-            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
-          },
           "422" : {
             "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
           },
-          "200" : {
-            "$ref" : "#/components/responses/dependencyMappingResponse"
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.UPDATE", "Desk.fields.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.fields.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.UPDATE" ]
         } ]
       },
       "delete" : {
@@ -420,6 +425,9 @@
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
         "responses" : {
+          "200" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
           "204" : {
             "$ref" : "./Common.json#/components/responses/emptyResponse"
           },
@@ -429,18 +437,17 @@
           "403" : {
             "$ref" : "./Common.json#/components/responses/licenseErrorResponse"
           },
-          "500" : {
-            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
-          },
           "422" : {
             "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
           },
-          "200" : {
-            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.settings.DELETE", "Desk.fields.DELETE" ]
+          "iam-oauth2-schema" : [ "Desk.fields.DELETE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.DELETE" ]
         } ]
       }
     }
@@ -478,6 +485,38 @@
         },
         "required" : [ "allowedValues", "displayLabel", "id" ]
       },
+      "parentJSON" : {
+        "type" : "object",
+        "description" : "Parent field configuration including its display label and ID",
+        "additionalProperties" : false,
+        "properties" : {
+          "displayLabel" : {
+            "description" : "Display label of the picklist field",
+            "type" : [ "string", "null" ],
+            "maxLength" : 200,
+            "minLength" : 0,
+            "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+          },
+          "allowedValues" : {
+            "description" : "List of allowed values for the picklist field",
+            "type" : [ "array", "null" ],
+            "items" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 120,
+              "minLength" : 0,
+              "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
+            },
+            "uniqueItems" : false
+          },
+          "id" : {
+            "description" : "Unique ID",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        },
+        "required" : [ "displayLabel", "id" ]
+      },
       "picklistJSONArr" : {
         "type" : [ "array", "null" ],
         "items" : {
@@ -505,7 +544,7 @@
         }
       },
       "dependencyJSON" : {
-        "type" : [ "object", "null" ],
+        "type" : "object",
         "additionalProperties" : false,
         "properties" : {
           "parent" : {
@@ -556,14 +595,101 @@
           "child" : {
             "description" : "Child field configuration including its display label, allowed values, and ID",
             "$ref" : "#/components/schemas/picklistJSON"
+          },
+          "valuesCount" : {
+            "description" : "ID of the child field",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
           }
         },
-        "required" : [ "child", "childId", "id", "layoutId", "mappings", "parent", "parentId" ]
+        "required" : [ "child", "childId", "id", "layoutId", "mappings", "parent", "parentId", "valuesCount" ]
       },
-      "dependencyJSONArr" : {
-        "type" : [ "array", "null" ],
+      "dependencyArrayData" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "parent" : {
+            "description" : "Parent field configuration including its display label, allowed values, and ID",
+            "$ref" : "#/components/schemas/parentJSON"
+          },
+          "id" : {
+            "description" : "Unique ID",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "childId" : {
+            "description" : "ID of the child field",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "mappings" : {
+            "description" : "Dependency mappings between parent field values and their corresponding child field values",
+            "type" : [ "object", "null" ],
+            "additionalProperties" : false,
+            "patternProperties" : {
+              "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+" : {
+                "type" : [ "array", "null" ],
+                "items" : {
+                  "type" : [ "string", "null" ],
+                  "maxLength" : 120,
+                  "minLength" : 0,
+                  "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
+                },
+                "uniqueItems" : false
+              }
+            }
+          },
+          "layoutId" : {
+            "description" : "ID of the layout in which the dependency is mapped",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "parentId" : {
+            "description" : "ID of the parent field",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "child" : {
+            "description" : "Child field configuration including its display label, allowed values, and ID",
+            "$ref" : "#/components/schemas/parentJSON"
+          },
+          "layout" : {
+            "type" : "object",
+            "additionalProperties" : false,
+            "properties" : {
+              "id" : {
+                "description" : "Unique ID",
+                "type" : [ "string", "integer", "null" ],
+                "format" : "int64",
+                "pattern" : "([0-9]+)"
+              },
+              "layoutName" : {
+                "description" : "Actual value of the dependent child field",
+                "type" : [ "string", "null" ],
+                "maxLength" : 120,
+                "minLength" : 0,
+                "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+"
+              }
+            }
+          }
+        },
+        "required" : [ "child", "childId", "id", "layoutId", "parent", "parentId" ]
+      },
+      "dependencyJSONList" : {
+        "type" : [ "object", "null" ],
         "items" : {
           "$ref" : "#/components/schemas/dependencyJSON"
+        }
+      },
+      "dependencyArrayList" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/dependencyArrayData"
         }
       }
     },
@@ -573,7 +699,7 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "object", "null" ],
+              "type" : "object",
               "additionalProperties" : false,
               "properties" : {
                 "children" : {
@@ -625,7 +751,7 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "object", "null" ],
+              "type" : "object",
               "additionalProperties" : false,
               "properties" : {
                 "allowedValues" : {
@@ -647,11 +773,11 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "object", "null" ],
+              "type" : "object",
               "additionalProperties" : false,
               "properties" : {
                 "data" : {
-                  "$ref" : "#/components/schemas/dependencyJSONArr"
+                  "$ref" : "#/components/schemas/dependencyArrayList"
                 }
               },
               "required" : [ "data" ]
@@ -730,6 +856,49 @@
           }
         }
       },
+      "getDependencyMappingsByLayoutJsonResponse" : {
+        "description" : "getDependencyMappingsByLayoutIdResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "#/components/schemas/dependencyJSONList"
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "data" : [ {
+                    "parent" : {
+                      "displayLabel" : "Category",
+                      "allowedValues" : [ "General", "Defects" ],
+                      "id" : "4000000000421"
+                    },
+                    "mappings" : {
+                      "General" : [ "Sub General" ],
+                      "Defects" : [ "Sub Defects" ]
+                    },
+                    "id" : "4000000007315",
+                    "childId" : "4000000000423",
+                    "layoutId" : "4000000007177",
+                    "parentId" : "4000000000421",
+                    "child" : {
+                      "displayLabel" : "Sub Category",
+                      "allowedValues" : [ "Sub General", "Sub Defects" ],
+                      "id" : "4000000000423"
+                    }
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      },
       "dependencyMappingResponse" : {
         "description" : "dependencyMappingResponse template definitions",
         "content" : {
@@ -756,7 +925,7 @@
       }
     },
     "requestBodies" : {
-      "createDependencyMappingjson" : {
+      "createDependencyMappingJson" : {
         "required" : true,
         "content" : {
           "application/json" : {
@@ -807,7 +976,7 @@
           }
         }
       },
-      "editDependencyMappingjson" : {
+      "editDependencyMappingJson" : {
         "required" : true,
         "content" : {
           "application/json" : {
@@ -850,7 +1019,11 @@
       },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "DependencyMappings"
 }

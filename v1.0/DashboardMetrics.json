@@ -11,13 +11,15 @@
         "summary" : "Get on hold tickets count",
         "description" : "Retrieves the number of tickets that are in the 'on hold' status.",
         "operationId" : "getOnholdTickets",
+        "x-mcp-group" : [ "Static Reports" ],
         "parameters" : [ {
           "name" : "startDate",
           "in" : "query",
           "required" : false,
           "schema" : {
             "type" : [ "string" ],
-            "pattern" : "[0-9\\-]+"
+            "pattern" : "[0-9\\-]+",
+            "x-regex-name" : "reportCustomTime"
           },
           "style" : "form",
           "explode" : true,
@@ -28,7 +30,8 @@
           "required" : false,
           "schema" : {
             "type" : [ "string" ],
-            "pattern" : "[0-9\\-]+"
+            "pattern" : "[0-9\\-]+",
+            "x-regex-name" : "reportCustomTime"
           },
           "style" : "form",
           "explode" : true,
@@ -42,8 +45,10 @@
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
-            "enum" : [ "LAST_30_DAYS", "LAST_7_DAYS", "THIS_WEEK", "LAST_WEEK", "THIS_MONTH", "LAST_MONTH", "CUSTOM_IN_DATE", "LAST24HOURS", "TODAY", "YESTERDAY", "CUSTOM_IN_MILLIS", "LAST_1_HOUR" ],
-            "pattern" : "([1-8]{1}|LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR)"
+            "enum" : [ "1", "2", "3", "4", "5", "6", "7", "8", "LAST24HOURS", "TODAY", "YESTERDAY", "LAST_30_DAYS", "LAST_7_DAYS", "THIS_WEEK", "LAST_WEEK", "THIS_MONTH", "LAST_MONTH", "CUSTOM_IN_DATE", "CUSTOM_IN_MILLIS", "LAST_1_HOUR", "LAST12MONTHS" ],
+            "pattern" : "([1-8]{1}|LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR|LAST12MONTHS)",
+            "x-regex-name" : "reportDuration",
+            "maxLength" : 100
           }
         }, {
           "name" : "agentId",
@@ -99,6 +104,7 @@
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
+            "x-dynamic-enum" : true,
             "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+",
             "maxLength" : 120
           }
@@ -111,7 +117,10 @@
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
-            "enum" : [ "date", "channel", "agent", "hour" ]
+            "enum" : [ "date", "channel", "hour", "department" ],
+            "pattern" : "date|channel|hour|department",
+            "x-regex-name" : "dashboardDefaultFilters",
+            "maxLength" : 100
           }
         } ],
         "responses" : {
@@ -142,7 +151,8 @@
           "required" : false,
           "schema" : {
             "type" : [ "string" ],
-            "pattern" : "[0-9\\-]+"
+            "pattern" : "[0-9\\-]+",
+            "x-regex-name" : "reportCustomTime"
           },
           "style" : "form",
           "explode" : true,
@@ -153,7 +163,8 @@
           "required" : false,
           "schema" : {
             "type" : [ "string" ],
-            "pattern" : "[0-9\\-]+"
+            "pattern" : "[0-9\\-]+",
+            "x-regex-name" : "reportCustomTime"
           },
           "style" : "form",
           "explode" : true,
@@ -167,8 +178,10 @@
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
-            "enum" : [ "LAST_30_DAYS", "LAST_7_DAYS", "THIS_WEEK", "LAST_WEEK", "THIS_MONTH", "LAST_MONTH", "CUSTOM_IN_DATE", "LAST24HOURS", "TODAY", "YESTERDAY", "CUSTOM_IN_MILLIS", "LAST_1_HOUR" ],
-            "pattern" : "([1-8]{1}|LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR)"
+            "enum" : [ "1", "2", "3", "4", "5", "6", "7", "8", "LAST24HOURS", "TODAY", "YESTERDAY", "LAST_30_DAYS", "LAST_7_DAYS", "THIS_WEEK", "LAST_WEEK", "THIS_MONTH", "LAST_MONTH", "CUSTOM_IN_DATE", "CUSTOM_IN_MILLIS", "LAST_1_HOUR", "LAST12MONTHS" ],
+            "pattern" : "([1-8]{1}|LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR|LAST12MONTHS)",
+            "x-regex-name" : "reportDuration",
+            "maxLength" : 100
           }
         }, {
           "name" : "agentId",
@@ -224,6 +237,7 @@
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
+            "x-dynamic-enum" : true,
             "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+",
             "maxLength" : 120
           }
@@ -236,7 +250,10 @@
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
-            "enum" : [ "date", "channel", "agent", "hour" ]
+            "enum" : [ "date", "channel", "hour", "department" ],
+            "pattern" : "date|channel|hour|department",
+            "x-regex-name" : "dashboardDefaultFilters",
+            "maxLength" : 100
           }
         }, {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -260,13 +277,15 @@
         "summary" : "Get unresolved tickets count",
         "description" : "Retrieves the number of tickets that have remained unresolved over a particular period.",
         "operationId" : "getBacklogTickets",
+        "x-mcp-group" : [ "Static Reports" ],
         "parameters" : [ {
           "name" : "startDate",
           "in" : "query",
           "required" : false,
           "schema" : {
             "type" : [ "string" ],
-            "pattern" : "[0-9\\-]+"
+            "pattern" : "[0-9\\-]+",
+            "x-regex-name" : "reportCustomTime"
           },
           "style" : "form",
           "explode" : true,
@@ -277,7 +296,8 @@
           "required" : false,
           "schema" : {
             "type" : [ "string" ],
-            "pattern" : "[0-9\\-]+"
+            "pattern" : "[0-9\\-]+",
+            "x-regex-name" : "reportCustomTime"
           },
           "style" : "form",
           "explode" : true,
@@ -291,8 +311,10 @@
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
-            "enum" : [ "LAST_30_DAYS", "LAST_7_DAYS", "THIS_WEEK", "LAST_WEEK", "THIS_MONTH", "LAST_MONTH", "CUSTOM_IN_DATE", "TODAY", "YESTERDAY", "CUSTOM_IN_MILLIS" ],
-            "pattern" : "([1-8]{1}|LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR)"
+            "enum" : [ "1", "2", "3", "4", "5", "6", "7", "8", "LAST24HOURS", "TODAY", "YESTERDAY", "LAST_30_DAYS", "LAST_7_DAYS", "THIS_WEEK", "LAST_WEEK", "THIS_MONTH", "LAST_MONTH", "CUSTOM_IN_DATE", "CUSTOM_IN_MILLIS", "LAST_1_HOUR", "LAST12MONTHS" ],
+            "pattern" : "([1-8]{1}|LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR|LAST12MONTHS)",
+            "x-regex-name" : "reportDuration",
+            "maxLength" : 100
           }
         }, {
           "name" : "agentId",
@@ -333,6 +355,7 @@
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
+            "x-dynamic-enum" : true,
             "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+",
             "maxLength" : 120
           }
@@ -370,13 +393,15 @@
         "summary" : "Get reopened tickets count",
         "description" : "Retrieves the number of tickets that were reopened in your help desk portal.",
         "operationId" : "getReopenedTickets",
+        "x-mcp-group" : [ "Static Reports" ],
         "parameters" : [ {
           "name" : "startDate",
           "in" : "query",
           "required" : false,
           "schema" : {
             "type" : [ "string" ],
-            "pattern" : "[0-9\\-]+"
+            "pattern" : "[0-9\\-]+",
+            "x-regex-name" : "reportCustomTime"
           },
           "style" : "form",
           "explode" : true,
@@ -387,7 +412,8 @@
           "required" : false,
           "schema" : {
             "type" : [ "string" ],
-            "pattern" : "[0-9\\-]+"
+            "pattern" : "[0-9\\-]+",
+            "x-regex-name" : "reportCustomTime"
           },
           "style" : "form",
           "explode" : true,
@@ -401,8 +427,10 @@
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
-            "enum" : [ "LAST_30_DAYS", "LAST_7_DAYS", "THIS_WEEK", "LAST_WEEK", "THIS_MONTH", "LAST_MONTH", "CUSTOM_IN_DATE", "LAST24HOURS", "TODAY", "YESTERDAY", "CUSTOM_IN_MILLIS", "LAST_1_HOUR" ],
-            "pattern" : "([1-8]{1}|LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR)"
+            "enum" : [ "1", "2", "3", "4", "5", "6", "7", "8", "LAST24HOURS", "TODAY", "YESTERDAY", "LAST_30_DAYS", "LAST_7_DAYS", "THIS_WEEK", "LAST_WEEK", "THIS_MONTH", "LAST_MONTH", "CUSTOM_IN_DATE", "CUSTOM_IN_MILLIS", "LAST_1_HOUR", "LAST12MONTHS" ],
+            "pattern" : "([1-8]{1}|LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR|LAST12MONTHS)",
+            "x-regex-name" : "reportDuration",
+            "maxLength" : 100
           }
         }, {
           "name" : "agentId",
@@ -458,6 +486,7 @@
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
+            "x-dynamic-enum" : true,
             "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+",
             "maxLength" : 120
           }
@@ -470,7 +499,10 @@
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
-            "enum" : [ "date", "channel", "agent", "hour" ]
+            "enum" : [ "date", "channel", "hour", "department" ],
+            "pattern" : "date|channel|hour|department",
+            "x-regex-name" : "dashboardDefaultFilters",
+            "maxLength" : 100
           }
         } ],
         "responses" : {
@@ -495,13 +527,15 @@
         "summary" : "Get resolution times",
         "description" : "Lists the duration taken to resolve tickets.",
         "operationId" : "getResolutionTime",
+        "x-mcp-group" : [ "Static Reports" ],
         "parameters" : [ {
           "name" : "startDate",
           "in" : "query",
           "required" : false,
           "schema" : {
             "type" : [ "string" ],
-            "pattern" : "[0-9\\-]+"
+            "pattern" : "[0-9\\-]+",
+            "x-regex-name" : "reportCustomTime"
           },
           "style" : "form",
           "explode" : true,
@@ -512,7 +546,8 @@
           "required" : false,
           "schema" : {
             "type" : [ "string" ],
-            "pattern" : "[0-9\\-]+"
+            "pattern" : "[0-9\\-]+",
+            "x-regex-name" : "reportCustomTime"
           },
           "style" : "form",
           "explode" : true,
@@ -526,8 +561,10 @@
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
-            "enum" : [ "LAST_30_DAYS", "LAST_7_DAYS", "THIS_WEEK", "LAST_WEEK", "THIS_MONTH", "LAST_MONTH", "CUSTOM_IN_DATE", "LAST24HOURS", "TODAY", "YESTERDAY", "CUSTOM_IN_MILLIS", "LAST_1_HOUR" ],
-            "pattern" : "([1-8]{1}|LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR)"
+            "enum" : [ "1", "2", "3", "4", "5", "6", "7", "8", "LAST24HOURS", "TODAY", "YESTERDAY", "LAST_30_DAYS", "LAST_7_DAYS", "THIS_WEEK", "LAST_WEEK", "THIS_MONTH", "LAST_MONTH", "CUSTOM_IN_DATE", "CUSTOM_IN_MILLIS", "LAST_1_HOUR", "LAST12MONTHS" ],
+            "pattern" : "([1-8]{1}|LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR|LAST12MONTHS)",
+            "x-regex-name" : "reportDuration",
+            "maxLength" : 100
           }
         }, {
           "name" : "agentId",
@@ -583,6 +620,7 @@
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
+            "x-dynamic-enum" : true,
             "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+",
             "maxLength" : 120
           }
@@ -595,7 +633,10 @@
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
-            "enum" : [ "date", "channel", "agent", "hour" ]
+            "enum" : [ "date", "channel", "hour", "department" ],
+            "pattern" : "date|channel|hour|department",
+            "x-regex-name" : "dashboardDefaultFilters",
+            "maxLength" : 100
           }
         } ],
         "responses" : {
@@ -620,13 +661,15 @@
         "summary" : "Get created tickets count",
         "description" : "Retrieves the number of tickets created in a particular duration.",
         "operationId" : "getCreatedTickets",
+        "x-mcp-group" : [ "Static Reports" ],
         "parameters" : [ {
           "name" : "startDate",
           "in" : "query",
           "required" : false,
           "schema" : {
             "type" : [ "string" ],
-            "pattern" : "[0-9\\-]+"
+            "pattern" : "[0-9\\-]+",
+            "x-regex-name" : "reportCustomTime"
           },
           "style" : "form",
           "explode" : true,
@@ -637,7 +680,8 @@
           "required" : false,
           "schema" : {
             "type" : [ "string" ],
-            "pattern" : "[0-9\\-]+"
+            "pattern" : "[0-9\\-]+",
+            "x-regex-name" : "reportCustomTime"
           },
           "style" : "form",
           "explode" : true,
@@ -651,8 +695,10 @@
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
-            "enum" : [ "LAST_30_DAYS", "LAST_7_DAYS", "THIS_WEEK", "LAST_WEEK", "THIS_MONTH", "LAST_MONTH", "CUSTOM_IN_DATE", "LAST24HOURS", "TODAY", "YESTERDAY", "CUSTOM_IN_MILLIS", "LAST_1_HOUR" ],
-            "pattern" : "([1-8]{1}|LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR)"
+            "enum" : [ "1", "2", "3", "4", "5", "6", "7", "8", "LAST24HOURS", "TODAY", "YESTERDAY", "LAST_30_DAYS", "LAST_7_DAYS", "THIS_WEEK", "LAST_WEEK", "THIS_MONTH", "LAST_MONTH", "CUSTOM_IN_DATE", "CUSTOM_IN_MILLIS", "LAST_1_HOUR", "LAST12MONTHS" ],
+            "pattern" : "([1-8]{1}|LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR|LAST12MONTHS)",
+            "x-regex-name" : "reportDuration",
+            "maxLength" : 100
           }
         }, {
           "name" : "agentId",
@@ -708,6 +754,7 @@
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
+            "x-dynamic-enum" : true,
             "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+",
             "maxLength" : 120
           }
@@ -720,7 +767,10 @@
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
-            "enum" : [ "date", "channel", "agent", "hour" ]
+            "enum" : [ "date", "channel", "hour", "department" ],
+            "pattern" : "date|channel|hour|department",
+            "x-regex-name" : "dashboardDefaultFilters",
+            "maxLength" : 100
           }
         } ],
         "responses" : {
@@ -745,13 +795,15 @@
         "summary" : "Get total response count",
         "description" : "Retrieves the total number of responses sent by agents.",
         "operationId" : "getResponseCount",
+        "x-mcp-group" : [ "Static Reports" ],
         "parameters" : [ {
           "name" : "startDate",
           "in" : "query",
           "required" : false,
           "schema" : {
             "type" : [ "string" ],
-            "pattern" : "[0-9\\-]+"
+            "pattern" : "[0-9\\-]+",
+            "x-regex-name" : "reportCustomTime"
           },
           "style" : "form",
           "explode" : true,
@@ -762,7 +814,8 @@
           "required" : false,
           "schema" : {
             "type" : [ "string" ],
-            "pattern" : "[0-9\\-]+"
+            "pattern" : "[0-9\\-]+",
+            "x-regex-name" : "reportCustomTime"
           },
           "style" : "form",
           "explode" : true,
@@ -776,8 +829,10 @@
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
-            "enum" : [ "LAST_30_DAYS", "LAST_7_DAYS", "THIS_WEEK", "LAST_WEEK", "THIS_MONTH", "LAST_MONTH", "CUSTOM_IN_DATE", "LAST24HOURS", "TODAY", "YESTERDAY", "CUSTOM_IN_MILLIS", "LAST_1_HOUR" ],
-            "pattern" : "([1-8]{1}|LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR)"
+            "enum" : [ "1", "2", "3", "4", "5", "6", "7", "8", "LAST24HOURS", "TODAY", "YESTERDAY", "LAST_30_DAYS", "LAST_7_DAYS", "THIS_WEEK", "LAST_WEEK", "THIS_MONTH", "LAST_MONTH", "CUSTOM_IN_DATE", "CUSTOM_IN_MILLIS", "LAST_1_HOUR", "LAST12MONTHS" ],
+            "pattern" : "([1-8]{1}|LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR|LAST12MONTHS)",
+            "x-regex-name" : "reportDuration",
+            "maxLength" : 100
           }
         }, {
           "name" : "agentId",
@@ -833,6 +888,7 @@
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
+            "x-dynamic-enum" : true,
             "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+",
             "maxLength" : 120
           }
@@ -845,7 +901,10 @@
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
-            "enum" : [ "date", "channel", "agent", "hour" ]
+            "enum" : [ "date", "channel", "hour", "department" ],
+            "pattern" : "date|channel|hour|department",
+            "x-regex-name" : "dashboardDefaultFilters",
+            "maxLength" : 100
           }
         } ],
         "responses" : {
@@ -870,13 +929,15 @@
         "summary" : "Get response times",
         "description" : "Lists the duration taken to respond to tickets.",
         "operationId" : "getResponseTime",
+        "x-mcp-group" : [ "Static Reports" ],
         "parameters" : [ {
           "name" : "startDate",
           "in" : "query",
           "required" : false,
           "schema" : {
             "type" : [ "string" ],
-            "pattern" : "[0-9\\-]+"
+            "pattern" : "[0-9\\-]+",
+            "x-regex-name" : "reportCustomTime"
           },
           "style" : "form",
           "explode" : true,
@@ -887,7 +948,8 @@
           "required" : false,
           "schema" : {
             "type" : [ "string" ],
-            "pattern" : "[0-9\\-]+"
+            "pattern" : "[0-9\\-]+",
+            "x-regex-name" : "reportCustomTime"
           },
           "style" : "form",
           "explode" : true,
@@ -901,8 +963,10 @@
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
-            "enum" : [ "LAST_30_DAYS", "LAST_7_DAYS", "THIS_WEEK", "LAST_WEEK", "THIS_MONTH", "LAST_MONTH", "CUSTOM_IN_DATE", "LAST24HOURS", "TODAY", "YESTERDAY", "CUSTOM_IN_MILLIS", "LAST_1_HOUR" ],
-            "pattern" : "([1-8]{1}|LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR)"
+            "enum" : [ "1", "2", "3", "4", "5", "6", "7", "8", "LAST24HOURS", "TODAY", "YESTERDAY", "LAST_30_DAYS", "LAST_7_DAYS", "THIS_WEEK", "LAST_WEEK", "THIS_MONTH", "LAST_MONTH", "CUSTOM_IN_DATE", "CUSTOM_IN_MILLIS", "LAST_1_HOUR", "LAST12MONTHS" ],
+            "pattern" : "([1-8]{1}|LAST24HOURS|TODAY|YESTERDAY|LAST_30_DAYS|LAST_7_DAYS|THIS_WEEK|LAST_WEEK|THIS_MONTH|LAST_MONTH|CUSTOM_IN_DATE|CUSTOM_IN_MILLIS|LAST_1_HOUR|LAST12MONTHS)",
+            "x-regex-name" : "reportDuration",
+            "maxLength" : 100
           }
         }, {
           "name" : "agentId",
@@ -958,6 +1022,7 @@
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
+            "x-dynamic-enum" : true,
             "pattern" : "[0-9a-zA-Z_\\-\\.\\$@\\?\\:\\/\\!\\P{InBasicLatin}\\s()]+",
             "maxLength" : 120
           }
@@ -970,7 +1035,10 @@
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
-            "enum" : [ "date", "channel", "agent", "hour" ]
+            "enum" : [ "date", "channel", "hour", "department" ],
+            "pattern" : "date|channel|hour|department",
+            "x-regex-name" : "dashboardDefaultFilters",
+            "maxLength" : 100
           }
         }, {
           "name" : "isFirstResponse",
@@ -1414,5 +1482,6 @@
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "DashboardMetrics"
 }

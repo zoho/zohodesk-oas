@@ -1,0 +1,264 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "UserAuthentication",
+    "version" : "1.0.0",
+    "description" : "Authenticates users for logging into the help center. These authentications can be done in various methods, including SAML, JWT, SMS, OIDC, and FEDERATED_LOGIN."
+  },
+  "paths" : {
+    "/api/v1/helpCenter/{id}/userAuthentications/{inputType}" : {
+      "patch" : {
+        "tags" : [ "UserAuthentication" ],
+        "summary" : "Update User Authentication Status",
+        "description" : "Updates the status of a specific user authentication type.",
+        "operationId" : "updateUserAuthenticationStatus",
+        "parameters" : [ {
+          "name" : "inputType",
+          "description" : "Type of user authentication to update. Possible values: SAML, FEDERATED_LOGIN, JWT, SMS, OIDC",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "pattern" : "SAML|FEDERATED_LOGIN|JWT|SMS|OIDC",
+            "enum" : [ "SAML", "FEDERATED_LOGIN", "JWT", "SMS", "OIDC" ]
+          }
+        }, {
+          "name" : "id",
+          "description" : "Unique ID of the help center",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/statusTemplate",
+          "required" : true
+        },
+        "responses" : {
+          "404" : {
+            "$ref" : "./Common.json#/components/responses/urlNotFoundErrorResponse"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "500" : {
+            "$ref" : "./Common.json#/components/responses/internalErrorResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.UPDATE" ]
+        } ]
+      }
+    },
+    "/api/v1/helpCenter/{id}/userAuthentications" : {
+      "get" : {
+        "tags" : [ "UserAuthentication" ],
+        "summary" : "Get User Authentication Types",
+        "description" : "Retrieves the user authentication types along with their current status for a particular help center.",
+        "operationId" : "getListOfUserAuthentication",
+        "parameters" : [ {
+          "name" : "status",
+          "in" : "query",
+          "description" : "Filter by authentication type status. Possible values: ENABLED, DISABLED",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "pattern" : "ENABLED|DISABLED",
+            "enum" : [ "ENABLED", "DISABLED" ]
+          }
+        }, {
+          "$ref" : "#/components/parameters/id",
+          "description" : "Unique ID of the help center"
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/data"
+          },
+          "400" : {
+            "$ref" : "./Common.json#/components/responses/badRequestErrorResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "403" : {
+            "$ref" : "./Common.json#/components/responses/forbiddenErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.READ" ]
+        } ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "userAuthenticationJSON" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "type" : {
+            "description" : "Type of user authentication. Possible values: JWT, SAML, SMS, FEDERATED_LOGIN, OIDC",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "SAML|FEDERATED_LOGIN|JWT|SMS|OIDC"
+          },
+          "status" : {
+            "description" : "Status of the authentication type. Possible values: ENABLED, DISABLED",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "ENABLED|DISABLED"
+          }
+        },
+        "required" : [ "status", "type" ]
+      },
+      "userAuthenticationJSONArray" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/userAuthenticationJSON"
+        }
+      },
+      "userAuthentications" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "description" : "List of user authentication type entries",
+        "properties" : {
+          "userAuthentications" : {
+            "$ref" : "#/components/schemas/userAuthenticationJSONArray"
+          }
+        },
+        "required" : [ "userAuthentications" ]
+      }
+    },
+    "responses" : {
+      "data" : {
+        "description" : "data template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "#/components/schemas/userAuthentications",
+                  "description" : "Wrapper object containing the response data"
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "data" : {
+                    "userAuthentications" : [ {
+                      "type" : "JWT",
+                      "status" : "DISABLED"
+                    }, {
+                      "type" : "SAML",
+                      "status" : "DISABLED"
+                    }, {
+                      "type" : "SMS",
+                      "status" : "DISABLED"
+                    }, {
+                      "type" : "FEDERATED_LOGIN",
+                      "status" : "ENABLED"
+                    }, {
+                      "type" : "OIDC",
+                      "status" : "DISABLED"
+                    } ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "parameters" : {
+      "id" : {
+        "name" : "id",
+        "description" : "Unique ID of the help center",
+        "in" : "path",
+        "required" : true,
+        "style" : "simple",
+        "explode" : false,
+        "schema" : {
+          "type" : [ "string", "integer" ],
+          "format" : "int64",
+          "pattern" : "([0-9]+)"
+        }
+      }
+    },
+    "requestBodies" : {
+      "statusTemplate" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "maxLength" : 50,
+              "minProperties" : 1,
+              "properties" : {
+                "status" : {
+                  "description" : "Status of the user authentication type. Possible values: ENABLED, DISABLED",
+                  "type" : [ "string" ],
+                  "maxLength" : 30,
+                  "pattern" : "ENABLED|DISABLED",
+                  "enum" : [ "ENABLED", "DISABLED" ]
+                }
+              },
+              "required" : [ "status" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "status" : "DISABLED"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "jwt-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/jwt-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "UserAuthentication"
+}

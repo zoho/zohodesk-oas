@@ -1,0 +1,3161 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "HelpCenterApp",
+    "version" : "1.0.0",
+    "description" : "Unified API contract for ASAP, Employee Self Service, and Feedback Widget help center apps, including employee self-service app initialization details."
+  },
+  "servers" : [ {
+    "url" : "/",
+    "description" : "Current Zoho Desk API origin"
+  } ],
+  "paths" : {
+    "/api/v1/selfServiceApp" : {
+      "get" : {
+        "tags" : [ "HelpCenterApp" ],
+        "summary" : "Get Employee Self-Service App Details",
+        "description" : "Returns the user, organization, Employee Self Service app, and static asset details required to initialize the employee self-service app. This is an internal API.",
+        "operationId" : "getSelfServiceAppDetails",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/selfServiceAppDetailsResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.channels.helpcenter.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.settings.READ" ]
+        } ]
+      }
+    },
+    "/api/v1/hcApps" : {
+      "get" : {
+        "tags" : [ "HelpCenterApp" ],
+        "summary" : "Retrieves a list of ASAPs, Employee Self Service apps, and Feedback Widgets, with pagination support.",
+        "description" : "Retrieves a list of ASAPs, Employee Self Service apps, and Feedback Widgets, with pagination support.",
+        "operationId" : "listHelpCenterApps",
+        "parameters" : [ {
+          "name" : "depId",
+          "in" : "query",
+          "description" : "ID of the department to filter ASAP. ID of the department to filter the app list.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/AppIdentifier"
+          }
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Index number starting from which the ASAPs must be listed. Index number starting from which the apps must be listed.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "minimum" : 0,
+            "default" : 0
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of ASAPs to list. Number of apps to list.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "minimum" : 1,
+            "default" : 50
+          }
+        }, {
+          "name" : "sortBy",
+          "in" : "query",
+          "description" : "Field by which the list is sorted. Possible values: appName, modifiedTime.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "appName", "modifiedTime" ],
+            "pattern" : "^(appName|modifiedTime)$"
+          }
+        }, {
+          "name" : "status",
+          "in" : "query",
+          "description" : "Filters by app status. Possible values: true = active apps, false = inactive apps.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "boolean" ]
+          }
+        }, {
+          "name" : "isAsc",
+          "in" : "query",
+          "description" : "Indicates whether to sort in ascending order. Possible values: true = ascending, false = descending.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "boolean" ]
+          }
+        }, {
+          "name" : "type",
+          "in" : "query",
+          "description" : "Filters apps by type. Possible values: ASAP, EMPLOYEE_SELF_SERVICE, FEEDBACK_WIDGET. Use EMPLOYEE_SELF_SERVICE to list Employee Self Service apps. Use FEEDBACK_WIDGET to list Feedback Widget apps.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/HelpCenterAppType"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/helpCenterAppListResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.channels.helpcenter.READ" ]
+        } ]
+      }
+    },
+    "/api/v1/hcApp" : {
+      "post" : {
+        "tags" : [ "HelpCenterApp" ],
+        "summary" : "Create a help center app",
+        "description" : "Creates an ASAP, Employee Self Service, or Feedback Widget app. The required type property selects and validates only the corresponding request schema, and the returned type selects the corresponding response schema.",
+        "operationId" : "createHelpCenterApp",
+        "parameters" : [ {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/createHelpCenterAppRequest"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/helpCenterAppResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.CREATE", "Desk.channels.helpcenter.CREATE" ]
+        } ]
+      }
+    },
+    "/api/v1/hcApps/{appId}" : {
+      "get" : {
+        "tags" : [ "HelpCenterApp" ],
+        "summary" : "Get a help center app",
+        "description" : "Gets an ASAP, Employee Self Service, or Feedback Widget app. The response type discriminator selects and validates only the matching response schema.",
+        "operationId" : "getHelpCenterApp",
+        "parameters" : [ {
+          "name" : "appId",
+          "in" : "path",
+          "description" : "Unique ID of the help center app. This value is supplied in the request path.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/AppIdentifier"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/helpCenterAppResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.READ", "Desk.channels.helpcenter.READ" ]
+        } ]
+      },
+      "patch" : {
+        "tags" : [ "HelpCenterApp" ],
+        "summary" : "Update a help center app",
+        "description" : "Updates an existing ASAP, Employee Self Service, or Feedback Widget app. First retrieve the app by appId and use the update schema that matches its returned type: UpdateAsapRequest for ASAP, UpdateAgentPortalRequest for EMPLOYEE_SELF_SERVICE, or UpdateFeedbackWidgetRequest for FEEDBACK_WIDGET. The update payload is type-less because the server derives the type from appId. Do not send one app type's modules or appProperties while updating another app type. The response type discriminator selects the matching response schema.",
+        "operationId" : "updateHelpCenterApp",
+        "parameters" : [ {
+          "name" : "appId",
+          "in" : "path",
+          "description" : "Unique ID of the help center app. This value is supplied in the request path.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/AppIdentifier"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/updateHelpCenterAppRequest"
+        },
+        "responses" : {
+          "200" : {
+            "$ref" : "#/components/responses/helpCenterAppResponse"
+          },
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.UPDATE", "Desk.channels.helpcenter.UPDATE" ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "HelpCenterApp" ],
+        "summary" : "Delete a help center app",
+        "description" : "Deletes an ASAP app.",
+        "operationId" : "deleteHelpCenterApp",
+        "parameters" : [ {
+          "name" : "appId",
+          "in" : "path",
+          "description" : "Unique ID of the help center app. This value is supplied in the request path.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/AppIdentifier"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "204" : {
+            "$ref" : "#/components/responses/noContentResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.settings.DELETE", "Desk.channels.helpcenter.DELETE" ]
+        } ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "SelfServiceUrlResponseValue" : {
+        "description" : "Absolute URL returned as part of employee self-service app initialization. The value can be null when the related integration or resource is not configured.",
+        "type" : [ "string", "null" ],
+        "format" : "uri",
+        "maxLength" : 2048
+      },
+      "SelfServiceUriReferenceResponseValue" : {
+        "description" : "Absolute or relative URI reference returned as part of employee self-service app initialization.",
+        "type" : [ "string", "null" ],
+        "format" : "uri-reference",
+        "maxLength" : 2048
+      },
+      "SelfServiceDomainResponseValue" : {
+        "description" : "Hostname returned for an employee self-service static resource domain.",
+        "type" : [ "string", "null" ],
+        "format" : "hostname",
+        "maxLength" : 253
+      },
+      "SelfServiceCloudAttachmentInfo" : {
+        "description" : "Cloud attachment configuration details.",
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "isAllowed" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether cloud attachments are allowed. Possible values: true = allowed; false = not allowed."
+          },
+          "isCloudPickersV2Enabled" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether Cloud Pickers V2 is enabled. Possible values: true = enabled; false = disabled."
+          },
+          "cloudPickerCustomCss" : {
+            "$ref" : "#/components/schemas/SelfServiceUriReferenceResponseValue",
+            "description" : "URL of the custom Cloud Picker stylesheet."
+          },
+          "gadgetsDomain" : {
+            "$ref" : "#/components/schemas/SelfServiceUrlResponseValue",
+            "description" : "Gadgets domain URL."
+          }
+        }
+      },
+      "SelfServiceHelpCenterLicenseInfo" : {
+        "description" : "License-related configuration exposed to the employee self-service app.",
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "attachments" : {
+            "$ref" : "#/components/schemas/SelfServiceAttachmentsProperties",
+            "description" : "Plan-level attachment license facts nested under licenseInfo."
+          }
+        }
+      },
+      "SelfServiceAttachmentsProperties" : {
+        "description" : "Plan-level attachment license limits and system-restricted file extensions.",
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "attachmentRestrictionLicense" : {
+            "$ref" : "#/components/schemas/SelfServiceAttachmentRestrictionLicense",
+            "description" : "Attachment restriction limits from the current license plan."
+          },
+          "systemRestrictedExtensions" : {
+            "type" : [ "array", "null" ],
+            "description" : "File extensions that are always restricted by the system.",
+            "maxItems" : 100,
+            "items" : {
+              "type" : "string",
+              "maxLength" : 20
+            }
+          },
+          "systemAllowedExtensions" : {
+            "type" : [ "array", "null" ],
+            "description" : "File extensions that are always allowed by the system.",
+            "maxItems" : 100,
+            "items" : {
+              "type" : "string",
+              "maxLength" : 20
+            }
+          }
+        }
+      },
+      "SelfServiceAttachmentRestrictionLicense" : {
+        "description" : "License plan limits for attachment restrictions.",
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "isAllowed" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether attachment restrictions are allowed by the current license. Possible values: true = allowed; false = not allowed."
+          },
+          "maxAttachmentSize" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32",
+            "description" : "Maximum attachment size allowed by the license, in bytes."
+          },
+          "maxCountAllowed" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32",
+            "description" : "Maximum number of attachments allowed by the license."
+          }
+        }
+      },
+      "SelfServiceKnowledgeBaseProperties" : {
+        "description" : "Knowledge base configuration details.",
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "isArticleIDConfigurationEnabled" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether article ID configuration is enabled. Possible values: true = enabled; false = disabled."
+          },
+          "commentChannelExtensionUUID" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "description" : "UUID of the article comment channel extension."
+          },
+          "articleSummaryEnabled" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether article summary is enabled. Possible values: true = enabled; false = disabled."
+          },
+          "articleSummaryMode" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "manual", "auto", null ],
+            "description" : "Article summary mode. Possible values: manual, auto."
+          }
+        }
+      },
+      "SelfServiceArticleChannelIntegrationInfo" : {
+        "description" : "Article comment channel integration details.",
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "channelName" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "description" : "Name of the article comment channel."
+          },
+          "uuid" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "description" : "UUID of the article comment channel."
+          },
+          "version" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "description" : "Version of the article comment channel integration."
+          }
+        }
+      },
+      "SelfServiceHelpCenterProperties" : {
+        "description" : "Help center and self-service portal properties.",
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "supportPortalURL" : {
+            "$ref" : "#/components/schemas/SelfServiceUrlResponseValue",
+            "description" : "URL of the support portal."
+          },
+          "selfServicePortalURL" : {
+            "$ref" : "#/components/schemas/SelfServiceUrlResponseValue",
+            "description" : "URL of the employee self-service portal."
+          },
+          "isTcIntegEnabled" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether TrainerCentral integration is enabled. Possible values: true = enabled; false = disabled."
+          },
+          "tcIntegOrgId" : {
+            "$ref" : "#/components/schemas/NullableAppIdentifier",
+            "description" : "Organization ID used by the TrainerCentral integration."
+          },
+          "isAgenSelfServiceEnabled" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether agent self-service is enabled. Possible values: true = enabled; false = disabled."
+          },
+          "agentSelfServiceStaticAppBased" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 255,
+            "description" : "App-server-based static asset version for agent self service."
+          },
+          "tcIntegEditorDomain" : {
+            "$ref" : "#/components/schemas/SelfServiceUrlResponseValue",
+            "description" : "TrainerCentral editor domain."
+          },
+          "hcAppPath" : {
+            "$ref" : "#/components/schemas/SelfServiceUriReferenceResponseValue",
+            "description" : "Absolute or relative path from which the Help Center application is loaded."
+          },
+          "hcAppStaticDomain" : {
+            "$ref" : "#/components/schemas/SelfServiceDomainResponseValue",
+            "description" : "Static domain used by the Employee Self Service app."
+          },
+          "hcAppVersion" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 255,
+            "description" : "Version of the Help Center application."
+          },
+          "cloudAttachInfo" : {
+            "$ref" : "#/components/schemas/SelfServiceCloudAttachmentInfo",
+            "description" : "Cloud attachment configuration details."
+          },
+          "agentSelfServiceStatic" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 255,
+            "description" : "Static asset version for agent self service."
+          },
+          "apiUrl" : {
+            "$ref" : "#/components/schemas/SelfServiceUriReferenceResponseValue",
+            "description" : "Relative API base path used by the employee self-service app."
+          },
+          "isEssOpenNewTabAccessEnabled" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether users can open employee self service in a new tab. Possible values: true = allowed; false = not allowed."
+          },
+          "kb" : {
+            "$ref" : "#/components/schemas/SelfServiceKnowledgeBaseProperties",
+            "description" : "Knowledge base configuration details."
+          },
+          "isAgentSelfServiceSetupAccessEnabled" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the current user can access agent self-service setup. Possible values: true = access is allowed; false = access is not allowed."
+          },
+          "tcIntegEditorUrl" : {
+            "$ref" : "#/components/schemas/SelfServiceUriReferenceResponseValue",
+            "description" : "Absolute or relative URI reference of the TrainerCentral editor."
+          },
+          "articleChannelIntegInfo" : {
+            "$ref" : "#/components/schemas/SelfServiceArticleChannelIntegrationInfo",
+            "description" : "Article comment channel integration configuration."
+          },
+          "licenseInfo" : {
+            "$ref" : "#/components/schemas/SelfServiceHelpCenterLicenseInfo",
+            "description" : "License-related configuration exposed to the employee self-service app."
+          }
+        }
+      },
+      "SelfServiceAgentPortalAppearance" : {
+        "description" : "Appearance settings configured for the Employee Self Service app.",
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "type" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "DEFAULT", "CONTRAST", "CUSTOM", null ],
+            "description" : "Appearance type configured for the Employee Self Service app."
+          },
+          "headerBackgroundColor" : {
+            "type" : [ "string", "null" ],
+            "pattern" : "^#?(([a-fA-F0-9]){3}){1,2}$",
+            "description" : "Header background color configured for the Employee Self Service app."
+          },
+          "headerTextColor" : {
+            "type" : [ "string", "null" ],
+            "pattern" : "^#?(([a-fA-F0-9]){3}){1,2}$",
+            "description" : "Header text color configured for the Employee Self Service app."
+          }
+        }
+      },
+      "SelfServiceAgentPortalAppProperties" : {
+        "description" : "Additional properties of the Employee Self Service app.",
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "portalUrl" : {
+            "$ref" : "#/components/schemas/SelfServiceUrlResponseValue",
+            "description" : "Portal URL configured for the Employee Self Service app. The response can return null when no portal URL is configured."
+          },
+          "appearence" : {
+            "$ref" : "#/components/schemas/SelfServiceAgentPortalAppearance",
+            "description" : "Appearance settings configured for the Employee Self Service app."
+          }
+        }
+      },
+      "SelfServiceHelpCenterAppInfo" : {
+        "description" : "Employee Self Service app configuration details.",
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "modifiedTime" : {
+            "$ref" : "#/components/schemas/ModifiedTime",
+            "description" : "Time when the Employee Self Service app was last modified."
+          },
+          "name" : {
+            "$ref" : "#/components/schemas/AppNameResponse",
+            "description" : "Name of the Employee Self Service app."
+          },
+          "appKey" : {
+            "$ref" : "#/components/schemas/AppKey",
+            "description" : "Public application key generated for the Employee Self Service app."
+          },
+          "modifiedBy" : {
+            "anyOf" : [ {
+              "$ref" : "#/components/schemas/AgentDetails"
+            } ],
+            "description" : "User who last modified the Employee Self Service app."
+          },
+          "id" : {
+            "$ref" : "#/components/schemas/NullableAppIdentifier",
+            "description" : "Unique ID of the help center app."
+          },
+          "departmentIds" : {
+            "type" : [ "array", "null" ],
+            "maxItems" : 200,
+            "items" : {
+              "$ref" : "#/components/schemas/AppIdentifier"
+            },
+            "description" : "IDs of departments associated with the Employee self service."
+          },
+          "type" : {
+            "$ref" : "#/components/schemas/AgentPortalAppType",
+            "description" : "Type of the Employee Self Service app."
+          },
+          "modules" : {
+            "$ref" : "#/components/schemas/AgentPortalModulesResponse",
+            "description" : "Modules enabled in the Employee Self Service app."
+          },
+          "appProperties" : {
+            "$ref" : "#/components/schemas/SelfServiceAgentPortalAppProperties",
+            "description" : "Additional properties of the Employee Self Service app."
+          },
+          "status" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the Employee Self Service app is enabled. Possible values: true = enabled; false = disabled."
+          },
+          "isVisibleInHC" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the Employee Self Service app is visible in the Help Center. Possible values: true = visible; false = hidden."
+          }
+        }
+      },
+      "SelfServiceOrganizationInfo" : {
+        "description" : "Organization and Employee Self Service configuration details required by the employee self-service app.",
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "orgId" : {
+            "$ref" : "#/components/schemas/NullableAppIdentifier",
+            "description" : "Unique ID of the organization."
+          },
+          "portalName" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "description" : "Name of the support portal."
+          },
+          "portalLogo" : {
+            "$ref" : "#/components/schemas/SelfServiceUriReferenceResponseValue",
+            "description" : "URL of the support portal logo."
+          },
+          "baseDomain" : {
+            "$ref" : "#/components/schemas/SelfServiceUrlResponseValue",
+            "description" : "Base domain of the organization."
+          },
+          "apiEndPoint" : {
+            "$ref" : "#/components/schemas/SelfServiceUrlResponseValue",
+            "description" : "API endpoint URL of the support portal."
+          },
+          "richTextEditorVersion" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "description" : "Version of the rich text editor configured for the portal."
+          },
+          "hcAppInfo" : {
+            "$ref" : "#/components/schemas/SelfServiceHelpCenterAppInfo",
+            "description" : "Employee Self Service app configuration details."
+          },
+          "hcProperties" : {
+            "$ref" : "#/components/schemas/SelfServiceHelpCenterProperties",
+            "description" : "Help center and self-service portal properties."
+          }
+        }
+      },
+      "SelfServiceUserPreferences" : {
+        "description" : "User preference values required by the employee self-service app.",
+        "type" : [ "object", "null" ],
+        "additionalProperties" : {
+          "type" : [ "string", "number", "boolean", "null" ]
+        },
+        "properties" : {
+          "ui_displayLayout" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "smartFocus", "focusedWidth", "fullWidth", null ],
+            "description" : "Display layout configured for the current user."
+          },
+          "ui_themes" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "description" : "Theme configured for the current user."
+          },
+          "namePattern" : {
+            "type" : [ "array", "null" ],
+            "minItems" : 2,
+            "maxItems" : 2,
+            "uniqueItems" : true,
+            "items" : {
+              "type" : [ "string" ],
+              "enum" : [ "FIRST_NAME", "LAST_NAME" ]
+            },
+            "description" : "Name pattern configured for the current user."
+          }
+        }
+      },
+      "SelfServiceUserInfo" : {
+        "description" : "Details of the current user required to initialize the employee self-service app.",
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "name" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "description" : "Name of the current user."
+          },
+          "email" : {
+            "type" : [ "string", "null" ],
+            "format" : "email",
+            "maxLength" : 320,
+            "description" : "Email address of the current user."
+          },
+          "zuId" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int64",
+            "description" : "Unique ID of the current user in Zoho accounts."
+          },
+          "userId" : {
+            "$ref" : "#/components/schemas/NullableAppIdentifier",
+            "description" : "Unique ID of the current user."
+          },
+          "profileUrl" : {
+            "$ref" : "#/components/schemas/SelfServiceUrlResponseValue",
+            "description" : "URL of the current user's profile image."
+          },
+          "profileName" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "description" : "Name of the current user's profile."
+          },
+          "profileRole" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "description" : "Role name of the current user."
+          },
+          "isUserOnline" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the current user is online. Possible values: true = online; false = offline."
+          },
+          "selectedLanguageCode" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 7,
+            "pattern" : "^[a-zA-Z]{2,4}([-_][a-zA-Z]{2})?$",
+            "description" : "Selected language code of the current user."
+          },
+          "myPreference" : {
+            "$ref" : "#/components/schemas/SelfServiceUserPreferences",
+            "description" : "User preference values required by the employee self-service app."
+          }
+        }
+      },
+      "SelfServiceAppDetails" : {
+        "description" : "Employee self-service app initialization response.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "userInfo" : {
+            "$ref" : "#/components/schemas/SelfServiceUserInfo",
+            "description" : "Details of the current user required to initialize the employee self-service app."
+          },
+          "orgInfo" : {
+            "$ref" : "#/components/schemas/SelfServiceOrganizationInfo",
+            "description" : "Organization and Employee Self Service configuration details required by the employee self-service app."
+          },
+          "staticVersion" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 255,
+            "description" : "Static asset version used by the employee self-service app."
+          },
+          "staticCDNPath" : {
+            "$ref" : "#/components/schemas/SelfServiceUrlResponseValue",
+            "description" : "Base CDN path for employee self-service static assets."
+          },
+          "isTestEnvironment" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the response is returned from a test environment. Possible values: true = test environment; false = production environment."
+          }
+        }
+      },
+      "HelpCenterAppType" : {
+        "description" : "Supported help center app type.",
+        "type" : [ "string" ],
+        "enum" : [ "ASAP", "EMPLOYEE_SELF_SERVICE", "FEEDBACK_WIDGET" ],
+        "pattern" : "^(ASAP|EMPLOYEE_SELF_SERVICE|FEEDBACK_WIDGET)$"
+      },
+      "AsapAppType" : {
+        "description" : "Discriminator value for an ASAP app.",
+        "type" : [ "string" ],
+        "enum" : [ "ASAP" ]
+      },
+      "AgentPortalAppType" : {
+        "description" : "Discriminator value for an Employee Self Service app.",
+        "type" : [ "string" ],
+        "enum" : [ "EMPLOYEE_SELF_SERVICE" ]
+      },
+      "FeedbackWidgetAppType" : {
+        "description" : "Discriminator value for a Feedback Widget app.",
+        "type" : [ "string" ],
+        "enum" : [ "FEEDBACK_WIDGET" ]
+      },
+      "AppNameRequest" : {
+        "description" : "Name of the help center app.",
+        "type" : [ "string" ],
+        "minLength" : 2,
+        "maxLength" : 100,
+        "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+",
+        "x-regex-name" : "cleartextampersand"
+      },
+      "AppNameResponse" : {
+        "description" : "Name of the help center app.",
+        "type" : [ "string", "null" ],
+        "minLength" : 0,
+        "maxLength" : 100
+      },
+      "AppIdentifier" : {
+        "description" : "Unique ID of the help center app.",
+        "type" : [ "string", "integer" ],
+        "format" : "int64",
+        "pattern" : "^[0-9]+$"
+      },
+      "NullableAppIdentifier" : {
+        "description" : "Nullable identifier returned by the service.",
+        "type" : [ "string", "integer", "null" ],
+        "format" : "int64",
+        "pattern" : "^[0-9]+$"
+      },
+      "ModifiedTime" : {
+        "description" : "Time when the app was last modified.",
+        "type" : [ "string", "integer", "null" ],
+        "format" : "int64",
+        "pattern" : "^[0-9]+$"
+      },
+      "AppKey" : {
+        "description" : "Public application key generated for the help center app.",
+        "type" : [ "string", "null" ],
+        "minLength" : 0,
+        "maxLength" : 100
+      },
+      "DepartmentIdsRequest" : {
+        "description" : "IDs of departments associated with the app.",
+        "type" : [ "array" ],
+        "minItems" : 0,
+        "maxItems" : 200,
+        "items" : {
+          "$ref" : "#/components/schemas/AppIdentifier"
+        }
+      },
+      "FeedbackWidgetDepartmentIdsRequest" : {
+        "description" : "Unique ID(s) of the departments associated with the Feedback Widget.",
+        "type" : [ "array" ],
+        "minItems" : 1,
+        "maxItems" : 200,
+        "items" : {
+          "$ref" : "#/components/schemas/AppIdentifier"
+        }
+      },
+      "DepartmentIdsResponse" : {
+        "description" : "IDs of departments associated with the app.",
+        "type" : [ "array" ],
+        "maxItems" : 200,
+        "items" : {
+          "$ref" : "#/components/schemas/AppIdentifier"
+        }
+      },
+      "ModuleClients" : {
+        "description" : "Platforms where the module is available.",
+        "type" : [ "array" ],
+        "minItems" : 0,
+        "maxItems" : 3,
+        "uniqueItems" : true,
+        "items" : {
+          "type" : [ "string" ],
+          "enum" : [ "web", "iOS", "android" ]
+        }
+      },
+      "ModuleDisplayName" : {
+        "description" : "Display name of the module.",
+        "type" : [ "string" ],
+        "minLength" : 1,
+        "maxLength" : 100,
+        "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+",
+        "x-regex-name" : "cleartextampersand"
+      },
+      "ColorCode" : {
+        "description" : "Three-digit or six-digit hexadecimal color code, with an optional leading hash.",
+        "type" : [ "string" ],
+        "maxLength" : 30,
+        "pattern" : "^#?(([a-fA-F0-9]){3}){1,2}$",
+        "x-regex-name" : "colorCode"
+      },
+      "UrlRequestValue" : {
+        "description" : "URL value accepted in a help center app request.",
+        "type" : [ "string" ],
+        "format" : "uri",
+        "maxLength" : 1000,
+        "pattern" : "^(https?[:]//[0-9a-zA-Z][-.\\w]*([:][0-9]{1,5})?/[a-zA-Z0-9\\-.?,|:'\\/\\\\+=&%\\${}#_\\[\\]@!\\(\\)\\*;~]*)$",
+        "x-regex-name" : "url"
+      },
+      "UrlResponseValue" : {
+        "description" : "URL value returned by the service. Unconfigured URL fields can be returned as an empty string or null.",
+        "type" : [ "string", "null" ],
+        "maxLength" : 1000,
+        "pattern" : "^(?:https?://[0-9a-zA-Z][-.\\w]*(:[0-9]{1,5})?/[a-zA-Z0-9\\-.?,|:'\\/\\\\+=&%\\${}#_\\[\\]@!\\(\\)\\*;~]*)?$",
+        "x-regex-name" : "url"
+      },
+      "ToggleRequestValue" : {
+        "description" : "Boolean value for a Feedback Widget toggle.",
+        "type" : [ "boolean" ]
+      },
+      "AgentDetails" : {
+        "description" : "User who last modified the app.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "photoURL" : {
+            "type" : [ "string", "null" ],
+            "format" : "uri",
+            "maxLength" : 2048,
+            "description" : "URL of the modifier's profile photo."
+          },
+          "name" : {
+            "type" : [ "string" ],
+            "maxLength" : 100,
+            "description" : "Name of the modifier."
+          },
+          "id" : {
+            "$ref" : "#/components/schemas/AppIdentifier",
+            "description" : "Unique ID of the modifier."
+          }
+        },
+        "required" : [ "photoURL", "name", "id" ]
+      },
+      "AsapTabPropertiesRequest" : {
+        "description" : "ASAP module-specific tab configuration.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "botId" : {
+            "type" : [ "string" ],
+            "maxLength" : 50,
+            "pattern" : "^[0-9a-zA-Z]*$",
+            "x-regex-name" : "alphaNumeric",
+            "description" : "Unique ID of the bot associated with the tab."
+          },
+          "isAgentTransfer" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether agent transfer is enabled for the tab. Possible values: true = enabled; false = disabled."
+          }
+        }
+      },
+      "AgentPortalTabPropertiesRequest" : {
+        "description" : "Additional properties specific to the Employee Self Service module type.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "orgId" : {
+            "$ref" : "#/components/schemas/AppIdentifier",
+            "description" : "Unique ID of the org associated with the tab."
+          }
+        }
+      },
+      "FeedbackWidgetTabPropertiesRequest" : {
+        "description" : "Feedback Widget tab labels and feature toggles.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "tabTitle" : {
+            "type" : [ "string" ],
+            "maxLength" : 50,
+            "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+",
+            "x-regex-name" : "cleartextampersand",
+            "description" : "Title shown for the tab."
+          },
+          "feedbackTitle" : {
+            "type" : [ "string" ],
+            "maxLength" : 50,
+            "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+",
+            "x-regex-name" : "cleartextampersand",
+            "description" : "Title shown in the feedback form."
+          },
+          "feedbackSubject" : {
+            "type" : [ "string" ],
+            "maxLength" : 500,
+            "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+",
+            "x-regex-name" : "cleartextampersand",
+            "description" : "Subject configured for the feedback form."
+          },
+          "feedbackDesc" : {
+            "type" : [ "string" ],
+            "maxLength" : 1000,
+            "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+",
+            "x-regex-name" : "cleartextampersand",
+            "description" : "Description shown in the feedback form."
+          },
+          "submissionMessage" : {
+            "type" : [ "string" ],
+            "maxLength" : 200,
+            "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+",
+            "x-regex-name" : "cleartextampersand",
+            "description" : "Submission message shown after feedback is submitted."
+          },
+          "isAttachFile" : {
+            "$ref" : "#/components/schemas/ToggleRequestValue",
+            "description" : "Indicates whether file attachment is enabled. Possible values: true = file attachment is enabled; false = file attachment is disabled."
+          },
+          "isScreenShot" : {
+            "$ref" : "#/components/schemas/ToggleRequestValue",
+            "description" : "Indicates whether screenshot capture is enabled. Possible values: true = screenshot capture is enabled; false = screenshot capture is disabled."
+          },
+          "isCaptcha" : {
+            "$ref" : "#/components/schemas/ToggleRequestValue",
+            "description" : "Indicates whether CAPTCHA is enabled for the tab. Possible values: true = CAPTCHA is enabled; false = CAPTCHA is disabled."
+          },
+          "isAutoSuggestion" : {
+            "$ref" : "#/components/schemas/ToggleRequestValue",
+            "description" : "Indicates whether auto-suggestion is enabled. Possible values: true = auto-suggestion is enabled; false = auto-suggestion is disabled."
+          }
+        }
+      },
+      "AsapModuleRequest" : {
+        "description" : "Module configuration accepted for an ASAP app.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "name" : {
+            "type" : [ "string" ],
+            "enum" : [ "Knowledge Base", "Community", "Ticket", "Home", "GC", "AnswerBot", "SalesIQ", "ZBM" ],
+            "description" : "Internal name of the tab."
+          },
+          "displayName" : {
+            "$ref" : "#/components/schemas/ModuleDisplayName",
+            "description" : "Display name of the tab in the ASAP widget."
+          },
+          "status" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the tab is enabled. Possible values: true = enabled; false = disabled."
+          },
+          "clients" : {
+            "$ref" : "#/components/schemas/ModuleClients",
+            "description" : "Platforms where the tab is available."
+          },
+          "tabProperties" : {
+            "$ref" : "#/components/schemas/AsapTabPropertiesRequest",
+            "description" : "Additional configuration for supported bot-based tabs."
+          }
+        },
+        "required" : [ "name", "status" ]
+      },
+      "AgentPortalModuleRequest" : {
+        "description" : "Module configuration for the Employee Self Service.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "name" : {
+            "type" : [ "string" ],
+            "enum" : [ "Knowledge Base", "Training" ],
+            "description" : "Internal name of the tab."
+          },
+          "displayName" : {
+            "$ref" : "#/components/schemas/ModuleDisplayName",
+            "description" : "Display name of the tab."
+          },
+          "status" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the tab is enabled. Possible values: true = enabled; false = disabled."
+          },
+          "clients" : {
+            "$ref" : "#/components/schemas/ModuleClients",
+            "description" : "Platforms where the tab is available."
+          },
+          "tabProperties" : {
+            "$ref" : "#/components/schemas/AgentPortalTabPropertiesRequest",
+            "description" : "Additional properties for the tab."
+          }
+        },
+        "required" : [ "name", "status" ]
+      },
+      "FeedbackWidgetModuleRequest" : {
+        "description" : "Module configuration for the Feedback Widget.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "name" : {
+            "type" : [ "string" ],
+            "enum" : [ "FeedbackWidget" ],
+            "description" : "Internal name of the tab."
+          },
+          "displayName" : {
+            "$ref" : "#/components/schemas/ModuleDisplayName",
+            "description" : "Display name of the tab."
+          },
+          "status" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the tab is active. Possible values: true = tab is active; false = tab is inactive."
+          },
+          "clients" : {
+            "$ref" : "#/components/schemas/ModuleClients",
+            "description" : "Clients configured for the tab."
+          },
+          "tabProperties" : {
+            "$ref" : "#/components/schemas/FeedbackWidgetTabPropertiesRequest",
+            "description" : "Tab properties configured for the Feedback Widget."
+          }
+        },
+        "required" : [ "name", "status" ]
+      },
+      "AsapModulesRequest" : {
+        "description" : "ASAP modules. The security template permits between one and ten entries.",
+        "type" : [ "array" ],
+        "minItems" : 1,
+        "maxItems" : 10,
+        "items" : {
+          "$ref" : "#/components/schemas/AsapModuleRequest"
+        }
+      },
+      "AgentPortalModulesRequest" : {
+        "description" : "Tabs configured for the Employee Self Service.",
+        "type" : [ "array" ],
+        "minItems" : 1,
+        "maxItems" : 10,
+        "items" : {
+          "$ref" : "#/components/schemas/AgentPortalModuleRequest"
+        }
+      },
+      "FeedbackWidgetModulesRequest" : {
+        "description" : "Tabs configured for the Feedback Widget.",
+        "type" : [ "array" ],
+        "minItems" : 1,
+        "maxItems" : 10,
+        "items" : {
+          "$ref" : "#/components/schemas/FeedbackWidgetModuleRequest"
+        }
+      },
+      "AgentPortalAppearanceRequest" : {
+        "description" : "Appearance settings for the Employee Self Service.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "type" : {
+            "type" : [ "string" ],
+            "enum" : [ "DEFAULT", "CONTRAST", "CUSTOM" ],
+            "pattern" : "^(DEFAULT|CONTRAST|CUSTOM)$",
+            "description" : "Appearance type configured for the Employee Self Service."
+          },
+          "headerBackgroundColor" : {
+            "$ref" : "#/components/schemas/ColorCode",
+            "description" : "Header background color configured for the Employee Self Service."
+          },
+          "headerTextColor" : {
+            "$ref" : "#/components/schemas/ColorCode",
+            "description" : "Header text color configured for the Employee Self Service."
+          }
+        }
+      },
+      "AgentPortalAppPropertiesRequest" : {
+        "description" : "App properties for the Employee self service.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "appearence" : {
+            "$ref" : "#/components/schemas/AgentPortalAppearanceRequest",
+            "description" : "Appearance settings for the Employee Self Service."
+          }
+        }
+      },
+      "FeedbackWidgetChatPreferenceRequest" : {
+        "description" : "Chat preference settings for the Feedback Widget.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "isChat" : {
+            "$ref" : "#/components/schemas/ToggleRequestValue",
+            "description" : "Indicates whether chat is enabled. Possible values: true = chat is enabled; false = chat is disabled."
+          },
+          "isEnableChatForDepartment" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether chat is enabled for the department. Possible values: true = chat is enabled for the department; false = chat is disabled for the department."
+          }
+        }
+      },
+      "FeedbackWidgetAppearanceRequest" : {
+        "description" : "Launcher appearance settings for the Feedback Widget.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "backgroundColor" : {
+            "$ref" : "#/components/schemas/ColorCode",
+            "description" : "Background color configured for the launcher appearance."
+          },
+          "fontColor" : {
+            "$ref" : "#/components/schemas/ColorCode",
+            "description" : "Font color configured for the launcher appearance."
+          },
+          "position" : {
+            "type" : [ "string" ],
+            "enum" : [ "Left", "Right", "Top", "Bottom" ],
+            "pattern" : "^(Left|Right|Top|Bottom)$",
+            "description" : "Position configured for the launcher appearance."
+          },
+          "offset" : {
+            "type" : [ "string" ],
+            "maxLength" : 4,
+            "pattern" : "^[0-9]{1,4}$",
+            "description" : "Offset configured for the launcher appearance."
+          }
+        }
+      },
+      "FeedbackWidgetAppPropertiesRequest" : {
+        "description" : "App properties for the Feedback Widget, including chat preferences and launcher appearance.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "chatPreference" : {
+            "$ref" : "#/components/schemas/FeedbackWidgetChatPreferenceRequest",
+            "description" : "Chat preference settings for the Feedback Widget."
+          },
+          "appearence" : {
+            "$ref" : "#/components/schemas/FeedbackWidgetAppearanceRequest",
+            "description" : "Launcher appearance settings for the Feedback Widget."
+          }
+        }
+      },
+      "NotificationDeployment" : {
+        "description" : "Deployment environment for the credential.",
+        "type" : [ "string" ],
+        "enum" : [ "PRODUCTION", "SANDBOX" ],
+        "pattern" : "^(PRODUCTION|SANDBOX)$"
+      },
+      "AndroidNotificationCredentialRequest" : {
+        "description" : "Android notification credential.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "deployment" : {
+            "$ref" : "#/components/schemas/NotificationDeployment",
+            "description" : "Deployment environment for the credential."
+          },
+          "serviceAccountJSONFileId" : {
+            "type" : [ "string" ],
+            "maxLength" : 5000,
+            "description" : "Service account JSON file ID for Android push notifications."
+          }
+        }
+      },
+      "IosNotificationCredentialRequest" : {
+        "description" : "iOS notification credential.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "deployment" : {
+            "$ref" : "#/components/schemas/NotificationDeployment",
+            "description" : "Deployment environment for the credential."
+          },
+          "certificateId" : {
+            "type" : [ "string" ],
+            "maxLength" : 5000,
+            "description" : "Unique ID of the iOS notification certificate."
+          },
+          "password" : {
+            "type" : [ "string" ],
+            "maxLength" : 5000,
+            "format" : "password",
+            "description" : "Password for the iOS notification certificate."
+          }
+        }
+      },
+      "AndroidNotificationSettingsRequest" : {
+        "description" : "Push notification settings for Android.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "isEnabled" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether push notifications are enabled for Android. Possible values: true = push notifications enabled; false = push notifications disabled."
+          },
+          "credentials" : {
+            "type" : [ "array" ],
+            "items" : {
+              "$ref" : "#/components/schemas/AndroidNotificationCredentialRequest"
+            },
+            "description" : "Notification credentials for Android."
+          }
+        },
+        "required" : [ "isEnabled", "credentials" ]
+      },
+      "IosNotificationSettingsRequest" : {
+        "description" : "Push notification settings for iOS.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "isEnabled" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether push notifications are enabled for iOS. Possible values: true = push notifications enabled; false = push notifications disabled."
+          },
+          "credentials" : {
+            "type" : [ "array" ],
+            "items" : {
+              "$ref" : "#/components/schemas/IosNotificationCredentialRequest"
+            },
+            "description" : "Notification credentials for iOS."
+          }
+        },
+        "required" : [ "isEnabled", "credentials" ]
+      },
+      "AndroidInstallationRequest" : {
+        "description" : "Installation settings for Android.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "bundleName" : {
+            "type" : [ "string" ],
+            "maxLength" : 255,
+            "x-regex-name" : "vaildinappbundlename",
+            "description" : "Bundle name of the Android app."
+          },
+          "notificationSettings" : {
+            "$ref" : "#/components/schemas/AndroidNotificationSettingsRequest",
+            "description" : "Push notification settings for Android. Valid credentials must come from the dedicated service-account JSON upload endpoint."
+          }
+        },
+        "required" : [ "bundleName" ]
+      },
+      "IosInstallationRequest" : {
+        "description" : "Installation settings for iOS.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "bundleName" : {
+            "type" : [ "string" ],
+            "maxLength" : 255,
+            "x-regex-name" : "vaildinappbundlename",
+            "description" : "Bundle name of the iOS app."
+          },
+          "notificationSettings" : {
+            "$ref" : "#/components/schemas/IosNotificationSettingsRequest",
+            "description" : "Push notification settings for iOS. Valid credentials and their password must come from the dedicated APN certificate upload flow."
+          }
+        },
+        "required" : [ "bundleName" ]
+      },
+      "InstallationPropertiesRequest" : {
+        "description" : "Installation settings for mobile platforms.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "android" : {
+            "$ref" : "#/components/schemas/AndroidInstallationRequest",
+            "description" : "Installation settings for Android."
+          },
+          "ios" : {
+            "$ref" : "#/components/schemas/IosInstallationRequest",
+            "description" : "Installation settings for iOS."
+          }
+        }
+      },
+      "MobilePrivacyRequest" : {
+        "description" : "Privacy settings for a mobile platform.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "isAnnonymousEnabled" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether anonymous access is enabled. Possible values: true = anonymous access enabled; false = anonymous access disabled."
+          },
+          "isJWTEnabled" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether JWT authentication is enabled. Possible values: true = JWT authentication enabled; false = JWT authentication disabled."
+          }
+        },
+        "required" : [ "isAnnonymousEnabled", "isJWTEnabled" ]
+      },
+      "JwtSettingsRequest" : {
+        "description" : "JWT configuration for the web platform.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "jsDomains" : {
+            "type" : [ "array" ],
+            "minItems" : 0,
+            "maxItems" : 5,
+            "items" : {
+              "type" : [ "string" ],
+              "maxLength" : 1000,
+              "format" : "uri"
+            },
+            "description" : "JavaScript domains allowed for JWT authentication on web."
+          }
+        }
+      },
+      "WebPrivacyRequest" : {
+        "description" : "Privacy settings for the web platform.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "isAnnonymousEnabled" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether anonymous access is enabled for web. Possible values: true = anonymous access enabled; false = anonymous access disabled."
+          },
+          "isJWTEnabled" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether JWT authentication is enabled for web. Possible values: true = JWT authentication enabled; false = JWT authentication disabled."
+          },
+          "jwt" : {
+            "$ref" : "#/components/schemas/JwtSettingsRequest",
+            "description" : "JWT configuration for the web platform."
+          }
+        },
+        "required" : [ "isAnnonymousEnabled", "isJWTEnabled" ]
+      },
+      "PrivacySettingsRequest" : {
+        "description" : "Privacy settings for the ASAP across platforms.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "web" : {
+            "$ref" : "#/components/schemas/WebPrivacyRequest",
+            "description" : "Privacy settings for the web platform."
+          },
+          "ios" : {
+            "$ref" : "#/components/schemas/MobilePrivacyRequest",
+            "description" : "Privacy settings for the iOS platform."
+          }
+        }
+      },
+      "WebAppAppearanceRequest" : {
+        "description" : "Appearance settings for the web app.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "themeColor" : {
+            "$ref" : "#/components/schemas/ColorCode",
+            "description" : "Theme color used in the web app."
+          },
+          "actionColor" : {
+            "$ref" : "#/components/schemas/ColorCode",
+            "description" : "Action color used in the web app."
+          },
+          "wallpaperType" : {
+            "type" : [ "string" ],
+            "enum" : [ "DEFAULT", "RANDOM_TRIANGLE", "CUBE", "RANDOM_SPRINKLE", "MOSAIC", "SHAPES", "CUSTOM" ],
+            "description" : "Type of wallpaper used in the web app."
+          },
+          "wallpaperUrl" : {
+            "$ref" : "#/components/schemas/UrlRequestValue",
+            "description" : "URL of the web app wallpaper."
+          },
+          "headerLogoUrl" : {
+            "$ref" : "#/components/schemas/UrlRequestValue",
+            "description" : "URL of the header logo."
+          },
+          "windowSize" : {
+            "type" : [ "string" ],
+            "enum" : [ "SMALL", "LARGE" ],
+            "description" : "Window size of the web app."
+          },
+          "showZohoTag" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the Zoho tag is shown. Possible values: true = shown; false = hidden."
+          },
+          "customCSSEnabled" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether custom CSS is enabled. Possible values: true = enabled; false = disabled."
+          },
+          "cssUrlId" : {
+            "$ref" : "#/components/schemas/AppIdentifier",
+            "description" : "Upload ID of the custom CSS resource to apply. Use this field in create and update requests. The response returns the resolved CSS file URL in cssUrl."
+          }
+        }
+      },
+      "LauncherAppearanceRequest" : {
+        "description" : "Appearance settings for the launcher.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "iconType" : {
+            "type" : [ "string" ],
+            "enum" : [ "IDEA", "SUGGESTION", "SELF_SERVICE", "INFO", "ANNOUNCEMENT", "CHAT_BUBBLE", "CUSTOM" ],
+            "description" : "Type of icon used for the launcher."
+          },
+          "iconUrl" : {
+            "$ref" : "#/components/schemas/UrlRequestValue",
+            "description" : "URL of the launcher icon."
+          },
+          "shape" : {
+            "type" : [ "string" ],
+            "enum" : [ "ROUND", "BUBBLE", "SQUARE", "RHOMBUS" ],
+            "description" : "Shape of the launcher icon."
+          },
+          "position" : {
+            "type" : [ "string" ],
+            "enum" : [ "CENTER_LEFT", "CENTER_RIGHT", "BOTTOM_LEFT", "BOTTOM_RIGHT" ],
+            "description" : "Position of the launcher."
+          },
+          "sideSpacing" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "^[0-9]+$",
+            "description" : "Side spacing of the launcher."
+          },
+          "bottomSpacing" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "^[0-9]+$",
+            "description" : "Bottom spacing of the launcher."
+          }
+        }
+      },
+      "StylePropertiesRequest" : {
+        "description" : "Style properties for the ASAP.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "webAppAppearence" : {
+            "$ref" : "#/components/schemas/WebAppAppearanceRequest",
+            "description" : "Appearance settings for the web app."
+          },
+          "launcherAppearence" : {
+            "$ref" : "#/components/schemas/LauncherAppearanceRequest",
+            "description" : "Appearance settings for the launcher."
+          }
+        }
+      },
+      "WelcomeMessagesRequest" : {
+        "description" : "Default welcome messages for the ASAP.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "greetingMessage" : {
+            "type" : [ "string" ],
+            "maxLength" : 255,
+            "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+",
+            "x-regex-name" : "cleartextampersand",
+            "description" : "Greeting message displayed to users when they open the app."
+          },
+          "introMessage" : {
+            "type" : [ "string" ],
+            "maxLength" : 255,
+            "pattern" : "[0-9a-zA-Z_\\-\\&\\.\\$\\@\\^\\(\\)\\{\\}\\~\\=\\-\\|\\*\\+\\?\\[\\]\\,\\:\\\"\\'\\/\\!\\P{InBasicLatin}\\s]+",
+            "x-regex-name" : "cleartextampersand",
+            "description" : "Introductory message displayed to users when they open the app."
+          }
+        }
+      },
+      "CreateAsapRequest" : {
+        "description" : "Create payload for an ASAP app.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "type" : {
+            "type" : [ "string" ],
+            "enum" : [ "ASAP" ],
+            "description" : "Type of help center app to create. The value must be ASAP."
+          },
+          "name" : {
+            "$ref" : "#/components/schemas/AppNameRequest",
+            "description" : "Display name of the ASAP widget."
+          },
+          "modules" : {
+            "$ref" : "#/components/schemas/AsapModulesRequest",
+            "description" : "Tabs to configure in the ASAP widget."
+          },
+          "departmentIds" : {
+            "$ref" : "#/components/schemas/DepartmentIdsRequest",
+            "description" : "Unique ID(s) of the departments associated with the ASAP."
+          },
+          "isLauncherVisible" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the ASAP widget launcher icon is visible. Possible values: true = visible; false = hidden."
+          },
+          "status" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the ASAP widget is active. Possible values: true = active; false = inactive."
+          }
+        },
+        "required" : [ "type", "name", "departmentIds" ]
+      },
+      "CreateAgentPortalRequest" : {
+        "description" : "Create payload for an Employee Self Service app.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "type" : {
+            "type" : [ "string" ],
+            "enum" : [ "EMPLOYEE_SELF_SERVICE" ],
+            "description" : "Type of the app. The value must be EMPLOYEE_SELF_SERVICE."
+          },
+          "name" : {
+            "$ref" : "#/components/schemas/AppNameRequest",
+            "description" : "Name of the Employee Self Service."
+          },
+          "modules" : {
+            "$ref" : "#/components/schemas/AgentPortalModulesRequest",
+            "description" : "Tabs configured for the Employee Self Service."
+          },
+          "departmentIds" : {
+            "$ref" : "#/components/schemas/DepartmentIdsRequest",
+            "description" : "IDs of departments associated with the Employee self service."
+          },
+          "status" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the Employee Self Service is active. Possible values: true = active; false = inactive."
+          },
+          "appProperties" : {
+            "$ref" : "#/components/schemas/AgentPortalAppPropertiesRequest",
+            "description" : "App properties for the Employee self service."
+          }
+        },
+        "required" : [ "type", "name", "departmentIds" ]
+      },
+      "CreateFeedbackWidgetRequest" : {
+        "description" : "Create payload for a Feedback Widget app.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "type" : {
+            "type" : [ "string" ],
+            "enum" : [ "FEEDBACK_WIDGET" ],
+            "description" : "App type. The value must be FEEDBACK_WIDGET."
+          },
+          "name" : {
+            "$ref" : "#/components/schemas/AppNameRequest",
+            "description" : "Name of the Feedback Widget."
+          },
+          "modules" : {
+            "$ref" : "#/components/schemas/FeedbackWidgetModulesRequest",
+            "description" : "Tabs configured for the Feedback Widget."
+          },
+          "departmentIds" : {
+            "$ref" : "#/components/schemas/FeedbackWidgetDepartmentIdsRequest",
+            "description" : "Unique ID(s) of the departments associated with the Feedback Widget."
+          },
+          "status" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the Feedback Widget is active. Possible values: true = app is active; false = app is inactive."
+          },
+          "appProperties" : {
+            "$ref" : "#/components/schemas/FeedbackWidgetAppPropertiesRequest",
+            "description" : "App properties for the Feedback Widget, including chat preferences and launcher appearance."
+          }
+        },
+        "required" : [ "type", "name", "departmentIds" ]
+      },
+      "UpdateAsapRequest" : {
+        "description" : "Type-less update payload for an ASAP app.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "minProperties" : 1,
+        "properties" : {
+          "name" : {
+            "$ref" : "#/components/schemas/AppNameRequest",
+            "description" : "Name of the ASAP."
+          },
+          "modules" : {
+            "$ref" : "#/components/schemas/AsapModulesRequest",
+            "description" : "Tabs configured for the ASAP."
+          },
+          "departmentIds" : {
+            "$ref" : "#/components/schemas/DepartmentIdsRequest",
+            "description" : "Unique ID(s) of the departments associated with the ASAP."
+          },
+          "isLauncherVisible" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the app launcher icon is visible. Possible values: true = visible; false = hidden."
+          },
+          "status" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the ASAP is active. Possible values: true = active; false = inactive."
+          },
+          "installationProperties" : {
+            "$ref" : "#/components/schemas/InstallationPropertiesRequest",
+            "description" : "Installation settings for mobile platforms."
+          },
+          "privacySettings" : {
+            "$ref" : "#/components/schemas/PrivacySettingsRequest",
+            "description" : "Privacy settings for the ASAP across platforms."
+          },
+          "whiteListedDomains" : {
+            "type" : [ "array" ],
+            "minItems" : 0,
+            "maxItems" : 5,
+            "items" : {
+              "type" : [ "string" ],
+              "format" : "uri",
+              "maxLength" : 1000
+            },
+            "description" : "Whitelisted domains for the ASAP."
+          },
+          "isVisibleInHC" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the ASAP is visible in the help center. Possible values: true = visible; false = hidden."
+          },
+          "defaultWelcomeMessages" : {
+            "$ref" : "#/components/schemas/WelcomeMessagesRequest",
+            "description" : "Default welcome messages for the ASAP."
+          },
+          "defaultMessagesLocale" : {
+            "type" : [ "string" ],
+            "pattern" : "^[a-zA-Z]{2,4}([-_][a-zA-Z]{2})?$",
+            "x-regex-name" : "articleLocale",
+            "enum" : [ "en-US", "ja", "zh", "es", "de", "fr", "tr", "ru", "pt", "it", "nl", "da", "sv", "pl", "ar", "he", "af", "cs", "fr-ca", "bg", "fi", "el", "hu", "id", "nb", "ro", "th", "uk", "vi", "ur", "hi", "te", "kn", "ta", "mr", "ko", "fa", "bn", "gu", "ms", "ml", "en-gb", "sk", "hr", "sl", "zh_TW", "zh-tw", "ca", "ka", "kk", "my", "km", "pt-br", "ru-RU" ],
+            "description" : "Default locale for welcome messages. Must be a supported language code."
+          },
+          "styleProperties" : {
+            "$ref" : "#/components/schemas/StylePropertiesRequest",
+            "description" : "Style properties for the ASAP."
+          }
+        }
+      },
+      "UpdateAgentPortalRequest" : {
+        "description" : "Update payload for an Employee Self Service app.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "minProperties" : 1,
+        "properties" : {
+          "name" : {
+            "$ref" : "#/components/schemas/AppNameRequest",
+            "description" : "Name of the Employee Self Service."
+          },
+          "modules" : {
+            "$ref" : "#/components/schemas/AgentPortalModulesRequest",
+            "description" : "Tabs configured for the Employee Self Service."
+          },
+          "departmentIds" : {
+            "$ref" : "#/components/schemas/DepartmentIdsRequest",
+            "description" : "IDs of departments associated with the Employee self service."
+          },
+          "status" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the Employee Self Service is active. Possible values: true = active; false = inactive."
+          },
+          "appProperties" : {
+            "$ref" : "#/components/schemas/AgentPortalAppPropertiesRequest",
+            "description" : "App properties for the Employee self service."
+          }
+        }
+      },
+      "UpdateFeedbackWidgetRequest" : {
+        "description" : "Update payload for a Feedback Widget app.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "minProperties" : 1,
+        "properties" : {
+          "name" : {
+            "$ref" : "#/components/schemas/AppNameRequest",
+            "description" : "Name of the Feedback Widget."
+          },
+          "modules" : {
+            "$ref" : "#/components/schemas/FeedbackWidgetModulesRequest",
+            "description" : "Tabs configured for the Feedback Widget."
+          },
+          "departmentIds" : {
+            "$ref" : "#/components/schemas/DepartmentIdsRequest",
+            "description" : "Unique ID(s) of the departments associated with the Feedback Widget."
+          },
+          "status" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the Feedback Widget is active. Possible values: true = app is active; false = app is inactive."
+          },
+          "appProperties" : {
+            "$ref" : "#/components/schemas/FeedbackWidgetAppPropertiesRequest",
+            "description" : "App properties for the Feedback Widget, including chat preferences and launcher appearance."
+          }
+        }
+      },
+      "UpdateHelpCenterAppRequest" : {
+        "description" : "Type-less update payload accepted by the update API. The discriminator value is generation context resolved from the app type associated with appId; it selects the matching request schema and is not included in the PATCH body.",
+        "anyOf" : [ {
+          "$ref" : "#/components/schemas/UpdateAsapRequest"
+        }, {
+          "$ref" : "#/components/schemas/UpdateAgentPortalRequest"
+        }, {
+          "$ref" : "#/components/schemas/UpdateFeedbackWidgetRequest"
+        } ],
+        "discriminator" : {
+          "propertyName" : "type",
+          "mapping" : {
+            "ASAP" : "#/components/schemas/UpdateAsapRequest",
+            "EMPLOYEE_SELF_SERVICE" : "#/components/schemas/UpdateAgentPortalRequest",
+            "FEEDBACK_WIDGET" : "#/components/schemas/UpdateFeedbackWidgetRequest"
+          }
+        }
+      },
+      "AsapTabPropertiesResponse" : {
+        "description" : "ASAP module-specific tab properties returned by the service. Empty objects are valid for modules without additional settings.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "botId" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "description" : "Unique ID of the bot associated with the tab."
+          },
+          "isAgentTransfer" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether agent transfer is enabled. Possible values: true = enabled; false = disabled."
+          }
+        }
+      },
+      "AgentPortalTabPropertiesResponse" : {
+        "description" : "Additional properties specific to the Employee Self Service module type.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "orgId" : {
+            "$ref" : "#/components/schemas/NullableAppIdentifier",
+            "description" : "Unique ID of the org associated with the tab."
+          }
+        }
+      },
+      "FeedbackWidgetTabPropertiesResponse" : {
+        "description" : "Feedback Widget tab labels and feature toggles.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "tabTitle" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "description" : "Title shown for the tab."
+          },
+          "feedbackTitle" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "description" : "Title shown in the feedback form."
+          },
+          "feedbackSubject" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 500,
+            "description" : "Subject configured for the feedback form."
+          },
+          "feedbackDesc" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 1000,
+            "description" : "Description shown in the feedback form."
+          },
+          "submissionMessage" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 200,
+            "description" : "Submission message shown after feedback is submitted."
+          },
+          "isAttachFile" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether file attachment is enabled. Possible values: true = file attachment is enabled; false = file attachment is disabled."
+          },
+          "isScreenShot" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether screenshot capture is enabled. Possible values: true = screenshot capture is enabled; false = screenshot capture is disabled."
+          },
+          "isCaptcha" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether CAPTCHA is enabled for the tab. Possible values: true = CAPTCHA is enabled; false = CAPTCHA is disabled."
+          },
+          "isAutoSuggestion" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether auto-suggestion is enabled. Possible values: true = auto-suggestion is enabled; false = auto-suggestion is disabled."
+          },
+          "isEmbed" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the tab is configured for embedding. Possible values: true = embedding is enabled; false = embedding is disabled."
+          }
+        }
+      },
+      "AsapModuleResponse" : {
+        "description" : "Module returned for an ASAP app.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "name" : {
+            "type" : [ "string" ],
+            "enum" : [ "Knowledge Base", "Community", "Ticket", "Home", "GC", "AnswerBot", "SalesIQ", "ZBM" ],
+            "description" : "Internal name of the tab."
+          },
+          "displayName" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "description" : "Display name of the tab."
+          },
+          "status" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the tab is enabled. Possible values: true = enabled; false = disabled."
+          },
+          "tabProperties" : {
+            "$ref" : "#/components/schemas/AsapTabPropertiesResponse",
+            "description" : "Additional properties for the tab."
+          },
+          "clients" : {
+            "$ref" : "#/components/schemas/ModuleClients",
+            "description" : "Platforms where the tab is available."
+          }
+        },
+        "required" : [ "name", "displayName", "status", "tabProperties", "clients" ]
+      },
+      "AgentPortalModuleResponse" : {
+        "description" : "Module returned for the Employee Self Service.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "name" : {
+            "type" : [ "string" ],
+            "enum" : [ "Knowledge Base", "Training" ],
+            "description" : "Internal name of the tab."
+          },
+          "displayName" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "description" : "Display name of the tab."
+          },
+          "status" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the tab is enabled. Possible values: true = enabled; false = disabled."
+          },
+          "tabProperties" : {
+            "$ref" : "#/components/schemas/AgentPortalTabPropertiesResponse",
+            "description" : "Additional properties for the tab."
+          },
+          "clients" : {
+            "$ref" : "#/components/schemas/ModuleClients",
+            "description" : "Platforms where the tab is available."
+          }
+        },
+        "required" : [ "name", "displayName", "status", "tabProperties", "clients" ]
+      },
+      "FeedbackWidgetModuleResponse" : {
+        "description" : "Module returned for the Feedback Widget.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "name" : {
+            "type" : [ "string" ],
+            "enum" : [ "FeedbackWidget" ],
+            "description" : "Internal name of the tab."
+          },
+          "displayName" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "description" : "Display name of the tab."
+          },
+          "status" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the tab is active. Possible values: true = tab is active; false = tab is inactive."
+          },
+          "tabProperties" : {
+            "$ref" : "#/components/schemas/FeedbackWidgetTabPropertiesResponse",
+            "description" : "Tab properties configured for the Feedback Widget."
+          },
+          "clients" : {
+            "$ref" : "#/components/schemas/ModuleClients",
+            "description" : "Clients configured for the tab."
+          }
+        },
+        "required" : [ "name", "displayName", "status", "tabProperties", "clients" ]
+      },
+      "AsapModulesResponse" : {
+        "description" : "ASAP modules returned by the service.",
+        "type" : [ "array" ],
+        "items" : {
+          "$ref" : "#/components/schemas/AsapModuleResponse"
+        }
+      },
+      "AgentPortalModulesResponse" : {
+        "description" : "Tabs configured for the Employee Self Service.",
+        "type" : [ "array" ],
+        "items" : {
+          "$ref" : "#/components/schemas/AgentPortalModuleResponse"
+        }
+      },
+      "FeedbackWidgetModulesResponse" : {
+        "description" : "Tabs configured for the Feedback Widget.",
+        "type" : [ "array" ],
+        "items" : {
+          "$ref" : "#/components/schemas/FeedbackWidgetModuleResponse"
+        }
+      },
+      "CommonTabPropertiesResponse" : {
+        "description" : "Common list-response tab properties for all app module types.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "botId" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "description" : "Unique ID of the bot associated with the module."
+          },
+          "isAgentTransfer" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether agent transfer is enabled. Possible values: true = agent transfer enabled; false = agent transfer disabled."
+          },
+          "orgId" : {
+            "$ref" : "#/components/schemas/NullableAppIdentifier",
+            "description" : "Org Id."
+          },
+          "tabTitle" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "description" : "Tab Title."
+          },
+          "feedbackTitle" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 50,
+            "description" : "Feedback Title."
+          },
+          "feedbackSubject" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 500,
+            "description" : "Feedback Subject."
+          },
+          "feedbackDesc" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 1000,
+            "description" : "Feedback Desc."
+          },
+          "submissionMessage" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 200,
+            "description" : "Submission Mesg."
+          },
+          "isAttachFile" : {
+            "type" : [ "boolean" ],
+            "description" : "Is Attach File."
+          },
+          "isScreenShot" : {
+            "type" : [ "boolean" ],
+            "description" : "Is Screen Shot."
+          },
+          "isCaptcha" : {
+            "type" : [ "boolean" ],
+            "description" : "Is Captcha."
+          },
+          "isAutoSuggestion" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Is Auto Suggestion."
+          },
+          "isEmbed" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Is Embed."
+          }
+        }
+      },
+      "CommonModuleResponse" : {
+        "description" : "Common module representation used only by the list API.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "name" : {
+            "type" : [ "string" ],
+            "enum" : [ "Knowledge Base", "Community", "Ticket", "Home", "GC", "AnswerBot", "SalesIQ", "ZBM", "Training", "FeedbackWidget" ],
+            "description" : "Internal name of the module."
+          },
+          "displayName" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "description" : "Display name of the module."
+          },
+          "status" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the module is enabled. Possible values: true = module is enabled; false = module is disabled."
+          },
+          "tabProperties" : {
+            "$ref" : "#/components/schemas/CommonTabPropertiesResponse",
+            "description" : "Additional properties specific to the module type."
+          },
+          "clients" : {
+            "$ref" : "#/components/schemas/ModuleClients",
+            "description" : "Platforms where the module is available."
+          }
+        },
+        "required" : [ "name", "status" ]
+      },
+      "CommonModulesResponse" : {
+        "description" : "Common modules used by the list API.",
+        "type" : [ "array" ],
+        "items" : {
+          "$ref" : "#/components/schemas/CommonModuleResponse"
+        }
+      },
+      "InstallationPropertiesResponse" : {
+        "description" : "Installation settings for mobile platforms.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "android" : {
+            "anyOf" : [ {
+              "$ref" : "#/components/schemas/AndroidInstallationRequest"
+            } ],
+            "description" : "Installation settings for Android."
+          },
+          "ios" : {
+            "anyOf" : [ {
+              "$ref" : "#/components/schemas/IosInstallationRequest"
+            } ],
+            "description" : "Installation settings for iOS."
+          }
+        },
+        "required" : [ "android", "ios" ]
+      },
+      "JwtSettingsResponse" : {
+        "description" : "JWT configuration returned for a web or mobile platform. An empty domain string can be returned when no web domain is configured.",
+        "type" : [ "object", "null" ],
+        "readOnly" : true,
+        "additionalProperties" : false,
+        "properties" : {
+          "jsDomains" : {
+            "type" : [ "array", "null" ],
+            "maxItems" : 5,
+            "items" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 1000,
+              "pattern" : "^(?:https?://[0-9a-zA-Z][-.\\w]*(:[0-9]{1,5})?(?:/[a-zA-Z0-9\\-.?,|:'\\/\\\\+=&%\\${}#_\\[\\]@!\\(\\)\\*;~]*)?)?$",
+              "x-regex-name" : "url"
+            },
+            "description" : "JavaScript domains allowed for JWT authentication. The service can return an empty string when no domain is configured."
+          },
+          "jwtSecret" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "description" : "JWT secret returned for a configured mobile client."
+          }
+        }
+      },
+      "MobilePrivacyResponse" : {
+        "description" : "Privacy settings for a mobile platform.",
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "isAnnonymousEnabled" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether anonymous access is enabled. Possible values: true = anonymous access enabled; false = anonymous access disabled."
+          },
+          "isJWTEnabled" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether JWT authentication is enabled. Possible values: true = JWT authentication enabled; false = JWT authentication disabled."
+          },
+          "jwt" : {
+            "$ref" : "#/components/schemas/JwtSettingsResponse",
+            "description" : "JWT configuration returned for the mobile platform."
+          }
+        }
+      },
+      "WebPrivacyResponse" : {
+        "description" : "Privacy settings for the web platform.",
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "isAnnonymousEnabled" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether anonymous access is enabled for web. Possible values: true = anonymous access enabled; false = anonymous access disabled."
+          },
+          "isJWTEnabled" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether JWT authentication is enabled for web. Possible values: true = JWT authentication enabled; false = JWT authentication disabled."
+          },
+          "jwt" : {
+            "$ref" : "#/components/schemas/JwtSettingsResponse",
+            "description" : "JWT configuration for the web platform."
+          }
+        }
+      },
+      "PrivacySettingsResponse" : {
+        "description" : "Privacy settings for the ASAP across platforms.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "web" : {
+            "$ref" : "#/components/schemas/WebPrivacyResponse",
+            "description" : "Privacy settings for the web platform."
+          },
+          "android" : {
+            "$ref" : "#/components/schemas/MobilePrivacyResponse",
+            "description" : "Privacy settings for the Android platform."
+          },
+          "ios" : {
+            "$ref" : "#/components/schemas/MobilePrivacyResponse",
+            "description" : "Privacy settings for the iOS platform."
+          }
+        },
+        "required" : [ "web", "android", "ios" ]
+      },
+      "WebAppAppearanceResponse" : {
+        "description" : "Appearance settings for the web app.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "windowSize" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "SMALL", "LARGE", null ],
+            "description" : "Window size of the web app."
+          },
+          "showZohoTag" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the Zoho tag is shown. Possible values: true = shown; false = hidden."
+          },
+          "actionColor" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 30,
+            "pattern" : "^#?(([a-fA-F0-9]){3}){1,2}$",
+            "description" : "Action color used in the web app."
+          },
+          "wallpaperUrl" : {
+            "$ref" : "#/components/schemas/UrlResponseValue",
+            "description" : "URL of the web app wallpaper."
+          },
+          "cssUrl" : {
+            "$ref" : "#/components/schemas/UrlResponseValue",
+            "description" : "Resolved URL of the custom CSS file returned by the service. This field is response-only. To set or change the CSS resource, send cssUrlId in the request."
+          },
+          "themeColor" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 30,
+            "pattern" : "^#?(([a-fA-F0-9]){3}){1,2}$",
+            "description" : "Theme color used in the web app."
+          },
+          "customCSSEnabled" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether custom CSS is enabled. Possible values: true = enabled; false = disabled."
+          },
+          "headerLogoUrl" : {
+            "$ref" : "#/components/schemas/UrlResponseValue",
+            "description" : "URL of the header logo."
+          },
+          "wallpaperType" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "DEFAULT", "RANDOM_TRIANGLE", "CUBE", "RANDOM_SPRINKLE", "MOSAIC", "SHAPES", "CUSTOM", null ],
+            "description" : "Type of wallpaper used in the web app."
+          }
+        },
+        "required" : [ "windowSize", "showZohoTag", "actionColor", "wallpaperUrl", "cssUrl", "themeColor", "customCSSEnabled", "headerLogoUrl", "wallpaperType" ]
+      },
+      "LauncherAppearanceResponse" : {
+        "description" : "Appearance settings for the launcher.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "shape" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "ROUND", "BUBBLE", "SQUARE", "RHOMBUS", null ],
+            "description" : "Shape of the launcher icon."
+          },
+          "bottomSpacing" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "^[0-9]+$",
+            "description" : "Bottom spacing of the launcher."
+          },
+          "iconType" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "IDEA", "SUGGESTION", "SELF_SERVICE", "INFO", "ANNOUNCEMENT", "CHAT_BUBBLE", "CUSTOM", null ],
+            "description" : "Type of icon used for the launcher."
+          },
+          "iconUrl" : {
+            "$ref" : "#/components/schemas/UrlResponseValue",
+            "description" : "URL of the launcher icon."
+          },
+          "sideSpacing" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "^[0-9]+$",
+            "description" : "Side spacing of the launcher."
+          },
+          "position" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "CENTER_LEFT", "CENTER_RIGHT", "BOTTOM_LEFT", "BOTTOM_RIGHT", null ],
+            "description" : "Position of the launcher."
+          }
+        },
+        "required" : [ "shape", "bottomSpacing", "iconType", "iconUrl", "sideSpacing", "position" ]
+      },
+      "StylePropertiesResponse" : {
+        "description" : "Style properties for the ASAP.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "webAppAppearence" : {
+            "$ref" : "#/components/schemas/WebAppAppearanceResponse",
+            "description" : "Appearance settings for the web app."
+          },
+          "launcherAppearence" : {
+            "$ref" : "#/components/schemas/LauncherAppearanceResponse",
+            "description" : "Appearance settings for the launcher."
+          }
+        },
+        "required" : [ "webAppAppearence", "launcherAppearence" ]
+      },
+      "WelcomeMessagesResponse" : {
+        "description" : "Default welcome messages for the ASAP.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "greetingMessage" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 255,
+            "description" : "Greeting message displayed to users when they open the app."
+          },
+          "introMessage" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 255,
+            "description" : "Introductory message displayed to users when they open the app."
+          }
+        }
+      },
+      "AgentPortalAppearanceResponse" : {
+        "description" : "Appearance settings for the Employee Self Service.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "type" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "DEFAULT", "CONTRAST", "CUSTOM", null ],
+            "description" : "Appearance type configured for the Employee Self Service."
+          },
+          "headerBackgroundColor" : {
+            "type" : [ "string", "null" ],
+            "pattern" : "^#?(([a-fA-F0-9]){3}){1,2}$",
+            "description" : "Header background color configured for the Employee Self Service."
+          },
+          "headerTextColor" : {
+            "type" : [ "string", "null" ],
+            "pattern" : "^#?(([a-fA-F0-9]){3}){1,2}$",
+            "description" : "Header text color configured for the Employee Self Service."
+          }
+        }
+      },
+      "AgentPortalAppPropertiesResponse" : {
+        "description" : "App properties for the Employee self service.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "portalUrl" : {
+            "type" : [ "string", "null" ],
+            "format" : "uri",
+            "maxLength" : 2048,
+            "description" : "Portal URL of the Employee Self Service."
+          },
+          "appearence" : {
+            "$ref" : "#/components/schemas/AgentPortalAppearanceResponse",
+            "description" : "Appearance settings for the Employee Self Service."
+          }
+        },
+        "required" : [ "portalUrl", "appearence" ]
+      },
+      "FeedbackWidgetChatPreferenceResponse" : {
+        "description" : "Chat preference settings for the Feedback Widget.",
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "isChat" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether chat is enabled. Possible values: true = chat is enabled; false = chat is disabled."
+          },
+          "isEnableChatForDepartment" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether chat is enabled for the department. Possible values: true = chat is enabled for the department; false = chat is disabled for the department."
+          }
+        }
+      },
+      "FeedbackWidgetAppearanceResponse" : {
+        "description" : "Launcher appearance settings for the Feedback Widget.",
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "backgroundColor" : {
+            "type" : [ "string", "null" ],
+            "pattern" : "^#?(([a-fA-F0-9]){3}){1,2}$",
+            "description" : "Background color configured for the launcher appearance."
+          },
+          "fontColor" : {
+            "type" : [ "string", "null" ],
+            "pattern" : "^#?(([a-fA-F0-9]){3}){1,2}$",
+            "description" : "Font color configured for the launcher appearance."
+          },
+          "position" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "Left", "Right", "Top", "Bottom", null ],
+            "description" : "Position configured for the launcher appearance."
+          },
+          "offset" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 4,
+            "pattern" : "^[0-9]{1,4}$",
+            "description" : "Offset configured for the launcher appearance."
+          }
+        }
+      },
+      "FeedbackWidgetAppPropertiesResponse" : {
+        "description" : "App properties for the Feedback Widget.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "chatPreference" : {
+            "$ref" : "#/components/schemas/FeedbackWidgetChatPreferenceResponse",
+            "description" : "Chat preference settings for the Feedback Widget."
+          },
+          "appearence" : {
+            "$ref" : "#/components/schemas/FeedbackWidgetAppearanceResponse",
+            "description" : "Launcher appearance settings for the Feedback Widget."
+          }
+        },
+        "required" : [ "chatPreference", "appearence" ]
+      },
+      "AsapAppResponse" : {
+        "description" : "Complete ASAP app response. The type property is fixed to ASAP.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "type" : {
+            "$ref" : "#/components/schemas/AsapAppType",
+            "description" : "Identifies the app type. Set the value to ASAP."
+          },
+          "name" : {
+            "$ref" : "#/components/schemas/AppNameResponse",
+            "description" : "Name of the ASAP."
+          },
+          "modules" : {
+            "$ref" : "#/components/schemas/AsapModulesResponse",
+            "description" : "Tabs configured for the ASAP."
+          },
+          "whiteListedDomains" : {
+            "type" : [ "array", "null" ],
+            "maxItems" : 5,
+            "items" : {
+              "type" : [ "string" ],
+              "maxLength" : 1000
+            },
+            "description" : "Whitelisted domains for the ASAP."
+          },
+          "isVisibleInHC" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the ASAP is visible in the help center. Possible values: true = visible; false = hidden."
+          },
+          "isLauncherVisible" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the app launcher icon is visible. Possible values: true = visible; false = hidden."
+          },
+          "appKey" : {
+            "$ref" : "#/components/schemas/AppKey",
+            "description" : "Key generated for the ASAP app."
+          },
+          "installationProperties" : {
+            "$ref" : "#/components/schemas/InstallationPropertiesResponse",
+            "description" : "Installation settings for mobile platforms."
+          },
+          "privacySettings" : {
+            "$ref" : "#/components/schemas/PrivacySettingsResponse",
+            "description" : "Privacy settings for the ASAP across platforms."
+          },
+          "styleProperties" : {
+            "$ref" : "#/components/schemas/StylePropertiesResponse",
+            "description" : "Style properties for the ASAP."
+          },
+          "defaultWelcomeMessages" : {
+            "$ref" : "#/components/schemas/WelcomeMessagesResponse",
+            "description" : "Default welcome messages for the ASAP."
+          },
+          "defaultMessagesLocale" : {
+            "type" : [ "string", "null" ],
+            "pattern" : "^[a-zA-Z]{2,4}([-_][a-zA-Z]{2})?$",
+            "description" : "Default locale for the welcome messages."
+          },
+          "id" : {
+            "$ref" : "#/components/schemas/AppIdentifier",
+            "description" : "Unique ID of the help center app."
+          },
+          "modifiedTime" : {
+            "$ref" : "#/components/schemas/ModifiedTime",
+            "description" : "Time when the ASAP was last modified."
+          },
+          "departmentIds" : {
+            "$ref" : "#/components/schemas/DepartmentIdsResponse",
+            "description" : "Unique ID(s) of the departments associated with the ASAP."
+          },
+          "modifiedBy" : {
+            "$ref" : "#/components/schemas/AgentDetails",
+            "description" : "Details of the user who last modified the ASAP."
+          },
+          "status" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the ASAP is active. Possible values: true = active; false = inactive."
+          },
+          "showSpecialNote" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether a special note is shown in the app. Possible values: true = shown; false = hidden."
+          },
+          "specialNote" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 120,
+            "description" : "Special note content."
+          }
+        },
+        "required" : [ "type", "name", "modules", "whiteListedDomains", "isVisibleInHC", "isLauncherVisible", "appKey", "installationProperties", "privacySettings", "styleProperties", "defaultWelcomeMessages", "defaultMessagesLocale", "id", "modifiedTime", "departmentIds", "modifiedBy", "status" ]
+      },
+      "AgentPortalAppResponse" : {
+        "description" : "Complete Employee Self Service app response. The type property is fixed to EMPLOYEE_SELF_SERVICE.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "type" : {
+            "$ref" : "#/components/schemas/AgentPortalAppType",
+            "description" : "Type of the app. The value must be EMPLOYEE_SELF_SERVICE."
+          },
+          "name" : {
+            "$ref" : "#/components/schemas/AppNameResponse",
+            "description" : "Name of the Employee Self Service."
+          },
+          "modules" : {
+            "$ref" : "#/components/schemas/AgentPortalModulesResponse",
+            "description" : "Tabs configured for the Employee Self Service."
+          },
+          "appKey" : {
+            "$ref" : "#/components/schemas/AppKey",
+            "description" : "Key generated for the Employee Self Service app."
+          },
+          "appProperties" : {
+            "$ref" : "#/components/schemas/AgentPortalAppPropertiesResponse",
+            "description" : "App properties for the Employee self service."
+          },
+          "id" : {
+            "$ref" : "#/components/schemas/AppIdentifier",
+            "description" : "Unique ID of the help center app."
+          },
+          "modifiedTime" : {
+            "$ref" : "#/components/schemas/ModifiedTime",
+            "description" : "Time when the Employee Self Service was last modified."
+          },
+          "departmentIds" : {
+            "$ref" : "#/components/schemas/DepartmentIdsResponse",
+            "description" : "IDs of departments associated with the Employee self service."
+          },
+          "modifiedBy" : {
+            "$ref" : "#/components/schemas/AgentDetails",
+            "description" : "Details of the user who last modified the Employee Self Service."
+          },
+          "status" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the Employee Self Service is active. Possible values: true = active; false = inactive."
+          },
+          "isVisibleInHC" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the Employee Self Service is visible in the help center. Possible values: true = app is visible in help center; false = app is hidden in help center."
+          }
+        },
+        "required" : [ "type", "name", "modules", "appKey", "appProperties", "id", "modifiedTime", "departmentIds", "modifiedBy", "status" ]
+      },
+      "FeedbackWidgetAppResponse" : {
+        "description" : "Complete Feedback Widget app response. The type property is fixed to FEEDBACK_WIDGET.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "type" : {
+            "$ref" : "#/components/schemas/FeedbackWidgetAppType",
+            "description" : "Type of the app. The value is FEEDBACK_WIDGET."
+          },
+          "name" : {
+            "$ref" : "#/components/schemas/AppNameResponse",
+            "description" : "Name of the Feedback Widget."
+          },
+          "modules" : {
+            "$ref" : "#/components/schemas/FeedbackWidgetModulesResponse",
+            "description" : "Tabs configured for the Feedback Widget."
+          },
+          "appKey" : {
+            "$ref" : "#/components/schemas/AppKey",
+            "description" : "Key generated for the Feedback Widget app."
+          },
+          "id" : {
+            "$ref" : "#/components/schemas/AppIdentifier",
+            "description" : "Unique ID of the help center app."
+          },
+          "appProperties" : {
+            "$ref" : "#/components/schemas/FeedbackWidgetAppPropertiesResponse",
+            "description" : "App properties for the Feedback Widget."
+          },
+          "modifiedBy" : {
+            "$ref" : "#/components/schemas/AgentDetails",
+            "description" : "Details of the user who last modified the Feedback Widget."
+          },
+          "status" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the Feedback Widget is active. Possible values: true = app is active; false = app is inactive."
+          },
+          "modifiedTime" : {
+            "$ref" : "#/components/schemas/ModifiedTime",
+            "description" : "Time when the Feedback Widget was last modified."
+          },
+          "departmentIds" : {
+            "$ref" : "#/components/schemas/DepartmentIdsResponse",
+            "description" : "Unique ID(s) of the departments associated with the Feedback Widget."
+          },
+          "isVisibleInHC" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Indicates whether the Feedback Widget is visible in the help center. Possible values: true = app is visible in help center; false = app is hidden in help center."
+          }
+        },
+        "required" : [ "type", "name", "modules", "appKey", "id", "appProperties", "modifiedBy", "status", "modifiedTime", "departmentIds" ]
+      },
+      "HelpCenterAppResponse" : {
+        "description" : "Polymorphic single-app response. The type property selects exactly one response schema.",
+        "oneOf" : [ {
+          "$ref" : "#/components/schemas/AsapAppResponse"
+        }, {
+          "$ref" : "#/components/schemas/AgentPortalAppResponse"
+        }, {
+          "$ref" : "#/components/schemas/FeedbackWidgetAppResponse"
+        } ],
+        "discriminator" : {
+          "propertyName" : "type",
+          "mapping" : {
+            "ASAP" : "#/components/schemas/AsapAppResponse",
+            "EMPLOYEE_SELF_SERVICE" : "#/components/schemas/AgentPortalAppResponse",
+            "FEEDBACK_WIDGET" : "#/components/schemas/FeedbackWidgetAppResponse"
+          }
+        }
+      },
+      "HelpCenterAppSummary" : {
+        "description" : "Common app representation returned by the list API.",
+        "type" : [ "object" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "type" : {
+            "$ref" : "#/components/schemas/HelpCenterAppType",
+            "description" : "App type. Possible values: ASAP, EMPLOYEE_SELF_SERVICE, FEEDBACK_WIDGET."
+          },
+          "name" : {
+            "$ref" : "#/components/schemas/AppNameResponse",
+            "description" : "Name of the help center app."
+          },
+          "modules" : {
+            "$ref" : "#/components/schemas/CommonModulesResponse",
+            "description" : "Modules configured for the help center app."
+          },
+          "appKey" : {
+            "$ref" : "#/components/schemas/AppKey",
+            "description" : "Public application key generated for the help center app."
+          },
+          "id" : {
+            "$ref" : "#/components/schemas/AppIdentifier",
+            "description" : "Unique ID of the help center app."
+          },
+          "modifiedTime" : {
+            "$ref" : "#/components/schemas/ModifiedTime",
+            "description" : "Time when the app was last modified."
+          },
+          "departmentIds" : {
+            "$ref" : "#/components/schemas/DepartmentIdsResponse",
+            "description" : "IDs of departments associated with the app."
+          },
+          "modifiedBy" : {
+            "$ref" : "#/components/schemas/AgentDetails",
+            "description" : "User who last modified the app."
+          },
+          "status" : {
+            "type" : [ "boolean" ],
+            "description" : "Indicates whether the app is active. Possible values: true = app is active; false = app is inactive."
+          },
+          "isLauncherVisible" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Is Launcher Visible."
+          },
+          "isVisibleInHC" : {
+            "type" : [ "boolean", "null" ],
+            "description" : "Is Visible In H C."
+          }
+        },
+        "required" : [ "type", "name", "id", "modifiedTime", "departmentIds", "modifiedBy", "status" ]
+      },
+      "HelpCenterAppListResponse" : {
+        "description" : "Common list of help center apps.",
+        "type" : [ "array" ],
+        "items" : {
+          "$ref" : "#/components/schemas/HelpCenterAppSummary"
+        }
+      }
+    },
+    "requestBodies" : {
+      "createHelpCenterAppRequest" : {
+        "description" : "Payload for creating one of the three supported help center app types.",
+        "required" : true,
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "description" : "Polymorphic create request. The type property selects exactly one app-specific schema.",
+              "oneOf" : [ {
+                "$ref" : "#/components/schemas/CreateAsapRequest"
+              }, {
+                "$ref" : "#/components/schemas/CreateAgentPortalRequest"
+              }, {
+                "$ref" : "#/components/schemas/CreateFeedbackWidgetRequest"
+              } ],
+              "discriminator" : {
+                "propertyName" : "type",
+                "mapping" : {
+                  "ASAP" : "#/components/schemas/CreateAsapRequest",
+                  "EMPLOYEE_SELF_SERVICE" : "#/components/schemas/CreateAgentPortalRequest",
+                  "FEEDBACK_WIDGET" : "#/components/schemas/CreateFeedbackWidgetRequest"
+                }
+              }
+            },
+            "examples" : {
+              "ASAP" : {
+                "summary" : "Create an ASAP app",
+                "value" : {
+                  "type" : "ASAP",
+                  "name" : "ASAP",
+                  "modules" : [ {
+                    "name" : "Knowledge Base",
+                    "displayName" : "Knowledge Base",
+                    "status" : true,
+                    "clients" : [ "web" ]
+                  }, {
+                    "name" : "Ticket",
+                    "displayName" : "Tickets",
+                    "status" : true,
+                    "clients" : [ "web" ]
+                  }, {
+                    "name" : "Community",
+                    "displayName" : "Community",
+                    "status" : true,
+                    "clients" : [ "web" ]
+                  }, {
+                    "name" : "SalesIQ",
+                    "displayName" : "SalesIQ Chat",
+                    "status" : true,
+                    "clients" : [ "web" ]
+                  }, {
+                    "name" : "GC",
+                    "displayName" : "Guided Conversations",
+                    "status" : true,
+                    "clients" : [ "web" ],
+                    "tabProperties" : {
+                      "botId" : "264720000000798001",
+                      "isAgentTransfer" : false
+                    }
+                  }, {
+                    "name" : "AnswerBot",
+                    "displayName" : "Answer Bot",
+                    "status" : false,
+                    "clients" : [ "web" ],
+                    "tabProperties" : {
+                      "botId" : "",
+                      "isAgentTransfer" : true
+                    }
+                  }, {
+                    "name" : "ZBM",
+                    "displayName" : "Business Messaging",
+                    "status" : true,
+                    "clients" : [ "web" ],
+                    "tabProperties" : {
+                      "botId" : "6043e05be8cd57c795fd563a3f61187f"
+                    }
+                  } ],
+                  "departmentIds" : [ ],
+                  "isLauncherVisible" : true,
+                  "status" : true
+                }
+              },
+              "AgentPortal" : {
+                "summary" : "Create an Employee Self Service app",
+                "value" : {
+                  "type" : "EMPLOYEE_SELF_SERVICE",
+                  "name" : "EMPLOYEE_SELF_SERVICE_APP",
+                  "modules" : [ {
+                    "name" : "Knowledge Base",
+                    "displayName" : "Knowledge Base",
+                    "status" : true,
+                    "tabProperties" : { },
+                    "clients" : [ ]
+                  }, {
+                    "name" : "Training",
+                    "displayName" : "Training",
+                    "status" : true,
+                    "tabProperties" : {
+                      "orgId" : "110056373"
+                    },
+                    "clients" : [ ]
+                  } ],
+                  "appProperties" : {
+                    "appearence" : {
+                      "type" : "CUSTOM",
+                      "headerBackgroundColor" : "#1877fa",
+                      "headerTextColor" : "#ffffff"
+                    }
+                  }
+                }
+              },
+              "FeedbackWidget" : {
+                "summary" : "Create a Feedback Widget app",
+                "value" : {
+                  "type" : "FEEDBACK_WIDGET",
+                  "name" : "Desk Widget new",
+                  "status" : false,
+                  "departmentIds" : [ 1000000030034 ],
+                  "modules" : [ {
+                    "name" : "FeedbackWidget",
+                    "displayName" : "FeedbackWidget",
+                    "status" : false,
+                    "clients" : [ "web" ],
+                    "tabProperties" : {
+                      "tabTitle" : "Feedback",
+                      "feedbackTitle" : "DevFive",
+                      "feedbackSubject" : "Subject",
+                      "feedbackDesc" : "How can we help you?",
+                      "submissionMessage" : "Thanks for your Feedback",
+                      "isAttachFile" : true,
+                      "isScreenShot" : true,
+                      "isCaptcha" : true,
+                      "isAutoSuggestion" : false
+                    }
+                  } ],
+                  "appProperties" : {
+                    "chatPreference" : {
+                      "isChat" : true,
+                      "isEnableChatForDepartment" : false
+                    },
+                    "appearence" : {
+                      "backgroundColor" : "#777777",
+                      "fontColor" : "#FFFFFF",
+                      "position" : "Bottom",
+                      "offset" : "215"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "updateHelpCenterAppRequest" : {
+        "description" : "Type-less payload for updating an existing help center app. Resolve the app's current type from appId before constructing the body, then use only the corresponding ASAP, Employee Self Service, or Feedback Widget update fields.",
+        "required" : true,
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/UpdateHelpCenterAppRequest"
+            },
+            "examples" : {
+              "ASAP" : {
+                "summary" : "Update ASAP launcher settings",
+                "value" : {
+                  "name" : "ASAP",
+                  "isLauncherVisible" : true,
+                  "status" : true,
+                  "styleProperties" : {
+                    "webAppAppearence" : {
+                      "customCSSEnabled" : true,
+                      "cssUrlId" : "264720000000190099"
+                    }
+                  }
+                }
+              },
+              "AgentPortal" : {
+                "summary" : "Update Employee Self Service appearance",
+                "value" : {
+                  "appProperties" : {
+                    "appearence" : {
+                      "type" : "CUSTOM",
+                      "headerBackgroundColor" : "#1877fa",
+                      "headerTextColor" : "#ffffff"
+                    }
+                  }
+                }
+              },
+              "FeedbackWidget" : {
+                "summary" : "Update Feedback Widget chat preference",
+                "value" : {
+                  "status" : false,
+                  "appProperties" : {
+                    "chatPreference" : {
+                      "isChat" : false,
+                      "isEnableChatForDepartment" : false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses" : {
+      "selfServiceAppDetailsResponse" : {
+        "description" : "Employee self-service app initialization details.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/SelfServiceAppDetails"
+            },
+            "examples" : {
+              "employeeSelfService" : {
+                "summary" : "Employee self-service app details",
+                "value" : {
+                  "userInfo" : {
+                    "userId" : "7432000000080003",
+                    "name" : "Agent Name",
+                    "email" : "agent@example.com",
+                    "zuId" : 11475395,
+                    "profileUrl" : "https://desk.zoho.in/api/v1/agents/7432000000080003/photo?orgId=123456",
+                    "profileName" : "Support Administrator",
+                    "profileRole" : "Admin",
+                    "isUserOnline" : true,
+                    "selectedLanguageCode" : "en_US",
+                    "myPreference" : {
+                      "ui_displayLayout" : "smartFocus",
+                      "ui_themes" : "blue",
+                      "namePattern" : [ "FIRST_NAME", "LAST_NAME" ]
+                    }
+                  },
+                  "orgInfo" : {
+                    "orgId" : 15671371,
+                    "portalName" : "myportal",
+                    "portalLogo" : "/support/App/build/images/portalLogo.png",
+                    "baseDomain" : "https://desk.zoho.in",
+                    "apiEndPoint" : "https://desk.zoho.in/zd/myportal/api/v1/",
+                    "richTextEditorVersion" : "5.4.4",
+                    "hcProperties" : {
+                      "supportPortalURL" : "https://desk.zoho.in/agent/myportal",
+                      "selfServicePortalURL" : "https://desk.zoho.in/selfservice/myportal",
+                      "isTcIntegEnabled" : false,
+                      "isAgenSelfServiceEnabled" : true,
+                      "hcAppStaticDomain" : "static.zylker.com",
+                      "cloudAttachInfo" : {
+                        "isAllowed" : true,
+                        "isCloudPickersV2Enabled" : false,
+                        "cloudPickerCustomCss" : "/support/App/build/css/CloudPickerApply.css",
+                        "gadgetsDomain" : "https://gadgets.example.com"
+                      },
+                      "licenseInfo" : {
+                        "attachments" : {
+                          "attachmentRestrictionLicense" : {
+                            "isAllowed" : true,
+                            "maxAttachmentSize" : 41943040,
+                            "maxCountAllowed" : 50
+                          },
+                          "systemRestrictedExtensions" : [ "ade", "adp", "apk", "terminal" ]
+                        }
+                      },
+                      "apiUrl" : "/api/v1"
+                    },
+                    "hcAppInfo" : {
+                      "id" : "7432000006970001",
+                      "type" : "EMPLOYEE_SELF_SERVICE",
+                      "name" : "Employee Self Service",
+                      "status" : true,
+                      "departmentIds" : [ ],
+                      "modules" : [ ]
+                    }
+                  },
+                  "staticVersion" : "zohoagentselfservice-efc-sdk-v1.0.09b0c07917a4510cacb3_",
+                  "staticCDNPath" : "https://static.zylker.com/helpcenter/agentselfservice/",
+                  "isTestEnvironment" : false
+                }
+              }
+            }
+          }
+        }
+      },
+      "helpCenterAppResponse" : {
+        "description" : "ASAP, Employee Self Service, or Feedback Widget app details selected by the type discriminator.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/HelpCenterAppResponse"
+            },
+            "examples" : {
+              "ASAP" : {
+                "summary" : "ASAP app response",
+                "value" : {
+                  "type" : "ASAP",
+                  "name" : "ASAP",
+                  "modules" : [ {
+                    "name" : "Knowledge Base",
+                    "displayName" : "Knowledge Base",
+                    "status" : true,
+                    "tabProperties" : { },
+                    "clients" : [ "web" ]
+                  }, {
+                    "name" : "GC",
+                    "displayName" : "Guided Conversations",
+                    "status" : true,
+                    "tabProperties" : {
+                      "botId" : "264720000000798001",
+                      "isAgentTransfer" : false
+                    },
+                    "clients" : [ "web" ]
+                  } ],
+                  "whiteListedDomains" : null,
+                  "isVisibleInHC" : false,
+                  "isLauncherVisible" : true,
+                  "appKey" : "edbsna8452196b433dfd0ba27c1e6d498773d4967aebc51293cc6a3c34b6b1d061605",
+                  "installationProperties" : {
+                    "android" : null,
+                    "ios" : null
+                  },
+                  "privacySettings" : {
+                    "web" : {
+                      "isAnnonymousEnabled" : false,
+                      "isJWTEnabled" : false,
+                      "jwt" : {
+                        "jsDomains" : [ "" ]
+                      }
+                    },
+                    "android" : null,
+                    "ios" : {
+                      "isAnnonymousEnabled" : false,
+                      "isJWTEnabled" : false,
+                      "jwt" : { }
+                    }
+                  },
+                  "styleProperties" : {
+                    "webAppAppearence" : {
+                      "windowSize" : "LARGE",
+                      "showZohoTag" : true,
+                      "actionColor" : "#3F51B5",
+                      "wallpaperUrl" : "",
+                      "cssUrl" : "",
+                      "themeColor" : "#3F51B5",
+                      "customCSSEnabled" : false,
+                      "headerLogoUrl" : "",
+                      "wallpaperType" : "DEFAULT"
+                    },
+                    "launcherAppearence" : {
+                      "shape" : "SQUARE",
+                      "bottomSpacing" : "10",
+                      "iconType" : "ANNOUNCEMENT",
+                      "iconUrl" : "",
+                      "sideSpacing" : "20",
+                      "position" : "BOTTOM_RIGHT"
+                    }
+                  },
+                  "defaultWelcomeMessages" : { },
+                  "defaultMessagesLocale" : null,
+                  "id" : "264720000003864001",
+                  "modifiedTime" : "1784556843410",
+                  "departmentIds" : [ ],
+                  "modifiedBy" : {
+                    "photoURL" : "https://deskstatic.zoho.com/api/v1/agents/264720000000190001/photo?orgId=123456",
+                    "name" : "Asap",
+                    "id" : "264720000000190001"
+                  },
+                  "status" : true
+                }
+              },
+              "AgentPortal" : {
+                "summary" : "Employee Self Service app response",
+                "value" : {
+                  "type" : "EMPLOYEE_SELF_SERVICE",
+                  "name" : "Employee Self Service",
+                  "modules" : [ {
+                    "name" : "Knowledge Base",
+                    "displayName" : "Knowledge Base",
+                    "status" : true,
+                    "tabProperties" : { },
+                    "clients" : [ ]
+                  }, {
+                    "name" : "Training",
+                    "displayName" : "Training",
+                    "status" : true,
+                    "tabProperties" : {
+                      "orgId" : "110056373"
+                    },
+                    "clients" : [ ]
+                  } ],
+                  "appKey" : "edbsn402951363dca5449c9a46b1671275d214fbae45b34e8f15d100256ee41c8b560",
+                  "appProperties" : {
+                    "portalUrl" : null,
+                    "appearence" : {
+                      "type" : "CUSTOM",
+                      "headerBackgroundColor" : "#1877fa",
+                      "headerTextColor" : "#ffffff"
+                    }
+                  },
+                  "id" : "264720000000542001",
+                  "modifiedTime" : "1783925571000",
+                  "departmentIds" : [ ],
+                  "modifiedBy" : {
+                    "photoURL" : "https://deskstatic.zoho.com/api/v1/agents/264720000000190001/photo?orgId=123456",
+                    "name" : "Asap",
+                    "id" : "264720000000190001"
+                  },
+                  "status" : true
+                }
+              },
+              "FeedbackWidget" : {
+                "summary" : "Feedback Widget app response",
+                "value" : {
+                  "type" : "FEEDBACK_WIDGET",
+                  "name" : "Desk Widget",
+                  "modules" : [ {
+                    "name" : "FeedbackWidget",
+                    "displayName" : "FeedbackWidget",
+                    "status" : false,
+                    "tabProperties" : {
+                      "tabTitle" : "Feedback",
+                      "feedbackTitle" : "DevFive",
+                      "feedbackSubject" : "Subject",
+                      "feedbackDesc" : "How can we help you?",
+                      "submissionMessage" : "Thanks for your Feedback",
+                      "isAttachFile" : true,
+                      "isScreenShot" : true,
+                      "isCaptcha" : true,
+                      "isAutoSuggestion" : true,
+                      "isEmbed" : true
+                    },
+                    "clients" : [ "web" ]
+                  } ],
+                  "appKey" : "edbsnc9d0b94b9b4436830b05d11801a0b72b",
+                  "id" : "1000000059005",
+                  "appProperties" : {
+                    "chatPreference" : {
+                      "isEnableChatForDepartment" : false,
+                      "isChat" : false
+                    },
+                    "appearence" : {
+                      "backgroundColor" : "#777777",
+                      "fontColor" : "#FFFFFF",
+                      "position" : "Bottom",
+                      "offset" : "215"
+                    }
+                  },
+                  "modifiedBy" : {
+                    "photoURL" : "https://desk.zylker.com/api/v1/agents/1000000000262/photo?orgId=123456",
+                    "name" : "Thiru",
+                    "id" : "1000000000262"
+                  },
+                  "status" : false,
+                  "modifiedTime" : "1783591475907",
+                  "departmentIds" : [ "1000000014251" ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "helpCenterAppListResponse" : {
+        "description" : "Common list response for all supported help center app types.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/HelpCenterAppListResponse"
+            },
+            "examples" : {
+              "Apps" : {
+                "summary" : "Common list containing all app types",
+                "value" : [ {
+                  "type" : "ASAP",
+                  "name" : "ASAP",
+                  "id" : "264720000003864001",
+                  "modifiedTime" : "1784556843410",
+                  "departmentIds" : [ ],
+                  "modifiedBy" : {
+                    "photoURL" : "https://desk.zoho.com/api/v1/agents/264720000000190001/photo?orgId=123456",
+                    "name" : "Asap",
+                    "id" : "264720000000190001"
+                  },
+                  "status" : true,
+                  "isLauncherVisible" : true,
+                  "isVisibleInHC" : false
+                }, {
+                  "type" : "EMPLOYEE_SELF_SERVICE",
+                  "name" : "Employee Self Service",
+                  "id" : "264720000000542001",
+                  "modifiedTime" : "1783925571000",
+                  "departmentIds" : [ ],
+                  "modifiedBy" : {
+                    "photoURL" : "https://desk.zoho.com/api/v1/agents/264720000000190001/photo?orgId=123456",
+                    "name" : "Asap",
+                    "id" : "264720000000190001"
+                  },
+                  "status" : true
+                }, {
+                  "type" : "FEEDBACK_WIDGET",
+                  "name" : "Desk Widget",
+                  "id" : "1000000059005",
+                  "modifiedTime" : "1783591475907",
+                  "departmentIds" : [ "1000000014251" ],
+                  "modifiedBy" : {
+                    "photoURL" : "https://desk.zoho.com/api/v1/agents/1000000000262/photo?orgId=123456",
+                    "name" : "Thiru",
+                    "id" : "1000000000262"
+                  },
+                  "status" : false
+                } ]
+              }
+            }
+          }
+        }
+      },
+      "noContentResponse" : {
+        "description" : "The help center app was deleted successfully. No response body is returned."
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "HelpCenterApp"
+}

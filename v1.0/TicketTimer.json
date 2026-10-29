@@ -8,13 +8,14 @@
     "/api/v1/allActiveTimers" : {
       "get" : {
         "tags" : [ "TicketTimer" ],
-        "summary" : "List active timers",
-        "description" : "This API lists a particular number of currently active timers in a department, based on the limit specified. ",
+        "summary" : "Get Active Timers",
+        "description" : "Retrieves active timers for the specified department, up to the specified limit.",
         "operationId" : "getActiveTimers",
+        "x-mcp-group" : [ "Time Tracking" ],
         "parameters" : [ {
           "name" : "departmentId",
           "in" : "query",
-          "description" : "ID of the department from which the timers must be fetched",
+          "description" : "Unique ID of the department from which timers must be fetched",
           "required" : true,
           "style" : "form",
           "explode" : true,
@@ -26,23 +27,22 @@
         }, {
           "name" : "module",
           "in" : "query",
-          "description" : "Zoho Desk modules from which the timers must be fetched. Values allowed are: Tickets, Tasks, Events, and Calls. You can pass multiple values by separating them using commas. If you do not pass a value, all modules are considered.",
+          "description" : "Modules from which timers must be fetched. Possible values: Tickets, Tasks, Events, Calls. Multiple values can be provided by separating them with commas. If no value is provided, all modules are considered.",
           "required" : false,
           "style" : "form",
-          "explode" : true,
+          "explode" : false,
           "schema" : {
             "type" : [ "array" ],
-            "maxLength" : 100,
-            "minLength" : 0,
+            "maxItems" : 4,
             "items" : {
               "type" : "string",
-              "enum" : [ "Tickets", "Tasks" ]
+              "enum" : [ "Tickets", "Tasks", "Events", "Calls" ]
             }
           }
         }, {
           "name" : "limit",
           "in" : "query",
-          "description" : "Number of timers to list",
+          "description" : "Number of timers to fetch. Defaults to 20 if not provided.",
           "required" : false,
           "style" : "form",
           "explode" : true,
@@ -56,7 +56,7 @@
         }, {
           "name" : "startTime",
           "in" : "query",
-          "description" : "Point of time before or after which the timers were started. This parameter works in conjunction with the sortBy parameter. If the value of sortBy is startTime, the timers are listed in ascending order. If the value of sortBy is -startTime, they are listed in descending order. (Note: With startTime in play, the time value associated with the last timer in an API response is considered as the value from which the next set of timers must be fetched in the subsequent response.)",
+          "description" : "Epoch timestamp in milliseconds from which to fetch the next set of timers. Works in conjunction with the sortBy parameter to determine sort direction. The startTime value of the last timer in a response serves as the starting point for the next API call.",
           "required" : false,
           "style" : "form",
           "explode" : true,
@@ -68,23 +68,25 @@
         }, {
           "name" : "sortBy",
           "in" : "query",
-          "description" : "Key that sorts the timers from oldest to latest (ascending order) or latest to oldest (descending order). Values allowed are: startTime (ascending order) and -startTime (descending order, which is the default sorting order). ",
+          "description" : "Sorts timers by start time. Possible values: startTime. Prefix the value with a hyphen (-) to sort in descending order. The default sorting order is descending.",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
+            "enum" : [ "startTime", "-startTime" ],
             "pattern" : "-?(startTime)"
           }
         }, {
           "name" : "owners",
           "in" : "query",
-          "description" : " Key that filters timers by Owner. Values allowed are any valid Owner ID or multiple Owner IDs separated by commas.",
+          "description" : "Filters timers by owner. Multiple owner IDs can be provided by separating them with commas.",
           "required" : false,
           "style" : "form",
-          "explode" : true,
+          "explode" : false,
           "schema" : {
             "type" : [ "array" ],
+            "maxItems" : 20,
             "items" : {
               "type" : [ "string", "integer" ],
               "format" : "int64",
@@ -112,11 +114,13 @@
       "get" : {
         "tags" : [ "TicketTimer" ],
         "summary" : "Get Ticket Timer",
-        "description" : "This API fetches the time elapsed in the ticket timer, along with the current state",
+        "description" : "Retrieves the elapsed time recorded in the ticket timer along with its current state",
         "operationId" : "getTicketTimer",
+        "x-mcp-group" : [ "Time Tracking", "Tickets" ],
         "parameters" : [ {
           "name" : "caseId",
           "in" : "path",
+          "description" : "Unique ID of the ticket",
           "required" : true,
           "style" : "simple",
           "explode" : false,
@@ -139,13 +143,14 @@
       },
       "post" : {
         "tags" : [ "TicketTimer" ],
-        "summary" : "Performs Ticket Timer actions",
-        "description" : "This API performs timer-related actions, such as START, STOP, PAUSE and RESUME ",
+        "summary" : "Perform Ticket Timer Actions",
+        "description" : "Perform timer-related actions for a ticket, such as start, stop, pause, and resume the timer.",
         "operationId" : "updateTicketTimerState",
+        "x-mcp-group" : [ "Time Tracking", "Tickets" ],
         "parameters" : [ {
           "name" : "action",
           "in" : "query",
-          "description" : " Action of the timer.Supported actions are  @START@, @STOP@, @PAUSE@ and @RESUME@",
+          "description" : "Action to perform on the timer. Possible values: START, STOP, PAUSE, RESUME",
           "required" : true,
           "style" : "form",
           "explode" : true,
@@ -156,6 +161,7 @@
         }, {
           "name" : "caseId",
           "in" : "path",
+          "description" : "Unique ID of the ticket",
           "required" : true,
           "style" : "simple",
           "explode" : false,
@@ -184,12 +190,13 @@
       "get" : {
         "tags" : [ "TicketTimer" ],
         "summary" : "Get Active Timer for an Agent",
-        "description" : "This API fetches currently running timer details for an agent",
+        "description" : "Retrieves the currently active timer details for the authenticated agent in the specified department, with pagination support.",
         "operationId" : "getMyActiveTimers",
+        "x-mcp-group" : [ "Time Tracking" ],
         "parameters" : [ {
           "name" : "departmentId",
           "in" : "query",
-          "description" : "ID of the department from which the timers must be fetched",
+          "description" : "Unique ID of the department from which timers must be fetched",
           "required" : true,
           "style" : "form",
           "explode" : true,
@@ -201,7 +208,7 @@
         }, {
           "name" : "limit",
           "in" : "query",
-          "description" : "Number of timers to list",
+          "description" : "Number of timers to fetch. Defaults to 20 if not provided.",
           "required" : false,
           "style" : "form",
           "explode" : true,
@@ -215,7 +222,7 @@
         }, {
           "name" : "from",
           "in" : "query",
-          "description" : "from",
+          "description" : "Index number from which timers must be fetched. Defaults to 0 if not provided.",
           "required" : false,
           "style" : "form",
           "explode" : true,
@@ -235,7 +242,7 @@
             "$ref" : "./Common.json#/components/responses/emptyResponse"
           },
           "200" : {
-            "$ref" : "#/components/responses/getActiveTimerForEntity"
+            "$ref" : "#/components/responses/getActiveTimerForAgents"
           }
         },
         "security" : [ {
@@ -246,13 +253,14 @@
     "/api/v1/tickets/{entityId}/activeTimer" : {
       "get" : {
         "tags" : [ "TicketTimer" ],
-        "summary" : "List ticket timers",
-        "description" : "This API fetches the details of timers currently active in a ticket.",
+        "summary" : "Get Ticket Timers",
+        "description" : "Retrieves the details of timers currently active in a specific ticket, with pagination support.",
         "operationId" : "getActiveTimersForTicket",
+        "x-mcp-group" : [ "Time Tracking", "Tickets" ],
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
-          "description" : "Secondary information related to the timers. Value supported is @owner@.",
+          "description" : "Additional information to include in the response. Possible values: owner",
           "required" : false,
           "style" : "form",
           "explode" : true,
@@ -264,7 +272,7 @@
         }, {
           "name" : "limit",
           "in" : "query",
-          "description" : "Number of timers to list",
+          "description" : "Number of timers to fetch. Defaults to 20 if not provided.",
           "required" : false,
           "style" : "form",
           "explode" : true,
@@ -278,7 +286,7 @@
         }, {
           "name" : "from",
           "in" : "query",
-          "description" : "from",
+          "description" : "Index number from which timers must be fetched. Defaults to 0 if not provided.",
           "required" : false,
           "style" : "form",
           "explode" : true,
@@ -290,6 +298,7 @@
         }, {
           "name" : "entityId",
           "in" : "path",
+          "description" : "Unique ID of the ticket",
           "required" : true,
           "style" : "simple",
           "explode" : false,
@@ -318,41 +327,50 @@
   "components" : {
     "schemas" : {
       "ticket" : {
+        "description" : "Ticket associated with the timer. Present when the entity is Tickets, or when the task, call, or event is linked to a parent ticket",
         "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "ticketNumber" : {
+            "description" : "Serial number of the ticket",
             "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           },
           "subject" : {
+            "description" : "Subject of the ticket",
             "type" : [ "string", "null" ],
             "maxLength" : 1000,
             "minLength" : 0
           },
           "depId" : {
+            "description" : "Unique ID of the department to which the ticket belongs",
             "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "id" : {
+            "description" : "Unique ID of the ticket",
             "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "depName" : {
+            "description" : "Name of the department to which the ticket belongs",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "status" : {
-            "type" : [ "string", "null" ]
+            "description" : "Status of the ticket",
+            "type" : [ "string", "null" ],
+            "x-dynamic-enum" : true
           }
         },
         "required" : [ "depId", "depName", "id", "status", "subject", "ticketNumber" ]
       },
       "ticketWithDueDate" : {
+        "type" : "object",
         "additionalProperties" : false,
         "allOf" : [ {
           "$ref" : "#/components/schemas/ticket"
@@ -360,6 +378,7 @@
           "type" : [ "object", "null" ],
           "properties" : {
             "dueDate" : {
+              "description" : "Due date of the ticket",
               "type" : [ "string", "null" ],
               "maxLength" : 100,
               "minLength" : 0,
@@ -371,82 +390,30 @@
         } ]
       },
       "timerJson" : {
+        "description" : "Timer details associated with the active timer entry",
         "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "hours" : {
-            "type" : [ "object", "null" ],
-            "additionalProperties" : false,
-            "maxProperties" : 3,
-            "minProperties" : 3,
-            "properties" : {
-              "hours" : {
-                "type" : [ "string", "null" ],
-                "maxLength" : 100,
-                "minLength" : 0
-              },
-              "seconds" : {
-                "type" : [ "string", "null" ],
-                "maxLength" : 100,
-                "minLength" : 0
-              },
-              "minutes" : {
-                "type" : [ "string", "null" ],
-                "maxLength" : 100,
-                "minLength" : 0
-              }
-            },
-            "required" : [ "hours", "minutes", "seconds" ]
+            "description" : "Number of hours spent by the agent",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
           },
           "seconds" : {
-            "type" : [ "object", "null" ],
-            "additionalProperties" : false,
-            "maxProperties" : 3,
-            "minProperties" : 3,
-            "properties" : {
-              "hours" : {
-                "type" : [ "string", "null" ],
-                "maxLength" : 100,
-                "minLength" : 0
-              },
-              "seconds" : {
-                "type" : [ "string", "null" ],
-                "maxLength" : 100,
-                "minLength" : 0
-              },
-              "minutes" : {
-                "type" : [ "string", "null" ],
-                "maxLength" : 100,
-                "minLength" : 0
-              }
-            },
-            "required" : [ "hours", "minutes", "seconds" ]
+            "description" : "Number of seconds spent by the agent",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
           },
           "minutes" : {
-            "type" : [ "object", "null" ],
-            "additionalProperties" : false,
-            "maxProperties" : 3,
-            "minProperties" : 3,
-            "properties" : {
-              "hours" : {
-                "type" : [ "string", "null" ],
-                "maxLength" : 100,
-                "minLength" : 0
-              },
-              "seconds" : {
-                "type" : [ "string", "null" ],
-                "maxLength" : 100,
-                "minLength" : 0
-              },
-              "minutes" : {
-                "type" : [ "string", "null" ],
-                "maxLength" : 100,
-                "minLength" : 0
-              }
-            },
-            "required" : [ "hours", "minutes", "seconds" ]
+            "description" : "Number of minutes spent by the agent",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
           },
           "state" : {
+            "description" : "Current state of the timer. Possible values: RUNNING, PAUSED, INIT",
             "type" : [ "string", "null" ],
             "enum" : [ "RUNNING", "PAUSED", "INIT" ]
           }
@@ -454,31 +421,37 @@
         "required" : [ "hours", "minutes", "seconds", "state" ]
       },
       "actor" : {
+        "description" : "Details of the agent who owns the timer",
         "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "photoURL" : {
+            "description" : "URL of the owner's profile photo",
             "type" : [ "string", "null" ],
             "maxLength" : 200,
             "minLength" : 0,
             "pattern" : "(^(ht|f)tp(s?)\\://[-.\\w]*(/?)([a-zA-Z0-9\\-\\.\\?\\,\\:\\'/\\\\+=&amp;%\\$#_@]*)?$)"
           },
           "firstName" : {
+            "description" : "First name of the owner",
             "type" : [ "string", "null" ],
             "maxLength" : 50,
             "minLength" : 0
           },
           "lastName" : {
+            "description" : "Last name of the owner",
             "type" : [ "string", "null" ],
             "maxLength" : 50,
             "minLength" : 0
           },
           "name" : {
+            "description" : "Full name of the owner",
             "type" : [ "string", "null" ],
             "maxLength" : 50,
             "minLength" : 0
           },
           "id" : {
+            "description" : "Unique ID of the owner",
             "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
@@ -497,18 +470,21 @@
             "$ref" : "#/components/schemas/timerJson"
           },
           "startTime" : {
+            "description" : "Epoch timestamp in milliseconds indicating when the timer was started",
             "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "entity" : {
+            "description" : "Module type the timer is associated with. Possible values: Tickets, Tasks, Events, Calls",
             "type" : [ "string", "null" ],
-            "enum" : [ "Tickets", "Tasks" ]
+            "enum" : [ "Tickets", "Tasks", "Events", "Calls" ]
           }
         },
         "required" : [ "entity", "owner", "startTime", "timer" ]
       },
       "ticketActiveTimer" : {
+        "type" : "object",
         "additionalProperties" : false,
         "allOf" : [ {
           "$ref" : "#/components/schemas/activeTimer"
@@ -524,36 +500,44 @@
         } ]
       },
       "task" : {
+        "description" : "Task associated with the timer. Present when the entity is Tasks",
         "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "subject" : {
+            "description" : "Subject of the task",
             "type" : [ "string", "null" ],
             "maxLength" : 300,
             "minLength" : 0
           },
           "depId" : {
+            "description" : "Unique ID of the department to which the task belongs",
             "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "id" : {
+            "description" : "Unique ID of the task",
             "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
           },
           "depName" : {
+            "description" : "Name of the department to which the task belongs",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
           },
           "status" : {
-            "type" : [ "string", "null" ]
+            "description" : "Status of the task",
+            "type" : [ "string", "null" ],
+            "x-dynamic-enum" : true
           }
         },
         "required" : [ "depId", "depName", "id", "status", "subject" ]
       },
       "taskWithDueDate" : {
+        "type" : "object",
         "additionalProperties" : false,
         "allOf" : [ {
           "$ref" : "#/components/schemas/task"
@@ -561,6 +545,7 @@
           "type" : [ "object", "null" ],
           "properties" : {
             "dueDate" : {
+              "description" : "Due date of the task",
               "type" : [ "string", "null" ],
               "maxLength" : 100,
               "minLength" : 0,
@@ -572,6 +557,7 @@
         } ]
       },
       "taskActiveTimer" : {
+        "type" : "object",
         "additionalProperties" : false,
         "allOf" : [ {
           "$ref" : "#/components/schemas/activeTimer"
@@ -587,6 +573,7 @@
         } ]
       },
       "taskActiveTimerWithTicket" : {
+        "type" : "object",
         "additionalProperties" : false,
         "allOf" : [ {
           "$ref" : "#/components/schemas/activeTimer"
@@ -604,7 +591,176 @@
           "additionalProperties" : false
         } ]
       },
+      "call" : {
+        "description" : "Call associated with the timer. Present when the entity is Calls",
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "subject" : {
+            "description" : "Subject of the call",
+            "type" : [ "string", "null" ],
+            "maxLength" : 300,
+            "minLength" : 0
+          },
+          "dueDate" : {
+            "description" : "Due date of the call",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+          },
+          "depId" : {
+            "description" : "Unique ID of the department to which the call belongs",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "id" : {
+            "description" : "Unique ID of the call",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "depName" : {
+            "description" : "Name of the department to which the call belongs",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "status" : {
+            "description" : "Status of the call",
+            "type" : [ "string", "null" ],
+            "x-dynamic-enum" : true
+          }
+        },
+        "required" : [ "depId", "depName", "dueDate", "id", "status", "subject" ]
+      },
+      "event" : {
+        "description" : "Event associated with the timer. Present when the entity is Events",
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "subject" : {
+            "description" : "Subject of the event",
+            "type" : [ "string", "null" ],
+            "maxLength" : 300,
+            "minLength" : 0
+          },
+          "dueDate" : {
+            "description" : "Due date of the event",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+          },
+          "depId" : {
+            "description" : "Unique ID of the department to which the event belongs",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "id" : {
+            "description" : "Unique ID of the event",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          },
+          "depName" : {
+            "description" : "Name of the department to which the event belongs",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "status" : {
+            "description" : "Status of the event",
+            "type" : [ "string", "null" ],
+            "x-dynamic-enum" : true
+          }
+        },
+        "required" : [ "depId", "depName", "dueDate", "id", "status", "subject" ]
+      },
+      "callActiveTimer" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/activeTimer"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "call" : {
+              "$ref" : "#/components/schemas/call"
+            },
+            "ticket" : {
+              "$ref" : "#/components/schemas/ticketWithDueDate"
+            }
+          },
+          "required" : [ "call" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "eventActiveTimer" : {
+        "type" : "object",
+        "additionalProperties" : false,
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/activeTimer"
+        }, {
+          "type" : [ "object", "null" ],
+          "properties" : {
+            "event" : {
+              "$ref" : "#/components/schemas/event"
+            },
+            "ticket" : {
+              "$ref" : "#/components/schemas/ticketWithDueDate"
+            }
+          },
+          "required" : [ "event" ],
+          "additionalProperties" : false
+        } ]
+      },
+      "callTimer" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "timer" : {
+            "$ref" : "#/components/schemas/ticketTimerJson"
+          },
+          "call" : {
+            "$ref" : "#/components/schemas/call"
+          },
+          "ticket" : {
+            "$ref" : "#/components/schemas/ticketWithDueDate"
+          },
+          "entity" : {
+            "description" : "Module type the timer is associated with. Possible values: Calls",
+            "type" : [ "string", "null" ],
+            "enum" : [ "Calls" ]
+          }
+        },
+        "required" : [ "call", "entity", "timer" ]
+      },
+      "eventTimer" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "timer" : {
+            "$ref" : "#/components/schemas/ticketTimerJson"
+          },
+          "event" : {
+            "$ref" : "#/components/schemas/event"
+          },
+          "ticket" : {
+            "$ref" : "#/components/schemas/ticketWithDueDate"
+          },
+          "entity" : {
+            "description" : "Module type the timer is associated with. Possible values: Events",
+            "type" : [ "string", "null" ],
+            "enum" : [ "Events" ]
+          }
+        },
+        "required" : [ "entity", "event", "timer" ]
+      },
       "getActiveTimersList" : {
+        "description" : "List of active timer entries",
         "type" : [ "array", "null" ],
         "items" : {
           "oneOf" : [ {
@@ -613,29 +769,38 @@
             "$ref" : "#/components/schemas/taskActiveTimer"
           }, {
             "$ref" : "#/components/schemas/taskActiveTimerWithTicket"
+          }, {
+            "$ref" : "#/components/schemas/callActiveTimer"
+          }, {
+            "$ref" : "#/components/schemas/eventActiveTimer"
           } ]
         }
       },
       "ticketTimerJson" : {
+        "description" : "Timer details associated with the active timer entry",
         "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "hours" : {
+            "description" : "Number of hours spent by the agent",
             "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           },
           "seconds" : {
+            "description" : "Number of seconds spent by the agent",
             "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           },
           "minutes" : {
+            "description" : "Number of minutes spent by the agent",
             "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           },
           "state" : {
+            "description" : "Current state of the timer. Possible values: RUNNING, PAUSED, INIT",
             "type" : [ "string", "null" ],
             "enum" : [ "RUNNING", "PAUSED", "INIT" ]
           }
@@ -656,6 +821,7 @@
             "$ref" : "#/components/schemas/ticket"
           },
           "entity" : {
+            "description" : "Module type the timer is associated with. Possible values: Tickets, Tasks",
             "type" : [ "string", "null" ],
             "enum" : [ "Tickets", "Tasks" ]
           }
@@ -673,6 +839,7 @@
             "$ref" : "#/components/schemas/task"
           },
           "entity" : {
+            "description" : "Module type the timer is associated with. Possible values: Tickets, Tasks",
             "type" : [ "string", "null" ],
             "enum" : [ "Tickets", "Tasks" ]
           }
@@ -693,6 +860,7 @@
             "$ref" : "#/components/schemas/ticketWithDueDate"
           },
           "entity" : {
+            "description" : "Module type the timer is associated with. Possible values: Tickets, Tasks",
             "type" : [ "string", "null" ],
             "enum" : [ "Tickets", "Tasks" ]
           }
@@ -710,6 +878,7 @@
             "$ref" : "#/components/schemas/taskWithDueDate"
           },
           "entity" : {
+            "description" : "Module type the timer is associated with. Possible values: Tickets, Tasks",
             "type" : [ "string", "null" ],
             "enum" : [ "Tickets", "Tasks" ]
           }
@@ -717,6 +886,7 @@
         "required" : [ "entity", "task", "timer" ]
       },
       "data" : {
+        "description" : "List of active timer entries",
         "type" : [ "array", "null" ],
         "items" : {
           "oneOf" : [ {
@@ -727,6 +897,10 @@
             "$ref" : "#/components/schemas/ticketTimerWithDueDate"
           }, {
             "$ref" : "#/components/schemas/taskTimerWithDueDate"
+          }, {
+            "$ref" : "#/components/schemas/callTimer"
+          }, {
+            "$ref" : "#/components/schemas/eventTimer"
           } ]
         }
       }
@@ -753,7 +927,7 @@
                     "owner" : {
                       "firstName" : "George",
                       "lastName" : "McKinson",
-                      "photoURL" : "https://desk.example.com/api/v1/agents/75485000000418459/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/75485000000418459/photo?orgId=123456",
                       "name" : "McKinson George",
                       "id" : "75485000000418459"
                     },
@@ -778,7 +952,7 @@
                     "owner" : {
                       "firstName" : "Lucas",
                       "lastName" : "Carol",
-                      "photoURL" : "https://desk.example.com/api/v1/agents/75485000000182033/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/75485000000182033/photo?orgId=123456",
                       "name" : "Carol Lucas",
                       "id" : "75485000000182033"
                     },
@@ -803,7 +977,7 @@
                     "owner" : {
                       "firstName" : "Lucas",
                       "lastName" : "Carol",
-                      "photoURL" : "https://desk.example.com/api/v1/agents/75485000000182033/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/75485000000182033/photo?orgId=123456",
                       "name" : "Carol Lucas",
                       "id" : "75485000000182033"
                     },
@@ -836,7 +1010,7 @@
                     "owner" : {
                       "firstName" : "Lucas",
                       "lastName" : "Carol",
-                      "photoURL" : "https://desk.example.com/api/v1/agents/75485000000182033/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/75485000000182033/photo?orgId=123456",
                       "name" : "Carol Lucas",
                       "id" : "75485000000182033"
                     },
@@ -860,7 +1034,7 @@
                     "owner" : {
                       "firstName" : "Lucas",
                       "lastName" : "Carol",
-                      "photoURL" : "https://desk.example.com/api/v1/agents/75485000000182033/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/75485000000182033/photo?orgId=123456",
                       "name" : "Carol Lucas",
                       "id" : "75485000000182033"
                     },
@@ -892,30 +1066,7 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "object", "null" ],
-              "additionalProperties" : false,
-              "properties" : {
-                "hours" : {
-                  "type" : [ "string", "integer", "null" ],
-                  "format" : "int32",
-                  "pattern" : "([0-9]+)"
-                },
-                "seconds" : {
-                  "type" : [ "string", "integer", "null" ],
-                  "format" : "int32",
-                  "pattern" : "([0-9]+)"
-                },
-                "minutes" : {
-                  "type" : [ "string", "integer", "null" ],
-                  "format" : "int32",
-                  "pattern" : "([0-9]+)"
-                },
-                "state" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "RUNNING", "PAUSED", "INIT" ]
-                }
-              },
-              "required" : [ "hours", "minutes", "seconds", "state" ]
+              "$ref" : "#/components/schemas/ticketTimerJson"
             },
             "examples" : {
               "Valid responses Definitions" : {
@@ -935,65 +1086,34 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "allOf" : [ {
-                "type" : [ "object" ],
-                "properties" : {
-                  "data" : {
-                    "type" : [ "array" ],
-                    "items" : {
-                      "type" : [ "object" ],
-                      "properties" : {
-                        "owner" : {
-                          "type" : [ "object", "null" ],
-                          "additionalProperties" : false,
-                          "maxProperties" : 5,
-                          "minProperties" : 5,
-                          "properties" : {
-                            "photoURL" : {
-                              "type" : [ "string", "null" ],
-                              "maxLength" : 100,
-                              "minLength" : 0,
-                              "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
-                            },
-                            "firstName" : {
-                              "type" : [ "string", "null" ],
-                              "maxLength" : 50,
-                              "minLength" : 0
-                            },
-                            "lastName" : {
-                              "type" : [ "string", "null" ],
-                              "maxLength" : 50,
-                              "minLength" : 0
-                            },
-                            "name" : {
-                              "type" : [ "string", "null" ],
-                              "maxLength" : 50,
-                              "minLength" : 0
-                            },
-                            "id" : {
-                              "type" : [ "string", "integer", "null" ],
-                              "format" : "int64",
-                              "pattern" : "([0-9]+)"
-                            }
-                          },
-                          "required" : [ "firstName", "id", "lastName", "name", "photoURL" ]
-                        }
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "description" : "List of active timer entries",
+                  "type" : [ "array", "null" ],
+                  "items" : {
+                    "type" : [ "object", "null" ],
+                    "additionalProperties" : false,
+                    "properties" : {
+                      "userId" : {
+                        "description" : "Unique ID of the agent whose timer is active",
+                        "type" : [ "string", "integer", "null" ],
+                        "format" : "int64",
+                        "pattern" : "([0-9]+)"
                       },
-                      "additionalProperties" : false
-                    }
+                      "timer" : {
+                        "$ref" : "#/components/schemas/timerJson"
+                      },
+                      "owner" : {
+                        "$ref" : "#/components/schemas/actor"
+                      }
+                    },
+                    "required" : [ "timer", "userId" ]
                   }
-                },
-                "additionalProperties" : false
-              }, {
-                "type" : [ "object", "null" ],
-                "additionalProperties" : false,
-                "properties" : {
-                  "data" : {
-                    "$ref" : "#/components/schemas/data"
-                  }
-                },
-                "required" : [ "data" ]
-              } ]
+                }
+              },
+              "required" : [ "data" ]
             },
             "examples" : {
               "Valid responses Definitions" : {
@@ -1002,7 +1122,7 @@
                     "owner" : {
                       "firstName" : "Sam",
                       "lastName" : "Jones",
-                      "photoURL" : "https://contacts.example.com/file?t=user&fs=thumb&ID=1234567890&nps=404&exp=20",
+                      "photoURL" : "https://contacts.zoho.com/file?t=user&fs=thumb&ID=56934690&nps=404&exp=20",
                       "name" : "Sam Jones",
                       "id" : "7000000020001"
                     },
@@ -1010,14 +1130,14 @@
                       "hours" : 93,
                       "seconds" : 9,
                       "minutes" : 6,
-                      "state" : "Running"
+                      "state" : "RUNNING"
                     },
                     "userId" : "7000000020001"
                   }, {
                     "owner" : {
                       "firstName" : "Robert",
                       "lastName" : "Downey",
-                      "photoURL" : "https://contacts.example.com/file?t=user&fs=thumb&ID=1234567890&nps=404&exp=20",
+                      "photoURL" : "https://contacts.zoho.com/file?t=user&fs=thumb&ID=56934690&nps=404&exp=20",
                       "name" : "Robert Downey",
                       "id" : "7000000030001"
                     },
@@ -1025,9 +1145,74 @@
                       "hours" : 19,
                       "seconds" : 24,
                       "minutes" : 9,
-                      "state" : "Paused"
+                      "state" : "PAUSED"
                     },
                     "userId" : "7000000030001"
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "getActiveTimerForAgents" : {
+        "description" : "getActiveTimerForAgents template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "#/components/schemas/data"
+                }
+              },
+              "required" : [ "data" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "data" : [ {
+                    "timer" : {
+                      "hours" : 216,
+                      "seconds" : 10,
+                      "minutes" : 47,
+                      "state" : "RUNNING"
+                    },
+                    "task" : {
+                      "subject" : "Task with ticket for timer",
+                      "dueDate" : "2021-07-14T06:30:00.000Z",
+                      "depId" : "75485000000569047",
+                      "id" : "75485000002466025",
+                      "depName" : "TestDept",
+                      "status" : "Not Started"
+                    },
+                    "ticket" : {
+                      "ticketNumber" : "672",
+                      "subject" : "checking active timer",
+                      "dueDate" : "2021-07-14T06:30:00.000Z",
+                      "depId" : "75485000000569047",
+                      "id" : "75485000002459023",
+                      "depName" : "TestDept",
+                      "status" : "Open"
+                    },
+                    "entity" : "Tasks"
+                  }, {
+                    "timer" : {
+                      "hours" : 274,
+                      "seconds" : 42,
+                      "minutes" : 26,
+                      "state" : "RUNNING"
+                    },
+                    "task" : {
+                      "subject" : "Task without ticket",
+                      "dueDate" : null,
+                      "depId" : "75485000000569047",
+                      "id" : "75485000000572019",
+                      "depName" : "TestDept",
+                      "status" : "Not Started"
+                    },
+                    "entity" : "Tasks"
                   } ]
                 }
               }
@@ -1047,5 +1232,6 @@
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "TicketTimer"
 }

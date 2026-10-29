@@ -11,6 +11,7 @@
         "summary" : "Get KB Article Statistics",
         "description" : "Retrieves statistical data related to help articles in the knowledge base.",
         "operationId" : "getArticleDashboardStatistics",
+        "x-mcp-group" : [ "KB Admin", "KB Dashboard", "View KB" ],
         "parameters" : [ {
           "name" : "rootCategoryIds",
           "in" : "query",
@@ -108,6 +109,7 @@
         "summary" : "Get Knowledge Base Trend",
         "description" : "Retrieves overall trend data for user actions recorded across the entire knowledge base.",
         "operationId" : "getAllKBTrends",
+        "x-mcp-group" : [ "KB Admin", "KB Dashboard", "View KB" ],
         "parameters" : [ {
           "name" : "rootCategoryIds",
           "in" : "query",
@@ -147,13 +149,10 @@
           "description" : "User action whose trend-related records must be fetched. Values allowed are: !@LIKE,@! !@DISLIKE,@! !@VIEW,@! !@TICKET_USAGE,@! !@COMMENT,@! !@TEMPLATE_USAGE@! and !@FEEDBACK@!. If you do not pass a value, all actions are included.",
           "required" : false,
           "style" : "form",
-          "explode" : true,
           "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : [ "string" ],
-              "enum" : [ "LIKE", "DISLIKE", "VIEW", "TICKET_USAGE", "COMMENT", "TEMPLATE_USAGE", "FEEDBACK" ]
-            }
+            "type" : [ "string" ],
+            "enum" : [ "LIKE", "DISLIKE", "VIEW" ],
+            "description" : "Interaction to count"
           }
         }, {
           "name" : "permission",
@@ -210,7 +209,7 @@
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
-            "enum" : [ "AGENTS", "REGISTERED_USERS", "PUBLIC_USERS", "ALL_USERS", "END_USERS" ],
+            "enum" : [ "AGENTS", "REGISTERED_USERS", "ALL_USERS", "PUBLIC_USERS" ],
             "default" : "ALL_USERS"
           }
         }, {
@@ -301,12 +300,63 @@
         } ]
       }
     },
+    "/api/v1/articles/{articleId}/translations/{locale}/insights/reset" : {
+      "post" : {
+        "tags" : [ "ArticleStatistics" ],
+        "summary" : "Reset Metrics of an Article Translation",
+        "description" : "Resets metrics on a specific translation of an article for the specified actions.",
+        "operationId" : "resetArticleTranslationMetrics",
+        "x-mcp-group" : [ "KB Admin" ],
+        "parameters" : [ {
+          "name" : "articleId",
+          "description" : "Unique ID of the article",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "locale",
+          "description" : "Language code of the translation",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "en", "ja", "zh", "es", "de", "fr", "tr", "ru", "pt", "it", "nl", "da", "sv", "pl", "ar", "he", "af", "cs", "fr-ca", "bg", "fi", "el", "hu", "id", "nb", "ro", "th", "uk", "vi", "ur", "hi", "te", "kn", "ta", "mr", "ko", "fa", "bn", "gu", "ms", "ml", "en-gb", "sk", "hr", "sl", "zh_TW", "zh-tw", "ca", "ka", "kk", "my", "km", "pt-br" ],
+            "pattern" : "([a-zA-Z]{2,4}([-_][a-zA-Z]{2})?)"
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/metricsResetPayload"
+        },
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/invalidDataErrorResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.UPDATE" ]
+        } ]
+      }
+    },
     "/api/v1/articles/{articleId}/insights/reset" : {
       "post" : {
         "tags" : [ "ArticleStatistics" ],
         "summary" : "Reset Metrics of All Article Translations",
         "description" : "Resets metrics on all translations of an article for the specified actions.",
         "operationId" : "resetAllArticleTranslationsMetrics",
+        "x-mcp-group" : [ "KB Admin" ],
         "parameters" : [ {
           "name" : "articleId",
           "description" : "Unique ID of the article",
@@ -338,12 +388,92 @@
         } ]
       }
     },
+    "/api/v1/articles/searchKeywords" : {
+      "get" : {
+        "tags" : [ "ArticleStatistics" ],
+        "summary" : "Get Keyword Metrics",
+        "description" : "Retrieves statistics related to keywords used for finding help articles.",
+        "operationId" : "getArticlesSearchKeywordsStats",
+        "x-mcp-group" : [ "Search", "KB Admin", "KB Dashboard", "View KB" ],
+        "parameters" : [ {
+          "name" : "duration",
+          "in" : "query",
+          "description" : "Period for keyword statistics. Possible values: LAST_24_HRS, LAST_7_DAYS, LAST_30_DAYS, LAST_365_DAYS, yyyy-MM-ddThh:mm:ss.SSSZ,yyyy-MM-ddThh:mm:ss.SSSZ. Note: Default value is LAST_365_DAYS.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string" ],
+            "enum" : [ "LAST_24_HRS", "LAST_7_DAYS", "LAST_30_DAYS", "LAST_365_DAYS" ],
+            "pattern" : "LAST_24_HRS|LAST_7_DAYS|LAST_30_DAYS|LAST_365_DAYS|(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z)),(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))"
+          }
+        }, {
+          "name" : "departmentId",
+          "in" : "query",
+          "description" : "Filters by department. If not provided, all departments are considered",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "string", "integer" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)"
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Number of search keywords to retrieve. The default value is 10000 and the maximum value allowed is 10000.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "integer" ],
+            "format" : "int32",
+            "maximum" : 10000,
+            "pattern" : "([0-9]+)",
+            "minimum" : 1,
+            "default" : 10000
+          }
+        }, {
+          "name" : "searchMetricsType",
+          "in" : "query",
+          "description" : "Type of search metrics. If not provided, both failure and popular keywords are returned. Possible values: SUCCESS, FAILURE",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : [ "array" ],
+            "items" : {
+              "type" : [ "string" ],
+              "enum" : [ "SUCCESS", "FAILURE" ]
+            },
+            "maxItems" : 2,
+            "minItems" : 1,
+            "uniqueItems" : true
+          }
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/multipleUnprocessEntityResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/getSearchKeywordsResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.articles.READ" ]
+        } ]
+      }
+    },
     "/api/v1/articles/{articleId}/trends" : {
       "get" : {
         "tags" : [ "ArticleStatistics" ],
         "summary" : "Get Article Trend",
         "description" : "Retrieves trend data for user actions recorded on an article and all of its translations.",
         "operationId" : "getArticleTrends",
+        "x-mcp-group" : [ "KB Admin", "KB Dashboard", "View KB" ],
         "parameters" : [ {
           "name" : "limit",
           "in" : "query",
@@ -365,13 +495,10 @@
           "description" : "User action whose trend-related records must be fetched. Values allowed are: !@LIKE,@! !@DISLIKE,@! !@VIEW,@! !@TICKET_USAGE,@! !@COMMENT,@! !@TEMPLATE_USAGE@! and !@FEEDBACK@!. If you do not pass a value, all actions are included.",
           "required" : false,
           "style" : "form",
-          "explode" : true,
           "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : [ "string" ],
-              "enum" : [ "LIKE", "DISLIKE", "VIEW", "TICKET_USAGE", "COMMENT", "TEMPLATE_USAGE", "FEEDBACK" ]
-            }
+            "type" : [ "string" ],
+            "enum" : [ "LIKE", "DISLIKE", "VIEW" ],
+            "description" : "Interaction to count"
           }
         }, {
           "name" : "from",
@@ -396,7 +523,7 @@
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
-            "enum" : [ "AGENTS", "REGISTERED_USERS", "PUBLIC_USERS", "ALL_USERS", "END_USERS" ],
+            "enum" : [ "AGENTS", "REGISTERED_USERS", "ALL_USERS", "PUBLIC_USERS" ],
             "default" : "ALL_USERS"
           }
         }, {
@@ -461,6 +588,7 @@
         "summary" : "Generate Top Articles Report",
         "description" : "Generates a real-time report of help articles that received the most user actions.",
         "operationId" : "generateTopArticleReport",
+        "x-mcp-group" : [ "KB Admin" ],
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
         } ],
@@ -486,6 +614,7 @@
         "summary" : "Get Top Article Translations",
         "description" : "Retrieves a ranked list of article translations based on user action counts.",
         "operationId" : "getTopArticleTranslationsReport",
+        "x-mcp-group" : [ "KB Admin", "KB Dashboard", "View KB" ],
         "parameters" : [ {
           "name" : "includeActionCounts",
           "in" : "query",
@@ -623,6 +752,7 @@
         "summary" : "Get Article Translation Interacted Users by Action Source",
         "description" : "Retrieves users who interacted with a translation, with extended filtering by action source.",
         "operationId" : "getArticleTranslationInsightsInteractedUsers",
+        "x-mcp-group" : [ "KnowledgeBase_Publishing", "KB Admin", "KB Dashboard", "View KB" ],
         "parameters" : [ {
           "name" : "articleId",
           "in" : "query",
@@ -743,6 +873,7 @@
         "summary" : "Get Article Translation Interacted Users",
         "description" : "Retrieves users who interacted with a specific article translation.",
         "operationId" : "getArticleTranslationInteractedUsers",
+        "x-mcp-group" : [ "KB Admin", "KB Dashboard", "View KB" ],
         "parameters" : [ {
           "name" : "locale",
           "description" : "Language code of the\ntranslation",
@@ -847,6 +978,7 @@
         "summary" : "Get Article Translation Action Counts",
         "description" : "Retrieves aggregated action counts for a specific article translation based on specified filters.",
         "operationId" : "getArticleTranslationCountActionStatistics",
+        "x-mcp-group" : [ "KB Admin", "KB Dashboard", "View KB" ],
         "parameters" : [ {
           "name" : "action",
           "in" : "query",
@@ -906,7 +1038,7 @@
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
-            "enum" : [ "AGENTS", "REGISTERED_USERS", "PUBLIC_USERS", "ALL_USERS", "END_USERS" ],
+            "enum" : [ "AGENTS", "REGISTERED_USERS", "ALL_USERS", "PUBLIC_USERS" ],
             "default" : "ALL_USERS"
           }
         }, {
@@ -971,6 +1103,7 @@
         "summary" : "Get Article Interacted Users",
         "description" : "Retrieves users who interacted with a specific article.",
         "operationId" : "getArticleInteractedUsers",
+        "x-mcp-group" : [ "KB Admin", "KB Dashboard", "View KB" ],
         "parameters" : [ {
           "name" : "limit",
           "in" : "query",
@@ -1063,6 +1196,7 @@
         "summary" : "Get Article Translation Interacted Users Count",
         "description" : "Retrieves the count of users who interacted with a specific article translation.",
         "operationId" : "getArticleTranslationInteractedUsersCount",
+        "x-mcp-group" : [ "KB Admin", "KB Dashboard", "View KB" ],
         "parameters" : [ {
           "name" : "locale",
           "description" : "Language code of the translation",
@@ -1197,10 +1331,62 @@
         }
       },
       "actionArray" : {
+        "type" : [ "array" ],
+        "items" : {
+          "type" : [ "string" ],
+          "enum" : [ "LIKE", "DISLIKE", "VIEW", "COMMENT", "TICKET_USAGE", "FEEDBACK", "TEMPLATE_USAGE" ]
+        }
+      },
+      "popularKeywordsJson" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "searchkeyword" : {
+            "description" : "Search keyword",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "successCount" : {
+            "description" : "Number of successful searches for this keyword",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          }
+        },
+        "required" : [ "searchkeyword", "successCount" ]
+      },
+      "popularKeywordsData" : {
+        "description" : "List of popular(successful) search keywords",
         "type" : [ "array", "null" ],
         "items" : {
-          "type" : [ "string", "null" ],
-          "enum" : [ "LIKE", "DISLIKE", "VIEW", "COMMENT", "TICKET_USAGE", "FEEDBACK", "TEMPLATE_USAGE" ]
+          "$ref" : "#/components/schemas/popularKeywordsJson"
+        }
+      },
+      "failureKeywordsJson" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "searchkeyword" : {
+            "description" : "Search keyword",
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "failureCount" : {
+            "description" : "Number of failed searches for this keyword",
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int32",
+            "pattern" : "([0-9]+)"
+          }
+        },
+        "required" : [ "failureCount", "searchkeyword" ]
+      },
+      "failureKeywordsData" : {
+        "description" : "List of failed search keywords",
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/failureKeywordsJson"
         }
       },
       "interactedUserMeta" : {
@@ -1609,6 +1795,85 @@
           }
         }
       },
+      "getSearchKeywordsResponse" : {
+        "description" : "getSearchKeywordsResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "oneOf" : [ {
+                "type" : [ "object", "null" ],
+                "additionalProperties" : false,
+                "properties" : {
+                  "overallSuccessKeywordsCount" : {
+                    "description" : "Total number of successful search keywords",
+                    "type" : [ "string", "integer", "null" ],
+                    "format" : "int32",
+                    "pattern" : "([0-9]+)"
+                  },
+                  "failureKeywords" : {
+                    "$ref" : "#/components/schemas/failureKeywordsData"
+                  },
+                  "popularKeywords" : {
+                    "$ref" : "#/components/schemas/popularKeywordsData"
+                  },
+                  "overallFailureKeywordsCount" : {
+                    "description" : "Total number of failed search keywords",
+                    "type" : [ "string", "integer", "null" ],
+                    "format" : "int32",
+                    "pattern" : "([0-9]+)"
+                  }
+                },
+                "required" : [ "failureKeywords", "overallFailureKeywordsCount", "overallSuccessKeywordsCount", "popularKeywords" ]
+              }, {
+                "type" : [ "object", "null" ],
+                "additionalProperties" : false,
+                "properties" : {
+                  "failureKeywords" : {
+                    "$ref" : "#/components/schemas/failureKeywordsData"
+                  },
+                  "overallFailureKeywordsCount" : {
+                    "type" : [ "string", "integer", "null" ],
+                    "format" : "int32",
+                    "pattern" : "([0-9]+)"
+                  }
+                },
+                "required" : [ "failureKeywords", "overallFailureKeywordsCount" ]
+              }, {
+                "type" : [ "object", "null" ],
+                "additionalProperties" : false,
+                "properties" : {
+                  "overallSuccessKeywordsCount" : {
+                    "description" : "Total number of successful search keywords",
+                    "type" : [ "string", "integer", "null" ],
+                    "format" : "int32",
+                    "pattern" : "([0-9]+)"
+                  },
+                  "popularKeywords" : {
+                    "$ref" : "#/components/schemas/popularKeywordsData"
+                  }
+                },
+                "required" : [ "overallSuccessKeywordsCount", "popularKeywords" ]
+              } ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "overallSuccessKeywordsCount" : "11180",
+                  "failureKeywords" : [ {
+                    "searchkeyword" : "Welcome",
+                    "failureCount" : "1"
+                  } ],
+                  "popularKeywords" : [ {
+                    "searchkeyword" : "image",
+                    "successCount" : "1"
+                  } ],
+                  "overallFailureKeywordsCount" : "2500"
+                }
+              }
+            }
+          }
+        }
+      },
       "interactedUsersResponse" : {
         "description" : "interactedUsersResponse template definitions",
         "content" : {
@@ -1629,10 +1894,10 @@
                   "data" : [ {
                     "action" : "LIKE",
                     "user" : {
-                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000000063/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000000063/photo?orgId=123456",
                       "firstName" : "Charlie",
                       "lastName" : "Stankovic",
-                      "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Contacts/dv/3000000039220",
+                      "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Contacts/dv/3000000039220",
                       "emailId" : "charlie@zylker.com",
                       "id" : "4000000000063",
                       "type" : [ "AGENT" ]
@@ -1640,10 +1905,10 @@
                   }, {
                     "action" : "LIKE",
                     "user" : {
-                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000000065/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000000065/photo?orgId=123456",
                       "firstName" : "Lisa",
                       "lastName" : "Roseland",
-                      "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Contacts/dv/3000000039255",
+                      "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Contacts/dv/3000000039255",
                       "emailId" : "lisa@zylker.com",
                       "id" : "4000000000065",
                       "type" : [ "REGISTERED_USERS" ]
@@ -1685,11 +1950,11 @@
                     "isTrashed" : false,
                     "createdTime" : 1588300921000,
                     "modifiedBy" : {
-                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000016508/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000016508/photo?orgId=123456",
                       "name" : "Charlie",
                       "id" : "4000000016508",
                       "status" : "ACTIVE",
-                      "zuid" : "1234567890"
+                      "zuid" : "234543"
                     },
                     "id" : "4000000081313",
                     "articleNumber" : "102",
@@ -1718,15 +1983,15 @@
                       "name" : "Charlie",
                       "id" : "4000000016508",
                       "status" : "ACTIVE",
-                      "zuid" : "1234567890"
+                      "zuid" : "234543"
                     },
                     "latestVersionStatus" : "Published",
                     "author" : {
-                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000016508/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000016508/photo?orgId=123456",
                       "name" : "Charlie",
                       "id" : "4000000016508",
                       "status" : "ACTIVE",
-                      "zuid" : "1234567890"
+                      "zuid" : "234543"
                     },
                     "permission" : "REGISTEREDUSERS",
                     "authorId" : "4000000016508",
@@ -1735,13 +2000,13 @@
                     "translationId" : "4000000081315",
                     "latestVersion" : "2.0",
                     "createdBy" : {
-                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000016508/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000016508/photo?orgId=123456",
                       "name" : "Charlie",
                       "id" : "4000000016508",
                       "status" : "ACTIVE",
-                      "zuid" : "1234567890"
+                      "zuid" : "234543"
                     },
-                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Solutions/dv/4000000081313/en",
+                    "webUrl" : "https://desk.zoho.com/support/solosolo/ShowHomePage.do#Solutions/dv/4000000081313/en",
                     "latestPublishedVersion" : "2.0",
                     "category" : {
                       "name" : "Cartoon",
@@ -1755,7 +2020,7 @@
                       "name" : "will smith",
                       "id" : "4000000000060",
                       "status" : "ACTIVE",
-                      "zuid" : "1234567890"
+                      "zuid" : "234544"
                     },
                     "status" : "Published"
                   }, {
@@ -1770,11 +2035,11 @@
                     "isTrashed" : false,
                     "createdTime" : 1588300855000,
                     "modifiedBy" : {
-                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000016508/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000016508/photo?orgId=123456",
                       "name" : "Charlie",
                       "id" : "4000000016508",
                       "status" : "ACTIVE",
-                      "zuid" : "1234567890"
+                      "zuid" : "234543"
                     },
                     "id" : "4000000081268",
                     "articleNumber" : "103",
@@ -1799,19 +2064,19 @@
                     } ],
                     "summary" : "Scooby doo infinity",
                     "owner" : {
-                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000016508/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000016508/photo?orgId=123456",
                       "name" : "Charlie",
                       "id" : "4000000016508",
                       "status" : "ACTIVE",
-                      "zuid" : "1234567890"
+                      "zuid" : "234543"
                     },
                     "latestVersionStatus" : "Published",
                     "author" : {
-                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000016508/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000016508/photo?orgId=123456",
                       "name" : "Charlie",
                       "id" : "4000000016508",
                       "status" : "ACTIVE",
-                      "zuid" : "1234567890"
+                      "zuid" : "234543"
                     },
                     "permission" : "REGISTEREDUSERS",
                     "authorId" : "4000000016508",
@@ -1820,13 +2085,13 @@
                     "translationId" : "4000000081270",
                     "latestVersion" : "1.0",
                     "createdBy" : {
-                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000016508/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000016508/photo?orgId=123456",
                       "name" : "Charlie",
                       "id" : "4000000016508",
                       "status" : "ACTIVE",
-                      "zuid" : "1234567890"
+                      "zuid" : "234543"
                     },
-                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Solutions/dv/4000000081268/en",
+                    "webUrl" : "https://desk.zoho.com/support/solosolo/ShowHomePage.do#Solutions/dv/4000000081268/en",
                     "latestPublishedVersion" : "1.0",
                     "category" : {
                       "name" : "Disney",
@@ -1848,11 +2113,11 @@
                     "isTrashed" : false,
                     "createdTime" : 1588310873000,
                     "modifiedBy" : {
-                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000016508/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000016508/photo?orgId=123456",
                       "name" : "Charlie",
                       "id" : "4000000016508",
                       "status" : "ACTIVE",
-                      "zuid" : "1234567890"
+                      "zuid" : "234543"
                     },
                     "id" : "4000000088001",
                     "articleNumber" : "104",
@@ -1877,19 +2142,19 @@
                     } ],
                     "summary" : "Yanni and notsolgia exploration",
                     "owner" : {
-                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000016508/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000016508/photo?orgId=123456",
                       "name" : "Charlie",
                       "id" : "4000000016508",
                       "status" : "ACTIVE",
-                      "zuid" : "1234567890"
+                      "zuid" : "234543"
                     },
                     "latestVersionStatus" : "Published",
                     "author" : {
-                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000016508/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000016508/photo?orgId=123456",
                       "name" : "Charlie",
                       "id" : "4000000016508",
                       "status" : "ACTIVE",
-                      "zuid" : "1234567890"
+                      "zuid" : "234543"
                     },
                     "permission" : "REGISTEREDUSERS",
                     "authorId" : "4000000016508",
@@ -1898,13 +2163,13 @@
                     "translationId" : "4000000088003",
                     "latestVersion" : "1.0",
                     "createdBy" : {
-                      "photoURL" : "https://desk.example.com/api/v1/agents/4000000016508/photo?orgId=1234567890",
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/4000000016508/photo?orgId=123456",
                       "name" : "Charlie",
                       "id" : "4000000016508",
                       "status" : "ACTIVE",
-                      "zuid" : "1234567890"
+                      "zuid" : "234543"
                     },
-                    "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Solutions/dv/4000000088001/en",
+                    "webUrl" : "https://desk.zoho.com/support/solosolo/ShowHomePage.do#Solutions/dv/4000000088001/en",
                     "latestPublishedVersion" : "1.0",
                     "category" : {
                       "name" : "Music",
@@ -1950,6 +2215,32 @@
       }
     },
     "requestBodies" : {
+      "metricsResetPayload" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "action" : {
+                  "description" : "User actions whose metrics must be reset. Possible values: LIKE, DISLIKE, VIEW, TICKET_USAGE, COMMENT, FEEDBACK, TEMPLATE_USAGE",
+                  "style" : "form",
+                  "$ref" : "#/components/schemas/actionArray",
+                  "explode" : false
+                }
+              },
+              "required" : [ "action" ]
+            },
+            "examples" : {
+              "Valid requestBody Definitions" : {
+                "value" : {
+                  "action" : [ "VIEW", "FEEDBACK" ]
+                }
+              }
+            }
+          }
+        }
+      },
       "resetArticleMetrics_metricsResetPayload" : {
         "content" : {
           "application/json" : {
@@ -2031,5 +2322,6 @@
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "ArticleStatistics"
 }

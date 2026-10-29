@@ -66,6 +66,7 @@
         "summary" : "Save the during actions transition draft",
         "description" : "Saves the during-actions transition draft for a specific transition on a ticket.",
         "operationId" : "saveDuringActionTransitionDraft",
+        "x-mcp-group" : [ "Blueprints" ],
         "parameters" : [ {
           "name" : "transition_id",
           "description" : "Unique ID of the transition.",
@@ -350,6 +351,10 @@
         "type" : "object",
         "additionalProperties" : false,
         "properties" : {
+          "cleartextpattern" : {
+            "type" : [ "string" ],
+            "maxLength" : 65535
+          },
           "productId" : {
             "description" : "Unique ID of the product associated with the ticket",
             "type" : [ "string", "integer" ],
@@ -384,19 +389,23 @@
           },
           "channel" : {
             "description" : "Channel of the ticket",
-            "type" : "string"
+            "type" : "string",
+            "x-dynamic-enum" : true
           },
           "language" : {
             "description" : "Language to set on the ticket",
-            "type" : "string"
+            "type" : "string",
+            "x-dynamic-enum" : true
           },
           "priority" : {
             "description" : "Priority to set on the ticket",
-            "type" : "string"
+            "type" : "string",
+            "x-dynamic-enum" : true
           },
           "classification" : {
             "description" : "Classification to set on the ticket",
-            "type" : "string"
+            "type" : "string",
+            "x-dynamic-enum" : true
           },
           "assigneeId" : {
             "description" : "Unique ID of the agent to assign the ticket to",
@@ -527,7 +536,8 @@
                               "pattern" : "([0-9]+)"
                             },
                             "minItems" : 0,
-                            "maxItems" : 10
+                            "maxItems" : 10,
+                            "x-template" : "automationRulesList"
                           },
                           "teamIds" : {
                             "description" : "Team IDs configured as transition owners",
@@ -538,12 +548,14 @@
                               "pattern" : "([0-9]+)"
                             },
                             "minItems" : 0,
-                            "maxItems" : 10
+                            "maxItems" : 10,
+                            "x-template" : "automationRulesList"
                           }
                         }
                       },
                       "minItems" : 1,
-                      "maxItems" : 4
+                      "maxItems" : 4,
+                      "x-template" : "transitionOwnerJSON"
                     }
                   }
                 }
@@ -630,5 +642,6 @@
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "EntityBlueprints"
 }

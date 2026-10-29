@@ -5,15 +5,17 @@
     "version" : "1.0.0"
   },
   "paths" : {
-    "/api/v1/tasks/{activityId}/timer" : {
+    "/api/v1/tasks/{taskId}/timer" : {
       "get" : {
         "tags" : [ "TaskTimer" ],
         "summary" : "Get Task Timer",
-        "description" : "This API fetches the time elapsed in the task timer, along with the current state",
+        "description" : "Retrieves the time elapsed in the task timer, along with its current state.",
         "operationId" : "getTaskTimer",
+        "x-mcp-group" : [ "Time Tracking", "Tasks" ],
         "parameters" : [ {
-          "name" : "activityId",
+          "name" : "taskId",
           "in" : "path",
+          "description" : "Unique ID of the task from which the timer must be retrieved",
           "required" : true,
           "style" : "simple",
           "explode" : false,
@@ -31,20 +33,21 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.activities.tasks.READ", "Desk.tasks.READ" ]
+          "iam-oauth2-schema" : [ "Desk.activities.tasks.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.tasks.READ" ]
         } ]
-      }
-    },
-    "/api/v1/tasks/{taskId}/timer" : {
+      },
       "post" : {
         "tags" : [ "TaskTimer" ],
-        "summary" : "Performs Task Timer actions",
-        "description" : "This API performs timer-related actions, such as START, STOP, PAUSE and RESUME",
+        "summary" : "Perform Task Timer Action",
+        "description" : "Performs a timer-related action on a task.",
         "operationId" : "updateTaskTimerState",
+        "x-mcp-group" : [ "Time Tracking", "Tasks" ],
         "parameters" : [ {
           "name" : "action",
           "in" : "query",
-          "description" : " Action of the timer.Supported actions are  @START@, @STOP@, @PAUSE@ and @RESUME@",
+          "description" : "Action to perform on the timer. Possible values: START, STOP, PAUSE, RESUME",
           "required" : true,
           "style" : "form",
           "explode" : true,
@@ -55,6 +58,7 @@
         }, {
           "name" : "taskId",
           "in" : "path",
+          "description" : "Unique ID of the task containing the timer",
           "required" : true,
           "style" : "simple",
           "explode" : false,
@@ -75,20 +79,23 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.activities.tasks.UPDATE", "Desk.tasks.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.activities.tasks.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.tasks.UPDATE" ]
         } ]
       }
     },
     "/api/v1/tasks/{entityId}/activeTimer" : {
       "get" : {
         "tags" : [ "TaskTimer" ],
-        "summary" : "List task timers",
-        "description" : "This API fetches the details of timers currently active in a task.",
+        "summary" : "Get Task Timers",
+        "description" : "Retrieves the details of timers currently active in a specific task, with pagination support.",
         "operationId" : "getActiveTimersForTask",
+        "x-mcp-group" : [ "Time Tracking", "Tasks" ],
         "parameters" : [ {
           "name" : "include",
           "in" : "query",
-          "description" : "Secondary information related to the timers. Value supported is @owner@.",
+          "description" : "Additional information to include in the response. Possible values: owner",
           "required" : false,
           "style" : "form",
           "explode" : true,
@@ -100,7 +107,7 @@
         }, {
           "name" : "limit",
           "in" : "query",
-          "description" : "Number of timers to fetch",
+          "description" : "Number of timers to fetch. Defaults to 20 if not provided.",
           "required" : false,
           "style" : "form",
           "explode" : true,
@@ -114,7 +121,7 @@
         }, {
           "name" : "from",
           "in" : "query",
-          "description" : "Index number, starting from which the timers must be fetched",
+          "description" : "Index number from which timers must be fetched",
           "required" : false,
           "style" : "form",
           "explode" : true,
@@ -127,6 +134,7 @@
         }, {
           "name" : "entityId",
           "in" : "path",
+          "description" : "Unique ID of the task",
           "required" : true,
           "style" : "simple",
           "explode" : false,
@@ -147,7 +155,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.activities.tasks.READ", "Desk.tasks.READ" ]
+          "iam-oauth2-schema" : [ "Desk.activities.tasks.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.tasks.READ" ]
         } ]
       }
     }
@@ -155,25 +165,30 @@
   "components" : {
     "schemas" : {
       "taskTimerJson" : {
+        "description" : "Timer details associated with the active timer entry",
         "type" : [ "object", "null" ],
         "additionalProperties" : false,
         "properties" : {
           "hours" : {
+            "description" : "Number of hours spent by the agent",
             "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           },
           "seconds" : {
+            "description" : "Number of seconds spent by the agent",
             "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           },
           "minutes" : {
+            "description" : "Number of minutes spent by the agent",
             "type" : [ "string", "integer", "null" ],
             "format" : "int32",
             "pattern" : "([0-9]+)"
           },
           "state" : {
+            "description" : "Current state of the timer. Possible values: RUNNING, PAUSED, INIT",
             "type" : [ "string", "null" ],
             "enum" : [ "RUNNING", "PAUSED", "INIT" ]
           }
@@ -188,14 +203,57 @@
             "$ref" : "#/components/schemas/taskTimerJson"
           },
           "userId" : {
+            "description" : "Unique ID of the agent whose timer is active",
             "type" : [ "string", "integer", "null" ],
             "format" : "int64",
             "pattern" : "([0-9]+)"
+          },
+          "owner" : {
+            "description" : "Details of the agent who owns the timer. Returned when include=owner is passed.",
+            "type" : [ "object", "null" ],
+            "additionalProperties" : false,
+            "maxProperties" : 5,
+            "minProperties" : 5,
+            "properties" : {
+              "photoURL" : {
+                "description" : "URL of the owner's profile photo",
+                "type" : [ "string", "null" ],
+                "maxLength" : 100,
+                "minLength" : 0,
+                "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
+              },
+              "firstName" : {
+                "description" : "First name of the owner",
+                "type" : [ "string", "null" ],
+                "maxLength" : 50,
+                "minLength" : 0
+              },
+              "lastName" : {
+                "description" : "Last name of the owner",
+                "type" : [ "string", "null" ],
+                "maxLength" : 50,
+                "minLength" : 0
+              },
+              "name" : {
+                "description" : "Full name of the owner",
+                "type" : [ "string", "null" ],
+                "maxLength" : 50,
+                "minLength" : 0
+              },
+              "id" : {
+                "description" : "Unique ID of the owner",
+                "type" : [ "string", "integer", "null" ],
+                "format" : "int64",
+                "pattern" : "([0-9]+)"
+              }
+            },
+            "required" : [ "firstName", "id", "lastName", "name", "photoURL" ]
           }
         },
         "required" : [ "timer", "userId" ]
       },
       "data" : {
+        "description" : "List of active timer entries",
         "type" : [ "array", "null" ],
         "items" : {
           "$ref" : "#/components/schemas/activeTimerJson"
@@ -208,30 +266,7 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "type" : [ "object", "null" ],
-              "additionalProperties" : false,
-              "properties" : {
-                "hours" : {
-                  "type" : [ "string", "integer", "null" ],
-                  "format" : "int32",
-                  "pattern" : "([0-9]+)"
-                },
-                "seconds" : {
-                  "type" : [ "string", "integer", "null" ],
-                  "format" : "int32",
-                  "pattern" : "([0-9]+)"
-                },
-                "minutes" : {
-                  "type" : [ "string", "integer", "null" ],
-                  "format" : "int32",
-                  "pattern" : "([0-9]+)"
-                },
-                "state" : {
-                  "type" : [ "string", "null" ],
-                  "enum" : [ "RUNNING", "PAUSED", "INIT" ]
-                }
-              },
-              "required" : [ "hours", "minutes", "seconds", "state" ]
+              "$ref" : "#/components/schemas/taskTimerJson"
             },
             "examples" : {
               "Valid responses Definitions" : {
@@ -251,56 +286,14 @@
         "content" : {
           "application/json" : {
             "schema" : {
-              "allOf" : [ {
-                "type" : [ "object" ],
-                "properties" : {
-                  "owner" : {
-                    "type" : [ "object", "null" ],
-                    "additionalProperties" : false,
-                    "maxProperties" : 5,
-                    "minProperties" : 5,
-                    "properties" : {
-                      "photoURL" : {
-                        "type" : [ "string", "null" ],
-                        "maxLength" : 100,
-                        "minLength" : 0,
-                        "pattern" : "([0-9a-zA-Z_\\-\\.\\$@\\?\\,\\:\\'\\/\\!\\P{InBasicLatin}\\s])+"
-                      },
-                      "firstName" : {
-                        "type" : [ "string", "null" ],
-                        "maxLength" : 50,
-                        "minLength" : 0
-                      },
-                      "lastName" : {
-                        "type" : [ "string", "null" ],
-                        "maxLength" : 50,
-                        "minLength" : 0
-                      },
-                      "name" : {
-                        "type" : [ "string", "null" ],
-                        "maxLength" : 50,
-                        "minLength" : 0
-                      },
-                      "id" : {
-                        "type" : [ "string", "integer", "null" ],
-                        "format" : "int64",
-                        "pattern" : "([0-9]+)"
-                      }
-                    },
-                    "required" : [ "firstName", "id", "lastName", "name", "photoURL" ]
-                  }
-                },
-                "additionalProperties" : false
-              }, {
-                "type" : [ "object", "null" ],
-                "additionalProperties" : false,
-                "properties" : {
-                  "data" : {
-                    "$ref" : "#/components/schemas/data"
-                  }
-                },
-                "required" : [ "data" ]
-              } ]
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "data" : {
+                  "$ref" : "#/components/schemas/data"
+                }
+              },
+              "required" : [ "data" ]
             },
             "examples" : {
               "Valid responses Definitions" : {
@@ -309,7 +302,7 @@
                     "owner" : {
                       "firstName" : "Sam",
                       "lastName" : "Jones",
-                      "photoURL" : "https://contacts.example.com/file?t=user&fs=thumb&ID=1234567890&nps=404&exp=20",
+                      "photoURL" : "https://contacts.zoho.com/file?t=user&fs=thumb&ID=56934690&nps=404&exp=20",
                       "name" : "Sam Jones",
                       "id" : "7000000020001"
                     },
@@ -317,14 +310,14 @@
                       "hours" : 93,
                       "seconds" : 9,
                       "minutes" : 6,
-                      "state" : "Running"
+                      "state" : "RUNNING"
                     },
                     "userId" : "7000000020001"
                   }, {
                     "owner" : {
                       "firstName" : "Robert",
                       "lastName" : "Downey",
-                      "photoURL" : "https://contacts.example.com/file?t=user&fs=thumb&ID=1234567890&nps=404&exp=20",
+                      "photoURL" : "https://contacts.zoho.com/file?t=user&fs=thumb&ID=56934690&nps=404&exp=20",
                       "name" : "Robert Downey",
                       "id" : "7000000030001"
                     },
@@ -332,7 +325,7 @@
                       "hours" : 19,
                       "seconds" : 24,
                       "minutes" : 9,
-                      "state" : "Paused"
+                      "state" : "PAUSED"
                     },
                     "userId" : "7000000030001"
                   } ]
@@ -352,7 +345,11 @@
       },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "TaskTimer"
 }

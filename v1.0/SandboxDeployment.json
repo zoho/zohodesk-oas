@@ -1,0 +1,286 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Sandbox Deployment",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/api/v1/sandbox/{sandboxId}/deployChangeSets" : {
+      "post" : {
+        "tags" : [ "SandboxDeployment" ],
+        "summary" : "Deploy Sandbox Changesets",
+        "description" : "Deploys qualified changesets from a sandbox to the production portal. Note: Validate the changesets using the Validate Sandbox Changesets API, then pass the qualified changeset IDs to this API. Do not use changeset IDs that have conflicts. While a sandbox create, rebuild, or deploy operation is in progress, requests to start any of these operations are rejected. You can start another one only after the current operation completes.",
+        "operationId" : "deployChangeSets",
+        "x-mcp-group" : [ "Sandbox Deployment" ],
+        "parameters" : [ {
+          "name" : "changeSetIds",
+          "in" : "query",
+          "description" : "List of changeset IDs to deploy from the sandbox to the production portal",
+          "required" : true,
+          "style" : "form",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "minItems" : 1,
+            "maxItems" : 50,
+            "items" : {
+              "type" : [ "string", "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "uniqueItems" : false
+          }
+        }, {
+          "$ref" : "./Sandbox.json#/components/parameters/sandboxId"
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/unprocessableEntityMessageOnlyResponse"
+          },
+          "400" : {
+            "$ref" : "./Sandbox.json#/components/responses/sandboxActionRestrictionResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.sandbox.deploy.CUSTOM" ]
+        } ]
+      }
+    },
+    "/api/v1/sandbox/{sandboxId}/validateChangeSets" : {
+      "get" : {
+        "tags" : [ "SandboxDeployment" ],
+        "summary" : "Validate Sandbox Changesets",
+        "description" : "Retrieves the valid and conflicting changesets for a sandbox, with their counts.",
+        "operationId" : "validateChangesets",
+        "x-mcp-group" : [ "Sandbox Deployment" ],
+        "parameters" : [ {
+          "name" : "changeSetIds",
+          "in" : "query",
+          "description" : "List of changeset IDs to check for conflicts",
+          "required" : true,
+          "style" : "form",
+          "explode" : false,
+          "schema" : {
+            "type" : [ "array" ],
+            "minItems" : 1,
+            "maxItems" : 50,
+            "items" : {
+              "type" : [ "string", "integer" ],
+              "format" : "int64",
+              "pattern" : "([0-9]+)"
+            },
+            "uniqueItems" : false
+          }
+        }, {
+          "$ref" : "./Sandbox.json#/components/parameters/sandboxId"
+        }, {
+          "$ref" : "./Common.json#/components/parameters/orgId"
+        } ],
+        "responses" : {
+          "422" : {
+            "$ref" : "./Common.json#/components/responses/unprocessableEntityMessageOnlyResponse"
+          },
+          "204" : {
+            "$ref" : "./Common.json#/components/responses/emptyResponse"
+          },
+          "200" : {
+            "$ref" : "#/components/responses/validateChangeSetResponse"
+          }
+        },
+        "security" : [ {
+          "iam-oauth2-schema" : [ "Desk.sandbox.READ" ]
+        } ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "qualifiedSandboxChangeset" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "./SandboxChangeset.json#/components/schemas/changesetResponse"
+        }
+      },
+      "changesetsWithConflictMessages" : {
+        "type" : [ "object", "null" ],
+        "additionalProperties" : false,
+        "properties" : {
+          "actor" : {
+            "$ref" : "./Sandbox.json#/components/schemas/sandboxActor",
+            "description" : "User who performed the changeset action"
+          },
+          "module" : {
+            "$ref" : "./Sandbox.json#/components/schemas/sandboxModule",
+            "description" : "Module in which the changeset was created"
+          },
+          "eventTime" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "pattern" : "(((19|20)\\d\\d)[-/.]{1}(0?[1-9]|1[012])[-/.]{1}(0?[1-9]|[12][0-9]|3[01])(T)([01]?[0-9]|2[0-3]):[0-5]?[0-9]:[0-5]?[0-9]([/.][\\d]{0,3})?(Z))",
+            "description" : "Time at which the changeset event occurred (ISO 8601 format)"
+          },
+          "externalId" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 100,
+            "minLength" : 0,
+            "description" : "External ID associated with the changed entity in the production portal"
+          },
+          "action" : {
+            "$ref" : "./Sandbox.json#/components/schemas/changesetAction",
+            "description" : "Action performed in the changeset. Possible values: ADD, UPDATE, DELETE"
+          },
+          "department" : {
+            "$ref" : "./Sandbox.json#/components/schemas/sandboxDepartment",
+            "description" : "Department associated with the changeset"
+          },
+          "entity" : {
+            "$ref" : "./Sandbox.json#/components/schemas/sandboxEntityObject",
+            "description" : "Entity affected by the changeset"
+          },
+          "changeSetId" : {
+            "type" : [ "string", "integer", "null" ],
+            "format" : "int64",
+            "pattern" : "([0-9]+)",
+            "description" : "Unique ID of the changeset"
+          },
+          "conflictMessages" : {
+            "type" : [ "array", "null" ],
+            "items" : {
+              "type" : [ "string", "null" ],
+              "maxLength" : 100,
+              "minLength" : 0
+            },
+            "uniqueItems" : false,
+            "description" : "Conflict messages returned for the changeset"
+          }
+        },
+        "required" : [ "action", "actor", "changeSetId", "conflictMessages", "department", "entity", "eventTime", "externalId", "module" ]
+      },
+      "conflictSandboxChangeset" : {
+        "type" : [ "array", "null" ],
+        "items" : {
+          "$ref" : "#/components/schemas/changesetsWithConflictMessages"
+        }
+      }
+    },
+    "responses" : {
+      "validateChangeSetResponse" : {
+        "description" : "validateChangeSetResponse template definitions",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : [ "object", "null" ],
+              "additionalProperties" : false,
+              "properties" : {
+                "totalCount" : {
+                  "type" : [ "integer" ],
+                  "format" : "int32",
+                  "pattern" : "([0-9]+)",
+                  "description" : "Total number of changesets validated"
+                },
+                "qualifiedCount" : {
+                  "type" : [ "integer" ],
+                  "format" : "int32",
+                  "pattern" : "([0-9]+)",
+                  "description" : "Number of qualified changesets"
+                },
+                "conflictCount" : {
+                  "type" : [ "integer" ],
+                  "format" : "int32",
+                  "pattern" : "([0-9]+)",
+                  "description" : "Number of conflicting changesets"
+                },
+                "qualified" : {
+                  "$ref" : "#/components/schemas/qualifiedSandboxChangeset",
+                  "description" : "Validated changesets that are qualified for deployment"
+                },
+                "conflicts" : {
+                  "$ref" : "#/components/schemas/conflictSandboxChangeset",
+                  "description" : "Changesets that have conflicts"
+                }
+              },
+              "required" : [ "conflicts", "conflictCount", "qualified", "qualifiedCount", "totalCount" ]
+            },
+            "examples" : {
+              "Valid responses Definitions" : {
+                "value" : {
+                  "totalCount" : 2,
+                  "qualifiedCount" : 1,
+                  "conflictCount" : 1,
+                  "qualified" : [ {
+                    "actor" : {
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/3000000000375/photo?orgId=123456",
+                      "firstName" : "",
+                      "lastName" : "chan",
+                      "name" : "chan",
+                      "id" : "3000000000375"
+                    },
+                    "module" : {
+                      "apiName" : null,
+                      "displayName" : null
+                    },
+                    "eventTime" : "2023-07-20T13:59:29.000Z",
+                    "externalId" : "2000000043591",
+                    "action" : "UPDATE",
+                    "department" : {
+                      "name" : "chanSpecCompany",
+                      "id" : "3000000025632"
+                    },
+                    "entity" : {
+                      "name" : "Time Tracking",
+                      "id" : "3000000043591",
+                      "type" : "Time Tracking"
+                    },
+                    "changeSetId" : "3000000133001"
+                  } ],
+                  "conflicts" : [ {
+                    "actor" : {
+                      "photoURL" : "https://desk.zoho.com/api/v1/agents/3000000000375/photo?orgId=123456",
+                      "firstName" : "",
+                      "lastName" : "chan",
+                      "name" : "chan",
+                      "id" : "3000000000375"
+                    },
+                    "module" : {
+                      "apiName" : "tickets",
+                      "displayName" : "Tickets"
+                    },
+                    "eventTime" : "2023-07-20T13:58:58.000Z",
+                    "externalId" : null,
+                    "action" : "ADD",
+                    "department" : null,
+                    "entity" : {
+                      "name" : "Single Line 2",
+                      "id" : "3000000134003",
+                      "type" : "Fields"
+                    },
+                    "changeSetId" : "3000000134017",
+                    "conflictMessages" : [ "This ChangeSet has Internal Conflicts" ]
+                  } ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "cookie-auth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/cookie-auth"
+      },
+      "org-oauth" : {
+        "$ref" : "./Common.json#/components/securitySchemes/org-oauth"
+      },
+      "iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      }
+    }
+  },
+  "x-entity" : "SandboxDeployment"
+}

@@ -9,7 +9,7 @@
       "get" : {
         "tags" : [ "AccountDeduplication" ],
         "summary" : "Get Default Field Name",
-        "description" : "This API fetches the name of the field set as the default field for account deduplication.",
+        "description" : "Retrieves the name of the field set as the default field for account deduplication.",
         "operationId" : "getDefaultFieldNameForAccountDeduplication",
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -20,13 +20,15 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.contacts.READ" ]
+          "iam-oauth2-schema" : [ "Desk.accounts.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.contacts.READ" ]
         } ]
       },
       "post" : {
         "tags" : [ "AccountDeduplication" ],
-        "summary" : "Set default field for account deduplication",
-        "description" : "This API sets the field you specify as the default field for deduplicating accounts.",
+        "summary" : "Set Default Field",
+        "description" : "Sets the specified field as the default field for account deduplication.",
         "operationId" : "setDefaultFieldNameForAccountDeduplication",
         "parameters" : [ {
           "$ref" : "./Common.json#/components/parameters/orgId"
@@ -46,25 +48,28 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.contacts.UPDATE" ]
+          "iam-oauth2-schema" : [ "Desk.accounts.UPDATE" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.contacts.UPDATE" ]
         } ]
       }
     },
     "/api/v1/groupAccountDuplicateValues" : {
       "get" : {
         "tags" : [ "AccountDeduplication" ],
-        "summary" : "List duplicate accounts",
-        "description" : "This API lists the duplicate entries of an account.The _fieldName_ parameters is mandatory in the API request   <br/></br/>_Note:_<br/> If you encounter a 202 status code while executing this API request, it means there are 100,000 or more accounts in the help desk portal. Matching the records and finding duplicates will be time-consuming in such a scenario. Therefore, the deduplication request will be accepted, and after the process is completed, an automated report will be sent to the user who initiated the deduplication.",
+        "summary" : "Get Duplicate Accounts",
+        "description" : "Retrieves duplicate account groups based on the specified field, with pagination support.\n\nNote: If the API returns a 202 status code, it means there are 100,000 or more accounts in the help desk portal. Matching records and finding duplicates is time-consuming in such scenarios, so the deduplication request is accepted and processed in the background. An automated report is sent to the user who initiated the deduplication once the process is complete.",
         "operationId" : "listGroupedDuplicateAccounts",
         "parameters" : [ {
           "name" : "fieldName",
           "in" : "query",
-          "description" : "Name of the field whose values must be matched for deduplication.Values allowed are: !@email,@! !@phone,@! and !@accountName@!",
+          "description" : "Name of the field whose values must be matched for deduplication. Values allowed are: email, phone, and accountName",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
+            "maxLength" : 100,
             "enum" : [ "email", "phone", "accountName" ],
             "pattern" : "^(email|phone|accountName)"
           }
@@ -110,12 +115,13 @@
         }, {
           "name" : "sortBy",
           "in" : "query",
-          "description" : "Key that sorts the accounts by a specific attribute: @count@ or @fieldValue@. The default sorting order is ascending. A @-@ prefix denotes descending order of sorting.",
+          "description" : "Key that sorts the accounts by a specific attribute: count or fieldValue. The default sorting order is ascending. A - prefix denotes descending order of sorting.",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
+            "maxLength" : 100,
             "enum" : [ "count", "fieldValue" ],
             "pattern" : "-?(count|fieldValue)"
           }
@@ -131,25 +137,28 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.contacts.READ" ]
+          "iam-oauth2-schema" : [ "Desk.accounts.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.contacts.READ" ]
         } ]
       }
     },
     "/api/v1/groupAccounts" : {
       "get" : {
         "tags" : [ "AccountDeduplication" ],
-        "summary" : "List details of duplicate accounts",
-        "description" : "This API lists all the details of duplicate accounts.The _fieldName_ and _fieldValues_ parameters are mandatory in the API request",
+        "summary" : "Get Duplicate Account Details",
+        "description" : "Retrieves full details of duplicate accounts grouped by the specified field value, with pagination support.",
         "operationId" : "listDuplicateAccounts",
         "parameters" : [ {
           "name" : "fieldName",
           "in" : "query",
-          "description" : "Name of the field whose values must be matched for deduplication.Values allowed are: !@email,@! !@phone,@! and !@accountName@!",
+          "description" : "Name of the field whose values must be matched for deduplication. Values allowed are: email, phone, and accountName",
           "required" : true,
           "style" : "form",
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
+            "maxLength" : 100,
             "enum" : [ "email", "phone", "accountName" ],
             "pattern" : "^(email|phone|accountName)"
           }
@@ -170,13 +179,14 @@
         }, {
           "name" : "sortBy",
           "in" : "query",
-          "description" : "Key that sorts the accounts by a specific attribute: @accountName@ or @createdTime@ or @modifiedTime@. The default sorting order is ascending. A @-@ prefix denotes descending order of sorting.",
+          "description" : "Key that sorts the accounts by a specific attribute: accountName or createdTime or modifiedTime. The default sorting order is ascending. A - prefix denotes descending order of sorting.",
           "required" : false,
           "style" : "form",
           "explode" : true,
           "schema" : {
             "type" : [ "string" ],
-            "enum" : [ "accountName", "createdTime" ],
+            "maxLength" : 100,
+            "enum" : [ "accountName", "createdTime", "modifiedTime" ],
             "pattern" : "-?(website|email|phone|accountName|createdTime|modifiedTime)"
           }
         }, {
@@ -216,7 +226,9 @@
           }
         },
         "security" : [ {
-          "iam-oauth2-schema" : [ "Desk.contacts.READ" ]
+          "iam-oauth2-schema" : [ "Desk.accounts.READ" ]
+        }, {
+          "deprecated-iam-oauth2-schema" : [ "Desk.contacts.READ" ]
         } ]
       }
     }
@@ -237,6 +249,7 @@
             "$ref" : "#/components/schemas/accountsArray"
           },
           "fieldValue" : {
+            "description" : "Field value shared among the duplicate accounts",
             "type" : [ "string", "null" ],
             "maxLength" : 100,
             "minLength" : 0
@@ -261,6 +274,7 @@
               "additionalProperties" : false,
               "properties" : {
                 "fieldName" : {
+                  "description" : "Name of the default field set for account deduplication. Accepted values: email, phone, accountName",
                   "type" : [ "string", "null" ],
                   "enum" : [ "email", "phone", "accountName", null ]
                 }
@@ -346,7 +360,7 @@
                       "website" : "112121",
                       "accountName" : "Admin Account",
                       "phone" : "121212",
-                      "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Accounts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
+                      "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Accounts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
                       "createdTime" : 1424105864000,
                       "zohoCRMAccount" : null,
                       "id" : "1892000000052077",
@@ -355,7 +369,7 @@
                       "website" : "112121",
                       "accountName" : "Admin Account",
                       "phone" : "121212",
-                      "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Accounts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
+                      "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Accounts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
                       "createdTime" : 1424105864000,
                       "zohoCRMAccount" : null,
                       "id" : "1892000000052077",
@@ -367,7 +381,7 @@
                       "website" : "112121",
                       "accountName" : "Agent Account",
                       "phone" : "121212",
-                      "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Accounts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
+                      "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Accounts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
                       "createdTime" : 1424105864000,
                       "zohoCRMAccount" : {
                         "id" : "32754000000537001"
@@ -378,7 +392,7 @@
                       "website" : "112121",
                       "accountName" : "Agent Account",
                       "phone" : "121212",
-                      "webUrl" : "https://desk.example.com/support/zylker/ShowHomePage.do#Accounts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
+                      "webUrl" : "https://desk.zoho.com/support/zylker/ShowHomePage.do#Accounts/dv/d126330fb061247d9ebddaeb9d93ba74750b0284bc703b38",
                       "createdTime" : 1424105864000,
                       "zohoCRMAccount" : {
                         "id" : "32754000000537001"
@@ -404,11 +418,13 @@
               "additionalProperties" : false,
               "properties" : {
                 "fieldName" : {
+                  "description" : "Name of the field to set as the default for deduplication. Accepted values: email, phone, accountName",
                   "type" : [ "string" ],
                   "enum" : [ "email", "phone", "accountName" ],
                   "pattern" : "^(email|phone|accountName)"
                 },
                 "markDefault" : {
+                  "description" : "Indicates whether to set or remove the field as the default. Accepted values: true = set the field as default, false = remove the field from default",
                   "type" : [ "boolean" ]
                 }
               },
@@ -435,7 +451,11 @@
       },
       "iam-oauth2-schema" : {
         "$ref" : "./Common.json#/components/securitySchemes/iam-oauth2-schema"
+      },
+      "deprecated-iam-oauth2-schema" : {
+        "$ref" : "./Common.json#/components/securitySchemes/deprecated-iam-oauth2-schema"
       }
     }
-  }
+  },
+  "x-entity" : "AccountDeduplication"
 }
